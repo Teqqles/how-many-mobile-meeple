@@ -56,10 +56,14 @@ class _MyHomePageState extends State<HomePage> {
                   children: <Widget>[
                     Container(
                       width: MediaQuery.of(context).size.width * 0.65,
-                      child: TextFormField(
-                        controller: controller,
-                        decoration: InputDecoration(
-                          hintText: "bgg username/geeklist id",
+                      child: ScopedModelDescendant<AppModel>(
+                        builder: (context, child, model) => TextFormField(
+                          enabled: model.items.length < 5,
+                          controller: controller,
+                          decoration: InputDecoration(
+                            hintText:
+                            model.items.length < 5 ? "bgg username/geeklist id" : "max items entered",
+                          ),
                         ),
                       ),
                     ),
@@ -72,7 +76,9 @@ class _MyHomePageState extends State<HomePage> {
                             if (controller.text.length == 0) return;
                             Item item = Item(controller.text);
                             model.addItem(item);
-                            setState(() => controller.text = '');
+                            setState(() {
+                              controller.text = '';
+                            });
                           },
                         ),
                       ),
@@ -88,8 +94,6 @@ class _MyHomePageState extends State<HomePage> {
                   padding: const EdgeInsets.all(8.0),
                   child: Text("Players?", textAlign: TextAlign.left),
                 ),
-                Icon(Icons.person,
-                    color: Theme.of(context).accentColor, size: 20),
                 Container(
                   width: MediaQuery.of(context).size.width * 0.60,
                   child: Slider(
@@ -97,25 +101,78 @@ class _MyHomePageState extends State<HomePage> {
                       min: 1.0,
                       max: 10.0,
                       divisions: 10,
-                      onChanged: (newRating) {
-                        setState(() =>
-                            model.settings.playerCount = newRating.floor());
+                      onChanged: (players) {
+                        setState(
+                            () => model.settings.playerCount = players.floor());
                       },
                       value: model.settings.playerCount.roundToDouble(),
                       label:
                           model.settings.playerCount.toString() + " players"),
                 ),
-                Icon(Icons.people,
-                    color: Theme.of(context).accentColor, size: 20),
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Container(
-                    decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Theme.of(context).accentColor),
+                    decoration: ShapeDecoration(
+                        color: Theme.of(context).accentColor,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8.0),
+                        )),
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Text(model.settings.playerCount.toString(),
+                          textAlign: TextAlign.right,
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Theme.of(context).selectedRowColor)),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          ScopedModelDescendant<AppModel>(
+            builder: (context, child, model) => Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: <Widget>[
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text("Time?", textAlign: TextAlign.left),
+                ),
+                Container(
+                  width: MediaQuery.of(context).size.width * 0.55,
+                  child: RangeSlider(
+                    activeColor: Theme.of(context).accentColor,
+                    min: 15.0,
+                    max: 300.0,
+                    divisions: 19,
+                    onChanged: (time) {
+                      setState(() {
+                        model.settings.minTime = time.start.floor();
+                        model.settings.maxTime = time.end.floor();
+                      });
+                    },
+                    values: RangeValues(model.settings.minTime.floorToDouble(),
+                        model.settings.maxTime.floorToDouble()),
+                    labels: RangeLabels(
+                        model.settings.minTime.toString() + " mins",
+                        model.settings.maxTime.toString() + " mins"),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Container(
+                    decoration: ShapeDecoration(
+                        color: Theme.of(context).accentColor,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8.0),
+                        )),
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                          model.settings.minTime.toString() +
+                              " - " +
+                              model.settings.maxTime.toString() +
+                              " mins",
                           textAlign: TextAlign.right,
                           style: TextStyle(
                               fontWeight: FontWeight.bold,

@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_splash_screen/flutter_splash_screen.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:scoped_multi_example/randomgamedisplay.dart';
 
@@ -14,6 +15,18 @@ class HomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<HomePage> {
   TextEditingController controller = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    hideScreen();
+  }
+
+  Future<void> hideScreen() async {
+    Future.delayed(Duration(milliseconds: 3600), () {
+      FlutterSplashScreen.hide();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {

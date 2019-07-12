@@ -2,8 +2,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_splash_screen/flutter_splash_screen.dart';
 import 'package:scoped_model/scoped_model.dart';
-import 'package:scoped_multi_example/randomgamedisplay.dart';
+import 'package:scoped_multi_example/random_game_display.dart';
 
+import 'game_config.dart';
+import 'how_many_meeple_app_bar.dart';
 import 'model.dart';
 
 class HomePage extends StatefulWidget {
@@ -13,8 +15,11 @@ class HomePage extends StatefulWidget {
   _MyHomePageState createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<HomePage> {
+class _MyHomePageState extends State<HomePage> with GameConfig {
   TextEditingController controller = TextEditingController();
+
+  static const String itemHintTextMessage = "bgg username/geeklist id";
+  static const String maxItemsMessage = "max items entered";
 
   @override
   void initState() {
@@ -31,45 +36,34 @@ class _MyHomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: buildHowManyMeepleAppbar('Game Options'),
-        floatingActionButton: FloatingActionButton.extended(
-          onPressed: () {
-            Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (context) => RandomGameDisplayPage(),
-              ),
-            );
-          },
-          icon: SizedBox(
-            height: 42,
-            width: 42,
-            child: Image.asset('lib/images/dice.png'),
-          ),
-          label: Text("Random Game"),
-        ),
+        appBar: HowManyMeepleAppBar(GameConfig.optionsPageTitle),
+        floatingActionButton: floatingRandomGameButton(context),
         body: Column(children: <Widget>[
           Align(
               alignment: Alignment.centerLeft,
               child: Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: GameConfig.defaultPadding,
                 child: Row(
                   children: <Widget>[
                     Container(
                       width: MediaQuery.of(context).size.width * 0.65,
                       child: ScopedModelDescendant<AppModel>(
                         builder: (context, child, model) => TextFormField(
-                          enabled: model.items.length < 5,
+                          enabled:
+                              model.items.length < GameConfig.maxItemsFromBgg,
                           controller: controller,
                           decoration: InputDecoration(
                             hintText:
-                            model.items.length < 5 ? "bgg username/geeklist id" : "max items entered",
+                                model.items.length < GameConfig.maxItemsFromBgg
+                                    ? itemHintTextMessage
+                                    : maxItemsMessage,
                           ),
                         ),
                       ),
                     ),
                     ScopedModelDescendant<AppModel>(
                       builder: (context, child, model) => Padding(
-                        padding: const EdgeInsets.all(8.0),
+                        padding: GameConfig.defaultPadding,
                         child: RaisedButton(
                           child: Text('Add'),
                           onPressed: () {
@@ -91,7 +85,7 @@ class _MyHomePageState extends State<HomePage> {
               mainAxisAlignment: MainAxisAlignment.start,
               children: <Widget>[
                 Padding(
-                  padding: const EdgeInsets.all(8.0),
+                  padding: GameConfig.defaultPadding,
                   child: Text("Players?", textAlign: TextAlign.left),
                 ),
                 Container(
@@ -110,7 +104,7 @@ class _MyHomePageState extends State<HomePage> {
                           model.settings.playerCount.toString() + " players"),
                 ),
                 Padding(
-                  padding: const EdgeInsets.all(8.0),
+                  padding: GameConfig.defaultPadding,
                   child: Container(
                     decoration: ShapeDecoration(
                         color: Theme.of(context).accentColor,
@@ -118,7 +112,7 @@ class _MyHomePageState extends State<HomePage> {
                           borderRadius: BorderRadius.circular(8.0),
                         )),
                     child: Padding(
-                      padding: const EdgeInsets.all(8.0),
+                      padding: GameConfig.defaultPadding,
                       child: Text(model.settings.playerCount.toString(),
                           textAlign: TextAlign.right,
                           style: TextStyle(
@@ -135,7 +129,7 @@ class _MyHomePageState extends State<HomePage> {
               mainAxisAlignment: MainAxisAlignment.start,
               children: <Widget>[
                 Padding(
-                  padding: const EdgeInsets.all(8.0),
+                  padding: GameConfig.defaultPadding,
                   child: Text("Time?", textAlign: TextAlign.left),
                 ),
                 Container(
@@ -159,7 +153,7 @@ class _MyHomePageState extends State<HomePage> {
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.all(8.0),
+                  padding: GameConfig.defaultPadding,
                   child: Container(
                     decoration: ShapeDecoration(
                         color: Theme.of(context).accentColor,
@@ -167,7 +161,7 @@ class _MyHomePageState extends State<HomePage> {
                           borderRadius: BorderRadius.circular(8.0),
                         )),
                     child: Padding(
-                      padding: const EdgeInsets.all(8.0),
+                      padding: GameConfig.defaultPadding,
                       child: Text(
                           model.settings.minTime.toString() +
                               " - " +
@@ -187,19 +181,21 @@ class _MyHomePageState extends State<HomePage> {
         ]));
   }
 
-  AppBar buildHowManyMeepleAppbar(String subtitle) {
-    return AppBar(
-      title: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Text('How Many Meeple?'),
-          Text(
-            subtitle,
-            style: TextStyle(fontSize: 12),
+  FloatingActionButton floatingRandomGameButton(BuildContext context) {
+    return FloatingActionButton.extended(
+      onPressed: () {
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => RandomGameDisplayPage(),
           ),
-        ],
+        );
+      },
+      icon: SizedBox(
+        height: 42,
+        width: 42,
+        child: Image.asset('lib/images/dice.png'),
       ),
+      label: Text("Random Game"),
     );
   }
 

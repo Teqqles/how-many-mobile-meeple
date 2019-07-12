@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:scoped_model/scoped_model.dart';
 
 import 'package:scoped_multi_example/model.dart';
-import 'package:scoped_multi_example/randomgamedisplay.dart';
+import 'package:scoped_multi_example/random_game_display.dart';
 
 import 'homepage.dart';
 

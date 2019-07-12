@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 
 import 'package:scoped_model/scoped_model.dart';
@@ -12,8 +14,16 @@ void main() => runApp(MyApp());
 class MyApp extends StatelessWidget {
   final routes = <String, WidgetBuilder>{
     HomePage.route: (BuildContext context) => HomePage(),
-    RandomGameDisplayPage.route: (BuildContext context) => RandomGameDisplayPage(),
+    RandomGameDisplayPage.route: (BuildContext context) =>
+        RandomGameDisplayPage(),
   };
+
+  List<Color> swatchList = [Colors.green, Colors.red, Colors.blue];
+
+  Color randomPrimaryColor() {
+    int swatchIndex = Random().nextInt(swatchList.length);
+    return swatchList[swatchIndex];
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -22,13 +32,10 @@ class MyApp extends StatelessWidget {
         child: MaterialApp(
           title: 'How Many Meeple?',
           theme: ThemeData(
-            primarySwatch: Colors.blue,
+            primarySwatch: randomPrimaryColor(),
           ),
           home: HomePage(),
           routes: routes,
-        )
-
-        );
+        ));
   }
 }
-

@@ -16,7 +16,7 @@ class RandomGameDisplayPage extends StatelessWidget {
           title: Text('Users/GeekLists'),
           actions: <Widget>[
             RaisedButton(
-              child: Text('Back Home'),
+              child: Text('Change Options'),
               onPressed: () {
                 Navigator
                     .of(context)

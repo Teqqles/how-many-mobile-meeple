@@ -167,7 +167,7 @@ class _MyHomePageState extends State<HomePage> with GameConfig, AppPage {
                   )),
               child: AppDefaultPadding(
                 child: Text(
-                    "${model.settings.minTime.toString()} - ${model.settings.maxTime.toString()} mins",
+                    "${model.settings.minTime.toString()}-${model.settings.maxTime.toString()} mins",
                     textAlign: TextAlign.right,
                     style: TextStyle(
                         fontWeight: FontWeight.bold,

@@ -2,8 +2,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_splash_screen/flutter_splash_screen.dart';
 import 'package:scoped_model/scoped_model.dart';
-import 'package:scoped_multi_example/random_game_display.dart';
 
+import 'app_default_padding.dart';
+import 'app_page.dart';
 import 'game_config.dart';
 import 'how_many_meeple_app_bar.dart';
 import 'model.dart';
@@ -15,7 +16,7 @@ class HomePage extends StatefulWidget {
   _MyHomePageState createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<HomePage> with GameConfig {
+class _MyHomePageState extends State<HomePage> with GameConfig, AppPage {
   TextEditingController controller = TextEditingController();
 
   static const String itemHintTextMessage = "bgg username/geeklist id";
@@ -41,8 +42,7 @@ class _MyHomePageState extends State<HomePage> with GameConfig {
         body: Column(children: <Widget>[
           Align(
               alignment: Alignment.centerLeft,
-              child: Padding(
-                padding: GameConfig.defaultPadding,
+              child: AppDefaultPadding(
                 child: Row(
                   children: <Widget>[
                     Container(
@@ -62,12 +62,11 @@ class _MyHomePageState extends State<HomePage> with GameConfig {
                       ),
                     ),
                     ScopedModelDescendant<AppModel>(
-                      builder: (context, child, model) => Padding(
-                        padding: GameConfig.defaultPadding,
+                      builder: (context, child, model) => AppDefaultPadding(
                         child: RaisedButton(
                           child: Text('Add'),
                           onPressed: () {
-                            if (controller.text.length == 0) return;
+                            if (controller.text.isEmpty) return;
                             Item item = Item(controller.text);
                             model.addItem(item);
                             setState(() {
@@ -84,8 +83,7 @@ class _MyHomePageState extends State<HomePage> with GameConfig {
             builder: (context, child, model) => Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: <Widget>[
-                Padding(
-                  padding: GameConfig.defaultPadding,
+                AppDefaultPadding(
                   child: Text("Players?", textAlign: TextAlign.left),
                 ),
                 Container(
@@ -103,16 +101,14 @@ class _MyHomePageState extends State<HomePage> with GameConfig {
                       label:
                           model.settings.playerCount.toString() + " players"),
                 ),
-                Padding(
-                  padding: GameConfig.defaultPadding,
+                AppDefaultPadding(
                   child: Container(
                     decoration: ShapeDecoration(
                         color: Theme.of(context).accentColor,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8.0),
                         )),
-                    child: Padding(
-                      padding: GameConfig.defaultPadding,
+                    child: AppDefaultPadding(
                       child: Text(model.settings.playerCount.toString(),
                           textAlign: TextAlign.right,
                           style: TextStyle(
@@ -128,8 +124,7 @@ class _MyHomePageState extends State<HomePage> with GameConfig {
             builder: (context, child, model) => Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: <Widget>[
-                Padding(
-                  padding: GameConfig.defaultPadding,
+                AppDefaultPadding(
                   child: Text("Time?", textAlign: TextAlign.left),
                 ),
                 Container(
@@ -152,16 +147,14 @@ class _MyHomePageState extends State<HomePage> with GameConfig {
                         model.settings.maxTime.toString() + " mins"),
                   ),
                 ),
-                Padding(
-                  padding: GameConfig.defaultPadding,
+                AppDefaultPadding(
                   child: Container(
                     decoration: ShapeDecoration(
                         color: Theme.of(context).accentColor,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8.0),
                         )),
-                    child: Padding(
-                      padding: GameConfig.defaultPadding,
+                    child: AppDefaultPadding(
                       child: Text(
                           model.settings.minTime.toString() +
                               " - " +
@@ -181,25 +174,8 @@ class _MyHomePageState extends State<HomePage> with GameConfig {
         ]));
   }
 
-  FloatingActionButton floatingRandomGameButton(BuildContext context) {
-    return FloatingActionButton.extended(
-      onPressed: () {
-        Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (context) => RandomGameDisplayPage(),
-          ),
-        );
-      },
-      icon: SizedBox(
-        height: 42,
-        width: 42,
-        child: Image.asset('lib/images/dice.png'),
-      ),
-      label: Text("Random Game"),
-    );
-  }
-
   ScopedModelDescendant<AppModel> buildBoardGameGeekItemDisplay() {
+    var iconSize = 30.0;
     return ScopedModelDescendant<AppModel>(
       builder: (context, child, model) => Column(
         children: ListTile.divideTiles(
@@ -212,7 +188,7 @@ class _MyHomePageState extends State<HomePage> with GameConfig {
                 children: [
                   IconButton(
                       icon: Icon(Icons.person,
-                          size: 30.0,
+                          size: iconSize,
                           color: colorItem(item, ItemType.collection)),
                       onPressed: () {
                         setState(() {
@@ -221,7 +197,7 @@ class _MyHomePageState extends State<HomePage> with GameConfig {
                       }),
                   IconButton(
                       icon: Icon(Icons.format_list_bulleted,
-                          size: 30.0,
+                          size: iconSize,
                           color: colorItem(item, ItemType.geekList)),
                       onPressed: () {
                         setState(() {
@@ -231,7 +207,7 @@ class _MyHomePageState extends State<HomePage> with GameConfig {
                   IconButton(
                     icon: Icon(
                       Icons.delete,
-                      size: 30.0,
+                      size: iconSize,
                       color: Theme.of(context).errorColor,
                     ),
                     onPressed: () {
@@ -249,8 +225,8 @@ class _MyHomePageState extends State<HomePage> with GameConfig {
   }
 
   String limitTitleLength(String text) {
-    if (text.length >= 20) {
-      text = text.substring(0, 17) + "...";
+    if (text.length > 20) {
+      text = text.substring(0, 18) + "...";
     }
     return text;
   }

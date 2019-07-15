@@ -79,6 +79,13 @@ class RandomGameDisplayPage extends StatelessWidget with ScreenTools, AppPage {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               AppDefaultPadding(
+                child: Text(
+                  game.name,
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+              AppDefaultPadding(
                 child: CachedNetworkImage(
                   imageUrl: game.imageUrl,
                   imageBuilder: (context, provider) => Container(
@@ -96,11 +103,7 @@ class RandomGameDisplayPage extends StatelessWidget with ScreenTools, AppPage {
                   errorWidget: (context, url, error) => new Icon(Icons.error),
                 ),
               ),
-              Text(
-                game.name,
-                style: TextStyle(fontWeight: FontWeight.bold),
-                textAlign: TextAlign.center,
-              ),
+              shareButton(context, game),
             ]),
       ),
     );

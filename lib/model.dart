@@ -2,8 +2,10 @@ import 'package:scoped_model/scoped_model.dart';
 
 class AppModel extends Model {
   List<Item> _items = [];
+
   List<Item> get items => _items;
   Settings _settings = Settings(5, 30, 90);
+
   Settings get settings => _settings;
 
   void addItem(Item item) {
@@ -17,11 +19,11 @@ class AppModel extends Model {
 }
 
 class ItemType {
-
   static const collection = ItemType("collection");
   static const geekList = ItemType("geeklist");
 
   final String name;
+
   const ItemType(this.name);
 }
 
@@ -29,6 +31,7 @@ class Settings {
   int playerCount;
   int minTime;
   int maxTime;
+
   Settings(this.playerCount, this.minTime, this.maxTime);
 }
 

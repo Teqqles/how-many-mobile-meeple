@@ -5,6 +5,7 @@ import 'package:scoped_model/scoped_model.dart';
 
 import 'app_default_padding.dart';
 import 'app_page.dart';
+import 'disclaimer_text.dart';
 import 'game_config.dart';
 import 'how_many_meeple_app_bar.dart';
 import 'model.dart';
@@ -37,14 +38,16 @@ class _MyHomePageState extends State<HomePage> with GameConfig, AppPage {
   Widget build(BuildContext context) {
     var textFieldWidth = MediaQuery.of(context).size.width * 0.65;
     return Scaffold(
-        appBar: HowManyMeepleAppBar(GameConfig.optionsPageTitle),
-        floatingActionButton: floatingRandomGameButton(context),
-        body: Column(children: <Widget>[
-          buildBoardGameItemTextField(textFieldWidth),
-          buildPlayerSliderDisplay(),
-          buildGameDurationSliderDisplay(),
-          buildBoardGameGeekItemDisplay(),
-        ]));
+      appBar: HowManyMeepleAppBar(GameConfig.optionsPageTitle),
+      floatingActionButton: floatingRandomGameButton(context),
+      body: Column(children: <Widget>[
+        buildBoardGameItemTextField(textFieldWidth),
+        buildPlayerSliderDisplay(),
+        buildGameDurationSliderDisplay(),
+        buildBoardGameGeekItemDisplay(),
+      ]),
+      persistentFooterButtons: <Widget>[footerDisplay()],
+    );
   }
 
   ScopedModelDescendant<AppModel> buildPlayerSliderDisplay() =>
@@ -229,6 +232,14 @@ class _MyHomePageState extends State<HomePage> with GameConfig, AppPage {
       ),
     );
   }
+
+  Widget footerDisplay() => Row(
+    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+    crossAxisAlignment: CrossAxisAlignment.end,
+    children: <Widget>[
+      DisclaimerText(GameConfig.disclaimerText, context)
+    ],
+  );
 
   String limitTitleLength(String text) {
     if (text.length > 20) {

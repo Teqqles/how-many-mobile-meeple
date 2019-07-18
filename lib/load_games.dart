@@ -79,8 +79,6 @@ class Game {
       this.averageRating});
 
   factory Game.fromJson(Map<String, dynamic> json) {
-    debugPrint(json['stats']);
-    debugPrint(json['stats']['average']);
     return Game(
       name: json['name'],
       maxPlayers: json['maxplayers'],
@@ -88,7 +86,7 @@ class Game {
       maxPlaytime: json['maxplaytime'],
       imageUrl: json['image'],
       thumbnailUrl: json['thumbnail'],
-      averageRating: double.tryParse(json['stats']['average'] ?? "0") ?? 0,
+      averageRating: json['stats']['average'] ?? 0,
     );
   }
 }

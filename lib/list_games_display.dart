@@ -17,7 +17,7 @@ class ListGamesDisplay extends NetworkWidget with AppPage {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: HowManyMeepleAppBar(GameConfig.listGamesPageTitle),
-        floatingActionButton: floatingActionButtonGroup(context),
+        floatingActionButton: lightweightFloatingGroup(context),
         body: Container(child: loadNetworkContent(displayGame)));
   }
 
@@ -26,17 +26,31 @@ class ListGamesDisplay extends NetworkWidget with AppPage {
     var heading = [
       TableRow(children: [
         TableCell(
-          child: Icon(Icons.image, size: thumbnailSize),
+          verticalAlignment: TableCellVerticalAlignment.middle,
+          child: AppDefaultPadding(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: <Widget>[
+                Icon(Icons.image, size: thumbnailSize),
+              ],
+            ),
+          ),
         ),
         TableCell(
-          child:
-              Container(alignment: Alignment.centerLeft, child: Text("Name")),
+          verticalAlignment: TableCellVerticalAlignment.middle,
+          child: AppDefaultPadding(
+            child: Container(
+                alignment: Alignment.bottomLeft,
+                decoration: BoxDecoration(border: Border.all()),
+                child: Text("Name")),
+          ),
         ),
         TableCell(
+          verticalAlignment: TableCellVerticalAlignment.middle,
           child: AppDefaultPadding(
             child: Row(
                 mainAxisAlignment: MainAxisAlignment.end,
-                children: [Text("Rating"), Icon(Icons.arrow_upward)]),
+                children: [Text("Rating")]),
           ),
         ),
       ])
@@ -44,6 +58,8 @@ class ListGamesDisplay extends NetworkWidget with AppPage {
     return SingleChildScrollView(
       scrollDirection: Axis.vertical,
       child: Table(
+        defaultColumnWidth: FixedColumnWidth(60),
+        columnWidths: {1: FlexColumnWidth(4.0), 2: FlexColumnWidth(1.0)},
         children: heading +
             (games.getGamesByRating().map((game) => TableRow(children: [
                       TableCell(
@@ -70,19 +86,21 @@ class ListGamesDisplay extends NetworkWidget with AppPage {
                         ),
                       ),
                       TableCell(
+                          verticalAlignment: TableCellVerticalAlignment.middle,
                           child: AppDefaultPadding(
-                        child: Container(
-                            alignment: Alignment.centerLeft,
-                            child: Text(
-                              game.name,
-                            )),
-                      )),
+                            child: Container(
+                                alignment: Alignment.centerLeft,
+                                child: Text(
+                                  game.name,
+                                )),
+                          )),
                       TableCell(
+                          verticalAlignment: TableCellVerticalAlignment.middle,
                           child: AppDefaultPadding(
-                        child: Container(
-                            alignment: Alignment.centerRight,
-                            child: Text(game.averageRating.toString())),
-                      ))
+                            child: Container(
+                                alignment: Alignment.centerRight,
+                                child: Text(game.averageRating.toString())),
+                          ))
                     ])))
                 .toList(),
       ),

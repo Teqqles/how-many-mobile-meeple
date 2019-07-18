@@ -1,12 +1,13 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 
 import 'game_config.dart';
 import 'model.dart';
 
 class LoadGames {
-
-  static String permittedResponseFields = 'name,maxplayers,minplayers,maxplaytime,image,thumbnail';
+  static String permittedResponseFields =
+      'name,maxplayers,minplayers,maxplaytime,image,thumbnail,stats';
 
   static Future<Games> fetchGames(Settings settings, List<Item> items) async {
     Games games = new Games(games: new List<Game>());
@@ -18,8 +19,7 @@ class LoadGames {
     };
     for (Item item in items) {
       var response = await http.get(
-          "${GameConfig.boardGameGeekProxyUrl}/${item.itemType.name}/${item
-              .name}",
+          "${GameConfig.boardGameGeekProxyUrl}/${item.itemType.name}/${item.name}",
           headers: requestHeaders);
       if (response.statusCode != 200) {
         throw Exception('Failed to load games for ${item.name}');
@@ -52,6 +52,12 @@ class Games {
     games.addAll(newGames.games);
     return this;
   }
+
+  List<Game> getGamesByRating() {
+    List<Game> sortedGames = List<Game>.from(games);
+    sortedGames.sort((a, b) => b.averageRating.compareTo(a.averageRating));
+    return sortedGames;
+  }
 }
 
 class Game {
@@ -61,13 +67,16 @@ class Game {
   final int maxPlaytime;
   final String imageUrl;
   final String thumbnailUrl;
+  final double averageRating;
 
-  Game({this.name,
-    this.maxPlayers,
-    this.minPlayers,
-    this.maxPlaytime,
-    this.imageUrl,
-    this.thumbnailUrl});
+  Game(
+      {this.name,
+      this.maxPlayers,
+      this.minPlayers,
+      this.maxPlaytime,
+      this.imageUrl,
+      this.thumbnailUrl,
+      this.averageRating});
 
   factory Game.fromJson(Map<String, dynamic> json) {
     return Game(
@@ -77,6 +86,7 @@ class Game {
       maxPlaytime: json['maxplaytime'],
       imageUrl: json['image'],
       thumbnailUrl: json['thumbnail'],
+      averageRating: json['stats']['average'] ?? 0,
     );
   }
 }

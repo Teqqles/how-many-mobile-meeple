@@ -38,15 +38,15 @@ class _MyHomePageState extends State<HomePage> with GameConfig, AppPage {
   Widget build(BuildContext context) {
     var textFieldWidth = MediaQuery.of(context).size.width * 0.65;
     return Scaffold(
-      appBar: HowManyMeepleAppBar(GameConfig.optionsPageTitle),
-      floatingActionButton: floatingRandomGameButton(context),
-      body: Column(children: <Widget>[
-        buildBoardGameItemTextField(textFieldWidth),
-        buildPlayerSliderDisplay(),
-        buildGameDurationSliderDisplay(),
-        buildBoardGameGeekItemDisplay(),
-      ]),
-      persistentFooterButtons: <Widget>[footerDisplay()],
+        appBar: HowManyMeepleAppBar(GameConfig.optionsPageTitle),
+        floatingActionButton: floatingActionButtonGroup(context),
+        body: Column(children: <Widget>[
+          buildBoardGameItemTextField(textFieldWidth),
+          buildPlayerSliderDisplay(),
+          buildGameDurationSliderDisplay(),
+          buildBoardGameGeekItemDisplay(),
+        ]),
+        persistentFooterButtons: <Widget>[footerDisplay()]
     );
   }
 

@@ -64,6 +64,38 @@ abstract class AppPage {
         ],
       );
 
+  Widget lightweightFloatingGroup(BuildContext context) => Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: <Widget>[
+          AppDefaultPadding(
+            child: FloatingActionButton(
+                heroTag: listHeroTag,
+                child: Icon(
+                  Icons.format_list_numbered,
+                  size: 36,
+                ),
+                onPressed: () {
+                  var listGamesPage = materialisePage(ListGamesDisplay());
+                  loadPage(context, listGamesPage);
+                }),
+          ),
+          AppDefaultPadding(
+            child: FloatingActionButton(
+                heroTag: randomGameHeroTag,
+                onPressed: () {
+                  var randomGamePage = materialisePage(RandomGameDisplayPage());
+                  loadPage(context, randomGamePage);
+                },
+                child: SizedBox(
+                  height: _imageButtonSize,
+                  width: _imageButtonSize,
+                  child: randomGameButtonIcon,
+                )),
+          ),
+        ],
+      );
+
   RaisedButton shareButton(BuildContext context, Game game) {
     return RaisedButton(
         color: Theme.of(context).accentColor,

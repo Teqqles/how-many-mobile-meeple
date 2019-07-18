@@ -5,4 +5,5 @@ abstract class GameConfig {
   static const String randomGamePageTitle = 'Random Game';
   static const int maxItemsFromBgg = 5;
   static const String boardGameGeekProxyUrl = "http://game-selector.sixfootsoftware.com:8080";
+  static const String disclaimerText = "Powered by Board Game Geek";
 }

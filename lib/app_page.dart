@@ -19,7 +19,7 @@ abstract class AppPage {
   static const String randomGameHeroTag = "random-game";
   static const String listHeroTag = "list-games";
 
-  double _imageButtonSize = 42;
+  final double _imageButtonSize = 42;
 
   void loadPage(BuildContext context, MaterialPageRoute<dynamic> page) {
     if (Navigator.of(context).canPop()) {

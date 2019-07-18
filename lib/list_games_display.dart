@@ -6,6 +6,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'app_default_padding.dart';
 import 'app_page.dart';
 import 'game_config.dart';
+import 'heading_text.dart';
 import 'how_many_meeple_app_bar.dart';
 import 'load_games.dart';
 import 'network_content_widget.dart';
@@ -31,7 +32,8 @@ class ListGamesDisplay extends NetworkWidget with AppPage {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: <Widget>[
-                Icon(Icons.image, size: thumbnailSize),
+                Icon(Icons.image,
+                    size: thumbnailSize, color: Theme.of(context).accentColor),
               ],
             ),
           ),
@@ -41,8 +43,7 @@ class ListGamesDisplay extends NetworkWidget with AppPage {
           child: AppDefaultPadding(
             child: Container(
                 alignment: Alignment.bottomLeft,
-                decoration: BoxDecoration(border: Border.all()),
-                child: Text("Name")),
+                child: HeadingText("Name", context)),
           ),
         ),
         TableCell(
@@ -50,7 +51,7 @@ class ListGamesDisplay extends NetworkWidget with AppPage {
           child: AppDefaultPadding(
             child: Row(
                 mainAxisAlignment: MainAxisAlignment.end,
-                children: [Text("Rating")]),
+                children: [HeadingText("Rating", context)]),
           ),
         ),
       ])

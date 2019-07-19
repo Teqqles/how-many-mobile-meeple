@@ -61,16 +61,20 @@ abstract class NetworkWidget extends StatelessWidget with ScreenTools {
     ]);
   }
 
-  Widget gameDataResponse(AsyncSnapshot<Games> snapshot, BuildContext context,
-      Widget displayWidgetFn(BuildContext context, Games games)) {
+  Widget gameDataResponse(
+      AppModel model,
+      AsyncSnapshot<Games> snapshot,
+      BuildContext context,
+      Widget displayWidgetFn(BuildContext context, BggCache cachedGames)) {
     if (snapshot.data.games.isEmpty) {
       return pageErrors(context, pageErrorNoGamesAvailable);
     }
-    return displayWidgetFn(context, snapshot.data);
+    model.replaceCache(snapshot.data);
+    return displayWidgetFn(context, model.bggCache);
   }
 
   Widget loadNetworkContent(
-      Widget displayWidgetFn(BuildContext context, Games games)) {
+      Widget displayWidgetFn(BuildContext context, BggCache cachedGames)) {
     return ScopedModelDescendant<AppModel>(
       builder: (context, child, model) {
         if (model.items.isEmpty) {
@@ -80,7 +84,8 @@ abstract class NetworkWidget extends StatelessWidget with ScreenTools {
           future: LoadGames.fetchGames(model.settings, model.items),
           builder: (context, snapshot) {
             if (snapshot.hasData) {
-              return gameDataResponse(snapshot, context, displayWidgetFn);
+              return gameDataResponse(
+                  model, snapshot, context, displayWidgetFn);
             } else if (snapshot.hasError) {
               return pageErrors(context, pageErrorOneOrMoreItemsInvalid);
             }

@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -11,6 +9,7 @@ import 'app_page.dart';
 import 'game_config.dart';
 import 'how_many_meeple_app_bar.dart';
 import 'load_games.dart';
+import 'model.dart';
 import 'network_content_widget.dart';
 
 class RandomGameDisplayPage extends NetworkWidget with AppPage {
@@ -24,13 +23,8 @@ class RandomGameDisplayPage extends NetworkWidget with AppPage {
         body: Container(child: loadNetworkContent(displayGame)));
   }
 
-  Game randomGame(Games games) {
-    var selectedGame = Random().nextInt(games.games.length);
-    return games.games[selectedGame];
-  }
-
-  Widget displayGame(BuildContext context, Games games) {
-    Game game = randomGame(games);
+  Widget displayGame(BuildContext context, BggCache cachedGames) {
+    Game game = cachedGames.random;
     return Center(
       child: Container(
         width: getScreenWidthPercentageInPixels(context, ScreenTools.eightyPercentScreen),

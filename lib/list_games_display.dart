@@ -9,7 +9,7 @@ import 'app_page.dart';
 import 'game_config.dart';
 import 'heading_text.dart';
 import 'how_many_meeple_app_bar.dart';
-import 'load_games.dart';
+import 'model.dart';
 import 'network_content_widget.dart';
 
 class ListGamesDisplay extends NetworkWidget with AppPage {
@@ -23,7 +23,8 @@ class ListGamesDisplay extends NetworkWidget with AppPage {
         body: Container(child: loadNetworkContent(displayGame)));
   }
 
-  Widget displayGame(BuildContext context, Games games) {
+  Widget displayGame(
+      BuildContext context, AppModel model, BggCache cachedGames) {
     var thumbnailSize = 30.0;
     var heading = [
       TableRow(children: [
@@ -63,7 +64,7 @@ class ListGamesDisplay extends NetworkWidget with AppPage {
         defaultColumnWidth: FixedColumnWidth(60),
         columnWidths: {1: FlexColumnWidth(4.0), 2: FlexColumnWidth(1.0)},
         children: heading +
-            (games.getGamesByRating().map((game) => TableRow(
+            (cachedGames.games.getGamesByRating().map((game) => TableRow(
                         decoration: BoxDecoration(
                             border: Border(
                                 bottom: BorderSide(

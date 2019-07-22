@@ -61,33 +61,50 @@ abstract class NetworkWidget extends StatelessWidget with ScreenTools {
     ]);
   }
 
-  Widget gameDataResponse(AsyncSnapshot<Games> snapshot, BuildContext context,
-      Widget displayWidgetFn(BuildContext context, Games games)) {
+  Widget gameDataResponse(
+      AppModel model,
+      AsyncSnapshot<Games> snapshot,
+      BuildContext context,
+      Widget displayWidgetFn(
+          BuildContext context, AppModel model, BggCache cachedGames)) {
     if (snapshot.data.games.isEmpty) {
       return pageErrors(context, pageErrorNoGamesAvailable);
     }
-    return displayWidgetFn(context, snapshot.data);
+    model.replaceCache(snapshot.data);
+    return displayWidgetFn(context, model, model.bggCache);
   }
 
   Widget loadNetworkContent(
-      Widget displayWidgetFn(BuildContext context, Games games)) {
+      Widget displayWidgetFn(
+          BuildContext context, AppModel model, BggCache cachedGames)) {
     return ScopedModelDescendant<AppModel>(
       builder: (context, child, model) {
         if (model.items.isEmpty) {
           return pageErrors(context, pageErrorNoItemsSupplied);
         }
-        return FutureBuilder<Games>(
-          future: LoadGames.fetchGames(model.settings, model.items),
-          builder: (context, snapshot) {
-            if (snapshot.hasData) {
-              return gameDataResponse(snapshot, context, displayWidgetFn);
-            } else if (snapshot.hasError) {
-              return pageErrors(context, pageErrorOneOrMoreItemsInvalid);
-            }
-            // By default, show a loading spinner.
-            return pageFrameOutline(context, loadingSpinner(context));
-          },
-        );
+        return contentFromNetworkOrCache(context, model, displayWidgetFn);
+      },
+    );
+  }
+
+  Widget contentFromNetworkOrCache(
+      BuildContext context,
+      AppModel model,
+      Widget displayWidgetFn(
+          BuildContext context, AppModel model, BggCache cachedGames)) {
+    if (!model.bggCache.isStale()) {
+      return displayWidgetFn(context, model, model.bggCache);
+    }
+    return FutureBuilder<Games>(
+      future: LoadGames.fetchGames(model.settings, model.items),
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          return gameDataResponse(model, snapshot, context, displayWidgetFn);
+        } else if (snapshot.hasError) {
+          return pageErrors(context, pageErrorOneOrMoreItemsInvalid);
+        }
+        // By default, show a loading spinner.
+        return pageFrameOutline(context, loadingSpinner(context));
       },
     );
   }

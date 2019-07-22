@@ -22,7 +22,8 @@ class ListGamesDisplay extends NetworkWidget with AppPage {
         body: Container(child: loadNetworkContent(displayGame)));
   }
 
-  Widget displayGame(BuildContext context, BggCache cachedGames) {
+  Widget displayGame(
+      BuildContext context, AppModel model, BggCache cachedGames) {
     var thumbnailSize = 30.0;
     var heading = [
       TableRow(children: [

@@ -65,16 +65,18 @@ abstract class NetworkWidget extends StatelessWidget with ScreenTools {
       AppModel model,
       AsyncSnapshot<Games> snapshot,
       BuildContext context,
-      Widget displayWidgetFn(BuildContext context, BggCache cachedGames)) {
+      Widget displayWidgetFn(
+          BuildContext context, AppModel model, BggCache cachedGames)) {
     if (snapshot.data.games.isEmpty) {
       return pageErrors(context, pageErrorNoGamesAvailable);
     }
     model.replaceCache(snapshot.data);
-    return displayWidgetFn(context, model.bggCache);
+    return displayWidgetFn(context, model, model.bggCache);
   }
 
   Widget loadNetworkContent(
-      Widget displayWidgetFn(BuildContext context, BggCache cachedGames)) {
+      Widget displayWidgetFn(
+          BuildContext context, AppModel model, BggCache cachedGames)) {
     return ScopedModelDescendant<AppModel>(
       builder: (context, child, model) {
         if (model.items.isEmpty) {
@@ -85,10 +87,13 @@ abstract class NetworkWidget extends StatelessWidget with ScreenTools {
     );
   }
 
-  Widget contentFromNetworkOrCache(BuildContext context, AppModel model,
-      Widget displayWidgetFn(BuildContext context, BggCache cachedGames)) {
+  Widget contentFromNetworkOrCache(
+      BuildContext context,
+      AppModel model,
+      Widget displayWidgetFn(
+          BuildContext context, AppModel model, BggCache cachedGames)) {
     if (!model.bggCache.isStale()) {
-      return displayWidgetFn(context, model.bggCache);
+      return displayWidgetFn(context, model, model.bggCache);
     }
     return FutureBuilder<Games>(
       future: LoadGames.fetchGames(model.settings, model.items),

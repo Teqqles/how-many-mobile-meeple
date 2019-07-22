@@ -5,8 +5,10 @@ import 'package:scoped_model/scoped_model.dart';
 import 'load_games.dart';
 
 class AppModel extends Model {
+  static int _defaultCacheDurationInMinutes = 30;
+
   List<Item> _items = [];
-  BggCache _bggCache = BggCache(Games());
+  BggCache _bggCache = BggCache(Games(), _defaultCacheDurationInMinutes);
   Settings _settings = Settings(5, 30, 90);
 
   List<Item> get items => _items;
@@ -18,7 +20,7 @@ class AppModel extends Model {
   void addItem(Item item) => _items.add(item);
 
   void replaceCache(Games games) {
-    _bggCache = BggCache(games);
+    _bggCache = BggCache(games, _defaultCacheDurationInMinutes);
     notifyListeners();
   }
 
@@ -39,8 +41,12 @@ class ItemType {
 
 class BggCache {
   Games _games;
+  int _durationMinutes;
+  int _cacheTimestamp;
 
   Games get games => _games;
+
+  int get durationInMinutes => _durationMinutes;
   Game _stickyRandom;
 
   Game get random {
@@ -51,7 +57,17 @@ class BggCache {
 
   Game get lastRandom => _stickyRandom ?? random;
 
-  BggCache(this._games);
+  BggCache(this._games, this._durationMinutes) {
+    this._cacheTimestamp =
+        epochToSeconds(DateTime.now().millisecondsSinceEpoch) +
+            (this.durationInMinutes * 60);
+  }
+
+  int epochToSeconds(int millisEpoch) => (millisEpoch / 1000).floor();
+
+  bool isStale() =>
+      this._cacheTimestamp <
+      epochToSeconds(DateTime.now().millisecondsSinceEpoch);
 }
 
 class Settings {

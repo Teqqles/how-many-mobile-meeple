@@ -90,6 +90,9 @@ class Settings {
   int minTime;
   int maxTime;
 
+  bool playerFilterEnabled = false;
+  bool timeFilterEnabled = false;
+
   Settings(this.playerCount, this.minTime, this.maxTime);
 }
 

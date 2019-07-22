@@ -40,52 +40,80 @@ class _MyHomePageState extends State<HomePage> with GameConfig, AppPage {
     return Scaffold(
         appBar: HowManyMeepleAppBar(GameConfig.optionsPageTitle),
         floatingActionButton: floatingActionButtonGroup(context),
-        body: Column(children: <Widget>[
+        body: SingleChildScrollView(
+            child: Column(children: <Widget>[
           buildBoardGameItemTextField(textFieldWidth),
           buildPlayerSliderDisplay(),
           buildGameDurationSliderDisplay(),
           buildBoardGameGeekItemDisplay(),
-        ]),
+        ])),
         persistentFooterButtons: <Widget>[footerDisplay()]);
   }
 
   ScopedModelDescendant<AppModel> buildPlayerSliderDisplay() =>
       ScopedModelDescendant<AppModel>(
-        builder: (context, child, model) => Row(
-          mainAxisAlignment: MainAxisAlignment.start,
+        builder: (context, child, model) => Column(
           children: <Widget>[
-            AppDefaultPadding(
-              child: Text("Players?", textAlign: TextAlign.left),
-            ),
             Container(
-              width: MediaQuery.of(context).size.width * 0.60,
-              child: Slider(
-                  activeColor: Theme.of(context).accentColor,
-                  min: 1.0,
-                  max: 10.0,
-                  divisions: 10,
-                  onChanged: (players) {
-                    setState(
-                        () => model.settings.playerCount = players.floor());
-                  },
-                  value: model.settings.playerCount.roundToDouble(),
-                  label: "${model.settings.playerCount.toString()} players"),
-            ),
-            AppDefaultPadding(
-              child: Container(
-                decoration: ShapeDecoration(
-                    color: Theme.of(context).accentColor,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8.0),
-                    )),
-                child: AppDefaultPadding(
-                  child: Text(model.settings.playerCount.toString(),
-                      textAlign: TextAlign.right,
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Theme.of(context).selectedRowColor)),
-                ),
+              color: Theme.of(context).highlightColor,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  AppDefaultPadding(
+                    child: Text("Players?", textAlign: TextAlign.left),
+                  ),
+                  Switch(
+                      onChanged: (bool value) {
+                        setState(() {
+                          model.settings.playerFilterEnabled = value;
+                          model.invalidateCache();
+                        });
+                      },
+                      value: model.settings.playerFilterEnabled)
+                ],
               ),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: <Widget>[
+                Container(
+                  width: MediaQuery.of(context).size.width * 0.60,
+                  child: Slider(
+                      activeColor: Theme.of(context).accentColor,
+                      min: 1.0,
+                      max: 10.0,
+                      divisions: 10,
+                      onChanged: !model.settings.playerFilterEnabled
+                          ? null
+                          : (players) {
+                              setState(() {
+                                model.settings.playerCount = players.floor();
+                                model.invalidateCache();
+                              });
+                            },
+                      value: model.settings.playerCount.roundToDouble(),
+                      label:
+                          "${model.settings.playerCount.toString()} players"),
+                ),
+                AppDefaultPadding(
+                  child: Container(
+                    decoration: ShapeDecoration(
+                        color: model.settings.playerFilterEnabled
+                            ? Theme.of(context).accentColor
+                            : Theme.of(context).disabledColor,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8.0),
+                        )),
+                    child: AppDefaultPadding(
+                      child: Text(model.settings.playerCount.toString(),
+                          textAlign: TextAlign.right,
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Theme.of(context).selectedRowColor)),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ],
         ),
@@ -130,52 +158,78 @@ class _MyHomePageState extends State<HomePage> with GameConfig, AppPage {
       ));
 
   ScopedModelDescendant<AppModel> buildGameDurationSliderDisplay() {
-    var sliderWidth = MediaQuery.of(context).size.width * 0.55;
+    var sliderWidth = MediaQuery.of(context).size.width * 0.60;
     var sliderMinValue = 15.0;
     var sliderMaxValue = 300.0;
     var sliderSteps = 19;
     return ScopedModelDescendant<AppModel>(
-      builder: (context, child, model) => Row(
-        mainAxisAlignment: MainAxisAlignment.start,
+      builder: (context, child, model) => Column(
         children: <Widget>[
-          AppDefaultPadding(
-            child: Text("Time?", textAlign: TextAlign.left),
-          ),
           Container(
-            width: sliderWidth,
-            child: RangeSlider(
-              activeColor: Theme.of(context).accentColor,
-              min: sliderMinValue,
-              max: sliderMaxValue,
-              divisions: sliderSteps,
-              onChanged: (time) {
-                setState(() {
-                  model.settings.minTime = time.start.floor();
-                  model.settings.maxTime = time.end.floor();
-                });
-              },
-              values: RangeValues(model.settings.minTime.floorToDouble(),
-                  model.settings.maxTime.floorToDouble()),
-              labels: RangeLabels("${model.settings.minTime.toString()} mins",
-                  "${model.settings.maxTime.toString()} mins"),
+            color: Theme.of(context).highlightColor,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                AppDefaultPadding(
+                  child: Text("Time?", textAlign: TextAlign.left),
+                ),
+                Switch(
+                    onChanged: (bool value) {
+                      setState(() {
+                        model.settings.timeFilterEnabled = value;
+                        model.invalidateCache();
+                      });
+                    },
+                    value: model.settings.timeFilterEnabled)
+              ],
             ),
           ),
-          AppDefaultPadding(
-            child: Container(
-              decoration: ShapeDecoration(
-                  color: Theme.of(context).accentColor,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8.0),
-                  )),
-              child: AppDefaultPadding(
-                child: Text(
-                    "${model.settings.minTime.toString()}-${model.settings.maxTime.toString()} mins",
-                    textAlign: TextAlign.right,
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Theme.of(context).selectedRowColor)),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: <Widget>[
+              Container(
+                width: sliderWidth,
+                child: RangeSlider(
+                  activeColor: Theme.of(context).accentColor,
+                  min: sliderMinValue,
+                  max: sliderMaxValue,
+                  divisions: sliderSteps,
+                  onChanged: !model.settings.timeFilterEnabled
+                      ? null
+                      : (time) {
+                          setState(() {
+                            model.settings.minTime = time.start.floor();
+                            model.settings.maxTime = time.end.floor();
+                            model.invalidateCache();
+                          });
+                        },
+                  values: RangeValues(model.settings.minTime.floorToDouble(),
+                      model.settings.maxTime.floorToDouble()),
+                  labels: RangeLabels(
+                      "${model.settings.minTime.toString()} mins",
+                      "${model.settings.maxTime.toString()} mins"),
+                ),
               ),
-            ),
+              AppDefaultPadding(
+                child: Container(
+                  decoration: ShapeDecoration(
+                      color: model.settings.timeFilterEnabled
+                          ? Theme.of(context).accentColor
+                          : Theme.of(context).disabledColor,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8.0),
+                      )),
+                  child: AppDefaultPadding(
+                    child: Text(
+                        "${model.settings.minTime.toString()}-${model.settings.maxTime.toString()} mins",
+                        textAlign: TextAlign.right,
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Theme.of(context).selectedRowColor)),
+                  ),
+                ),
+              ),
+            ],
           ),
         ],
       ),
@@ -186,48 +240,57 @@ class _MyHomePageState extends State<HomePage> with GameConfig, AppPage {
     var iconSize = 30.0;
     return ScopedModelDescendant<AppModel>(
       builder: (context, child, model) => Column(
-        children: ListTile.divideTiles(
-          context: context,
-          tiles: model.items.map(
-            (item) => ListTile(
-              title: Text(limitTitleLength(item.name)),
-              trailing: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  IconButton(
-                      icon: Icon(Icons.person,
+        children: <Widget>[
+          Container(
+              color: Theme.of(context).highlightColor,
+              child: AppDefaultPadding(
+                child: Row(children: [Text("Usernames/Geeklists Selected")]),
+              )),
+          Column(
+            children: ListTile.divideTiles(
+              context: context,
+              tiles: model.items.map(
+                (item) => ListTile(
+                  title: Text(limitTitleLength(item.name)),
+                  trailing: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      IconButton(
+                          icon: Icon(Icons.person,
+                              size: iconSize,
+                              color: colorItem(item, ItemType.collection)),
+                          onPressed: () {
+                            setState(() {
+                              item.itemType = ItemType.collection;
+                            });
+                          }),
+                      IconButton(
+                          icon: Icon(Icons.format_list_bulleted,
+                              size: iconSize,
+                              color: colorItem(item, ItemType.geekList)),
+                          onPressed: () {
+                            setState(() {
+                              item.itemType = ItemType.geekList;
+                            });
+                          }),
+                      IconButton(
+                        icon: Icon(
+                          Icons.delete,
                           size: iconSize,
-                          color: colorItem(item, ItemType.collection)),
-                      onPressed: () {
-                        setState(() {
-                          item.itemType = ItemType.collection;
-                        });
-                      }),
-                  IconButton(
-                      icon: Icon(Icons.format_list_bulleted,
-                          size: iconSize,
-                          color: colorItem(item, ItemType.geekList)),
-                      onPressed: () {
-                        setState(() {
-                          item.itemType = ItemType.geekList;
-                        });
-                      }),
-                  IconButton(
-                    icon: Icon(
-                      Icons.delete,
-                      size: iconSize,
-                      color: Theme.of(context).errorColor,
-                    ),
-                    onPressed: () {
-                      model.deleteItem(item);
-                    },
+                          color: Theme.of(context).errorColor,
+                        ),
+                        onPressed: () {
+                          model.deleteItem(item);
+                        },
+                      ),
+                    ],
+                    mainAxisSize: MainAxisSize.min,
                   ),
-                ],
-                mainAxisSize: MainAxisSize.min,
+                ),
               ),
-            ),
+            ).toList(),
           ),
-        ).toList(),
+        ],
       ),
     );
   }

@@ -8,6 +8,7 @@ import 'package:scoped_multi_example/model.dart';
 import 'package:scoped_multi_example/random_game_display.dart';
 
 import 'homepage.dart';
+import 'meeple_theme.dart';
 
 void main() => runApp(MyApp());
 
@@ -18,21 +19,26 @@ class MyApp extends StatelessWidget {
         RandomGameDisplayPage(),
   };
 
-  List<Color> swatchList = [Colors.green, Colors.red, Colors.blue];
+  List<Color> swatchList = [
+    MeepleTheme.meepleBlue,
+    MeepleTheme.meepleGreen,
+    MeepleTheme.meepleRed
+  ];
 
-  Color randomPrimaryColor() {
+  Color randomThemeColor() {
     int swatchIndex = Random().nextInt(swatchList.length);
     return swatchList[swatchIndex];
   }
 
   @override
   Widget build(BuildContext context) {
+    var swatch = randomThemeColor();
     return ScopedModel<AppModel>(
         model: AppModel(),
         child: MaterialApp(
           title: 'How Many Meeple?',
           theme: ThemeData(
-            primarySwatch: randomPrimaryColor(),
+            primarySwatch: swatch,
           ),
           home: HomePage(),
           routes: routes,

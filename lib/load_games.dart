@@ -9,13 +9,18 @@ class LoadGames {
       'name,maxplayers,minplayers,maxplaytime,image,thumbnail,stats';
 
   static Future<Games> fetchGames(Settings settings, List<Item> items) async {
-    Games games = new Games(gamesByName: new Map<String, Game>());
-    Map<String, String> requestHeaders = {
-      'Bgg-Filter-Player-Count': settings.playerCount.toString(),
-      'Bgg-Filter-Min-Duration': settings.minTime.toString(),
-      'Bgg-Filter-Max-Duration': settings.maxTime.toString(),
-      'Bgg-Field-Whitelist': permittedResponseFields
-    };
+    Games games = new Games(gamesByName: Map<String, Game>());
+    Map<String, String> requestHeaders = Map<String, String>();
+    requestHeaders.addAll({'Bgg-Field-Whitelist': permittedResponseFields});
+    if (settings.playerFilterEnabled)
+      requestHeaders
+          .addAll({'Bgg-Filter-Player-Count': settings.playerCount.toString()});
+    if (settings.timeFilterEnabled) {
+      requestHeaders
+          .addAll({'Bgg-Filter-Min-Duration': settings.minTime.toString()});
+      requestHeaders
+          .addAll({'Bgg-Filter-Max-Duration': settings.maxTime.toString()});
+    }
     for (Item item in items) {
       var response = await http.get(
           "${GameConfig.boardGameGeekProxyUrl}/${item.itemType.name}/${item.name}",

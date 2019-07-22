@@ -64,56 +64,63 @@ class ListGamesDisplay extends NetworkWidget with AppPage {
         defaultColumnWidth: FixedColumnWidth(60),
         columnWidths: {1: FlexColumnWidth(4.0), 2: FlexColumnWidth(1.0)},
         children: heading +
-            (cachedGames.games.getGamesByRating().map((game) => TableRow(
-                        decoration: BoxDecoration(
-                            border: Border(
-                                bottom: BorderSide(
-                                    color: Theme.of(context).dividerColor))),
-                        children: [
-                          TableCell(
-                            child: AppDefaultPadding(
-                              child: Container(
-                                alignment: Alignment.centerLeft,
-                                child: CachedNetworkImage(
-                                  imageUrl: game.imageUrl,
-                                  imageBuilder: (context, provider) =>
-                                      Container(
-                                    height: thumbnailSize,
-                                    width: thumbnailSize,
-                                    decoration: BoxDecoration(
-                                      image: DecorationImage(
-                                          image: provider, fit: BoxFit.fill),
+            (cachedGames.games.getGamesByRating().map(
+                      (game) => TableRow(
+                          decoration: BoxDecoration(
+                              border: Border(
+                                  bottom: BorderSide(
+                                      color: Theme.of(context).dividerColor))),
+                          children: [
+                            TableCell(
+                              child: AppDefaultPadding(
+                                child: Container(
+                                  alignment: Alignment.centerLeft,
+                                  child: CachedNetworkImage(
+                                    imageUrl: game.imageUrl,
+                                    imageBuilder: (context, provider) =>
+                                        Container(
+                                      height: thumbnailSize,
+                                      width: thumbnailSize,
+                                      decoration: BoxDecoration(
+                                        image: DecorationImage(
+                                            image: provider, fit: BoxFit.fill),
+                                      ),
                                     ),
+                                    placeholder: (context, url) =>
+                                        SpinKitCircle(
+                                            color:
+                                                Theme.of(context).accentColor,
+                                            size: thumbnailSize),
+                                    errorWidget: (context, url, error) =>
+                                        new Icon(Icons.error),
                                   ),
-                                  placeholder: (context, url) => SpinKitCircle(
-                                      color: Theme.of(context).accentColor,
-                                      size: thumbnailSize),
-                                  errorWidget: (context, url, error) =>
-                                      new Icon(Icons.error),
                                 ),
                               ),
                             ),
-                          ),
-                          TableCell(
+                            TableCell(
+                                verticalAlignment:
+                                    TableCellVerticalAlignment.middle,
+                                child: AppDefaultPadding(
+                                  child: Container(
+                                      alignment: Alignment.centerLeft,
+                                      child: Text(
+                                        game.name,
+                                      )),
+                                )),
+                            TableCell(
                               verticalAlignment:
                                   TableCellVerticalAlignment.middle,
                               child: AppDefaultPadding(
                                 child: Container(
-                                    alignment: Alignment.centerLeft,
-                                    child: Text(
-                                      game.name,
-                                    )),
-                              )),
-                          TableCell(
-                              verticalAlignment:
-                                  TableCellVerticalAlignment.middle,
-                              child: AppDefaultPadding(
-                                child: Container(
-                                    alignment: Alignment.centerRight,
-                                    child: Text(sprintf(
-                                        "%0.2f", [game.averageRating]))),
-                              ))
-                        ])))
+                                  alignment: Alignment.centerRight,
+                                  child: Text(
+                                    sprintf("%0.2f", [game.averageRating]),
+                                  ),
+                                ),
+                              ),
+                            )
+                          ]),
+                    ))
                 .toList(),
       ),
     );

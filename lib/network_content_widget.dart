@@ -80,19 +80,26 @@ abstract class NetworkWidget extends StatelessWidget with ScreenTools {
         if (model.items.isEmpty) {
           return pageErrors(context, pageErrorNoItemsSupplied);
         }
-        return FutureBuilder<Games>(
-          future: LoadGames.fetchGames(model.settings, model.items),
-          builder: (context, snapshot) {
-            if (snapshot.hasData) {
-              return gameDataResponse(
-                  model, snapshot, context, displayWidgetFn);
-            } else if (snapshot.hasError) {
-              return pageErrors(context, pageErrorOneOrMoreItemsInvalid);
-            }
-            // By default, show a loading spinner.
-            return pageFrameOutline(context, loadingSpinner(context));
-          },
-        );
+        return contentFromNetworkOrCache(context, model, displayWidgetFn);
+      },
+    );
+  }
+
+  Widget contentFromNetworkOrCache(BuildContext context, AppModel model,
+      Widget displayWidgetFn(BuildContext context, BggCache cachedGames)) {
+    if (!model.bggCache.isStale()) {
+      return displayWidgetFn(context, model.bggCache);
+    }
+    return FutureBuilder<Games>(
+      future: LoadGames.fetchGames(model.settings, model.items),
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          return gameDataResponse(model, snapshot, context, displayWidgetFn);
+        } else if (snapshot.hasError) {
+          return pageErrors(context, pageErrorOneOrMoreItemsInvalid);
+        }
+        // By default, show a loading spinner.
+        return pageFrameOutline(context, loadingSpinner(context));
       },
     );
   }

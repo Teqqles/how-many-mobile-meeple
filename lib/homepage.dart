@@ -51,41 +51,50 @@ class _MyHomePageState extends State<HomePage> with GameConfig, AppPage {
 
   ScopedModelDescendant<AppModel> buildPlayerSliderDisplay() =>
       ScopedModelDescendant<AppModel>(
-        builder: (context, child, model) => Row(
-          mainAxisAlignment: MainAxisAlignment.start,
+        builder: (context, child, model) => Column(
           children: <Widget>[
-            AppDefaultPadding(
-              child: Text("Players?", textAlign: TextAlign.left),
+            Row(
+              children: [
+                AppDefaultPadding(
+                  child: Text("Players?", textAlign: TextAlign.left),
+                )
+              ],
             ),
-            Container(
-              width: MediaQuery.of(context).size.width * 0.60,
-              child: Slider(
-                  activeColor: Theme.of(context).accentColor,
-                  min: 1.0,
-                  max: 10.0,
-                  divisions: 10,
-                  onChanged: (players) {
-                    setState(
-                        () => model.settings.playerCount = players.floor());
-                  },
-                  value: model.settings.playerCount.roundToDouble(),
-                  label: "${model.settings.playerCount.toString()} players"),
-            ),
-            AppDefaultPadding(
-              child: Container(
-                decoration: ShapeDecoration(
-                    color: Theme.of(context).accentColor,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8.0),
-                    )),
-                child: AppDefaultPadding(
-                  child: Text(model.settings.playerCount.toString(),
-                      textAlign: TextAlign.right,
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Theme.of(context).selectedRowColor)),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: <Widget>[
+                Container(
+                  width: MediaQuery.of(context).size.width * 0.60,
+                  child: Slider(
+                      activeColor: Theme.of(context).accentColor,
+                      min: 1.0,
+                      max: 10.0,
+                      divisions: 10,
+                      onChanged: (players) {
+                        setState(
+                            () => model.settings.playerCount = players.floor());
+                      },
+                      value: model.settings.playerCount.roundToDouble(),
+                      label:
+                          "${model.settings.playerCount.toString()} players"),
                 ),
-              ),
+                AppDefaultPadding(
+                  child: Container(
+                    decoration: ShapeDecoration(
+                        color: Theme.of(context).accentColor,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8.0),
+                        )),
+                    child: AppDefaultPadding(
+                      child: Text(model.settings.playerCount.toString(),
+                          textAlign: TextAlign.right,
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Theme.of(context).selectedRowColor)),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ],
         ),

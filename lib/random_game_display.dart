@@ -23,11 +23,18 @@ class RandomGameDisplayPage extends NetworkWidget with AppPage {
         body: Container(child: loadNetworkContent(displayGame)));
   }
 
-  Widget displayGame(BuildContext context, BggCache cachedGames) {
+  Widget displayGame(
+      BuildContext context, AppModel model, BggCache cachedGames) {
     Game game = cachedGames.lastRandom;
+    if (model.screenOrientation == null ||
+        model.screenOrientation == MediaQuery.of(context).orientation) {
+      game = cachedGames.random;
+    }
+    model.screenOrientation = MediaQuery.of(context).orientation;
     return Center(
       child: Container(
-        width: getScreenWidthPercentageInPixels(context, ScreenTools.eightyPercentScreen),
+        width: getScreenWidthPercentageInPixels(
+            context, ScreenTools.eightyPercentScreen),
         child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.stretch,

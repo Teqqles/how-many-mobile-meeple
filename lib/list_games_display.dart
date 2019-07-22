@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:sprintf/sprintf.dart';
 
 import 'app_default_padding.dart';
 import 'app_page.dart';
@@ -108,7 +109,8 @@ class ListGamesDisplay extends NetworkWidget with AppPage {
                               child: AppDefaultPadding(
                                 child: Container(
                                     alignment: Alignment.centerRight,
-                                    child: Text(game.averageRating.toString())),
+                                    child: Text(sprintf(
+                                        "%0.2f", [game.averageRating]))),
                               ))
                         ])))
                 .toList(),

@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 
 import 'game_config.dart';
@@ -10,7 +9,7 @@ class LoadGames {
       'name,maxplayers,minplayers,maxplaytime,image,thumbnail,stats';
 
   static Future<Games> fetchGames(Settings settings, List<Item> items) async {
-    Games games = new Games(games: new List<Game>());
+    Games games = new Games(gamesByName: new Map<String, Game>());
     Map<String, String> requestHeaders = {
       'Bgg-Filter-Player-Count': settings.playerCount.toString(),
       'Bgg-Filter-Min-Duration': settings.minTime.toString(),
@@ -34,29 +33,34 @@ class LoadGames {
 }
 
 class Games {
-  final List<Game> games;
+  final Map<String, Game> gamesByName;
 
-  Games({this.games});
+  List<Game> get games => gamesByName.values.toList();
+
+  Games({this.gamesByName});
 
   factory Games.fromJson(List<dynamic> parsedJson) {
-    List<Game> games = new List<Game>();
+    var games = new Map<String, Game>();
 
-    games = parsedJson.map((i) => Game.fromJson(i)).toList();
+    games = Map.fromEntries(parsedJson.map((gameData) {
+      var gameFromJs = Game.fromJson(gameData);
+      return MapEntry(gameFromJs.name, gameFromJs);
+    }));
 
     return new Games(
-      games: games,
+      gamesByName: games,
     );
   }
 
   Games addGames(Games newGames) {
-    games.addAll(newGames.games);
+    gamesByName.addAll(newGames.gamesByName);
     return this;
   }
 
   List<Game> getGamesByRating() {
-    List<Game> sortedGames = List<Game>.from(games);
-    sortedGames.sort((a, b) => b.averageRating.compareTo(a.averageRating));
-    return sortedGames;
+    List<Game> unsortedGames = games;
+    unsortedGames.sort((a, b) => b.averageRating.compareTo(a.averageRating));
+    return unsortedGames;
   }
 }
 

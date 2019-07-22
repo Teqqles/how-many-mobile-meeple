@@ -24,7 +24,7 @@ class RandomGameDisplayPage extends NetworkWidget with AppPage {
   }
 
   Widget displayGame(BuildContext context, BggCache cachedGames) {
-    Game game = cachedGames.random;
+    Game game = cachedGames.lastRandom;
     return Center(
       child: Container(
         width: getScreenWidthPercentageInPixels(context, ScreenTools.eightyPercentScreen),

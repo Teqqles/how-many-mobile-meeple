@@ -46,8 +46,7 @@ class _MyHomePageState extends State<HomePage> with GameConfig, AppPage {
           buildGameDurationSliderDisplay(),
           buildBoardGameGeekItemDisplay(),
         ]),
-        persistentFooterButtons: <Widget>[footerDisplay()]
-    );
+        persistentFooterButtons: <Widget>[footerDisplay()]);
   }
 
   ScopedModelDescendant<AppModel> buildPlayerSliderDisplay() =>
@@ -117,7 +116,7 @@ class _MyHomePageState extends State<HomePage> with GameConfig, AppPage {
                   child: Text('Add'),
                   onPressed: () {
                     if (controller.text.isEmpty) return;
-                    Item item = Item(controller.text);
+                    Item item = Item(controller.text.trim());
                     model.addItem(item);
                     setState(() {
                       controller.text = '';
@@ -234,12 +233,10 @@ class _MyHomePageState extends State<HomePage> with GameConfig, AppPage {
   }
 
   Widget footerDisplay() => Row(
-    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-    crossAxisAlignment: CrossAxisAlignment.end,
-    children: <Widget>[
-      DisclaimerText(GameConfig.disclaimerText, context)
-    ],
-  );
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: <Widget>[DisclaimerText(GameConfig.disclaimerText, context)],
+      );
 
   String limitTitleLength(String text) {
     if (text.length > 20) {

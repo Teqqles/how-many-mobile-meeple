@@ -1,15 +1,20 @@
 import 'dart:math';
 
+import 'package:flutter/cupertino.dart';
 import 'package:scoped_model/scoped_model.dart';
 
 import 'load_games.dart';
 
 class AppModel extends Model {
+  static AppModel of(BuildContext context) => ScopedModel.of<AppModel>(context);
+
   static int _defaultCacheDurationInMinutes = 30;
+  static int _unsetCacheDurationInMinutes = -1;
 
   List<Item> _items = [];
-  BggCache _bggCache = BggCache(Games(), _defaultCacheDurationInMinutes);
+  BggCache _bggCache = BggCache(Games(), _unsetCacheDurationInMinutes);
   Settings _settings = Settings(5, 30, 90);
+  Orientation screenOrientation;
 
   List<Item> get items => _items;
 
@@ -17,7 +22,14 @@ class AppModel extends Model {
 
   Settings get settings => _settings;
 
-  void addItem(Item item) => _items.add(item);
+  void addItem(Item item) {
+    this.invalidateCache();
+    _items.add(item);
+  }
+
+  void invalidateCache() {
+    _bggCache.makeStale();
+  }
 
   void replaceCache(Games games) {
     _bggCache = BggCache(games, _defaultCacheDurationInMinutes);
@@ -25,6 +37,7 @@ class AppModel extends Model {
   }
 
   void deleteItem(Item item) {
+    this.invalidateCache();
     _items.remove(item);
     notifyListeners();
   }
@@ -68,6 +81,8 @@ class BggCache {
   bool isStale() =>
       this._cacheTimestamp <
       epochToSeconds(DateTime.now().millisecondsSinceEpoch);
+
+  void makeStale() => this._cacheTimestamp = 0;
 }
 
 class Settings {

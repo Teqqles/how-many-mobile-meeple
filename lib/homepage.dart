@@ -36,7 +36,6 @@ class _MyHomePageState extends State<HomePage> with GameConfig, AppPage {
 
   @override
   Widget build(BuildContext context) {
-    AppModel.of(context).screenOrientation = MediaQuery.of(context).orientation;
     var textFieldWidth = MediaQuery.of(context).size.width * 0.65;
     return Scaffold(
         appBar: HowManyMeepleAppBar(GameConfig.optionsPageTitle),

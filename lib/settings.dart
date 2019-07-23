@@ -18,8 +18,8 @@ class Settings {
   Map<String, Setting> get allSettings => _settings;
 
   Map<String, Setting> get enabledSettings {
-    var filteredSettings = Map.from(_settings);
-    filteredSettings.removeWhere((_, setting) => setting.enabled);
+    Map<String, Setting> filteredSettings = Map.from(_settings);
+    filteredSettings.removeWhere((_, setting) => !setting.enabled);
     return filteredSettings;
   }
 

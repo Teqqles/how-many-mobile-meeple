@@ -34,7 +34,7 @@ class Games {
   Games({this.gamesByName});
 
   factory Games.fromJson(List<dynamic> parsedJson) {
-    var games = new Map<String, Game>();
+    var games = Map<String, Game>();
 
     games = Map.fromEntries(parsedJson.map((gameData) {
       var gameFromJs = Game.fromJson(gameData);

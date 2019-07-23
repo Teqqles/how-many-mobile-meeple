@@ -2,8 +2,12 @@ import 'dart:math';
 
 import 'package:flutter/cupertino.dart';
 import 'package:scoped_model/scoped_model.dart';
+import 'package:how_many_mobile_meeple/settings.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'load_games.dart';
+
+import 'dart:convert';
 
 class AppModel extends Model {
   static AppModel of(BuildContext context) => ScopedModel.of<AppModel>(context);
@@ -13,7 +17,12 @@ class AppModel extends Model {
 
   List<Item> _items = [];
   BggCache _bggCache = BggCache(Games(), _unsetCacheDurationInMinutes);
-  Settings _settings = Settings(5, 30, 90);
+  Settings _settings = Settings({
+    Settings.fieldsToReturnFromApi.name: Settings.fieldsToReturnFromApi,
+    Settings.filterMinimumTimeToPlay.name: Settings.filterMinimumTimeToPlay,
+    Settings.filterMaximumTimeToPlay.name: Settings.filterMaximumTimeToPlay,
+    Settings.filterNumberOfPlayers.name: Settings.filterNumberOfPlayers
+  });
   Orientation screenOrientation;
 
   List<Item> get items => _items;
@@ -25,6 +34,7 @@ class AppModel extends Model {
   void addItem(Item item) {
     this.invalidateCache();
     _items.add(item);
+    this.updateStore();
   }
 
   void invalidateCache() {
@@ -33,13 +43,25 @@ class AppModel extends Model {
 
   void replaceCache(Games games) {
     _bggCache = BggCache(games, _defaultCacheDurationInMinutes);
-    notifyListeners();
+    this.updateStore();
   }
 
   void deleteItem(Item item) {
-    this.invalidateCache();
     _items.remove(item);
+    this.updateStore();
+  }
+
+  void updateStore() {
+    _storeSettings(settings);
+    this.invalidateCache();
     notifyListeners();
+  }
+
+  void _storeSettings(Settings settings) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    for (var setting in settings.allSettings.values) {
+      await prefs.setString(setting.name, json.encode(setting));
+    }
   }
 }
 
@@ -83,17 +105,6 @@ class BggCache {
       epochToSeconds(DateTime.now().millisecondsSinceEpoch);
 
   void makeStale() => this._cacheTimestamp = 0;
-}
-
-class Settings {
-  int playerCount;
-  int minTime;
-  int maxTime;
-
-  bool playerFilterEnabled = false;
-  bool timeFilterEnabled = false;
-
-  Settings(this.playerCount, this.minTime, this.maxTime);
 }
 
 class Item {

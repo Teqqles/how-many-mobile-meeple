@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_splash_screen/flutter_splash_screen.dart';
 import 'package:scoped_model/scoped_model.dart';
+import 'package:how_many_mobile_meeple/settings.dart';
 
 import 'app_default_padding.dart';
 import 'app_page.dart';
@@ -65,11 +66,15 @@ class _MyHomePageState extends State<HomePage> with GameConfig, AppPage {
                   Switch(
                       onChanged: (bool value) {
                         setState(() {
-                          model.settings.playerFilterEnabled = value;
-                          model.invalidateCache();
+                          model.settings
+                              .setting(Settings.filterNumberOfPlayers.name)
+                              .enabled = value;
+                          model.updateStore();
                         });
                       },
-                      value: model.settings.playerFilterEnabled)
+                      value: model.settings
+                          .setting(Settings.filterNumberOfPlayers.name)
+                          .enabled)
                 ],
               ),
             ),
@@ -83,29 +88,43 @@ class _MyHomePageState extends State<HomePage> with GameConfig, AppPage {
                       min: 1.0,
                       max: 10.0,
                       divisions: 10,
-                      onChanged: !model.settings.playerFilterEnabled
+                      onChanged: !model.settings
+                              .setting(Settings.filterNumberOfPlayers.name)
+                              .enabled
                           ? null
                           : (players) {
                               setState(() {
-                                model.settings.playerCount = players.floor();
-                                model.invalidateCache();
+                                model.settings
+                                    .setting(
+                                        Settings.filterNumberOfPlayers.name)
+                                    .value = players.floor();
+                                model.updateStore();
                               });
                             },
-                      value: model.settings.playerCount.roundToDouble(),
+                      value: model.settings
+                          .setting(Settings.filterNumberOfPlayers.name)
+                          .value
+                          .roundToDouble(),
                       label:
-                          "${model.settings.playerCount.toString()} players"),
+                          "${model.settings.setting(Settings.filterNumberOfPlayers.name).value.toString()} players"),
                 ),
                 AppDefaultPadding(
                   child: Container(
                     decoration: ShapeDecoration(
-                        color: model.settings.playerFilterEnabled
+                        color: model.settings
+                                .setting(Settings.filterNumberOfPlayers.name)
+                                .enabled
                             ? Theme.of(context).accentColor
                             : Theme.of(context).disabledColor,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8.0),
                         )),
                     child: AppDefaultPadding(
-                      child: Text(model.settings.playerCount.toString(),
+                      child: Text(
+                          model.settings
+                              .setting(Settings.filterNumberOfPlayers.name)
+                              .value
+                              .toString(),
                           textAlign: TextAlign.right,
                           style: TextStyle(
                               fontWeight: FontWeight.bold,
@@ -176,11 +195,15 @@ class _MyHomePageState extends State<HomePage> with GameConfig, AppPage {
                 Switch(
                     onChanged: (bool value) {
                       setState(() {
-                        model.settings.timeFilterEnabled = value;
-                        model.invalidateCache();
+                        model.settings
+                            .setting(Settings.filterMinimumTimeToPlay.name)
+                            .enabled = true;
+                        model.updateStore();
                       });
                     },
-                    value: model.settings.timeFilterEnabled)
+                    value: model.settings
+                        .setting(Settings.filterMinimumTimeToPlay.name)
+                        .enabled)
               ],
             ),
           ),
@@ -194,26 +217,41 @@ class _MyHomePageState extends State<HomePage> with GameConfig, AppPage {
                   min: sliderMinValue,
                   max: sliderMaxValue,
                   divisions: sliderSteps,
-                  onChanged: !model.settings.timeFilterEnabled
+                  onChanged: !model.settings
+                          .setting(Settings.filterMinimumTimeToPlay.name)
+                          .enabled
                       ? null
                       : (time) {
                           setState(() {
-                            model.settings.minTime = time.start.floor();
-                            model.settings.maxTime = time.end.floor();
-                            model.invalidateCache();
+                            model.settings
+                                .setting(Settings.filterMinimumTimeToPlay.name)
+                                .value = time.start.floor();
+                            model.settings
+                                .setting(Settings.filterMaximumTimeToPlay.name)
+                                .value = time.end.floor();
+                            model.updateStore();
                           });
                         },
-                  values: RangeValues(model.settings.minTime.floorToDouble(),
-                      model.settings.maxTime.floorToDouble()),
+                  values: RangeValues(
+                      model.settings
+                          .setting(Settings.filterMinimumTimeToPlay.name)
+                          .value
+                          .floorToDouble(),
+                      model.settings
+                          .setting(Settings.filterMinimumTimeToPlay.name)
+                          .value
+                          .floorToDouble()),
                   labels: RangeLabels(
-                      "${model.settings.minTime.toString()} mins",
-                      "${model.settings.maxTime.toString()} mins"),
+                      "${model.settings.setting(Settings.filterMinimumTimeToPlay.name).value.toString()} mins",
+                      "${model.settings..setting(Settings.filterMaximumTimeToPlay.name).value.toString()} mins"),
                 ),
               ),
               AppDefaultPadding(
                 child: Container(
                   decoration: ShapeDecoration(
-                      color: model.settings.timeFilterEnabled
+                      color: model.settings
+                              .setting(Settings.filterMinimumTimeToPlay.name)
+                              .enabled
                           ? Theme.of(context).accentColor
                           : Theme.of(context).disabledColor,
                       shape: RoundedRectangleBorder(
@@ -221,7 +259,7 @@ class _MyHomePageState extends State<HomePage> with GameConfig, AppPage {
                       )),
                   child: AppDefaultPadding(
                     child: Text(
-                        "${model.settings.minTime.toString()}-${model.settings.maxTime.toString()} mins",
+                        "${model.settings.setting(Settings.filterMinimumTimeToPlay.name).value.toString()}-${model.settings.setting(Settings.filterMaximumTimeToPlay.name).value.toString()} mins",
                         textAlign: TextAlign.right,
                         style: TextStyle(
                             fontWeight: FontWeight.bold,

@@ -1,26 +1,15 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:how_many_mobile_meeple/settings.dart';
 
 import 'game_config.dart';
 import 'model.dart';
 
 class LoadGames {
-  static String permittedResponseFields =
-      'name,maxplayers,minplayers,maxplaytime,image,thumbnail,stats';
-
   static Future<Games> fetchGames(Settings settings, List<Item> items) async {
     Games games = new Games(gamesByName: Map<String, Game>());
-    Map<String, String> requestHeaders = Map<String, String>();
-    requestHeaders.addAll({'Bgg-Field-Whitelist': permittedResponseFields});
-    if (settings.playerFilterEnabled)
-      requestHeaders
-          .addAll({'Bgg-Filter-Player-Count': settings.playerCount.toString()});
-    if (settings.timeFilterEnabled) {
-      requestHeaders
-          .addAll({'Bgg-Filter-Min-Duration': settings.minTime.toString()});
-      requestHeaders
-          .addAll({'Bgg-Filter-Max-Duration': settings.maxTime.toString()});
-    }
+    Map<String, String> requestHeaders = settings.enabledSettings.map(
+        (_, setting) => MapEntry(setting.header, setting.value.toString()));
     for (Item item in items) {
       var response = await http.get(
           "${GameConfig.boardGameGeekProxyUrl}/${item.itemType.name}/${item.name}",

@@ -197,7 +197,7 @@ class _MyHomePageState extends State<HomePage> with GameConfig, AppPage {
                       setState(() {
                         model.settings
                             .setting(Settings.filterMinimumTimeToPlay.name)
-                            .enabled = true;
+                            .enabled = value;
                         model.updateStore();
                       });
                     },
@@ -238,12 +238,12 @@ class _MyHomePageState extends State<HomePage> with GameConfig, AppPage {
                           .value
                           .floorToDouble(),
                       model.settings
-                          .setting(Settings.filterMinimumTimeToPlay.name)
+                          .setting(Settings.filterMaximumTimeToPlay.name)
                           .value
                           .floorToDouble()),
                   labels: RangeLabels(
                       "${model.settings.setting(Settings.filterMinimumTimeToPlay.name).value.toString()} mins",
-                      "${model.settings..setting(Settings.filterMaximumTimeToPlay.name).value.toString()} mins"),
+                      "${model.settings.setting(Settings.filterMaximumTimeToPlay.name).value.toString()} mins"),
                 ),
               ),
               AppDefaultPadding(

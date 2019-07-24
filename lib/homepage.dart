@@ -2,14 +2,15 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_splash_screen/flutter_splash_screen.dart';
 import 'package:scoped_model/scoped_model.dart';
-import 'package:how_many_mobile_meeple/settings.dart';
+import 'package:how_many_mobile_meeple/model/settings.dart';
 
 import 'app_default_padding.dart';
 import 'app_page.dart';
 import 'disclaimer_text.dart';
 import 'game_config.dart';
 import 'how_many_meeple_app_bar.dart';
-import 'model.dart';
+import 'package:how_many_mobile_meeple/model/item.dart';
+import 'package:how_many_mobile_meeple/model/model.dart';
 
 class HomePage extends StatefulWidget {
   static final String route = "Home-page";
@@ -37,6 +38,9 @@ class _MyHomePageState extends State<HomePage> with GameConfig, AppPage {
 
   @override
   Widget build(BuildContext context) {
+    if (!AppModel.of(context).hasLoadedPersistedData) {
+      AppModel.of(context).loadStoredData();
+    }
     var textFieldWidth = MediaQuery.of(context).size.width * 0.65;
     return Scaffold(
         appBar: HowManyMeepleAppBar(GameConfig.optionsPageTitle),
@@ -70,6 +74,7 @@ class _MyHomePageState extends State<HomePage> with GameConfig, AppPage {
                               .setting(Settings.filterNumberOfPlayers.name)
                               .enabled = value;
                           model.updateStore();
+                          model.invalidateCache();
                         });
                       },
                       value: model.settings
@@ -99,6 +104,7 @@ class _MyHomePageState extends State<HomePage> with GameConfig, AppPage {
                                         Settings.filterNumberOfPlayers.name)
                                     .value = players.floor();
                                 model.updateStore();
+                                model.invalidateCache();
                               });
                             },
                       value: model.settings
@@ -199,6 +205,7 @@ class _MyHomePageState extends State<HomePage> with GameConfig, AppPage {
                             .setting(Settings.filterMinimumTimeToPlay.name)
                             .enabled = value;
                         model.updateStore();
+                        model.invalidateCache();
                       });
                     },
                     value: model.settings
@@ -230,6 +237,7 @@ class _MyHomePageState extends State<HomePage> with GameConfig, AppPage {
                                 .setting(Settings.filterMaximumTimeToPlay.name)
                                 .value = time.end.floor();
                             model.updateStore();
+                            model.invalidateCache();
                           });
                         },
                   values: RangeValues(

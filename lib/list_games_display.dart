@@ -6,10 +6,11 @@ import 'package:sprintf/sprintf.dart';
 
 import 'app_default_padding.dart';
 import 'app_page.dart';
+import 'package:how_many_mobile_meeple/model/bgg_cache.dart';
 import 'game_config.dart';
 import 'heading_text.dart';
 import 'how_many_meeple_app_bar.dart';
-import 'model.dart';
+import 'package:how_many_mobile_meeple/model/model.dart';
 import 'network_content_widget.dart';
 
 class ListGamesDisplay extends NetworkWidget with AppPage {

@@ -4,10 +4,10 @@ import 'package:esys_flutter_share/esys_flutter_share.dart';
 import 'package:flutter/material.dart';
 import 'package:mime_type/mime_type.dart';
 import 'package:http/http.dart' as http;
+import 'model/game.dart';
 import 'random_game_display.dart';
 import 'app_default_padding.dart';
 import 'list_games_display.dart';
-import 'load_games.dart';
 import 'package:path/path.dart';
 
 import 'package:flutter/foundation.dart';

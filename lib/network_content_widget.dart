@@ -5,8 +5,11 @@ import 'package:scoped_model/scoped_model.dart';
 import 'package:how_many_mobile_meeple/screen_tools.dart';
 
 import 'app_default_padding.dart';
+import 'package:how_many_mobile_meeple/model/bgg_cache.dart';
 import 'load_games.dart';
-import 'model.dart';
+import 'package:how_many_mobile_meeple/model/model.dart';
+
+import 'model/games.dart';
 
 abstract class NetworkWidget extends StatelessWidget with ScreenTools {
   static const String speedDisclaimer =

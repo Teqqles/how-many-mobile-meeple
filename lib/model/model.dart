@@ -1,19 +1,22 @@
-import 'dart:math';
-
 import 'package:flutter/cupertino.dart';
 import 'package:scoped_model/scoped_model.dart';
-import 'package:how_many_mobile_meeple/settings.dart';
+import 'package:how_many_mobile_meeple/model/settings.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'load_games.dart';
+import 'package:how_many_mobile_meeple/model/bgg_cache.dart';
+import 'package:how_many_mobile_meeple/model/item.dart';
 
 import 'dart:convert';
+
+import 'games.dart';
 
 class AppModel extends Model {
   static AppModel of(BuildContext context) => ScopedModel.of<AppModel>(context);
 
   static int _defaultCacheDurationInMinutes = 30;
   static int _unsetCacheDurationInMinutes = -1;
+
+  bool hasLoadedPersistedData = false;
 
   List<Item> _items = [];
   BggCache _bggCache = BggCache(Games(), _unsetCacheDurationInMinutes);
@@ -32,8 +35,8 @@ class AppModel extends Model {
   Settings get settings => _settings;
 
   void addItem(Item item) {
-    this.invalidateCache();
     _items.add(item);
+    this.invalidateCache();
     this.updateStore();
   }
 
@@ -48,13 +51,24 @@ class AppModel extends Model {
 
   void deleteItem(Item item) {
     _items.remove(item);
+    this.invalidateCache();
     this.updateStore();
   }
 
   void updateStore() {
     _storeSettings(settings);
-    this.invalidateCache();
     notifyListeners();
+  }
+
+  void loadStoredData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    for (var setting in settings.allSettings.values) {
+      var loadedSetting =
+          Setting.fromJson(jsonDecode(prefs.getString(setting.name)));
+      this.settings.updateSetting(loadedSetting);
+    }
+    this.hasLoadedPersistedData = true;
+    this.notifyListeners();
   }
 
   void _storeSettings(Settings settings) async {
@@ -62,57 +76,5 @@ class AppModel extends Model {
     for (var setting in settings.allSettings.values) {
       await prefs.setString(setting.name, json.encode(setting));
     }
-  }
-}
-
-class ItemType {
-  static const collection = ItemType("collection");
-  static const geekList = ItemType("geeklist");
-
-  final String name;
-
-  const ItemType(this.name);
-}
-
-class BggCache {
-  Games _games;
-  int _durationMinutes;
-  int _cacheTimestamp;
-
-  Games get games => _games;
-
-  int get durationInMinutes => _durationMinutes;
-  Game _stickyRandom;
-
-  Game get random {
-    var selectedGame = Random().nextInt(games.games.length);
-    this._stickyRandom = games.games[selectedGame];
-    return this._stickyRandom;
-  }
-
-  Game get lastRandom => _stickyRandom ?? random;
-
-  BggCache(this._games, this._durationMinutes) {
-    this._cacheTimestamp =
-        epochToSeconds(DateTime.now().millisecondsSinceEpoch) +
-            (this.durationInMinutes * 60);
-  }
-
-  int epochToSeconds(int millisEpoch) => (millisEpoch / 1000).floor();
-
-  bool isStale() =>
-      this._cacheTimestamp <
-      epochToSeconds(DateTime.now().millisecondsSinceEpoch);
-
-  void makeStale() => this._cacheTimestamp = 0;
-}
-
-class Item {
-  final String name;
-  ItemType itemType;
-
-  Item(this.name) {
-    var isNumeric = this.name.contains(RegExp(r"^\d+$"));
-    this.itemType = isNumeric ? ItemType.geekList : ItemType.collection;
   }
 }

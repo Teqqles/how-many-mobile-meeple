@@ -45,13 +45,15 @@ class Settings {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-          other is Settings &&
-              runtimeType == other.runtimeType &&
-              allSettings.toString() == other.allSettings.toString();
+      other is Settings &&
+          runtimeType == other.runtimeType &&
+          allSettings.toString() == other.allSettings.toString();
 
   @override
   int get hashCode => allSettings.toString().hashCode;
 
   @override
   String toString() => allSettings.toString();
+
+  Settings clone() => Settings(allSettings);
 }

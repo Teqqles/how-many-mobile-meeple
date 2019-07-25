@@ -145,33 +145,63 @@ abstract class AppPage {
               ),
             ),
             ScopedModelDescendant<AppModel>(
-              builder: (context, child, model) => Container(
-                color: Theme.of(context).highlightColor,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: <Widget>[
-                    AppDefaultPadding(
-                      child: Text(
-                        "Recommended Player Count Filter",
-                        textAlign: TextAlign.left,
-                        style: TextStyle(fontSize: 13),
-                      ),
+              builder: (context, child, model) => Column(
+                children: <Widget>[
+                  Container(
+                    color: Theme.of(context).highlightColor,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+                        AppDefaultPadding(
+                          child: Text(
+                            "Recommended Player Count Filter",
+                            textAlign: TextAlign.left,
+                            style: TextStyle(fontSize: 13),
+                          ),
+                        ),
+                        Switch(
+                            onChanged: (bool value) {
+                              var name =
+                                  Settings.filterUsingUserRecommendations.name;
+                              model.settings.setting(name).value = value;
+                              model.settings.setting(name).enabled = true;
+                              model.updateStore();
+                              model.invalidateCache();
+                            },
+                            value: model.settings
+                                .setting(Settings
+                                    .filterUsingUserRecommendations.name)
+                                .value)
+                      ],
                     ),
-                    Switch(
-                        onChanged: (bool value) {
-                          var name =
-                              Settings.filterUsingUserRecommendations.name;
-                          model.settings.setting(name).value = value;
-                          model.settings.setting(name).enabled = true;
-                          model.updateStore();
-                          model.invalidateCache();
-                        },
-                        value: model.settings
-                            .setting(
-                                Settings.filterUsingUserRecommendations.name)
-                            .value)
-                  ],
-                ),
+                  ),
+                  Container(
+                    color: Theme.of(context).highlightColor,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+                        AppDefaultPadding(
+                          child: Text(
+                            "Include Expansions in Filter",
+                            textAlign: TextAlign.left,
+                            style: TextStyle(fontSize: 13),
+                          ),
+                        ),
+                        Switch(
+                            onChanged: (bool value) {
+                              var name = Settings.filterIncludesExpansions.name;
+                              model.settings.setting(name).value = value;
+                              model.settings.setting(name).enabled = true;
+                              model.updateStore();
+                              model.invalidateCache();
+                            },
+                            value: model.settings
+                                .setting(Settings.filterIncludesExpansions.name)
+                                .value)
+                      ],
+                    ),
+                  ),
+                ],
               ),
             ),
           ],

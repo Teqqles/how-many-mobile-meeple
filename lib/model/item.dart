@@ -13,6 +13,17 @@ class ItemType {
   factory ItemType.fromJson(Map<String, dynamic> json) {
     return ItemType(json['name']);
   }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ItemType && runtimeType == other.runtimeType && name == other.name;
+
+  @override
+  int get hashCode => name.hashCode;
+
+  @override
+  String toString() => name;
 }
 
 class Item {
@@ -37,10 +48,13 @@ class Item {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-          other is Item &&
-              runtimeType == other.runtimeType &&
-              this.toString() == other.toString();
+      other is Item &&
+          runtimeType == other.runtimeType &&
+          this.toString() == other.toString();
 
   @override
-  int get hashCode => this.toString().hashCode;
+  int get hashCode => this.toJson().hashCode;
+
+  @override
+  String toString() => this.toJson().toString();
 }

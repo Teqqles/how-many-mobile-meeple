@@ -44,6 +44,7 @@ class _MyHomePageState extends State<HomePage> with GameConfig, AppPage {
     var textFieldWidth = MediaQuery.of(context).size.width * 0.65;
     return Scaffold(
         appBar: HowManyMeepleAppBar(GameConfig.optionsPageTitle),
+        drawer: pageDrawer(context),
         floatingActionButton: floatingActionButtonGroup(context),
         body: SingleChildScrollView(
             child: Column(children: <Widget>[

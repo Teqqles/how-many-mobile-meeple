@@ -4,13 +4,14 @@ import 'package:esys_flutter_share/esys_flutter_share.dart';
 import 'package:flutter/material.dart';
 import 'package:mime_type/mime_type.dart';
 import 'package:http/http.dart' as http;
+import 'package:scoped_model/scoped_model.dart';
 import 'model/game.dart';
+import 'model/model.dart';
+import 'model/settings.dart';
 import 'random_game_display.dart';
 import 'app_default_padding.dart';
 import 'list_games_display.dart';
 import 'package:path/path.dart';
-
-import 'package:flutter/foundation.dart';
 
 abstract class AppPage {
   static const String randomGameLabel = "Random Game";
@@ -105,18 +106,82 @@ abstract class AppPage {
         onPressed: () async {
           var response = await http.get(game.imageUrl);
           var mimeType = mime(basename(game.imageUrl));
-          debugPrint(extension(game.imageUrl));
           Uint8List bytes = response.bodyBytes;
-          debugPrint(mimeType);
           await Share.file(
               "${game.name}", basename(game.imageUrl), bytes, mimeType,
               text:
                   "We'll next be playing this randomly selected game... ${game.name}");
         },
-        shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(30.0)));
+        shape:
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(30.0)));
   }
 
   MaterialPageRoute materialisePage(StatelessWidget page) =>
       MaterialPageRoute(builder: (context) => page);
+
+  Widget pageDrawer(BuildContext context) => Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: <Widget>[
+            Container(
+              height: 80.0,
+              child: DrawerHeader(
+                padding: EdgeInsets.only(left: 8),
+                margin: EdgeInsets.zero,
+                child: Row(
+                  children: <Widget>[
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+                        Text(
+                          'Advanced Options',
+                          style: TextStyle(
+                              color: Theme.of(context).selectedRowColor),
+                        ),
+                        IconButton(
+                            icon: Icon(Icons.keyboard_arrow_left,
+                                color: Theme.of(context).selectedRowColor),
+                            onPressed: () => Navigator.pop(context))
+                      ],
+                    ),
+                  ],
+                ),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).accentColor,
+                ),
+              ),
+            ),
+            ScopedModelDescendant<AppModel>(
+              builder: (context, child, model) => Container(
+                color: Theme.of(context).highlightColor,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    AppDefaultPadding(
+                      child: Text(
+                        "Recommended Player Count Filter",
+                        textAlign: TextAlign.left,
+                        style: TextStyle(fontSize: 13),
+                      ),
+                    ),
+                    Switch(
+                        onChanged: (bool value) {
+                          var name =
+                              Settings.filterUsingUserRecommendations.name;
+                          model.settings.setting(name).value = value;
+                          model.settings.setting(name).enabled = true;
+                          model.updateStore();
+                          model.invalidateCache();
+                        },
+                        value: model.settings
+                            .setting(
+                                Settings.filterUsingUserRecommendations.name)
+                            .value)
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
 }

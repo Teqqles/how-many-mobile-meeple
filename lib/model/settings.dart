@@ -15,6 +15,12 @@ class Settings {
   static Setting filterMaximumTimeToPlay = Setting("maximumTimeToPlay",
       header: "Bgg-Filter-Max-Duration", value: 90);
 
+  static Setting filterUsingUserRecommendations = Setting(
+      "useUserRecommendedFilters",
+      header: "Bgg-Filter-Using-Recommended-Players",
+      value: true,
+      enabled: true);
+
   Map<String, Setting> _settings = Map<String, Setting>();
 
   Map<String, Setting> get allSettings => _settings;

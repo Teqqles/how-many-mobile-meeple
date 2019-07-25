@@ -25,7 +25,9 @@ class AppModel extends Model {
     Settings.fieldsToReturnFromApi.name: Settings.fieldsToReturnFromApi,
     Settings.filterMinimumTimeToPlay.name: Settings.filterMinimumTimeToPlay,
     Settings.filterMaximumTimeToPlay.name: Settings.filterMaximumTimeToPlay,
-    Settings.filterNumberOfPlayers.name: Settings.filterNumberOfPlayers
+    Settings.filterNumberOfPlayers.name: Settings.filterNumberOfPlayers,
+    Settings.filterUsingUserRecommendations.name:
+        Settings.filterUsingUserRecommendations
   });
   Orientation screenOrientation;
 

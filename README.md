@@ -19,7 +19,7 @@ How Many Mobile Meeple is the sister project to the web based [How Many Meeples]
 
 ## Contributing
 
-Have an idea for a feature that you think will make this app amazing?  Feel free to [raise an issue](https://github.com/how-many-meeple/how-many-meeples/issues) if you are unable to write code, or fork this repository and raise a PR.  We'll appreciate the help. 
+Have an idea for a feature that you think will make this app amazing?  Feel free to [raise an issue](https://github.com/how-many-meeple/how-many-meeples/issues) if you are unable to write code; or if you fancy getting your hands dirty with Dart and Flutter then fork this repository and raise a PR.  We'll appreciate the help. 
 
 ## Contributors
 

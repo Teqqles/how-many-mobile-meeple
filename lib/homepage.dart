@@ -326,7 +326,8 @@ class _MyHomePageState extends State<HomePage> with GameConfig, AppPage {
                           color: Theme.of(context).errorColor,
                         ),
                         onPressed: () {
-                          model.deleteItem(item);
+                          setState(() =>
+                            model.deleteItem(item));
                         },
                       ),
                     ],

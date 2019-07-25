@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:how_many_mobile_meeple/storage/stored_preferences.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:how_many_mobile_meeple/model/settings.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -8,6 +9,7 @@ import 'package:how_many_mobile_meeple/model/item.dart';
 
 import 'dart:convert';
 
+import '../game_config.dart';
 import 'games.dart';
 
 class AppModel extends Model {
@@ -46,35 +48,57 @@ class AppModel extends Model {
 
   void replaceCache(Games games) {
     _bggCache = BggCache(games, _defaultCacheDurationInMinutes);
-    this.updateStore();
   }
 
   void deleteItem(Item item) {
+    var itemIndex = _items.indexOf(item);
     _items.remove(item);
+    _removeItemFromStore(itemIndex);
     this.invalidateCache();
-    this.updateStore();
+  }
+
+  void _removeItemFromStore(int index) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.remove("$_itemStoreNamePrefix$index");
   }
 
   void updateStore() {
     _storeSettings(settings);
+    _storeItems(items);
     notifyListeners();
   }
 
   void loadStoredData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    for (var setting in settings.allSettings.values) {
-      var loadedSetting =
-          Setting.fromJson(jsonDecode(prefs.getString(setting.name)));
-      this.settings.updateSetting(loadedSetting);
-    }
+    StoredPreferences store = StoredPreferences(prefs);
+    _items = _loadItems(prefs);
+    _settings = await store.loadSettings(settings);
     this.hasLoadedPersistedData = true;
     this.notifyListeners();
   }
 
+  List<Item> _loadItems(SharedPreferences prefs) {
+    List<Item> savedItems = List<Item>();
+    for (var i = 0; i < GameConfig.maxItemsFromBgg; i++) {
+      if (prefs.containsKey("$_itemStoreNamePrefix$i")) {
+        var item = prefs.getString("$_itemStoreNamePrefix$i");
+        var loadedItem = Item.fromJson(jsonDecode(item));
+        savedItems.add(loadedItem);
+      }
+    }
+    return savedItems;
+  }
+
   void _storeSettings(Settings settings) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    for (var setting in settings.allSettings.values) {
-      await prefs.setString(setting.name, json.encode(setting));
+    StoredPreferences store = StoredPreferences(prefs);
+    store.saveSettings(settings);
+  }
+
+  void _storeItems(List<Item> items) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    for (var i = 0; i < items.length; i++) {
+      await prefs.setString("$_itemStoreNamePrefix$i", json.encode(items[i]));
     }
   }
 }

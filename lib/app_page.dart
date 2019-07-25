@@ -98,7 +98,7 @@ abstract class AppPage {
   RaisedButton shareButton(BuildContext context, Game game) {
     return RaisedButton(
         color: Theme.of(context).accentColor,
-        child: new Icon(
+        child: Icon(
           Icons.share,
           color: Theme.of(context).selectedRowColor,
         ),
@@ -113,8 +113,8 @@ abstract class AppPage {
               text:
                   "We'll next be playing this randomly selected game... ${game.name}");
         },
-        shape: new RoundedRectangleBorder(
-            borderRadius: new BorderRadius.circular(30.0)));
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(30.0)));
   }
 
   MaterialPageRoute materialisePage(StatelessWidget page) =>

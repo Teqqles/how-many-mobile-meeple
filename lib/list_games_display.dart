@@ -93,7 +93,7 @@ class ListGamesDisplay extends NetworkWidget with AppPage {
                                                 Theme.of(context).accentColor,
                                             size: thumbnailSize),
                                     errorWidget: (context, url, error) =>
-                                        new Icon(Icons.error),
+                                        Icon(Icons.error),
                                   ),
                                 ),
                               ),

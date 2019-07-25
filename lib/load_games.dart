@@ -10,7 +10,7 @@ import 'model/games.dart';
 
 class LoadGames {
   static Future<Games> fetchGames(Settings settings, List<Item> items) async {
-    Games games = new Games(gamesByName: Map<String, Game>());
+    Games games = Games(gamesByName: Map<String, Game>());
     Map<String, String> requestHeaders = settings.enabledSettings.map(
         (_, setting) => MapEntry(setting.header, setting.value.toString()));
     for (Item item in items) {

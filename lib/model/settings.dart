@@ -1,3 +1,5 @@
+import 'package:how_many_mobile_meeple/model/setting.dart';
+
 class Settings {
   static Setting fieldsToReturnFromApi = Setting("fieldsToUse",
       header: "Bgg-Field-Whitelist",
@@ -37,24 +39,19 @@ class Settings {
 
   factory Settings.fromJson(Map<String, dynamic> json) {
     return Settings(
-        json['settings'].map((value) => new Setting.fromJson(value)).toList());
-  }
-}
-
-class Setting {
-  final String name;
-  dynamic value;
-  String header;
-  bool enabled;
-
-  Setting(this.name, {this.value, this.header, this.enabled = false});
-
-  toJson() {
-    return {'name': name, 'value': value, 'header': header, 'enabled': enabled};
+        json['settings'].map((value) => Setting.fromJson(value)).toList());
   }
 
-  factory Setting.fromJson(Map<String, dynamic> json) {
-    return Setting(json['name'],
-        value: json['value'], header: json['header'], enabled: json['enabled']);
-  }
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+          other is Settings &&
+              runtimeType == other.runtimeType &&
+              allSettings.toString() == other.allSettings.toString();
+
+  @override
+  int get hashCode => allSettings.toString().hashCode;
+
+  @override
+  String toString() => allSettings.toString();
 }

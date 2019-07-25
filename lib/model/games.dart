@@ -15,7 +15,7 @@ class Games {
       return MapEntry(gameFromJs.name, gameFromJs);
     }));
 
-    return new Games(
+    return Games(
       gamesByName: games,
     );
   }

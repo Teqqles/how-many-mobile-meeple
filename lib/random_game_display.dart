@@ -62,7 +62,7 @@ class RandomGameDisplayPage extends NetworkWidget with AppPage {
                       color: Theme.of(context).accentColor,
                       size: getScreenWidthPercentageInPixels(
                           context, ScreenTools.fiftyPercentScreen)),
-                  errorWidget: (context, url, error) => new Icon(Icons.error),
+                  errorWidget: (context, url, error) => Icon(Icons.error),
                 ),
               ),
               shareButton(context, game),

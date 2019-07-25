@@ -2,14 +2,15 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:scoped_multi_example/screen_tools.dart';
+import 'package:how_many_mobile_meeple/screen_tools.dart';
 
 import 'app_default_padding.dart';
 import 'app_page.dart';
+import 'package:how_many_mobile_meeple/model/bgg_cache.dart';
 import 'game_config.dart';
 import 'how_many_meeple_app_bar.dart';
-import 'load_games.dart';
-import 'model.dart';
+import 'package:how_many_mobile_meeple/model/model.dart';
+import 'model/game.dart';
 import 'network_content_widget.dart';
 
 class RandomGameDisplayPage extends NetworkWidget with AppPage {
@@ -61,7 +62,7 @@ class RandomGameDisplayPage extends NetworkWidget with AppPage {
                       color: Theme.of(context).accentColor,
                       size: getScreenWidthPercentageInPixels(
                           context, ScreenTools.fiftyPercentScreen)),
-                  errorWidget: (context, url, error) => new Icon(Icons.error),
+                  errorWidget: (context, url, error) => Icon(Icons.error),
                 ),
               ),
               shareButton(context, game),

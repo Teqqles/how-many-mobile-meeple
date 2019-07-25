@@ -3,12 +3,11 @@ import 'dart:typed_data';
 import 'package:esys_flutter_share/esys_flutter_share.dart';
 import 'package:flutter/material.dart';
 import 'package:mime_type/mime_type.dart';
-import 'package:scoped_multi_example/random_game_display.dart';
 import 'package:http/http.dart' as http;
-
+import 'model/game.dart';
+import 'random_game_display.dart';
 import 'app_default_padding.dart';
 import 'list_games_display.dart';
-import 'load_games.dart';
 import 'package:path/path.dart';
 
 import 'package:flutter/foundation.dart';
@@ -99,7 +98,7 @@ abstract class AppPage {
   RaisedButton shareButton(BuildContext context, Game game) {
     return RaisedButton(
         color: Theme.of(context).accentColor,
-        child: new Icon(
+        child: Icon(
           Icons.share,
           color: Theme.of(context).selectedRowColor,
         ),
@@ -114,8 +113,8 @@ abstract class AppPage {
               text:
                   "We'll next be playing this randomly selected game... ${game.name}");
         },
-        shape: new RoundedRectangleBorder(
-            borderRadius: new BorderRadius.circular(30.0)));
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(30.0)));
   }
 
   MaterialPageRoute materialisePage(StatelessWidget page) =>

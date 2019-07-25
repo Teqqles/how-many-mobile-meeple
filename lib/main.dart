@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 
 import 'package:scoped_model/scoped_model.dart';
 
-import 'package:scoped_multi_example/model.dart';
-import 'package:scoped_multi_example/random_game_display.dart';
+import 'package:how_many_mobile_meeple/model/model.dart';
+import 'package:how_many_mobile_meeple/random_game_display.dart';
 
 import 'homepage.dart';
 import 'meeple_theme.dart';

@@ -2,13 +2,15 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_splash_screen/flutter_splash_screen.dart';
 import 'package:scoped_model/scoped_model.dart';
+import 'package:how_many_mobile_meeple/model/settings.dart';
 
 import 'app_default_padding.dart';
 import 'app_page.dart';
 import 'disclaimer_text.dart';
 import 'game_config.dart';
 import 'how_many_meeple_app_bar.dart';
-import 'model.dart';
+import 'package:how_many_mobile_meeple/model/item.dart';
+import 'package:how_many_mobile_meeple/model/model.dart';
 
 class HomePage extends StatefulWidget {
   static final String route = "Home-page";
@@ -36,6 +38,9 @@ class _MyHomePageState extends State<HomePage> with GameConfig, AppPage {
 
   @override
   Widget build(BuildContext context) {
+    if (!AppModel.of(context).hasLoadedPersistedData) {
+      AppModel.of(context).loadStoredData();
+    }
     var textFieldWidth = MediaQuery.of(context).size.width * 0.65;
     return Scaffold(
         appBar: HowManyMeepleAppBar(GameConfig.optionsPageTitle),
@@ -65,11 +70,16 @@ class _MyHomePageState extends State<HomePage> with GameConfig, AppPage {
                   Switch(
                       onChanged: (bool value) {
                         setState(() {
-                          model.settings.playerFilterEnabled = value;
+                          model.settings
+                              .setting(Settings.filterNumberOfPlayers.name)
+                              .enabled = value;
+                          model.updateStore();
                           model.invalidateCache();
                         });
                       },
-                      value: model.settings.playerFilterEnabled)
+                      value: model.settings
+                          .setting(Settings.filterNumberOfPlayers.name)
+                          .enabled)
                 ],
               ),
             ),
@@ -83,29 +93,44 @@ class _MyHomePageState extends State<HomePage> with GameConfig, AppPage {
                       min: 1.0,
                       max: 10.0,
                       divisions: 10,
-                      onChanged: !model.settings.playerFilterEnabled
+                      onChanged: !model.settings
+                              .setting(Settings.filterNumberOfPlayers.name)
+                              .enabled
                           ? null
                           : (players) {
                               setState(() {
-                                model.settings.playerCount = players.floor();
+                                model.settings
+                                    .setting(
+                                        Settings.filterNumberOfPlayers.name)
+                                    .value = players.floor();
+                                model.updateStore();
                                 model.invalidateCache();
                               });
                             },
-                      value: model.settings.playerCount.roundToDouble(),
+                      value: model.settings
+                          .setting(Settings.filterNumberOfPlayers.name)
+                          .value
+                          .roundToDouble(),
                       label:
-                          "${model.settings.playerCount.toString()} players"),
+                          "${model.settings.setting(Settings.filterNumberOfPlayers.name).value.toString()} players"),
                 ),
                 AppDefaultPadding(
                   child: Container(
                     decoration: ShapeDecoration(
-                        color: model.settings.playerFilterEnabled
+                        color: model.settings
+                                .setting(Settings.filterNumberOfPlayers.name)
+                                .enabled
                             ? Theme.of(context).accentColor
                             : Theme.of(context).disabledColor,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8.0),
                         )),
                     child: AppDefaultPadding(
-                      child: Text(model.settings.playerCount.toString(),
+                      child: Text(
+                          model.settings
+                              .setting(Settings.filterNumberOfPlayers.name)
+                              .value
+                              .toString(),
                           textAlign: TextAlign.right,
                           style: TextStyle(
                               fontWeight: FontWeight.bold,
@@ -176,11 +201,16 @@ class _MyHomePageState extends State<HomePage> with GameConfig, AppPage {
                 Switch(
                     onChanged: (bool value) {
                       setState(() {
-                        model.settings.timeFilterEnabled = value;
+                        model.settings
+                            .setting(Settings.filterMinimumTimeToPlay.name)
+                            .enabled = value;
+                        model.updateStore();
                         model.invalidateCache();
                       });
                     },
-                    value: model.settings.timeFilterEnabled)
+                    value: model.settings
+                        .setting(Settings.filterMinimumTimeToPlay.name)
+                        .enabled)
               ],
             ),
           ),
@@ -194,26 +224,42 @@ class _MyHomePageState extends State<HomePage> with GameConfig, AppPage {
                   min: sliderMinValue,
                   max: sliderMaxValue,
                   divisions: sliderSteps,
-                  onChanged: !model.settings.timeFilterEnabled
+                  onChanged: !model.settings
+                          .setting(Settings.filterMinimumTimeToPlay.name)
+                          .enabled
                       ? null
                       : (time) {
                           setState(() {
-                            model.settings.minTime = time.start.floor();
-                            model.settings.maxTime = time.end.floor();
+                            model.settings
+                                .setting(Settings.filterMinimumTimeToPlay.name)
+                                .value = time.start.floor();
+                            model.settings
+                                .setting(Settings.filterMaximumTimeToPlay.name)
+                                .value = time.end.floor();
+                            model.updateStore();
                             model.invalidateCache();
                           });
                         },
-                  values: RangeValues(model.settings.minTime.floorToDouble(),
-                      model.settings.maxTime.floorToDouble()),
+                  values: RangeValues(
+                      model.settings
+                          .setting(Settings.filterMinimumTimeToPlay.name)
+                          .value
+                          .floorToDouble(),
+                      model.settings
+                          .setting(Settings.filterMaximumTimeToPlay.name)
+                          .value
+                          .floorToDouble()),
                   labels: RangeLabels(
-                      "${model.settings.minTime.toString()} mins",
-                      "${model.settings.maxTime.toString()} mins"),
+                      "${model.settings.setting(Settings.filterMinimumTimeToPlay.name).value.toString()} mins",
+                      "${model.settings.setting(Settings.filterMaximumTimeToPlay.name).value.toString()} mins"),
                 ),
               ),
               AppDefaultPadding(
                 child: Container(
                   decoration: ShapeDecoration(
-                      color: model.settings.timeFilterEnabled
+                      color: model.settings
+                              .setting(Settings.filterMinimumTimeToPlay.name)
+                              .enabled
                           ? Theme.of(context).accentColor
                           : Theme.of(context).disabledColor,
                       shape: RoundedRectangleBorder(
@@ -221,7 +267,7 @@ class _MyHomePageState extends State<HomePage> with GameConfig, AppPage {
                       )),
                   child: AppDefaultPadding(
                     child: Text(
-                        "${model.settings.minTime.toString()}-${model.settings.maxTime.toString()} mins",
+                        "${model.settings.setting(Settings.filterMinimumTimeToPlay.name).value.toString()}-${model.settings.setting(Settings.filterMaximumTimeToPlay.name).value.toString()} mins",
                         textAlign: TextAlign.right,
                         style: TextStyle(
                             fontWeight: FontWeight.bold,
@@ -280,7 +326,8 @@ class _MyHomePageState extends State<HomePage> with GameConfig, AppPage {
                           color: Theme.of(context).errorColor,
                         ),
                         onPressed: () {
-                          model.deleteItem(item);
+                          setState(() =>
+                            model.deleteItem(item));
                         },
                       ),
                     ],

@@ -1,5 +1,7 @@
 # How Many Mobile Meeple
 
+![GitHub](https://img.shields.io/github/license/teqqles/how-many-mobile-meeple) ![GitHub issues by-label](https://img.shields.io/github/issues/how-many-meeple/how-many-meeples/enhancement?color=green) ![GitHub issues by-label](https://img.shields.io/github/issues/how-many-meeple/how-many-meeples/bug)
+
 ## About
 
 How Many Mobile Meeple is the sister project to the web based [How Many Meeples](https://github.com/how-many-meeple/how-many-meeples).  We share a common [API](https://github.com/how-many-meeple/bgg-game-selector-api) and a common goal.  These are a group of passion projects created to help Board Gamers throughout the world play a better variety of games from their collections, or those of others.

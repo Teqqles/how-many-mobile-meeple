@@ -129,21 +129,14 @@ abstract class AppPage {
                 padding: EdgeInsets.only(left: 8),
                 margin: EdgeInsets.zero,
                 child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
-                        Text(
-                          'Advanced Options',
-                          style: TextStyle(
-                              color: Theme.of(context).selectedRowColor),
-                        ),
-                        IconButton(
-                            icon: Icon(Icons.keyboard_arrow_left,
-                                color: Theme.of(context).selectedRowColor),
-                            onPressed: () => Navigator.pop(context))
-                      ],
+                    Text(
+                      'Advanced Options',
+                      style: TextStyle(
+                          color: Theme.of(context).selectedRowColor),
                     ),
+                    BackButton(color: Theme.of(context).selectedRowColor)
                   ],
                 ),
                 decoration: BoxDecoration(

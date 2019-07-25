@@ -1,16 +1,15 @@
 import 'package:flutter/cupertino.dart';
+import 'package:how_many_mobile_meeple/storage/storage_factory.dart';
 import 'package:how_many_mobile_meeple/storage/stored_preferences.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:how_many_mobile_meeple/model/settings.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:how_many_mobile_meeple/model/bgg_cache.dart';
 import 'package:how_many_mobile_meeple/model/item.dart';
 
-import 'dart:convert';
-
 import '../game_config.dart';
 import 'games.dart';
+import 'items.dart';
 
 class AppModel extends Model {
   static AppModel of(BuildContext context) => ScopedModel.of<AppModel>(context);
@@ -20,7 +19,7 @@ class AppModel extends Model {
 
   bool hasLoadedPersistedData = false;
 
-  List<Item> _items = [];
+  Items _items = Items([]);
   BggCache _bggCache = BggCache(Games(), _unsetCacheDurationInMinutes);
   Settings _settings = Settings({
     Settings.fieldsToReturnFromApi.name: Settings.fieldsToReturnFromApi,
@@ -30,14 +29,14 @@ class AppModel extends Model {
   });
   Orientation screenOrientation;
 
-  List<Item> get items => _items;
+  List<Item> get items => _items.items;
 
   BggCache get bggCache => _bggCache;
 
   Settings get settings => _settings;
 
   void addItem(Item item) {
-    _items.add(item);
+    _items.items.add(item);
     this.invalidateCache();
     this.updateStore();
   }
@@ -51,54 +50,32 @@ class AppModel extends Model {
   }
 
   void deleteItem(Item item) {
-    var itemIndex = _items.indexOf(item);
-    _items.remove(item);
-    _removeItemFromStore(itemIndex);
+    _items.items.remove(item);
+    _storeItems(_items);
     this.invalidateCache();
-  }
-
-  void _removeItemFromStore(int index) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.remove("$_itemStoreNamePrefix$index");
   }
 
   void updateStore() {
     _storeSettings(settings);
-    _storeItems(items);
+    _storeItems(_items);
     notifyListeners();
   }
 
   void loadStoredData() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    StoredPreferences store = StoredPreferences(prefs);
-    _items = _loadItems(prefs);
+    StoredPreferences store = await StorageFactory.getStoredPreferences();
+    _items = await store.loadItems(GameConfig.maxItemsFromBgg);
     _settings = await store.loadSettings(settings);
     this.hasLoadedPersistedData = true;
     this.notifyListeners();
   }
 
-  List<Item> _loadItems(SharedPreferences prefs) {
-    List<Item> savedItems = List<Item>();
-    for (var i = 0; i < GameConfig.maxItemsFromBgg; i++) {
-      if (prefs.containsKey("$_itemStoreNamePrefix$i")) {
-        var item = prefs.getString("$_itemStoreNamePrefix$i");
-        var loadedItem = Item.fromJson(jsonDecode(item));
-        savedItems.add(loadedItem);
-      }
-    }
-    return savedItems;
-  }
-
   void _storeSettings(Settings settings) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    StoredPreferences store = StoredPreferences(prefs);
+    StoredPreferences store = await StorageFactory.getStoredPreferences();
     store.saveSettings(settings);
   }
 
-  void _storeItems(List<Item> items) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    for (var i = 0; i < items.length; i++) {
-      await prefs.setString("$_itemStoreNamePrefix$i", json.encode(items[i]));
-    }
+  void _storeItems(Items items) async {
+    StoredPreferences store = await StorageFactory.getStoredPreferences();
+    store.saveItems(items, GameConfig.maxItemsFromBgg);
   }
 }

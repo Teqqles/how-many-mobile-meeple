@@ -64,6 +64,8 @@ class AppModel extends Model {
     notifyListeners();
   }
 
+  void refreshState() => this.notifyListeners();
+
   void loadStoredData() async {
     StoredPreferences store = await StorageFactory.getStoredPreferences();
     _items = await store.loadItems(GameConfig.maxItemsFromBgg);

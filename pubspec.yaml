@@ -9,8 +9,6 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^0.1.2
   scoped_model: ^1.0.1
-  flutter_splash_screen: ^0.1.0
-  splashscreen:
   flutter_spinkit: ^3.1.0
   http: ^0.12.0
   cached_network_image: ^1.1.0
@@ -18,6 +16,7 @@ dependencies:
   mime_type: ^0.2.4
   sprintf: ^4.0.2
   shared_preferences: ^0.5.3
+  package_info: ^0.4.0+6
 
 dev_dependencies:
   flutter_test:
@@ -41,6 +40,7 @@ flutter:
 
   assets:
     - lib/images/dice.png
+    - lib/images/howmanymeeple.png
 
   # To add assets to your application, add an assets section, like this:
   # assets:

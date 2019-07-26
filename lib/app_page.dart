@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:mime_type/mime_type.dart';
 import 'package:http/http.dart' as http;
 import 'package:scoped_model/scoped_model.dart';
+import 'drawer_bgg_filter.dart';
 import 'model/game.dart';
 import 'model/model.dart';
 import 'model/settings.dart';
@@ -20,6 +21,20 @@ abstract class AppPage {
   static const String listHeroTag = "list-games";
 
   final double _imageButtonSize = 42;
+
+  List<Widget> drawerFilters(BuildContext context, AppModel model) => [
+        DrawerBggFilter(
+            "Recommended Player Count Filter",
+            model.settings
+                .setting(Settings.filterUsingUserRecommendations.name),
+            model,
+            context),
+        DrawerBggFilter(
+            "Include Expansions in Filter",
+            model.settings.setting(Settings.filterIncludesExpansions.name),
+            model,
+            context)
+      ];
 
   void loadPage(BuildContext context, MaterialPageRoute<dynamic> page) {
     if (Navigator.of(context).canPop()) {
@@ -131,12 +146,15 @@ abstract class AppPage {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
-                    Text(
-                      'Advanced Options',
-                      style: TextStyle(
-                          color: Theme.of(context).selectedRowColor),
-                    ),
-                    BackButton(color: Theme.of(context).selectedRowColor)
+                    BackButton(color: Theme.of(context).selectedRowColor),
+                    Padding(
+                      padding: const EdgeInsets.only(right: 12),
+                      child: Text(
+                        'Advanced Options',
+                        style: TextStyle(
+                            color: Theme.of(context).selectedRowColor),
+                      ),
+                    )
                   ],
                 ),
                 decoration: BoxDecoration(
@@ -145,64 +163,8 @@ abstract class AppPage {
               ),
             ),
             ScopedModelDescendant<AppModel>(
-              builder: (context, child, model) => Column(
-                children: <Widget>[
-                  Container(
-                    color: Theme.of(context).highlightColor,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
-                        AppDefaultPadding(
-                          child: Text(
-                            "Recommended Player Count Filter",
-                            textAlign: TextAlign.left,
-                            style: TextStyle(fontSize: 13),
-                          ),
-                        ),
-                        Switch(
-                            onChanged: (bool value) {
-                              var name =
-                                  Settings.filterUsingUserRecommendations.name;
-                              model.settings.setting(name).value = value;
-                              model.settings.setting(name).enabled = true;
-                              model.updateStore();
-                              model.invalidateCache();
-                            },
-                            value: model.settings
-                                .setting(Settings
-                                    .filterUsingUserRecommendations.name)
-                                .value)
-                      ],
-                    ),
-                  ),
-                  Container(
-                    color: Theme.of(context).highlightColor,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
-                        AppDefaultPadding(
-                          child: Text(
-                            "Include Expansions in Filter",
-                            textAlign: TextAlign.left,
-                            style: TextStyle(fontSize: 13),
-                          ),
-                        ),
-                        Switch(
-                            onChanged: (bool value) {
-                              var name = Settings.filterIncludesExpansions.name;
-                              model.settings.setting(name).value = value;
-                              model.settings.setting(name).enabled = true;
-                              model.updateStore();
-                              model.invalidateCache();
-                            },
-                            value: model.settings
-                                .setting(Settings.filterIncludesExpansions.name)
-                                .value)
-                      ],
-                    ),
-                  ),
-                ],
-              ),
+              builder: (context, child, model) =>
+                  Column(children: drawerFilters(context, model)),
             ),
           ],
         ),

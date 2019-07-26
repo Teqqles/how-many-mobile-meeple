@@ -13,7 +13,7 @@ import 'how_many_meeple_app_bar.dart';
 import 'package:how_many_mobile_meeple/model/model.dart';
 import 'network_content_widget.dart';
 
-class ListGamesDisplay extends NetworkWidget with AppPage {
+class ListGamesDisplayPage extends NetworkWidget with AppPage {
   static final String route = "List-games-page";
 
   @override

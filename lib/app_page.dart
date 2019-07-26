@@ -58,7 +58,7 @@ abstract class AppPage {
                 size: 36,
               ),
               onPressed: () {
-                var listGamesPage = materialisePage(ListGamesDisplay());
+                var listGamesPage = materialisePage(ListGamesDisplayPage());
                 loadPage(context, listGamesPage);
               }),
           AppDefaultPadding(
@@ -91,7 +91,7 @@ abstract class AppPage {
                   size: 36,
                 ),
                 onPressed: () {
-                  var listGamesPage = materialisePage(ListGamesDisplay());
+                  var listGamesPage = materialisePage(ListGamesDisplayPage());
                   loadPage(context, listGamesPage);
                 }),
           ),
@@ -163,8 +163,8 @@ abstract class AppPage {
               ),
             ),
             ScopedModelDescendant<AppModel>(
-              builder: (context, child, model) =>
-                  Column(children: drawerFilters(context, model)),
+              builder: (context, child, model) => Column(
+                  children: drawerFilters(context, model)),
             ),
           ],
         ),

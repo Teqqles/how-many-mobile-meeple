@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_splash_screen/flutter_splash_screen.dart';
+import 'package:package_info/package_info.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:how_many_mobile_meeple/model/settings.dart';
 
@@ -12,29 +12,12 @@ import 'how_many_meeple_app_bar.dart';
 import 'package:how_many_mobile_meeple/model/item.dart';
 import 'package:how_many_mobile_meeple/model/model.dart';
 
-class HomePage extends StatefulWidget {
+class HomePage extends StatelessWidget with GameConfig, AppPage {
   static final String route = "Home-page";
-
-  @override
-  _MyHomePageState createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<HomePage> with GameConfig, AppPage {
-  TextEditingController controller = TextEditingController();
+  final TextEditingController controller = TextEditingController();
 
   static const String itemHintTextMessage = "bgg username/geeklist id";
   static const String maxItemsMessage = "max items entered";
-
-  @override
-  void initState() {
-    super.initState();
-    hideScreen();
-  }
-
-  Future<void> hideScreen() async {
-    Future.delayed(Duration(milliseconds: GameConfig.splashScreenDisplayTime),
-        () => FlutterSplashScreen.hide());
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -50,10 +33,17 @@ class _MyHomePageState extends State<HomePage> with GameConfig, AppPage {
             child: Column(children: <Widget>[
           buildBoardGameItemTextField(textFieldWidth),
           buildPlayerSliderDisplay(),
-          buildGameDurationSliderDisplay(),
+          buildGameDurationSliderDisplay(context),
           buildBoardGameGeekItemDisplay(),
         ])),
-        persistentFooterButtons: <Widget>[footerDisplay()]);
+        persistentFooterButtons: <Widget>[
+          FutureBuilder(
+              future: footerDisplay(context),
+              builder: (context, snapshot) {
+                if (snapshot.hasData) return snapshot.data;
+                return Text("");
+              })
+        ]);
   }
 
   ScopedModelDescendant<AppModel> buildPlayerSliderDisplay() =>
@@ -70,13 +60,11 @@ class _MyHomePageState extends State<HomePage> with GameConfig, AppPage {
                   ),
                   Switch(
                       onChanged: (bool value) {
-                        setState(() {
-                          model.settings
-                              .setting(Settings.filterNumberOfPlayers.name)
-                              .enabled = value;
-                          model.updateStore();
-                          model.invalidateCache();
-                        });
+                        model.settings
+                            .setting(Settings.filterNumberOfPlayers.name)
+                            .enabled = value;
+                        model.updateStore();
+                        model.invalidateCache();
                       },
                       value: model.settings
                           .setting(Settings.filterNumberOfPlayers.name)
@@ -99,14 +87,11 @@ class _MyHomePageState extends State<HomePage> with GameConfig, AppPage {
                               .enabled
                           ? null
                           : (players) {
-                              setState(() {
-                                model.settings
-                                    .setting(
-                                        Settings.filterNumberOfPlayers.name)
-                                    .value = players.floor();
-                                model.updateStore();
-                                model.invalidateCache();
-                              });
+                              model.settings
+                                  .setting(Settings.filterNumberOfPlayers.name)
+                                  .value = players.floor();
+                              model.updateStore();
+                              model.invalidateCache();
                             },
                       value: model.settings
                           .setting(Settings.filterNumberOfPlayers.name)
@@ -172,9 +157,8 @@ class _MyHomePageState extends State<HomePage> with GameConfig, AppPage {
                     if (controller.text.isEmpty) return;
                     Item item = Item(controller.text.trim());
                     model.addItem(item);
-                    setState(() {
-                      controller.text = '';
-                    });
+                    controller.text = '';
+                    model.updateStore();
                   },
                 ),
               ),
@@ -183,7 +167,8 @@ class _MyHomePageState extends State<HomePage> with GameConfig, AppPage {
         ),
       ));
 
-  ScopedModelDescendant<AppModel> buildGameDurationSliderDisplay() {
+  ScopedModelDescendant<AppModel> buildGameDurationSliderDisplay(
+      BuildContext context) {
     var sliderWidth = MediaQuery.of(context).size.width * 0.60;
     var sliderMinValue = 15.0;
     var sliderMaxValue = 300.0;
@@ -201,13 +186,11 @@ class _MyHomePageState extends State<HomePage> with GameConfig, AppPage {
                 ),
                 Switch(
                     onChanged: (bool value) {
-                      setState(() {
-                        model.settings
-                            .setting(Settings.filterMinimumTimeToPlay.name)
-                            .enabled = value;
-                        model.updateStore();
-                        model.invalidateCache();
-                      });
+                      model.settings
+                          .setting(Settings.filterMinimumTimeToPlay.name)
+                          .enabled = value;
+                      model.updateStore();
+                      model.invalidateCache();
                     },
                     value: model.settings
                         .setting(Settings.filterMinimumTimeToPlay.name)
@@ -230,16 +213,14 @@ class _MyHomePageState extends State<HomePage> with GameConfig, AppPage {
                           .enabled
                       ? null
                       : (time) {
-                          setState(() {
-                            model.settings
-                                .setting(Settings.filterMinimumTimeToPlay.name)
-                                .value = time.start.floor();
-                            model.settings
-                                .setting(Settings.filterMaximumTimeToPlay.name)
-                                .value = time.end.floor();
-                            model.updateStore();
-                            model.invalidateCache();
-                          });
+                          model.settings
+                              .setting(Settings.filterMinimumTimeToPlay.name)
+                              .value = time.start.floor();
+                          model.settings
+                              .setting(Settings.filterMaximumTimeToPlay.name)
+                              .value = time.end.floor();
+                          model.updateStore();
+                          model.invalidateCache();
                         },
                   values: RangeValues(
                       model.settings
@@ -305,20 +286,22 @@ class _MyHomePageState extends State<HomePage> with GameConfig, AppPage {
                       IconButton(
                           icon: Icon(Icons.person,
                               size: iconSize,
-                              color: colorItem(item, ItemType.collection)),
+                              color: colorItem(
+                                  context, item, ItemType.collection)),
                           onPressed: () {
-                            setState(() {
-                              item.itemType = ItemType.collection;
-                            });
+                            item.itemType = ItemType.collection;
+                            model.invalidateCache();
+                            model.updateStore();
                           }),
                       IconButton(
                           icon: Icon(Icons.format_list_bulleted,
                               size: iconSize,
-                              color: colorItem(item, ItemType.geekList)),
+                              color:
+                                  colorItem(context, item, ItemType.geekList)),
                           onPressed: () {
-                            setState(() {
-                              item.itemType = ItemType.geekList;
-                            });
+                            item.itemType = ItemType.geekList;
+                            model.invalidateCache();
+                            model.updateStore();
                           }),
                       IconButton(
                         icon: Icon(
@@ -327,8 +310,7 @@ class _MyHomePageState extends State<HomePage> with GameConfig, AppPage {
                           color: Theme.of(context).errorColor,
                         ),
                         onPressed: () {
-                          setState(() =>
-                            model.deleteItem(item));
+                          model.deleteItem(item);
                         },
                       ),
                     ],
@@ -343,11 +325,20 @@ class _MyHomePageState extends State<HomePage> with GameConfig, AppPage {
     );
   }
 
-  Widget footerDisplay() => Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: <Widget>[DisclaimerText(GameConfig.disclaimerText, context)],
-      );
+  Future<Widget> footerDisplay(BuildContext context) async {
+    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: <Widget>[
+        Padding(
+          padding: const EdgeInsets.only(right: 8.0),
+          child: DisclaimerText(GameConfig.disclaimerText, context),
+        ),
+        DisclaimerText("(v:${packageInfo.version})", context)
+      ],
+    );
+  }
 
   String limitTitleLength(String text) {
     if (text.length > 20) {
@@ -356,7 +347,7 @@ class _MyHomePageState extends State<HomePage> with GameConfig, AppPage {
     return text;
   }
 
-  Color colorItem(Item item, ItemType expectedType) =>
+  Color colorItem(BuildContext context, Item item, ItemType expectedType) =>
       expectedType == item.itemType
           ? Theme.of(context).accentColor
           : Theme.of(context).disabledColor;

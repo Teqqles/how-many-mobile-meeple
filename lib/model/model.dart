@@ -27,7 +27,8 @@ class AppModel extends Model {
     Settings.filterMaximumTimeToPlay.name: Settings.filterMaximumTimeToPlay,
     Settings.filterNumberOfPlayers.name: Settings.filterNumberOfPlayers,
     Settings.filterUsingUserRecommendations.name:
-        Settings.filterUsingUserRecommendations
+        Settings.filterUsingUserRecommendations,
+    Settings.filterIncludesExpansions.name: Settings.filterIncludesExpansions
   });
   Orientation screenOrientation;
 

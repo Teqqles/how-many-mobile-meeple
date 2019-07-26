@@ -21,6 +21,9 @@ class Settings {
       value: true,
       enabled: true);
 
+  static Setting filterIncludesExpansions = Setting("includeExpansions",
+      header: "Bgg-Include-Expansions", value: false, enabled: true);
+
   Map<String, Setting> _settings = Map<String, Setting>();
 
   Map<String, Setting> get allSettings => _settings;

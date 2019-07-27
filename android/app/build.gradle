@@ -31,8 +31,8 @@ android {
         applicationId "com.sixfootsoftware.howmanymobilemeeple"
         minSdkVersion 16
         targetSdkVersion 28
-        versionCode 2006
-        versionName "1.4"
+        versionCode 2007
+        versionName "1.5"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
 

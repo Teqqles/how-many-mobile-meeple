@@ -20,7 +20,7 @@ class RandomGameDisplayPage extends NetworkWidget with AppPage {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: HowManyMeepleAppBar(GameConfig.randomGamePageTitle),
-        floatingActionButton: floatingActionButtonGroup(context),
+        persistentFooterButtons: [iconButtonGroup(context)],
         body: Container(child: loadNetworkContent(displayGame)));
   }
 

@@ -53,65 +53,64 @@ abstract class AppPage {
     }
   }
 
-  Widget floatingActionButtonGroup(BuildContext context) => Row(
+  Widget iconButtonGroup(BuildContext context) => Row(
         mainAxisAlignment: MainAxisAlignment.end,
+        crossAxisAlignment: CrossAxisAlignment.end,
         children: <Widget>[
-          FloatingActionButton(
-              heroTag: listHeroTag,
-              child: Icon(
-                Icons.format_list_numbered,
-                size: 36,
-              ),
-              onPressed: () {
-                var listGamesPage = materialisePage(ListGamesDisplayPage());
-                loadPage(context, listGamesPage);
-              }),
-          AppDefaultPadding(
-            child: FloatingActionButton.extended(
-              heroTag: randomGameHeroTag,
+          Container(
+            decoration: new BoxDecoration(
+              color: Theme.of(context).accentColor,
+              borderRadius: new BorderRadius.circular(40.0),
+            ),
+            child: Padding(
+              padding: EdgeInsets.only(left: 5, right: 5, top: 2, bottom: 2),
+              child: IconButton(
+                  color: Theme.of(context).selectedRowColor,
+                  icon: Icon(
+                    Icons.format_list_numbered,
+                    size: 36,
+                  ),
+                  onPressed: () {
+                    var listGamesPage = materialisePage(ListGamesDisplayPage());
+                    loadPage(context, listGamesPage);
+                  }),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(left: 8, right: 8),
+            child: MaterialButton(
               onPressed: () {
                 var randomGamePage = materialisePage(RandomGameDisplayPage());
                 loadPage(context, randomGamePage);
               },
-              icon: SizedBox(
-                height: _imageButtonSize,
-                width: _imageButtonSize,
-                child: randomGameButtonIcon,
-              ),
-              label: Text(randomGameLabel),
-            ),
-          ),
-        ],
-      );
-
-  Widget lightweightFloatingGroup(BuildContext context) => Column(
-        mainAxisAlignment: MainAxisAlignment.end,
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: <Widget>[
-          AppDefaultPadding(
-            child: FloatingActionButton(
-                heroTag: listHeroTag,
-                child: Icon(
-                  Icons.format_list_numbered,
-                  size: 36,
+              child: Container(
+                decoration: new BoxDecoration(
+                  color: Theme.of(context).accentColor,
+                  borderRadius: new BorderRadius.circular(40.0),
                 ),
-                onPressed: () {
-                  var listGamesPage = materialisePage(ListGamesDisplayPage());
-                  loadPage(context, listGamesPage);
-                }),
-          ),
-          AppDefaultPadding(
-            child: FloatingActionButton(
-                heroTag: randomGameHeroTag,
-                onPressed: () {
-                  var randomGamePage = materialisePage(RandomGameDisplayPage());
-                  loadPage(context, randomGamePage);
-                },
-                child: SizedBox(
-                  height: _imageButtonSize,
-                  width: _imageButtonSize,
-                  child: randomGameButtonIcon,
-                )),
+                child: Padding(
+                  padding: EdgeInsets.only(left: 18, right: 12, top: 5, bottom: 5),
+                  child: Row(
+                    children: <Widget>[
+                      SizedBox(
+                        height: _imageButtonSize,
+                        width: _imageButtonSize,
+                        child: randomGameButtonIcon,
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 8, right: 8),
+                        child: Text(
+                          randomGameLabel,
+                          style: TextStyle(
+                              color: Theme.of(context).selectedRowColor,
+                              fontWeight: FontWeight.bold),
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+              ),
+            ),
           ),
         ],
       );

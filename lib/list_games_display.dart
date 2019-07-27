@@ -20,7 +20,7 @@ class ListGamesDisplayPage extends NetworkWidget with AppPage {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: HowManyMeepleAppBar(GameConfig.listGamesPageTitle),
-        floatingActionButton: lightweightFloatingGroup(context),
+        persistentFooterButtons: [iconButtonGroup(context)],
         body: Container(child: loadNetworkContent(displayGame)));
   }
 

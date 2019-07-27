@@ -28,7 +28,10 @@ class AppModel extends Model {
     Settings.filterNumberOfPlayers.name: Settings.filterNumberOfPlayers,
     Settings.filterUsingUserRecommendations.name:
         Settings.filterUsingUserRecommendations,
-    Settings.filterIncludesExpansions.name: Settings.filterIncludesExpansions
+    Settings.filterIncludesExpansions.name: Settings.filterIncludesExpansions,
+    Settings.filterMechanics.name: Settings.filterMechanics,
+    Settings.filterUseAllMechanics.name: Settings.filterUseAllMechanics,
+    Settings.filterComplexity.name: Settings.filterComplexity,
   });
   Orientation screenOrientation;
 
@@ -56,6 +59,7 @@ class AppModel extends Model {
     _items.items.remove(item);
     _storeItems(_items);
     this.invalidateCache();
+    notifyListeners();
   }
 
   void updateStore() {

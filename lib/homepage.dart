@@ -30,7 +30,21 @@ class HomePage extends StatelessWidget with GameConfig, AppPage {
     return Scaffold(
         appBar: HowManyMeepleAppBar(GameConfig.optionsPageTitle),
         drawer: pageDrawer(context),
-        floatingActionButton: lightweightFloatingGroup(context),
+        bottomNavigationBar: Container(
+          color: Theme.of(context).highlightColor,
+          child: AppDefaultPadding(
+            child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: <Widget>[
+                  FutureBuilder(
+                      future: footerDisplay(context),
+                      builder: (context, snapshot) {
+                        if (snapshot.hasData) return snapshot.data;
+                        return Text("");
+                      })
+                ]),
+          ),
+        ),
         body: SingleChildScrollView(
             child: Column(children: <Widget>[
           buildBoardGameItemTextField(textFieldWidth),
@@ -40,14 +54,7 @@ class HomePage extends StatelessWidget with GameConfig, AppPage {
           buildComplexitySliderDisplay(),
           buildMechanicFilterDisplay(context),
         ])),
-        persistentFooterButtons: <Widget>[
-          FutureBuilder(
-              future: footerDisplay(context),
-              builder: (context, snapshot) {
-                if (snapshot.hasData) return snapshot.data;
-                return Text("");
-              })
-        ]);
+        persistentFooterButtons: [iconButtonGroup(context)]);
   }
 
   ScopedModelDescendant<AppModel> buildComplexitySliderDisplay() =>

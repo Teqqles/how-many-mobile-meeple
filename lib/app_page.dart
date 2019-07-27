@@ -33,6 +33,11 @@ abstract class AppPage {
             "Include Expansions in Filter",
             model.settings.setting(Settings.filterIncludesExpansions.name),
             model,
+            context),
+        DrawerBggFilter(
+            "Show All Mechanics",
+            model.settings.setting(Settings.filterUseAllMechanics.name),
+            model,
             context)
       ];
 
@@ -163,8 +168,8 @@ abstract class AppPage {
               ),
             ),
             ScopedModelDescendant<AppModel>(
-              builder: (context, child, model) => Column(
-                  children: drawerFilters(context, model)),
+              builder: (context, child, model) =>
+                  Column(children: drawerFilters(context, model)),
             ),
           ],
         ),

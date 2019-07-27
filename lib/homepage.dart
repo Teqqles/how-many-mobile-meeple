@@ -12,6 +12,8 @@ import 'how_many_meeple_app_bar.dart';
 import 'package:how_many_mobile_meeple/model/item.dart';
 import 'package:how_many_mobile_meeple/model/model.dart';
 
+import 'model/mechanics.dart';
+
 class HomePage extends StatelessWidget with GameConfig, AppPage {
   static final String route = "Home-page";
   final TextEditingController controller = TextEditingController();
@@ -28,13 +30,15 @@ class HomePage extends StatelessWidget with GameConfig, AppPage {
     return Scaffold(
         appBar: HowManyMeepleAppBar(GameConfig.optionsPageTitle),
         drawer: pageDrawer(context),
-        floatingActionButton: floatingActionButtonGroup(context),
+        floatingActionButton: lightweightFloatingGroup(context),
         body: SingleChildScrollView(
             child: Column(children: <Widget>[
           buildBoardGameItemTextField(textFieldWidth),
-          buildPlayerSliderDisplay(),
-          buildGameDurationSliderDisplay(context),
           buildBoardGameGeekItemDisplay(),
+          buildGameDurationSliderDisplay(context),
+          buildPlayerSliderDisplay(),
+          buildComplexitySliderDisplay(),
+          buildMechanicFilterDisplay(context),
         ])),
         persistentFooterButtons: <Widget>[
           FutureBuilder(
@@ -46,11 +50,97 @@ class HomePage extends StatelessWidget with GameConfig, AppPage {
         ]);
   }
 
+  ScopedModelDescendant<AppModel> buildComplexitySliderDisplay() =>
+      ScopedModelDescendant<AppModel>(
+        builder: (context, child, model) => Column(
+          children: <Widget>[
+            Container(
+              height: 35,
+              color: Theme.of(context).highlightColor,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  AppDefaultPadding(
+                    child: Text("How Difficult?", textAlign: TextAlign.left),
+                  ),
+                  Switch(
+                      onChanged: (bool value) {
+                        model.settings
+                            .setting(Settings.filterComplexity.name)
+                            .enabled = value;
+                        model.updateStore();
+                        model.invalidateCache();
+                      },
+                      value: model.settings
+                          .setting(Settings.filterComplexity.name)
+                          .enabled)
+                ],
+              ),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: <Widget>[
+                Container(
+                  height: 35,
+                  width: MediaQuery.of(context).size.width * 0.60,
+                  child: Slider(
+                      activeColor: Theme.of(context).accentColor,
+                      min: 0.0,
+                      max: 5.0,
+                      divisions: 10,
+                      onChanged: !model.settings
+                              .setting(Settings.filterComplexity.name)
+                              .enabled
+                          ? null
+                          : (complexity) {
+                              model.settings
+                                  .setting(Settings.filterComplexity.name)
+                                  .value = complexity;
+                              model.updateStore();
+                              model.invalidateCache();
+                            },
+                      value: model.settings
+                          .setting(Settings.filterComplexity.name)
+                          .value,
+                      label:
+                          "${model.settings.setting(Settings.filterComplexity.name).value.toString()} weighting"),
+                ),
+                AppDefaultPadding(
+                  child: Container(
+                    decoration: ShapeDecoration(
+                        color: model.settings
+                                .setting(Settings.filterComplexity.name)
+                                .enabled
+                            ? Theme.of(context).accentColor
+                            : Theme.of(context).disabledColor,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8.0),
+                        )),
+                    child: AppDefaultPadding(
+                      child: Text(
+                          model.settings
+                              .setting(Settings.filterComplexity.name)
+                              .value
+                              .toString(),
+                          textAlign: TextAlign.right,
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Theme.of(context).selectedRowColor)),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      );
+
   ScopedModelDescendant<AppModel> buildPlayerSliderDisplay() =>
       ScopedModelDescendant<AppModel>(
         builder: (context, child, model) => Column(
           children: <Widget>[
             Container(
+              height: 35,
               color: Theme.of(context).highlightColor,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -76,6 +166,7 @@ class HomePage extends StatelessWidget with GameConfig, AppPage {
               mainAxisAlignment: MainAxisAlignment.start,
               children: <Widget>[
                 Container(
+                  height: 35,
                   width: MediaQuery.of(context).size.width * 0.60,
                   child: Slider(
                       activeColor: Theme.of(context).accentColor,
@@ -136,6 +227,7 @@ class HomePage extends StatelessWidget with GameConfig, AppPage {
         child: Row(
           children: <Widget>[
             Container(
+              height: 35,
               width: textFieldWidth,
               child: ScopedModelDescendant<AppModel>(
                 builder: (context, child, model) => TextFormField(
@@ -177,6 +269,7 @@ class HomePage extends StatelessWidget with GameConfig, AppPage {
       builder: (context, child, model) => Column(
         children: <Widget>[
           Container(
+            height: 35,
             color: Theme.of(context).highlightColor,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -264,63 +357,151 @@ class HomePage extends StatelessWidget with GameConfig, AppPage {
     );
   }
 
+  ScopedModelDescendant<AppModel> buildMechanicFilterDisplay(
+      BuildContext context) {
+    return ScopedModelDescendant<AppModel>(
+      builder: (context, child, model) {
+        var mechanics =
+            model.settings.setting(Settings.filterUseAllMechanics.name).value
+                ? Mechanics.bggMechanics
+                : Mechanics.popularMechanics;
+        return Column(
+          children: <Widget>[
+            Container(
+              height: 35,
+              color: Theme.of(context).highlightColor,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  AppDefaultPadding(
+                    child: Text("Mechanics?", textAlign: TextAlign.left),
+                  ),
+                  Switch(
+                      onChanged: (bool value) {
+                        model.settings
+                            .setting(Settings.filterMechanics.name)
+                            .enabled = value;
+                        model.updateStore();
+                        model.invalidateCache();
+                      },
+                      value: model.settings
+                          .setting(Settings.filterMechanics.name)
+                          .enabled)
+                ],
+              ),
+            ),
+            Wrap(
+              alignment: WrapAlignment.center,
+              spacing: 5,
+              children: mechanics.map((String value) {
+                return ChoiceChip(
+                  labelStyle: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                      color: model.settings
+                              .setting(Settings.filterMechanics.name)
+                              .enabled
+                          ? Theme.of(context).accentColor
+                          : Theme.of(context).disabledColor),
+                  label: Text(value),
+                  selected: model.settings
+                      .setting(Settings.filterMechanics.name)
+                      .value
+                      .contains(value),
+                  onSelected: (bool selected) {
+                    if (!model.settings
+                        .setting(Settings.filterMechanics.name)
+                        .enabled) return;
+                    selected
+                        ? model.settings
+                            .setting(Settings.filterMechanics.name)
+                            .value
+                            .add(value)
+                        : model.settings
+                            .setting(Settings.filterMechanics.name)
+                            .value
+                            .remove(value);
+                    model.invalidateCache();
+                    model.updateStore();
+                  },
+                );
+              }).toList(),
+            )
+          ],
+        );
+      },
+    );
+  }
+
   ScopedModelDescendant<AppModel> buildBoardGameGeekItemDisplay() {
-    var iconSize = 30.0;
     return ScopedModelDescendant<AppModel>(
       builder: (context, child, model) => Column(
         children: <Widget>[
           Container(
+              height: 35,
               color: Theme.of(context).highlightColor,
               child: AppDefaultPadding(
                 child: Row(children: [Text("Usernames/Geeklists Selected")]),
               )),
           Column(
             children: ListTile.divideTiles(
-              context: context,
-              tiles: model.items.map(
-                (item) => ListTile(
-                  title: Text(limitTitleLength(item.name)),
-                  trailing: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      IconButton(
-                          icon: Icon(Icons.person,
-                              size: iconSize,
-                              color: colorItem(
-                                  context, item, ItemType.collection)),
-                          onPressed: () {
-                            item.itemType = ItemType.collection;
-                            model.invalidateCache();
-                            model.updateStore();
-                          }),
-                      IconButton(
-                          icon: Icon(Icons.format_list_bulleted,
-                              size: iconSize,
-                              color:
-                                  colorItem(context, item, ItemType.geekList)),
-                          onPressed: () {
-                            item.itemType = ItemType.geekList;
-                            model.invalidateCache();
-                            model.updateStore();
-                          }),
-                      IconButton(
-                        icon: Icon(
-                          Icons.delete,
-                          size: iconSize,
-                          color: Theme.of(context).errorColor,
-                        ),
-                        onPressed: () {
-                          model.deleteItem(item);
-                        },
-                      ),
-                    ],
-                    mainAxisSize: MainAxisSize.min,
-                  ),
-                ),
-              ),
-            ).toList(),
+                    context: context, tiles: itemsSelected(context, model))
+                .toList(),
           ),
         ],
+      ),
+    );
+  }
+
+  Iterable<Widget> itemsSelected(BuildContext context, AppModel model) {
+    var iconSize = 30.0;
+    if (model.items.isEmpty) {
+      return [
+        ListTile(
+            title: Text(
+          "No Items Selected",
+          style:
+              TextStyle(fontSize: 13, color: Theme.of(context).disabledColor),
+        ))
+      ];
+    }
+    return model.items.map(
+      (item) => ListTile(
+        title: Text(limitTitleLength(item.name)),
+        trailing: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            IconButton(
+                icon: Icon(Icons.person,
+                    size: iconSize,
+                    color: colorItem(context, item, ItemType.collection)),
+                onPressed: () {
+                  item.itemType = ItemType.collection;
+                  model.invalidateCache();
+                  model.updateStore();
+                }),
+            IconButton(
+                icon: Icon(Icons.format_list_bulleted,
+                    size: iconSize,
+                    color: colorItem(context, item, ItemType.geekList)),
+                onPressed: () {
+                  item.itemType = ItemType.geekList;
+                  model.invalidateCache();
+                  model.updateStore();
+                }),
+            IconButton(
+              icon: Icon(
+                Icons.delete,
+                size: iconSize,
+                color: Theme.of(context).errorColor,
+              ),
+              onPressed: () {
+                model.deleteItem(item);
+              },
+            ),
+          ],
+          mainAxisSize: MainAxisSize.min,
+        ),
       ),
     );
   }

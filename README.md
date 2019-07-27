@@ -12,6 +12,9 @@ How Many Mobile Meeple is the sister project to the web based [How Many Meeples]
 :heavy_check_mark: Supply up-to 5 Geeklists and collections\
 :heavy_check_mark: Filtering on player counts\
 :heavy_check_mark: Filtering on time available to play\
+:heavy_check_mark: Filtering on game difficulty\
+:heavy_check_mark: Filtering on different game mechanics\
+:heavy_check_mark: Allows including/excluding expansions\
 :heavy_check_mark: Randomly select a game based on your filters\
 :heavy_check_mark: List all games matching your filters\
 :heavy_check_mark: Caches game information to speed up page changes\

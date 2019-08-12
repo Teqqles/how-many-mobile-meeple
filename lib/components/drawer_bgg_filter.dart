@@ -1,9 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:how_many_mobile_meeple/model/model.dart';
+import 'package:how_many_mobile_meeple/model/setting.dart';
 
-import 'app_default_padding.dart';
-import 'model/model.dart';
-import 'model/setting.dart';
+import '../app_default_padding.dart';
 
 class DrawerBggFilter extends Container {
   DrawerBggFilter(

@@ -4,8 +4,8 @@ import 'package:sprintf/sprintf.dart';
 import 'app_default_padding.dart';
 import 'app_page.dart';
 import 'package:how_many_mobile_meeple/model/bgg_cache.dart';
-import 'game_config.dart';
-import 'heading_text.dart';
+import 'app_const.dart';
+import 'package:how_many_mobile_meeple/components/heading_text.dart';
 import 'how_many_meeple_app_bar.dart';
 import 'package:how_many_mobile_meeple/model/model.dart';
 import 'model/game.dart';
@@ -17,7 +17,7 @@ class ListGamesDisplayPage extends NetworkWidget with AppPage {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: HowManyMeepleAppBar(GameConfig.listGamesPageTitle),
+        appBar: HowManyMeepleAppBar(AppConst.listGamesPageTitle),
         persistentFooterButtons: [iconButtonGroup(context)],
         body: Container(child: loadNetworkContent(displayGame)));
   }

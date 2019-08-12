@@ -2,15 +2,18 @@ import 'dart:typed_data';
 
 import 'package:esys_flutter_share/esys_flutter_share.dart';
 import 'package:flutter/material.dart';
+import 'package:how_many_mobile_meeple/model/app_preferences.dart';
+import 'package:how_many_mobile_meeple/storage/preferences_history.dart';
 import 'package:mime_type/mime_type.dart';
 import 'package:http/http.dart' as http;
 import 'package:scoped_model/scoped_model.dart';
-import 'drawer_bgg_filter.dart';
+import 'package:how_many_mobile_meeple/components/drawer_bgg_filter.dart';
+import 'package:how_many_mobile_meeple/components/drawer_heading.dart';
+import 'package:how_many_mobile_meeple/components/drawer_saved_setting.dart';
 import 'model/game.dart';
 import 'model/model.dart';
 import 'model/settings.dart';
 import 'random_game_display.dart';
-import 'app_default_padding.dart';
 import 'list_games_display.dart';
 import 'package:path/path.dart';
 
@@ -21,25 +24,6 @@ abstract class AppPage {
   static const String listHeroTag = "list-games";
 
   final double _imageButtonSize = 42;
-
-  List<Widget> drawerFilters(BuildContext context, AppModel model) => [
-        DrawerBggFilter(
-            "Recommended Player Count Filter",
-            model.settings
-                .setting(Settings.filterUsingUserRecommendations.name),
-            model,
-            context),
-        DrawerBggFilter(
-            "Include Expansions in Filter",
-            model.settings.setting(Settings.filterIncludesExpansions.name),
-            model,
-            context),
-        DrawerBggFilter(
-            "Show All Mechanics",
-            model.settings.setting(Settings.filterUseAllMechanics.name),
-            model,
-            context)
-      ];
 
   void loadPage(BuildContext context, MaterialPageRoute<dynamic> page) {
     if (Navigator.of(context).canPop()) {
@@ -89,7 +73,8 @@ abstract class AppPage {
                   borderRadius: new BorderRadius.circular(40.0),
                 ),
                 child: Padding(
-                  padding: EdgeInsets.only(left: 18, right: 12, top: 5, bottom: 5),
+                  padding:
+                      EdgeInsets.only(left: 18, right: 12, top: 5, bottom: 5),
                   child: Row(
                     children: <Widget>[
                       SizedBox(
@@ -138,39 +123,67 @@ abstract class AppPage {
   MaterialPageRoute materialisePage(StatelessWidget page) =>
       MaterialPageRoute(builder: (context) => page);
 
-  Widget pageDrawer(BuildContext context) => Drawer(
-        child: ListView(
-          padding: EdgeInsets.zero,
+  Widget pageDrawer(BuildContext context) {
+    return Drawer(
+        child: ListView(padding: EdgeInsets.zero, children: <Widget>[
+      Container(
+        height: 80.0,
+        child: DrawerHeader(
+          padding: EdgeInsets.only(left: 8),
+          margin: EdgeInsets.zero,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              BackButton(color: Theme.of(context).selectedRowColor),
+              Padding(
+                padding: const EdgeInsets.only(right: 12),
+                child: Text(
+                  'Advanced Options',
+                  style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                      color: Theme.of(context).selectedRowColor),
+                ),
+              )
+            ],
+          ),
+          decoration: BoxDecoration(
+            color: Theme.of(context).accentColor,
+          ),
+        ),
+      ),
+      ScopedModelDescendant<AppModel>(
+        builder: (context, child, model) => Column(
           children: <Widget>[
-            Container(
-              height: 80.0,
-              child: DrawerHeader(
-                padding: EdgeInsets.only(left: 8),
-                margin: EdgeInsets.zero,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: <Widget>[
-                    BackButton(color: Theme.of(context).selectedRowColor),
-                    Padding(
-                      padding: const EdgeInsets.only(right: 12),
-                      child: Text(
-                        'Advanced Options',
-                        style: TextStyle(
-                            color: Theme.of(context).selectedRowColor),
-                      ),
-                    )
-                  ],
-                ),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).accentColor,
-                ),
-              ),
-            ),
-            ScopedModelDescendant<AppModel>(
-              builder: (context, child, model) =>
-                  Column(children: drawerFilters(context, model)),
+            DrawerBggFilter(
+                "Recommended Player Count Filter",
+                model.settings
+                    .setting(Settings.filterUsingUserRecommendations.name),
+                model,
+                context),
+            DrawerBggFilter(
+                "Include Expansions in Filter",
+                model.settings.setting(Settings.filterIncludesExpansions.name),
+                model,
+                context),
+            DrawerBggFilter(
+                "Show All Mechanics",
+                model.settings.setting(Settings.filterUseAllMechanics.name),
+                model,
+                context),
+            FutureBuilder(
+              future: drawerContent(context, model),
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  return snapshot.data;
+                } else {
+                  return Text("");
+                }
+              },
             ),
           ],
         ),
-      );
+      ),
+    ]));
+  }
 }

@@ -7,7 +7,7 @@ import 'package:how_many_mobile_meeple/model/settings.dart';
 import 'package:how_many_mobile_meeple/model/bgg_cache.dart';
 import 'package:how_many_mobile_meeple/model/item.dart';
 
-import '../game_config.dart';
+import '../app_const.dart';
 import 'game.dart';
 import 'games.dart';
 import 'items.dart';
@@ -19,6 +19,8 @@ class AppModel extends Model {
   static int _unsetCacheDurationInMinutes = -1;
 
   bool hasLoadedPersistedData = false;
+
+  String title;
 
   Items _items = Items([]);
   BggCache _bggCache = BggCache(Games(), _unsetCacheDurationInMinutes);
@@ -36,7 +38,7 @@ class AppModel extends Model {
   });
   Orientation screenOrientation;
 
-  List<Item> get items => _items.items;
+  Items get items => _items;
 
   BggCache get bggCache => _bggCache;
 
@@ -51,7 +53,7 @@ class AppModel extends Model {
   }
 
   void addItem(Item item) {
-    _items.items.add(item);
+    _items.itemList.add(item);
     this.invalidateCache();
     this.updateStore();
   }
@@ -65,7 +67,7 @@ class AppModel extends Model {
   }
 
   void deleteItem(Item item) {
-    _items.items.remove(item);
+    _items.itemList.remove(item);
     _storeItems(_items);
     this.invalidateCache();
     notifyListeners();
@@ -81,7 +83,7 @@ class AppModel extends Model {
 
   void loadStoredData() async {
     StoredPreferences store = await StorageFactory.getStoredPreferences();
-    _items = await store.loadItems(GameConfig.maxItemsFromBgg);
+    _items = await store.loadItems(AppConst.maxItemsFromBgg);
     _settings = await store.loadSettings(settings);
     this.hasLoadedPersistedData = true;
     this.notifyListeners();
@@ -94,6 +96,6 @@ class AppModel extends Model {
 
   void _storeItems(Items items) async {
     StoredPreferences store = await StorageFactory.getStoredPreferences();
-    store.saveItems(items, GameConfig.maxItemsFromBgg);
+    store.saveItems(items, AppConst.maxItemsFromBgg);
   }
 }

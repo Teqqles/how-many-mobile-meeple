@@ -3,29 +3,30 @@ import 'item.dart';
 class Items {
   static final String itemStoreNamePrefix = 'bgg-item-';
 
-  List<Item> items;
+  List<Item> itemList;
 
-  Items(this.items);
+  Items(this.itemList);
 
   toJson() {
-    return {'items': items};
+    return {'items': itemList};
   }
 
   factory Items.fromJson(Map<String, dynamic> json) {
-    return Items(
-        json['items'].map((value) => Items.fromJson(value)).toList());
+    return Items(json['items'].map((value) => Items.fromJson(value)).toList());
   }
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-          other is Items &&
-              runtimeType == other.runtimeType &&
-              items.toString() == other.items.toString();
+      other is Items &&
+          runtimeType == other.runtimeType &&
+          itemList.toString() == other.itemList.toString();
 
   @override
-  int get hashCode => items.toString().hashCode;
+  int get hashCode => itemList.toString().hashCode;
 
   @override
-  String toString() => items.toString();
+  String toString() => itemList.toString();
+
+  bool get isEmpty => itemList.isEmpty;
 }

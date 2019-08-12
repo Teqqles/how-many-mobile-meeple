@@ -99,7 +99,7 @@ abstract class NetworkWidget extends StatelessWidget with ScreenTools {
       return displayWidgetFn(context, model, model.bggCache);
     }
     return FutureBuilder<Games>(
-      future: LoadGames.fetchGames(model.settings, model.items),
+      future: LoadGames.fetchGames(model.settings, model.items.itemList),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
           return gameDataResponse(model, snapshot, context, displayWidgetFn);

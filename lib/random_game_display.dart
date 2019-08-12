@@ -7,7 +7,7 @@ import 'package:how_many_mobile_meeple/screen_tools.dart';
 import 'app_default_padding.dart';
 import 'app_page.dart';
 import 'package:how_many_mobile_meeple/model/bgg_cache.dart';
-import 'game_config.dart';
+import 'app_const.dart';
 import 'how_many_meeple_app_bar.dart';
 import 'package:how_many_mobile_meeple/model/model.dart';
 import 'model/game.dart';
@@ -19,7 +19,7 @@ class RandomGameDisplayPage extends NetworkWidget with AppPage {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: HowManyMeepleAppBar(GameConfig.randomGamePageTitle),
+        appBar: HowManyMeepleAppBar(AppConst.randomGamePageTitle),
         persistentFooterButtons: [iconButtonGroup(context)],
         body: Container(child: loadNetworkContent(displayGame)));
   }

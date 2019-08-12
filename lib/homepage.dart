@@ -7,14 +7,14 @@ import 'package:how_many_mobile_meeple/model/settings.dart';
 import 'app_default_padding.dart';
 import 'app_page.dart';
 import 'disclaimer_text.dart';
-import 'game_config.dart';
+import 'app_const.dart';
 import 'how_many_meeple_app_bar.dart';
 import 'package:how_many_mobile_meeple/model/item.dart';
 import 'package:how_many_mobile_meeple/model/model.dart';
 
 import 'model/mechanics.dart';
 
-class HomePage extends StatelessWidget with GameConfig, AppPage {
+class HomePage extends StatelessWidget with AppConst, AppPage {
   static final String route = "Home-page";
   final TextEditingController controller = TextEditingController();
 
@@ -28,7 +28,8 @@ class HomePage extends StatelessWidget with GameConfig, AppPage {
     }
     var textFieldWidth = MediaQuery.of(context).size.width * 0.65;
     return Scaffold(
-        appBar: HowManyMeepleAppBar(GameConfig.optionsPageTitle),
+        appBar: HowManyMeepleAppBar(AppConst.optionsPageTitle,
+            hasSaveDialog: true, model: AppModel.of(context), context: context),
         drawer: pageDrawer(context),
         bottomNavigationBar: Container(
           color: Theme.of(context).highlightColor,
@@ -238,12 +239,14 @@ class HomePage extends StatelessWidget with GameConfig, AppPage {
               width: textFieldWidth,
               child: ScopedModelDescendant<AppModel>(
                 builder: (context, child, model) => TextFormField(
-                  enabled: model.items.length < GameConfig.maxItemsFromBgg,
+                  enabled:
+                      model.items.itemList.length < AppConst.maxItemsFromBgg,
                   controller: controller,
                   decoration: InputDecoration(
-                    hintText: model.items.length < GameConfig.maxItemsFromBgg
-                        ? itemHintTextMessage
-                        : maxItemsMessage,
+                    hintText:
+                        model.items.itemList.length < AppConst.maxItemsFromBgg
+                            ? itemHintTextMessage
+                            : maxItemsMessage,
                   ),
                 ),
               ),
@@ -475,7 +478,7 @@ class HomePage extends StatelessWidget with GameConfig, AppPage {
         ))
       ];
     }
-    return model.items.map(
+    return model.items.itemList.map(
       (item) => ListTile(
         title: Text(limitTitleLength(item.name)),
         trailing: Row(
@@ -524,7 +527,7 @@ class HomePage extends StatelessWidget with GameConfig, AppPage {
       children: <Widget>[
         Padding(
           padding: const EdgeInsets.only(right: 8.0),
-          child: DisclaimerText(GameConfig.disclaimerText, context),
+          child: DisclaimerText(AppConst.disclaimerText, context),
         ),
         DisclaimerText("(v:${packageInfo.version})", context)
       ],

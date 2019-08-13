@@ -5,7 +5,7 @@ class Games {
 
   List<Game> get games => gamesByName.values.toList();
 
-  Games({this.gamesByName});
+  Games({this.gamesByName: const {}});
 
   factory Games.fromJson(List<dynamic> parsedJson) {
     var games = Map<String, Game>();
@@ -29,5 +29,21 @@ class Games {
     List<Game> unsortedGames = games;
     unsortedGames.sort((a, b) => b.averageRating.compareTo(a.averageRating));
     return unsortedGames;
+  }
+
+  Games clone() {
+    return Games(gamesByName: gamesByName);
+  }
+
+  Games remove(Game game) {
+    Map<String, Game> newGamesList = Map<String, Game>();
+    newGamesList.addAll(gamesByName);
+    newGamesList.remove(game.name);
+    return Games(gamesByName: newGamesList);
+  }
+
+  @override
+  String toString() {
+    return gamesByName.toString();
   }
 }

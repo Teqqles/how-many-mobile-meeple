@@ -9,12 +9,12 @@ class Game {
 
   Game(
       {this.name,
-        this.maxPlayers,
-        this.minPlayers,
-        this.maxPlaytime,
-        this.imageUrl,
-        this.thumbnailUrl,
-        this.averageRating});
+      this.maxPlayers,
+      this.minPlayers,
+      this.maxPlaytime,
+      this.imageUrl,
+      this.thumbnailUrl,
+      this.averageRating});
 
   factory Game.fromJson(Map<String, dynamic> json) {
     return Game(
@@ -27,4 +27,16 @@ class Game {
       averageRating: json['stats']['average'] ?? 0,
     );
   }
+
+  @override
+  String toString() {
+    return "$name, $minPlayers, $maxPlayers";
+  }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) || other is Game && toString() == other.toString();
+
+  @override
+  int get hashCode => toString().hashCode;
 }

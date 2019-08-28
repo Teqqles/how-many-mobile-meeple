@@ -9,7 +9,6 @@ import 'heading_text.dart';
 import 'how_many_meeple_app_bar.dart';
 import 'package:how_many_mobile_meeple/model/model.dart';
 import 'model/game.dart';
-import 'model/games.dart';
 import 'network_content_widget.dart';
 
 class ListGamesDisplayPage extends NetworkWidget with AppPage {

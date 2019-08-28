@@ -289,6 +289,9 @@ class HomePage extends StatelessWidget with GameConfig, AppPage {
                       model.settings
                           .setting(Settings.filterMinimumTimeToPlay.name)
                           .enabled = value;
+                      model.settings
+                          .setting(Settings.filterMaximumTimeToPlay.name)
+                          .enabled = value;
                       model.updateStore();
                       model.invalidateCache();
                     },

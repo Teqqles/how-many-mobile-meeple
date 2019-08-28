@@ -1,9 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:sprintf/sprintf.dart';
-
 import 'app_default_padding.dart';
 import 'app_page.dart';
 import 'package:how_many_mobile_meeple/model/bgg_cache.dart';
@@ -26,27 +23,22 @@ class ListGamesDisplayPage extends NetworkWidget with AppPage {
 
   Widget displayGame(
       BuildContext context, AppModel model, BggCache cachedGames) {
-    var thumbnailSize = 30.0;
     var heading = [
       TableRow(children: [
-        TableCell(
-          verticalAlignment: TableCellVerticalAlignment.middle,
-          child: AppDefaultPadding(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: <Widget>[
-                Icon(Icons.image,
-                    size: thumbnailSize, color: Theme.of(context).accentColor),
-              ],
-            ),
-          ),
-        ),
         TableCell(
           verticalAlignment: TableCellVerticalAlignment.middle,
           child: AppDefaultPadding(
             child: Container(
                 alignment: Alignment.bottomLeft,
                 child: HeadingText("Name", context)),
+          ),
+        ),
+        TableCell(
+          verticalAlignment: TableCellVerticalAlignment.middle,
+          child: AppDefaultPadding(
+            child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [HeadingText("Weight", context)]),
           ),
         ),
         TableCell(
@@ -63,7 +55,11 @@ class ListGamesDisplayPage extends NetworkWidget with AppPage {
       scrollDirection: Axis.vertical,
       child: Table(
         defaultColumnWidth: FixedColumnWidth(60),
-        columnWidths: {1: FlexColumnWidth(4.0), 2: FlexColumnWidth(1.0)},
+        columnWidths: {
+          0: FlexColumnWidth(4.0),
+          1: FlexColumnWidth(1.0),
+          2: FlexColumnWidth(1.0)
+        },
         children: heading +
             (cachedGames.games.getGamesByRating().map(
                       (game) => TableRow(
@@ -72,32 +68,6 @@ class ListGamesDisplayPage extends NetworkWidget with AppPage {
                                   bottom: BorderSide(
                                       color: Theme.of(context).dividerColor))),
                           children: [
-                            TableCell(
-                              child: AppDefaultPadding(
-                                child: Container(
-                                  alignment: Alignment.centerLeft,
-                                  child: CachedNetworkImage(
-                                    imageUrl: game.imageUrl,
-                                    imageBuilder: (context, provider) =>
-                                        Container(
-                                      height: thumbnailSize,
-                                      width: thumbnailSize,
-                                      decoration: BoxDecoration(
-                                        image: DecorationImage(
-                                            image: provider, fit: BoxFit.fill),
-                                      ),
-                                    ),
-                                    placeholder: (context, url) =>
-                                        SpinKitCircle(
-                                            color:
-                                                Theme.of(context).accentColor,
-                                            size: thumbnailSize),
-                                    errorWidget: (context, url, error) =>
-                                        Icon(Icons.error),
-                                  ),
-                                ),
-                              ),
-                            ),
                             TableCell(
                                 verticalAlignment:
                                     TableCellVerticalAlignment.middle,
@@ -108,6 +78,18 @@ class ListGamesDisplayPage extends NetworkWidget with AppPage {
                                         game.name,
                                       )),
                                 )),
+                            TableCell(
+                              verticalAlignment:
+                                  TableCellVerticalAlignment.middle,
+                              child: AppDefaultPadding(
+                                child: Container(
+                                  alignment: Alignment.centerRight,
+                                  child: Text(
+                                    sprintf("%0.2f", [game.averageWeight]),
+                                  ),
+                                ),
+                              ),
+                            ),
                             TableCell(
                               verticalAlignment:
                                   TableCellVerticalAlignment.middle,

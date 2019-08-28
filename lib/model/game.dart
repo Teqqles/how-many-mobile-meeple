@@ -1,3 +1,5 @@
+enum SortableGameField { name, rating, weight }
+
 class Game {
   final String name;
   final int maxPlayers;

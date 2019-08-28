@@ -8,6 +8,7 @@ import 'package:how_many_mobile_meeple/model/bgg_cache.dart';
 import 'package:how_many_mobile_meeple/model/item.dart';
 
 import '../game_config.dart';
+import 'game.dart';
 import 'games.dart';
 import 'items.dart';
 
@@ -40,6 +41,14 @@ class AppModel extends Model {
   BggCache get bggCache => _bggCache;
 
   Settings get settings => _settings;
+
+  SortOrder sortDirection = SortOrder.Desc;
+
+  SortableGameField sortGameField = SortableGameField.rating;
+
+  void toggleSortDirection() {
+    sortDirection = sortDirection == SortOrder.Asc ? SortOrder.Desc : SortOrder.Asc;
+  }
 
   void addItem(Item item) {
     _items.items.add(item);

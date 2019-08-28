@@ -1,5 +1,7 @@
 import 'game.dart';
 
+enum SortOrder { Asc, Desc }
+
 class Games {
   final Map<String, Game> gamesByName;
 
@@ -25,9 +27,63 @@ class Games {
     return this;
   }
 
-  List<Game> getGamesByRating() {
+  List<Game> getGamesBy(
+      {SortableGameField field = SortableGameField.rating,
+      SortOrder order = SortOrder.Desc}) {
+    switch (field) {
+      case SortableGameField.name:
+        return getGamesByName(order);
+        break;
+      case SortableGameField.weight:
+        return getGamesByWeight(order);
+      default:
+        return getGamesByRating(order);
+    }
+  }
+
+  List<Game> getGamesByRating(SortOrder order) {
     List<Game> unsortedGames = games;
-    unsortedGames.sort((a, b) => b.averageRating.compareTo(a.averageRating));
+
+    switch (order) {
+      case SortOrder.Asc:
+        unsortedGames
+            .sort((a, b) => a.averageRating.compareTo(b.averageRating));
+        break;
+      case SortOrder.Desc:
+        unsortedGames
+            .sort((a, b) => b.averageRating.compareTo(a.averageRating));
+        break;
+    }
+    return unsortedGames;
+  }
+
+  List<Game> getGamesByName(SortOrder order) {
+    List<Game> unsortedGames = games;
+
+    switch (order) {
+      case SortOrder.Asc:
+        unsortedGames.sort((a, b) => a.name.compareTo(b.name));
+        break;
+      case SortOrder.Desc:
+        unsortedGames.sort((a, b) => b.name.compareTo(a.name));
+        break;
+    }
+    return unsortedGames;
+  }
+
+  List<Game> getGamesByWeight(SortOrder order) {
+    List<Game> unsortedGames = games;
+
+    switch (order) {
+      case SortOrder.Asc:
+        unsortedGames
+            .sort((a, b) => a.averageWeight.compareTo(b.averageWeight));
+        break;
+      case SortOrder.Desc:
+        unsortedGames
+            .sort((a, b) => b.averageWeight.compareTo(a.averageWeight));
+        break;
+    }
     return unsortedGames;
   }
 

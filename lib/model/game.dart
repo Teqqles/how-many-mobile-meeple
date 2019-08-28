@@ -4,8 +4,8 @@ class Game {
   final int minPlayers;
   final int maxPlaytime;
   final String imageUrl;
-  final String thumbnailUrl;
   final double averageRating;
+  final double averageWeight;
 
   Game(
       {this.name,
@@ -13,8 +13,8 @@ class Game {
       this.minPlayers,
       this.maxPlaytime,
       this.imageUrl,
-      this.thumbnailUrl,
-      this.averageRating});
+      this.averageRating,
+      this.averageWeight});
 
   factory Game.fromJson(Map<String, dynamic> json) {
     return Game(
@@ -23,8 +23,8 @@ class Game {
       minPlayers: json['minplayers'],
       maxPlaytime: json['maxplaytime'],
       imageUrl: json['image'],
-      thumbnailUrl: json['thumbnail'],
       averageRating: json['stats']['average'] ?? 0,
+      averageWeight: json['stats']['averageweight'] ?? 0,
     );
   }
 

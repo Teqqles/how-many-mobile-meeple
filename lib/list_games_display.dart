@@ -8,6 +8,8 @@ import 'game_config.dart';
 import 'heading_text.dart';
 import 'how_many_meeple_app_bar.dart';
 import 'package:how_many_mobile_meeple/model/model.dart';
+import 'model/game.dart';
+import 'model/games.dart';
 import 'network_content_widget.dart';
 
 class ListGamesDisplayPage extends NetworkWidget with AppPage {
@@ -23,30 +25,52 @@ class ListGamesDisplayPage extends NetworkWidget with AppPage {
 
   Widget displayGame(
       BuildContext context, AppModel model, BggCache cachedGames) {
+    var model = AppModel.of(context);
     var heading = [
       TableRow(children: [
         TableCell(
           verticalAlignment: TableCellVerticalAlignment.middle,
           child: AppDefaultPadding(
-            child: Container(
-                alignment: Alignment.bottomLeft,
-                child: HeadingText("Name", context)),
+            child: FlatButton(
+                padding: EdgeInsets.zero,
+                onPressed: () {
+                  model.toggleSortDirection();
+                  model.sortGameField = SortableGameField.name;
+                  model.refreshState();
+                },
+                child: Container(
+                    alignment: Alignment.bottomLeft,
+                    child: HeadingText("Name", context))),
           ),
         ),
         TableCell(
           verticalAlignment: TableCellVerticalAlignment.middle,
           child: AppDefaultPadding(
-            child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [HeadingText("Weight", context)]),
+            child: FlatButton(
+                padding: EdgeInsets.zero,
+                onPressed: () {
+                  model.toggleSortDirection();
+                  model.sortGameField = SortableGameField.weight;
+                  model.refreshState();
+                },
+                child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [HeadingText("Weight", context)])),
           ),
         ),
         TableCell(
           verticalAlignment: TableCellVerticalAlignment.middle,
           child: AppDefaultPadding(
-            child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [HeadingText("Rating", context)]),
+            child: FlatButton(
+                padding: EdgeInsets.zero,
+                onPressed: () {
+                  model.toggleSortDirection();
+                  model.sortGameField = SortableGameField.rating;
+                  model.refreshState();
+                },
+                child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [HeadingText("Rating", context)])),
           ),
         ),
       ])
@@ -61,7 +85,10 @@ class ListGamesDisplayPage extends NetworkWidget with AppPage {
           2: FlexColumnWidth(1.0)
         },
         children: heading +
-            (cachedGames.games.getGamesByRating().map(
+            (cachedGames.games
+                    .getGamesBy(
+                        field: model.sortGameField, order: model.sortDirection)
+                    .map(
                       (game) => TableRow(
                           decoration: BoxDecoration(
                               border: Border(

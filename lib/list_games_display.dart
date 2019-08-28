@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:sprintf/sprintf.dart';
-
 import 'app_default_padding.dart';
 import 'app_page.dart';
 import 'package:how_many_mobile_meeple/model/bgg_cache.dart';

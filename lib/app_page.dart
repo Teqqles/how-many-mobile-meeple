@@ -10,6 +10,9 @@ import 'package:scoped_model/scoped_model.dart';
 import 'package:how_many_mobile_meeple/components/drawer_bgg_filter.dart';
 import 'package:how_many_mobile_meeple/components/drawer_heading.dart';
 import 'package:how_many_mobile_meeple/components/drawer_saved_setting.dart';
+import 'app_const.dart';
+import 'components/component_factory.dart';
+import 'components/drawer_settings_column.dart';
 import 'model/game.dart';
 import 'model/model.dart';
 import 'model/settings.dart';
@@ -24,6 +27,58 @@ abstract class AppPage {
   static const String listHeroTag = "list-games";
 
   final double _imageButtonSize = 42;
+
+  Container drawerHeader(BuildContext context) => Container(
+        height: 80.0,
+        child: DrawerHeader(
+          padding: EdgeInsets.only(left: 8),
+          margin: EdgeInsets.zero,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              BackButton(color: Theme.of(context).selectedRowColor),
+              Padding(
+                padding: const EdgeInsets.only(right: 12),
+                child: Text(
+                  'Advanced Options',
+                  style: TextStyle(color: Theme.of(context).selectedRowColor),
+                ),
+              )
+            ],
+          ),
+          decoration: BoxDecoration(
+            color: Theme.of(context).accentColor,
+          ),
+        ),
+      );
+
+  List<Widget> staticFilters(AppModel model, BuildContext context) => [
+        DrawerBggFilter(
+            "Recommended Player Count Filter",
+            model.settings
+                .setting(Settings.filterUsingUserRecommendations.name),
+            model,
+            context),
+        DrawerBggFilter(
+            "Include Expansions in Filter",
+            model.settings.setting(Settings.filterIncludesExpansions.name),
+            model,
+            context),
+        DrawerBggFilter(
+            "Show All Mechanics",
+            model.settings.setting(Settings.filterUseAllMechanics.name),
+            model,
+            context),
+      ];
+
+  Future<List<Widget>> drawerFilters(
+      BuildContext context, AppModel model) async {
+    var drawerSettingsColumn =
+        await ComponentFactory.getDrawerSettingsColumn(AppConst.savedSettings);
+    return <Widget>[drawerHeader(context)] +
+        staticFilters(model, context) +
+        await drawerSettingsColumn.drawerContent(context, model);
+  }
 
   void loadPage(BuildContext context, MaterialPageRoute<dynamic> page) {
     if (Navigator.of(context).canPop()) {
@@ -124,66 +179,26 @@ abstract class AppPage {
       MaterialPageRoute(builder: (context) => page);
 
   Widget pageDrawer(BuildContext context) {
-    return Drawer(
-        child: ListView(padding: EdgeInsets.zero, children: <Widget>[
-      Container(
-        height: 80.0,
-        child: DrawerHeader(
-          padding: EdgeInsets.only(left: 8),
-          margin: EdgeInsets.zero,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              BackButton(color: Theme.of(context).selectedRowColor),
-              Padding(
-                padding: const EdgeInsets.only(right: 12),
-                child: Text(
-                  'Advanced Options',
-                  style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w600,
-                      color: Theme.of(context).selectedRowColor),
-                ),
-              )
-            ],
-          ),
-          decoration: BoxDecoration(
-            color: Theme.of(context).accentColor,
-          ),
+    var staticDataComponentLength = 5;
+    return ScopedModelDescendant<AppModel>(
+      builder: (context, child, model) => Drawer(
+        child: FutureBuilder(
+          future: drawerFilters(context, model),
+          builder: (BuildContext context, AsyncSnapshot snapshot) {
+            if (!snapshot.hasData ||
+                snapshot.data.length == staticDataComponentLength)
+              return ListView(
+                  children: <Widget>[drawerHeader(context)] +
+                      staticFilters(model, context),
+                  padding: EdgeInsets.zero);
+            return ListView.builder(
+              itemCount: snapshot.data.length,
+              padding: EdgeInsets.zero,
+              itemBuilder: (context, index) => snapshot.data[index],
+            );
+          },
         ),
       ),
-      ScopedModelDescendant<AppModel>(
-        builder: (context, child, model) => Column(
-          children: <Widget>[
-            DrawerBggFilter(
-                "Recommended Player Count Filter",
-                model.settings
-                    .setting(Settings.filterUsingUserRecommendations.name),
-                model,
-                context),
-            DrawerBggFilter(
-                "Include Expansions in Filter",
-                model.settings.setting(Settings.filterIncludesExpansions.name),
-                model,
-                context),
-            DrawerBggFilter(
-                "Show All Mechanics",
-                model.settings.setting(Settings.filterUseAllMechanics.name),
-                model,
-                context),
-            FutureBuilder(
-              future: drawerContent(context, model),
-              builder: (context, snapshot) {
-                if (snapshot.hasData) {
-                  return snapshot.data;
-                } else {
-                  return Text("");
-                }
-              },
-            ),
-          ],
-        ),
-      ),
-    ]));
+    );
   }
 }

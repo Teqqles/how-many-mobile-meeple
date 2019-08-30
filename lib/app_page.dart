@@ -2,17 +2,12 @@ import 'dart:typed_data';
 
 import 'package:esys_flutter_share/esys_flutter_share.dart';
 import 'package:flutter/material.dart';
-import 'package:how_many_mobile_meeple/model/app_preferences.dart';
-import 'package:how_many_mobile_meeple/storage/preferences_history.dart';
 import 'package:mime_type/mime_type.dart';
 import 'package:http/http.dart' as http;
 import 'package:scoped_model/scoped_model.dart';
 import 'package:how_many_mobile_meeple/components/drawer_bgg_filter.dart';
-import 'package:how_many_mobile_meeple/components/drawer_heading.dart';
-import 'package:how_many_mobile_meeple/components/drawer_saved_setting.dart';
 import 'app_const.dart';
 import 'components/component_factory.dart';
-import 'components/drawer_settings_column.dart';
 import 'model/game.dart';
 import 'model/model.dart';
 import 'model/settings.dart';

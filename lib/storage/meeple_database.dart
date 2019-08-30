@@ -24,7 +24,6 @@ abstract class MeepleDatabase {
   final _lock = new Lock();
 
   Future<Database> getDb() async {
-    await Sqflite.devSetDebugModeOn(true);
     if (_db == null) {
       await _lock.synchronized(() async {
         if (_db == null) {
@@ -50,8 +49,6 @@ abstract class MeepleDatabase {
     }
     return path;
   }
-
-  Future<Map> insert(String statement, List<dynamic> binds) async {}
 
   int getSecondsTimestamp() {
     double timestampInSeconds = DateTime.now().millisecondsSinceEpoch / 1000;

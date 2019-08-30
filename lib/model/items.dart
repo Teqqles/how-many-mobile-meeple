@@ -11,8 +11,10 @@ class Items {
     return {'items': itemList};
   }
 
-  factory Items.fromJson(Map<String, dynamic> json) {
-    return Items(json['items'].map((value) => Items.fromJson(value)).toList());
+  factory Items.fromDb(Map<String, dynamic> json) {
+    List<Item> items =
+        List<Item>.from(json['items'].map((item) => Item.fromJson(item)));
+    return Items(items);
   }
 
   @override

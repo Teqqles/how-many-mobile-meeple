@@ -93,12 +93,10 @@ class PreferencesHistoryDb extends MeepleDatabase {
   }
 
   Future<List<AppPreferences>> loadAllPreferences() async {
-    print("load preferences");
     String selectPreferenceStatement =
         'SELECT * FROM $tableName ORDER BY timestamp DESC LIMIT 5';
     var db = await getDb();
     List<Map> list = await db.rawQuery(selectPreferenceStatement);
-    print(list);
     return _tableDataToPreferences(list);
   }
 }

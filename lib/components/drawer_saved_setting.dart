@@ -56,7 +56,7 @@ class DrawerSavedSetting extends Container {
           ),
         );
 
-  static DrawerSavedSetting preferencesToDrawSettings(
+  static DrawerSavedSetting preferencesToDrawerSettings(
       AppPreferences preferences, BuildContext context) {
     return DrawerSavedSetting(preferences.title, preferences, context);
   }

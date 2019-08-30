@@ -23,7 +23,7 @@ class DrawerSettingsColumn {
     List<AppPreferences> settings = await historyDb.loadAllPreferences();
     return settings
         .map((pref) =>
-            DrawerSavedSetting.preferencesToDrawSettings(pref, context))
+            DrawerSavedSetting.preferencesToDrawerSettings(pref, context))
         .toList();
   }
 }

@@ -8,7 +8,7 @@ import 'model/model.dart';
 class SaveDialog extends StatelessWidget {
   final TextEditingController controller = TextEditingController();
 
-  final PreferencesHistory history = PreferencesHistory();
+  final PreferencesHistoryDb history = PreferencesHistoryDb();
 
   final String title = 'Save Preferences';
   final AppModel model;

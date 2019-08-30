@@ -49,11 +49,24 @@ class AppModel extends Model {
   SortableGameField sortGameField = SortableGameField.rating;
 
   void toggleSortDirection() {
-    sortDirection = sortDirection == SortOrder.Asc ? SortOrder.Desc : SortOrder.Asc;
+    sortDirection =
+        sortDirection == SortOrder.Asc ? SortOrder.Desc : SortOrder.Asc;
   }
 
   void addItem(Item item) {
     _items.itemList.add(item);
+    this.invalidateCache();
+    this.updateStore();
+  }
+
+  void replaceItems(Items items) {
+    _items = items;
+    this.invalidateCache();
+    this.updateStore();
+  }
+
+  void replaceSettings(Settings settings) {
+    _settings = settings;
     this.invalidateCache();
     this.updateStore();
   }

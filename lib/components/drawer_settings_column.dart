@@ -6,31 +6,24 @@ import 'package:how_many_mobile_meeple/storage/preferences_history.dart';
 import 'drawer_heading.dart';
 import 'drawer_saved_setting.dart';
 
-class DrawerSettingsColumn extends StatelessWidget {
-  final PreferencesHistory history;
+class DrawerSettingsColumn {
+  final PreferencesHistoryDb historyDb;
   final String drawerName;
 
-  DrawerSettingsColumn(this.drawerName, {this.history}) : super();
+  DrawerSettingsColumn(this.drawerName, {this.historyDb}) : super();
 
-  Future<Column> drawerContent(BuildContext context, AppModel model) async {
+  Future<List<Widget>> drawerContent(
+      BuildContext context, AppModel model) async {
     List<Widget> fixedDrawerItems = [DrawerHeading(drawerName, context)];
     List<Widget> dynamicDrawerItems = await settingsFromDb(context);
-    return Column(children: fixedDrawerItems + dynamicDrawerItems);
+    return fixedDrawerItems + dynamicDrawerItems;
   }
 
   Future<List<DrawerSavedSetting>> settingsFromDb(BuildContext context) async {
-    List<AppPreferences> settings = await history.loadAllPreferences();
+    List<AppPreferences> settings = await historyDb.loadAllPreferences();
     return settings
         .map((pref) =>
             DrawerSavedSetting.preferencesToDrawSettings(pref, context))
         .toList();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    // TODO: implement build
-    return Column(
-      children: <Widget>[Text("Wibble")],
-    );
   }
 }

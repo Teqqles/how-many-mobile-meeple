@@ -2,6 +2,7 @@
 abstract class AppConst {
   static const int splashScreenDisplayTime = 3600;
   static const String optionsPageTitle = 'Game Options';
+  static const String savedSettings = 'Saved Settings';
   static const String randomGamePageTitle = 'Random Game';
   static const String listGamesPageTitle = 'List of Games';
   static const int maxItemsFromBgg = 5;

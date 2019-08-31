@@ -26,15 +26,13 @@ class HowManyMeepleAppBar extends AppBar {
               hasSaveDialog
                   ? IconButton(
                       icon: Icon(Icons.save),
-                      onPressed: (model == null || model.items.isEmpty)
-                          ? null
-                          : () => showDialog(
-                              context: context,
-                              builder: (context) => SaveDialog(
-                                    model: model,
-                                  )))
+                      onPressed: () => showDialog(
+                          context: context,
+                          builder: (context) => SaveDialog(
+                                model: model,
+                              )))
                   : EmptyWidget()
             ],
           ),
         );
-} // todo redraw on any form changes to allow data to populate button
+}

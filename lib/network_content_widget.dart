@@ -4,7 +4,7 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:how_many_mobile_meeple/screen_tools.dart';
 
-import 'app_default_padding.dart';
+import 'package:how_many_mobile_meeple/components/app_default_padding.dart';
 import 'package:how_many_mobile_meeple/model/bgg_cache.dart';
 import 'load_games.dart';
 import 'package:how_many_mobile_meeple/model/model.dart';
@@ -99,7 +99,7 @@ abstract class NetworkWidget extends StatelessWidget with ScreenTools {
       return displayWidgetFn(context, model, model.bggCache);
     }
     return FutureBuilder<Games>(
-      future: LoadGames.fetchGames(model.settings, model.items),
+      future: LoadGames.fetchGames(model.settings, model.items.itemList),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
           return gameDataResponse(model, snapshot, context, displayWidgetFn);

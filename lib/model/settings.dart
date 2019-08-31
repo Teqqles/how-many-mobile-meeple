@@ -56,11 +56,6 @@ class Settings {
     return {'settings': allSettings};
   }
 
-  factory Settings.fromJson(Map<String, dynamic> json) {
-    return Settings(
-        json['settings'].map((value) => Setting.fromJson(value)).toList());
-  }
-
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||

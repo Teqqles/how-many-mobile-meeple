@@ -1,7 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:how_many_mobile_meeple/splashscreen.dart';
+import 'package:how_many_mobile_meeple/app_builder.dart';
 
 import 'package:scoped_model/scoped_model.dart';
 
@@ -16,7 +16,7 @@ void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
   final routes = <String, WidgetBuilder>{
-    HomePage.route: (BuildContext context) => SplashScreen(),
+    HomePage.route: (BuildContext context) => AppBuilder(),
     RandomGameDisplayPage.route: (BuildContext context) =>
         RandomGameDisplayPage(),
     ListGamesDisplayPage.route: (BuildContext context) =>
@@ -44,7 +44,7 @@ class MyApp extends StatelessWidget {
           theme: ThemeData(
             primarySwatch: swatch,
           ),
-          home: SplashScreen(),
+          home: AppBuilder(),
           routes: routes,
         ));
   }

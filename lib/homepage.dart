@@ -7,14 +7,14 @@ import 'package:how_many_mobile_meeple/model/settings.dart';
 import 'app_default_padding.dart';
 import 'app_page.dart';
 import 'disclaimer_text.dart';
-import 'app_const.dart';
+import 'app_common.dart';
 import 'how_many_meeple_app_bar.dart';
 import 'package:how_many_mobile_meeple/model/item.dart';
 import 'package:how_many_mobile_meeple/model/model.dart';
 
 import 'model/mechanics.dart';
 
-class HomePage extends StatelessWidget with AppConst, AppPage {
+class HomePage extends StatelessWidget with AppCommon, AppPage {
   static final String route = "Home-page";
   final TextEditingController controller = TextEditingController();
 
@@ -28,7 +28,7 @@ class HomePage extends StatelessWidget with AppConst, AppPage {
     }
     var textFieldWidth = MediaQuery.of(context).size.width * 0.65;
     return Scaffold(
-        appBar: HowManyMeepleAppBar(AppConst.optionsPageTitle,
+        appBar: HowManyMeepleAppBar(AppCommon.optionsPageTitle,
             hasSaveDialog: true, model: AppModel.of(context), context: context),
         drawer: pageDrawer(context),
         bottomNavigationBar: Container(
@@ -240,11 +240,11 @@ class HomePage extends StatelessWidget with AppConst, AppPage {
               child: ScopedModelDescendant<AppModel>(
                 builder: (context, child, model) => TextFormField(
                   enabled:
-                      model.items.itemList.length < AppConst.maxItemsFromBgg,
+                      model.items.itemList.length < AppCommon.maxItemsFromBgg,
                   controller: controller,
                   decoration: InputDecoration(
                     hintText:
-                        model.items.itemList.length < AppConst.maxItemsFromBgg
+                        model.items.itemList.length < AppCommon.maxItemsFromBgg
                             ? itemHintTextMessage
                             : maxItemsMessage,
                   ),
@@ -527,7 +527,7 @@ class HomePage extends StatelessWidget with AppConst, AppPage {
       children: <Widget>[
         Padding(
           padding: const EdgeInsets.only(right: 8.0),
-          child: DisclaimerText(AppConst.disclaimerText, context),
+          child: DisclaimerText(AppCommon.disclaimerText, context),
         ),
         DisclaimerText("(v:${packageInfo.version})", context)
       ],

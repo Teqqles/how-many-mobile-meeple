@@ -6,7 +6,7 @@ import 'package:mime_type/mime_type.dart';
 import 'package:http/http.dart' as http;
 import 'package:scoped_model/scoped_model.dart';
 import 'package:how_many_mobile_meeple/components/drawer_bgg_filter.dart';
-import 'app_const.dart';
+import 'app_common.dart';
 import 'components/component_factory.dart';
 import 'model/game.dart';
 import 'model/model.dart';
@@ -69,7 +69,7 @@ abstract class AppPage {
   Future<List<Widget>> drawerFilters(
       BuildContext context, AppModel model) async {
     var drawerSettingsColumn =
-        await ComponentFactory.getDrawerSettingsColumn(AppConst.savedSettings);
+        await ComponentFactory.getDrawerSettingsColumn(AppCommon.savedSettings);
     return <Widget>[drawerHeader(context)] +
         staticFilters(model, context) +
         await drawerSettingsColumn.drawerContent(context, model);
@@ -92,9 +92,9 @@ abstract class AppPage {
         crossAxisAlignment: CrossAxisAlignment.end,
         children: <Widget>[
           Container(
-            decoration: new BoxDecoration(
+            decoration: BoxDecoration(
               color: Theme.of(context).accentColor,
-              borderRadius: new BorderRadius.circular(40.0),
+              borderRadius: BorderRadius.circular(40.0),
             ),
             child: Padding(
               padding: EdgeInsets.only(left: 5, right: 5, top: 2, bottom: 2),
@@ -118,9 +118,9 @@ abstract class AppPage {
                 loadPage(context, randomGamePage);
               },
               child: Container(
-                decoration: new BoxDecoration(
+                decoration: BoxDecoration(
                   color: Theme.of(context).accentColor,
-                  borderRadius: new BorderRadius.circular(40.0),
+                  borderRadius: BorderRadius.circular(40.0),
                 ),
                 child: Padding(
                   padding:
@@ -163,8 +163,7 @@ abstract class AppPage {
           Uint8List bytes = response.bodyBytes;
           await Share.file(
               "${game.name}", basename(game.imageUrl), bytes, mimeType,
-              text:
-                  "We'll next be playing this randomly selected game... ${game.name}");
+              text: AppCommon.randomGameMessage(game.name));
         },
         shape:
             RoundedRectangleBorder(borderRadius: BorderRadius.circular(30.0)));

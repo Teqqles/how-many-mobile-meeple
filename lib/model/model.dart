@@ -7,7 +7,7 @@ import 'package:how_many_mobile_meeple/model/settings.dart';
 import 'package:how_many_mobile_meeple/model/bgg_cache.dart';
 import 'package:how_many_mobile_meeple/model/item.dart';
 
-import '../app_const.dart';
+import '../app_common.dart';
 import 'game.dart';
 import 'games.dart';
 import 'items.dart';
@@ -96,7 +96,7 @@ class AppModel extends Model {
 
   void loadStoredData() async {
     StoredPreferences store = await StorageFactory.getStoredPreferences();
-    _items = await store.loadItems(AppConst.maxItemsFromBgg);
+    _items = await store.loadItems(AppCommon.maxItemsFromBgg);
     _settings = await store.loadSettings(settings);
     this.hasLoadedPersistedData = true;
     this.notifyListeners();
@@ -109,6 +109,6 @@ class AppModel extends Model {
 
   void _storeItems(Items items) async {
     StoredPreferences store = await StorageFactory.getStoredPreferences();
-    store.saveItems(items, AppConst.maxItemsFromBgg);
+    store.saveItems(items, AppCommon.maxItemsFromBgg);
   }
 }

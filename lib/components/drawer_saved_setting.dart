@@ -7,7 +7,6 @@ import 'package:how_many_mobile_meeple/storage/preferences_history.dart';
 import '../app_common.dart';
 
 class DrawerSavedSetting extends Container {
-
   final String preferencesTitle;
   final AppPreferences preferences;
 
@@ -23,22 +22,21 @@ class DrawerSavedSetting extends Container {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
-              FlatButton(
-                  padding: EdgeInsets.zero,
-                  child: Text(
-                    preferencesTitle,
-                    textAlign: TextAlign.left,
-                    style: TextStyle(
-                        fontSize: 13, decoration: TextDecoration.underline),
-                  ),
-                  onPressed: () {
-                    var model = AppModel.of(context);
-                    model.replaceItems(preferences.items);
-                    model.replaceSettings(preferences.settings);
-                    model.refreshState();
-                    Navigator.pop(context);
-                  },// id},
-                  ),
+              InkWell(
+                child: Text(
+                  preferencesTitle,
+                  textAlign: TextAlign.left,
+                  style: TextStyle(
+                      fontSize: 13, decoration: TextDecoration.underline),
+                ),
+                onTap: () {
+                  var model = AppModel.of(context);
+                  model.replaceItems(preferences.items);
+                  model.replaceSettings(preferences.settings);
+                  model.refreshState();
+                  Navigator.pop(context);
+                }, // id},
+              ),
               IconButton(
                 icon: Icon(
                   Icons.delete,

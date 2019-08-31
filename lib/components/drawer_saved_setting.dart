@@ -4,9 +4,9 @@ import 'package:how_many_mobile_meeple/model/app_preferences.dart';
 import 'package:how_many_mobile_meeple/model/model.dart';
 import 'package:how_many_mobile_meeple/storage/preferences_history.dart';
 
-class DrawerSavedSetting extends Container {
+import '../app_common.dart';
 
-  static var iconSize = 30.0;
+class DrawerSavedSetting extends Container {
 
   final String preferencesTitle;
   final AppPreferences preferences;
@@ -42,7 +42,7 @@ class DrawerSavedSetting extends Container {
               IconButton(
                 icon: Icon(
                   Icons.delete,
-                  size: iconSize,
+                  size: AppCommon.standardIconSize,
                   color: Theme.of(context).errorColor,
                 ),
                 onPressed: () {

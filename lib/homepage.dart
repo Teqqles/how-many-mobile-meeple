@@ -4,9 +4,9 @@ import 'package:package_info/package_info.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:how_many_mobile_meeple/model/settings.dart';
 
-import 'app_default_padding.dart';
+import 'package:how_many_mobile_meeple/components/app_default_padding.dart';
 import 'app_page.dart';
-import 'disclaimer_text.dart';
+import 'package:how_many_mobile_meeple/components/disclaimer_text.dart';
 import 'app_common.dart';
 import 'how_many_meeple_app_bar.dart';
 import 'package:how_many_mobile_meeple/model/item.dart';
@@ -467,7 +467,6 @@ class HomePage extends StatelessWidget with AppCommon, AppPage {
   }
 
   Iterable<Widget> itemsSelected(BuildContext context, AppModel model) {
-    var iconSize = 30.0;
     if (model.items.isEmpty) {
       return [
         ListTile(
@@ -486,7 +485,7 @@ class HomePage extends StatelessWidget with AppCommon, AppPage {
           children: [
             IconButton(
                 icon: Icon(Icons.person,
-                    size: iconSize,
+                    size: AppCommon.standardIconSize,
                     color: colorItem(context, item, ItemType.collection)),
                 onPressed: () {
                   item.itemType = ItemType.collection;
@@ -495,7 +494,7 @@ class HomePage extends StatelessWidget with AppCommon, AppPage {
                 }),
             IconButton(
                 icon: Icon(Icons.format_list_bulleted,
-                    size: iconSize,
+                    size: AppCommon.standardIconSize,
                     color: colorItem(context, item, ItemType.geekList)),
                 onPressed: () {
                   item.itemType = ItemType.geekList;
@@ -505,7 +504,7 @@ class HomePage extends StatelessWidget with AppCommon, AppPage {
             IconButton(
               icon: Icon(
                 Icons.delete,
-                size: iconSize,
+                size: AppCommon.standardIconSize,
                 color: Theme.of(context).errorColor,
               ),
               onPressed: () {

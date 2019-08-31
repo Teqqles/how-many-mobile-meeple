@@ -5,12 +5,13 @@ import 'package:flutter/material.dart';
 import 'package:mime_type/mime_type.dart';
 import 'package:http/http.dart' as http;
 import 'package:scoped_model/scoped_model.dart';
-import 'drawer_bgg_filter.dart';
+import 'package:how_many_mobile_meeple/components/drawer_bgg_filter.dart';
+import 'app_common.dart';
+import 'components/component_factory.dart';
 import 'model/game.dart';
 import 'model/model.dart';
 import 'model/settings.dart';
 import 'random_game_display.dart';
-import 'app_default_padding.dart';
 import 'list_games_display.dart';
 import 'package:path/path.dart';
 
@@ -22,7 +23,31 @@ abstract class AppPage {
 
   final double _imageButtonSize = 42;
 
-  List<Widget> drawerFilters(BuildContext context, AppModel model) => [
+  Container drawerHeader(BuildContext context) => Container(
+        height: 80.0,
+        child: DrawerHeader(
+          padding: EdgeInsets.only(left: 8),
+          margin: EdgeInsets.zero,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              BackButton(color: Theme.of(context).selectedRowColor),
+              Padding(
+                padding: const EdgeInsets.only(right: 12),
+                child: Text(
+                  'Advanced Options',
+                  style: TextStyle(color: Theme.of(context).selectedRowColor),
+                ),
+              )
+            ],
+          ),
+          decoration: BoxDecoration(
+            color: Theme.of(context).accentColor,
+          ),
+        ),
+      );
+
+  List<Widget> staticFilters(AppModel model, BuildContext context) => [
         DrawerBggFilter(
             "Recommended Player Count Filter",
             model.settings
@@ -38,8 +63,17 @@ abstract class AppPage {
             "Show All Mechanics",
             model.settings.setting(Settings.filterUseAllMechanics.name),
             model,
-            context)
+            context),
       ];
+
+  Future<List<Widget>> drawerFilters(
+      BuildContext context, AppModel model) async {
+    var drawerSettingsColumn =
+        await ComponentFactory.getDrawerSettingsColumn(AppCommon.savedSettings);
+    return <Widget>[drawerHeader(context)] +
+        staticFilters(model, context) +
+        await drawerSettingsColumn.drawerContent(context, model);
+  }
 
   void loadPage(BuildContext context, MaterialPageRoute<dynamic> page) {
     if (Navigator.of(context).canPop()) {
@@ -58,9 +92,9 @@ abstract class AppPage {
         crossAxisAlignment: CrossAxisAlignment.end,
         children: <Widget>[
           Container(
-            decoration: new BoxDecoration(
+            decoration: BoxDecoration(
               color: Theme.of(context).accentColor,
-              borderRadius: new BorderRadius.circular(40.0),
+              borderRadius: BorderRadius.circular(40.0),
             ),
             child: Padding(
               padding: EdgeInsets.only(left: 5, right: 5, top: 2, bottom: 2),
@@ -84,12 +118,13 @@ abstract class AppPage {
                 loadPage(context, randomGamePage);
               },
               child: Container(
-                decoration: new BoxDecoration(
+                decoration: BoxDecoration(
                   color: Theme.of(context).accentColor,
-                  borderRadius: new BorderRadius.circular(40.0),
+                  borderRadius: BorderRadius.circular(40.0),
                 ),
                 child: Padding(
-                  padding: EdgeInsets.only(left: 18, right: 12, top: 5, bottom: 5),
+                  padding:
+                      EdgeInsets.only(left: 18, right: 12, top: 5, bottom: 5),
                   child: Row(
                     children: <Widget>[
                       SizedBox(
@@ -128,8 +163,7 @@ abstract class AppPage {
           Uint8List bytes = response.bodyBytes;
           await Share.file(
               "${game.name}", basename(game.imageUrl), bytes, mimeType,
-              text:
-                  "We'll next be playing this randomly selected game... ${game.name}");
+              text: AppCommon.randomGameMessage(game.name));
         },
         shape:
             RoundedRectangleBorder(borderRadius: BorderRadius.circular(30.0)));
@@ -138,39 +172,27 @@ abstract class AppPage {
   MaterialPageRoute materialisePage(StatelessWidget page) =>
       MaterialPageRoute(builder: (context) => page);
 
-  Widget pageDrawer(BuildContext context) => Drawer(
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: <Widget>[
-            Container(
-              height: 80.0,
-              child: DrawerHeader(
-                padding: EdgeInsets.only(left: 8),
-                margin: EdgeInsets.zero,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: <Widget>[
-                    BackButton(color: Theme.of(context).selectedRowColor),
-                    Padding(
-                      padding: const EdgeInsets.only(right: 12),
-                      child: Text(
-                        'Advanced Options',
-                        style: TextStyle(
-                            color: Theme.of(context).selectedRowColor),
-                      ),
-                    )
-                  ],
-                ),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).accentColor,
-                ),
-              ),
-            ),
-            ScopedModelDescendant<AppModel>(
-              builder: (context, child, model) =>
-                  Column(children: drawerFilters(context, model)),
-            ),
-          ],
+  Widget pageDrawer(BuildContext context) {
+    var staticDataComponentLength = 5;
+    return ScopedModelDescendant<AppModel>(
+      builder: (context, child, model) => Drawer(
+        child: FutureBuilder(
+          future: drawerFilters(context, model),
+          builder: (BuildContext context, AsyncSnapshot snapshot) {
+            if (!snapshot.hasData ||
+                snapshot.data.length == staticDataComponentLength)
+              return ListView(
+                  children: <Widget>[drawerHeader(context)] +
+                      staticFilters(model, context),
+                  padding: EdgeInsets.zero);
+            return ListView.builder(
+              itemCount: snapshot.data.length,
+              padding: EdgeInsets.zero,
+              itemBuilder: (context, index) => snapshot.data[index],
+            );
+          },
         ),
-      );
+      ),
+    );
+  }
 }

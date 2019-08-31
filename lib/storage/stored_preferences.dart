@@ -40,8 +40,8 @@ class StoredPreferences {
     for (var i = 0; i < maxItemsToLoadFromStore; i++) {
       await _prefs.remove("${Items.itemStoreNamePrefix}$i");
     }
-    for (var i = 0; i < items.items.length; i++) {
-      var item = items.items[i];
+    for (var i = 0; i < items.itemList.length; i++) {
+      var item = items.itemList[i];
       await _prefs.setString(
           "${Items.itemStoreNamePrefix}$i", json.encode(item));
     }

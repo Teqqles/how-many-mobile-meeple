@@ -4,22 +4,20 @@ import 'package:package_info/package_info.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:how_many_mobile_meeple/model/settings.dart';
 
-import 'app_default_padding.dart';
+import 'package:how_many_mobile_meeple/components/app_default_padding.dart';
 import 'app_page.dart';
-import 'disclaimer_text.dart';
-import 'game_config.dart';
+import 'package:how_many_mobile_meeple/components/disclaimer_text.dart';
+import 'app_common.dart';
+import 'components/empty_widget.dart';
 import 'how_many_meeple_app_bar.dart';
 import 'package:how_many_mobile_meeple/model/item.dart';
 import 'package:how_many_mobile_meeple/model/model.dart';
 
 import 'model/mechanics.dart';
 
-class HomePage extends StatelessWidget with GameConfig, AppPage {
+class HomePage extends StatelessWidget with AppPage {
   static final String route = "Home-page";
   final TextEditingController controller = TextEditingController();
-
-  static const String itemHintTextMessage = "bgg username/geeklist id";
-  static const String maxItemsMessage = "max items entered";
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +26,8 @@ class HomePage extends StatelessWidget with GameConfig, AppPage {
     }
     var textFieldWidth = MediaQuery.of(context).size.width * 0.65;
     return Scaffold(
-        appBar: HowManyMeepleAppBar(GameConfig.optionsPageTitle),
+        appBar: HowManyMeepleAppBar(AppCommon.optionsPageTitle,
+            hasSaveDialog: true, model: AppModel.of(context), context: context),
         drawer: pageDrawer(context),
         bottomNavigationBar: Container(
           color: Theme.of(context).highlightColor,
@@ -40,7 +39,7 @@ class HomePage extends StatelessWidget with GameConfig, AppPage {
                       future: footerDisplay(context),
                       builder: (context, snapshot) {
                         if (snapshot.hasData) return snapshot.data;
-                        return Text("");
+                        return EmptyWidget();
                       })
                 ]),
           ),
@@ -68,7 +67,8 @@ class HomePage extends StatelessWidget with GameConfig, AppPage {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   AppDefaultPadding(
-                    child: Text("How Difficult?", textAlign: TextAlign.left),
+                    child: Text(AppCommon.labelDifficulty,
+                        textAlign: TextAlign.left),
                   ),
                   Switch(
                       onChanged: (bool value) {
@@ -153,7 +153,8 @@ class HomePage extends StatelessWidget with GameConfig, AppPage {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   AppDefaultPadding(
-                    child: Text("Players?", textAlign: TextAlign.left),
+                    child:
+                        Text(AppCommon.labelPlayers, textAlign: TextAlign.left),
                   ),
                   Switch(
                       onChanged: (bool value) {
@@ -238,12 +239,14 @@ class HomePage extends StatelessWidget with GameConfig, AppPage {
               width: textFieldWidth,
               child: ScopedModelDescendant<AppModel>(
                 builder: (context, child, model) => TextFormField(
-                  enabled: model.items.length < GameConfig.maxItemsFromBgg,
+                  enabled:
+                      model.items.itemList.length < AppCommon.maxItemsFromBgg,
                   controller: controller,
                   decoration: InputDecoration(
-                    hintText: model.items.length < GameConfig.maxItemsFromBgg
-                        ? itemHintTextMessage
-                        : maxItemsMessage,
+                    hintText:
+                        model.items.itemList.length < AppCommon.maxItemsFromBgg
+                            ? AppCommon.itemHintTextMessage
+                            : AppCommon.maxItemsMessage,
                   ),
                 ),
               ),
@@ -282,7 +285,7 @@ class HomePage extends StatelessWidget with GameConfig, AppPage {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
                 AppDefaultPadding(
-                  child: Text("Time?", textAlign: TextAlign.left),
+                  child: Text(AppCommon.labelTime, textAlign: TextAlign.left),
                 ),
                 Switch(
                     onChanged: (bool value) {
@@ -384,7 +387,8 @@ class HomePage extends StatelessWidget with GameConfig, AppPage {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
                   AppDefaultPadding(
-                    child: Text("Mechanics?", textAlign: TextAlign.left),
+                    child: Text(AppCommon.labelMechanics,
+                        textAlign: TextAlign.left),
                   ),
                   Switch(
                       onChanged: (bool value) {
@@ -464,7 +468,6 @@ class HomePage extends StatelessWidget with GameConfig, AppPage {
   }
 
   Iterable<Widget> itemsSelected(BuildContext context, AppModel model) {
-    var iconSize = 30.0;
     if (model.items.isEmpty) {
       return [
         ListTile(
@@ -475,7 +478,7 @@ class HomePage extends StatelessWidget with GameConfig, AppPage {
         ))
       ];
     }
-    return model.items.map(
+    return model.items.itemList.map(
       (item) => ListTile(
         title: Text(limitTitleLength(item.name)),
         trailing: Row(
@@ -483,7 +486,7 @@ class HomePage extends StatelessWidget with GameConfig, AppPage {
           children: [
             IconButton(
                 icon: Icon(Icons.person,
-                    size: iconSize,
+                    size: AppCommon.standardIconSize,
                     color: colorItem(context, item, ItemType.collection)),
                 onPressed: () {
                   item.itemType = ItemType.collection;
@@ -492,7 +495,7 @@ class HomePage extends StatelessWidget with GameConfig, AppPage {
                 }),
             IconButton(
                 icon: Icon(Icons.format_list_bulleted,
-                    size: iconSize,
+                    size: AppCommon.standardIconSize,
                     color: colorItem(context, item, ItemType.geekList)),
                 onPressed: () {
                   item.itemType = ItemType.geekList;
@@ -502,7 +505,7 @@ class HomePage extends StatelessWidget with GameConfig, AppPage {
             IconButton(
               icon: Icon(
                 Icons.delete,
-                size: iconSize,
+                size: AppCommon.standardIconSize,
                 color: Theme.of(context).errorColor,
               ),
               onPressed: () {
@@ -524,7 +527,7 @@ class HomePage extends StatelessWidget with GameConfig, AppPage {
       children: <Widget>[
         Padding(
           padding: const EdgeInsets.only(right: 8.0),
-          child: DisclaimerText(GameConfig.disclaimerText, context),
+          child: DisclaimerText(AppCommon.disclaimerText, context),
         ),
         DisclaimerText("(v:${packageInfo.version})", context)
       ],

@@ -6,20 +6,23 @@ import 'package:how_many_mobile_meeple/screen_tools.dart';
 
 import 'homepage.dart';
 
-class SplashScreen extends StatefulWidget {
+class AppBuilder extends StatefulWidget {
   static final String route = "Splash-page";
 
   @override
   State<StatefulWidget> createState() {
-    return SplashScreenState();
+    return AppBuilderState();
+  }
+
+  static AppBuilderState of(BuildContext context) {
+    return context.ancestorStateOfType(const TypeMatcher<AppBuilderState>());
   }
 }
 
-class SplashScreenState extends State<SplashScreen> with ScreenTools {
+class AppBuilderState extends State<AppBuilder> with ScreenTools {
   @override
   void initState() {
     super.initState();
-
     loadData();
   }
 

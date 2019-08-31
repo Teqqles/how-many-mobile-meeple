@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:how_many_mobile_meeple/model/settings.dart';
 
-import 'game_config.dart';
+import 'app_common.dart';
 import 'package:how_many_mobile_meeple/model/item.dart';
 
 import 'model/game.dart';
@@ -16,7 +16,7 @@ class LoadGames {
     print(requestHeaders);
     for (Item item in items) {
       var response = await http.get(
-          "${GameConfig.boardGameGeekProxyUrl}/${item.itemType.name}/${item.name}",
+          "${AppCommon.boardGameGeekProxyUrl}/${item.itemType.name}/${item.name}",
           headers: requestHeaders);
       if (response.statusCode != 200) {
         throw Exception('Failed to load games for ${item.name}');

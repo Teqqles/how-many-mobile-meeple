@@ -8,18 +8,16 @@ import 'package:how_many_mobile_meeple/components/app_default_padding.dart';
 import 'app_page.dart';
 import 'package:how_many_mobile_meeple/components/disclaimer_text.dart';
 import 'app_common.dart';
+import 'components/empty_widget.dart';
 import 'how_many_meeple_app_bar.dart';
 import 'package:how_many_mobile_meeple/model/item.dart';
 import 'package:how_many_mobile_meeple/model/model.dart';
 
 import 'model/mechanics.dart';
 
-class HomePage extends StatelessWidget with AppCommon, AppPage {
+class HomePage extends StatelessWidget with AppPage {
   static final String route = "Home-page";
   final TextEditingController controller = TextEditingController();
-
-  static const String itemHintTextMessage = "bgg username/geeklist id";
-  static const String maxItemsMessage = "max items entered";
 
   @override
   Widget build(BuildContext context) {
@@ -41,7 +39,7 @@ class HomePage extends StatelessWidget with AppCommon, AppPage {
                       future: footerDisplay(context),
                       builder: (context, snapshot) {
                         if (snapshot.hasData) return snapshot.data;
-                        return Text("");
+                        return EmptyWidget();
                       })
                 ]),
           ),
@@ -69,7 +67,8 @@ class HomePage extends StatelessWidget with AppCommon, AppPage {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   AppDefaultPadding(
-                    child: Text("How Difficult?", textAlign: TextAlign.left),
+                    child: Text(AppCommon.labelDifficulty,
+                        textAlign: TextAlign.left),
                   ),
                   Switch(
                       onChanged: (bool value) {
@@ -154,7 +153,8 @@ class HomePage extends StatelessWidget with AppCommon, AppPage {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   AppDefaultPadding(
-                    child: Text("Players?", textAlign: TextAlign.left),
+                    child:
+                        Text(AppCommon.labelPlayers, textAlign: TextAlign.left),
                   ),
                   Switch(
                       onChanged: (bool value) {
@@ -245,8 +245,8 @@ class HomePage extends StatelessWidget with AppCommon, AppPage {
                   decoration: InputDecoration(
                     hintText:
                         model.items.itemList.length < AppCommon.maxItemsFromBgg
-                            ? itemHintTextMessage
-                            : maxItemsMessage,
+                            ? AppCommon.itemHintTextMessage
+                            : AppCommon.maxItemsMessage,
                   ),
                 ),
               ),
@@ -285,7 +285,7 @@ class HomePage extends StatelessWidget with AppCommon, AppPage {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
                 AppDefaultPadding(
-                  child: Text("Time?", textAlign: TextAlign.left),
+                  child: Text(AppCommon.labelTime, textAlign: TextAlign.left),
                 ),
                 Switch(
                     onChanged: (bool value) {
@@ -387,7 +387,8 @@ class HomePage extends StatelessWidget with AppCommon, AppPage {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
                   AppDefaultPadding(
-                    child: Text("Mechanics?", textAlign: TextAlign.left),
+                    child: Text(AppCommon.labelMechanics,
+                        textAlign: TextAlign.left),
                   ),
                   Switch(
                       onChanged: (bool value) {

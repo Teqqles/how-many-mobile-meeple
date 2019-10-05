@@ -35,6 +35,7 @@ class AppModel extends Model {
     Settings.filterMechanics.name: Settings.filterMechanics,
     Settings.filterUseAllMechanics.name: Settings.filterUseAllMechanics,
     Settings.filterComplexity.name: Settings.filterComplexity,
+    Settings.filterMinRating.name: Settings.filterMinRating,
   });
   Orientation screenOrientation;
 

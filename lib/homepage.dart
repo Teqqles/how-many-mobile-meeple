@@ -51,6 +51,7 @@ class HomePage extends StatelessWidget with AppPage {
           buildGameDurationSliderDisplay(context),
           buildPlayerSliderDisplay(),
           buildComplexitySliderDisplay(),
+          buildRatingSliderDisplay(),
           buildMechanicFilterDisplay(context),
         ])),
         persistentFooterButtons: [iconButtonGroup(context)]);
@@ -176,7 +177,8 @@ class HomePage extends StatelessWidget with AppPage {
                 Container(
                   height: 35,
                   width: MediaQuery.of(context).size.width * 0.60,
-                  child: Slider(
+                  child:
+                  Slider(
                       activeColor: Theme.of(context).accentColor,
                       min: 1.0,
                       max: 10.0,
@@ -214,6 +216,92 @@ class HomePage extends StatelessWidget with AppPage {
                       child: Text(
                           model.settings
                               .setting(Settings.filterNumberOfPlayers.name)
+                              .value
+                              .toString(),
+                          textAlign: TextAlign.right,
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Theme.of(context).selectedRowColor)),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      );
+
+  ScopedModelDescendant<AppModel> buildRatingSliderDisplay() =>
+      ScopedModelDescendant<AppModel>(
+        builder: (context, child, model) => Column(
+          children: <Widget>[
+            Container(
+              height: 35,
+              color: Theme.of(context).highlightColor,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  AppDefaultPadding(
+                    child:
+                        Text(AppCommon.labelRating, textAlign: TextAlign.left),
+                  ),
+                  Switch(
+                      onChanged: (bool value) {
+                        model.settings
+                            .setting(Settings.filterMinRating.name)
+                            .enabled = value;
+                        model.updateStore();
+                        model.invalidateCache();
+                      },
+                      value: model.settings
+                          .setting(Settings.filterMinRating.name)
+                          .enabled)
+                ],
+              ),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: <Widget>[
+                Container(
+                  height: 35,
+                  width: MediaQuery.of(context).size.width * 0.60,
+                  child: Slider(
+                      activeColor: Theme.of(context).accentColor,
+                      min: 0.0,
+                      max: 10.0,
+                      divisions: 20,
+                      onChanged: !model.settings
+                              .setting(Settings.filterMinRating.name)
+                              .enabled
+                          ? null
+                          : (rating) {
+                              model.settings
+                                  .setting(Settings.filterMinRating.name)
+                                  .value = rating;
+                              model.updateStore();
+                              model.invalidateCache();
+                            },
+                      value: model.settings
+                          .setting(Settings.filterMinRating.name)
+                          .value,
+                      label:
+                          "${model.settings.setting(Settings.filterMinRating.name).value.toString()} rating"),
+                ),
+                AppDefaultPadding(
+                  child: Container(
+                    decoration: ShapeDecoration(
+                        color: model.settings
+                                .setting(Settings.filterMinRating.name)
+                                .enabled
+                            ? Theme.of(context).accentColor
+                            : Theme.of(context).disabledColor,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8.0),
+                        )),
+                    child: AppDefaultPadding(
+                      child: Text(
+                          model.settings
+                              .setting(Settings.filterMinRating.name)
                               .value
                               .toString(),
                           textAlign: TextAlign.right,

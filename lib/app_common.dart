@@ -10,6 +10,7 @@ abstract class AppCommon {
   static const String labelPlayers = 'Players?';
   static const String labelTime = 'Time?';
   static const String labelMechanics = 'Mechanics?';
+  static const String labelRating = 'Min Rating?';
   static const int maxItemsFromBgg = 5;
   static const String boardGameGeekProxyUrl =
       "http://game-selector.sixfootsoftware.com:8080";

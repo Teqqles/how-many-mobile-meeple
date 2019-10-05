@@ -33,6 +33,9 @@ class Settings {
   static Setting filterIncludesExpansions = Setting("includeExpansions",
       header: "Bgg-Include-Expansions", value: false, enabled: true);
 
+  static Setting filterMinRating =
+      Setting("minimumRating", header: "Bgg-Filter-Min-Rating", value: 5.0);
+
   Map<String, Setting> _settings = Map<String, Setting>();
 
   Map<String, Setting> get allSettings => _settings;

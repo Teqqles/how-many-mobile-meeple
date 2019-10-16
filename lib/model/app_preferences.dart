@@ -27,14 +27,17 @@ class AppPreferences {
     "setting_user_recommendations",
     "setting_mechanic",
     "setting_use_all_mechanics",
-    "setting_include_expansions"
+    "setting_include_expansions",
+    "setting_rating"
   ];
 
   factory AppPreferences.fromDb(Map<String, dynamic> row) {
     var settings = [];
     for (var setting in storedSettings) {
-      var storedSetting = Setting.fromJson(json.decode(row[setting]));
-      settings.add(storedSetting);
+      if (row[setting] != null) {
+        var storedSetting = Setting.fromJson(json.decode(row[setting]));
+        settings.add(storedSetting);
+      }
     }
 
     return AppPreferences(

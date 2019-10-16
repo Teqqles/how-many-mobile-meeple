@@ -10,14 +10,20 @@ abstract class MeepleDatabase {
 
   static String databaseName = 'meeple.db';
 
-  final int version = 1;
+  int dbVersion();
 
   final String tableName;
 
   String createTable(int version);
 
+  void upgradeDb(Database db, int oldVersion, int newVersion);
+
   _onCreate(Database db, int version) async {
     await db.execute(createTable(version));
+  }
+
+  _onUpdate(Database db, int oldVersion, int newVersion) async {
+    upgradeDb(db, oldVersion, newVersion);
   }
 
   Database _db;
@@ -29,8 +35,10 @@ abstract class MeepleDatabase {
         if (_db == null) {
           try {
             var path = await initDatabasePath();
-            _db =
-                await openDatabase(path, version: version, onCreate: _onCreate);
+            _db = await openDatabase(path,
+                version: dbVersion(),
+                onCreate: _onCreate,
+                onUpgrade: _onUpdate);
           } catch (e) {
             debugPrint(e.toString());
           }

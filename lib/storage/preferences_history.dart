@@ -2,13 +2,18 @@ import 'dart:convert';
 
 import 'package:how_many_mobile_meeple/model/app_preferences.dart';
 import 'package:how_many_mobile_meeple/model/settings.dart';
+import 'package:how_many_mobile_meeple/storage/preference_history_db_migration.dart';
+import 'package:sqflite/sqflite.dart';
 
 import 'meeple_database.dart';
 
 class PreferencesHistoryDb extends MeepleDatabase {
   static final String table = 'preference_history';
+  final version = 20191001;
 
   PreferencesHistoryDb() : super(table);
+
+  //todo what happens when this is a new database connection
 
   @override
   String createTable(int version) {
@@ -41,8 +46,10 @@ class PreferencesHistoryDb extends MeepleDatabase {
         "setting_user_recommendations, "
         "setting_mechanic, "
         "setting_use_all_mechanics, "
-        "setting_include_expansions) "
-        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        "setting_include_expansions, "
+        "setting_rating"
+        ") "
+        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
     var db = await getDb();
     await db.rawInsert(insertStatement, [
@@ -66,6 +73,7 @@ class PreferencesHistoryDb extends MeepleDatabase {
           preferences.settings.setting(Settings.filterUseAllMechanics.name)),
       json.encode(
           preferences.settings.setting(Settings.filterIncludesExpansions.name)),
+      json.encode(preferences.settings.setting(Settings.filterMinRating.name)),
     ]);
   }
 
@@ -98,5 +106,25 @@ class PreferencesHistoryDb extends MeepleDatabase {
     var db = await getDb();
     List<Map> list = await db.rawQuery(selectPreferenceStatement);
     return _tableDataToPreferences(list);
+  }
+
+  @override
+  int dbVersion() => version;
+
+  @override
+  void upgradeDb(Database db, int oldVersion, int newVersion) {
+    var migration = PreferenceHistoryDBMigration();
+
+    if (!migration.hasUpgrade(oldVersion, newVersion)) {
+      return;
+    }
+
+    var upgradeScripts = migration.upgradesForVersion(oldVersion, newVersion);
+    upgradeScripts.keys.toList()
+      ..sort() //make sure to sort
+      ..forEach((key) async {
+        var script = upgradeScripts[key];
+        await db.execute(script);
+      });
   }
 }

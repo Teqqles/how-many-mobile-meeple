@@ -13,26 +13,6 @@ class PreferencesHistoryDb extends MeepleDatabase {
 
   PreferencesHistoryDb() : super(table);
 
-  //todo what happens when this is a new database connection
-
-  @override
-  String createTable(int version) {
-    String tableStatement = "CREATE TABLE $tableName (id TEXT PRIMARY KEY, "
-        "title TEXT, "
-        "timestamp INTEGER, "
-        "items TEXT, "
-        "setting_whitelist TEXT, "
-        "setting_num_players TEXT, "
-        "setting_min_time TEXT, "
-        "setting_max_time TEXT, "
-        "setting_complexity TEXT, "
-        "setting_user_recommendations TEXT, "
-        "setting_mechanic TEXT, "
-        "setting_use_all_mechanics TEXT, "
-        "setting_include_expansions TEXT)";
-    return tableStatement;
-  }
-
   void storePreference(AppPreferences preferences) async {
     String insertStatement = "INSERT OR REPLACE INTO $tableName (id, "
         "title, "
@@ -110,6 +90,25 @@ class PreferencesHistoryDb extends MeepleDatabase {
 
   @override
   int dbVersion() => version;
+
+  @override
+  void createDatabase(Database db, int version) async {
+    await db.execute("CREATE TABLE $tableName (id TEXT PRIMARY KEY, "
+        "title TEXT, "
+        "timestamp INTEGER, "
+        "items TEXT, "
+        "setting_whitelist TEXT, "
+        "setting_num_players TEXT, "
+        "setting_min_time TEXT, "
+        "setting_max_time TEXT, "
+        "setting_complexity TEXT, "
+        "setting_user_recommendations TEXT, "
+        "setting_mechanic TEXT, "
+        "setting_use_all_mechanics TEXT, "
+        "setting_include_expansions TEXT, "
+        "setting_rating TEXT "
+        ")");
+  }
 
   @override
   void upgradeDb(Database db, int oldVersion, int newVersion) {

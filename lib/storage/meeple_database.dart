@@ -14,12 +14,12 @@ abstract class MeepleDatabase {
 
   final String tableName;
 
-  String createTable(int version);
+  void createDatabase(Database db, int version);
 
   void upgradeDb(Database db, int oldVersion, int newVersion);
 
   _onCreate(Database db, int version) async {
-    await db.execute(createTable(version));
+    createDatabase(db, version);
   }
 
   _onUpdate(Database db, int oldVersion, int newVersion) async {

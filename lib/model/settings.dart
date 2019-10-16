@@ -72,5 +72,5 @@ class Settings {
   @override
   String toString() => allSettings.toString();
 
-  Settings clone() => Settings(allSettings);
+  Settings clone() => Settings(Map<String, Setting>.from(allSettings));
 }

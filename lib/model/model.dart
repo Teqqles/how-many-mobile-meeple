@@ -24,7 +24,7 @@ class AppModel extends Model {
 
   Items _items = Items([]);
   BggCache _bggCache = BggCache(Games(), _unsetCacheDurationInMinutes);
-  Settings _settings = Settings({
+  Settings _defaultSettings = Settings({
     Settings.fieldsToReturnFromApi.name: Settings.fieldsToReturnFromApi,
     Settings.filterMinimumTimeToPlay.name: Settings.filterMinimumTimeToPlay,
     Settings.filterMaximumTimeToPlay.name: Settings.filterMaximumTimeToPlay,
@@ -37,6 +37,8 @@ class AppModel extends Model {
     Settings.filterComplexity.name: Settings.filterComplexity,
     Settings.filterMinRating.name: Settings.filterMinRating,
   });
+
+  Settings _settings;
   Orientation screenOrientation;
 
   Items get items => _items;
@@ -48,6 +50,10 @@ class AppModel extends Model {
   SortOrder sortDirection = SortOrder.Desc;
 
   SortableGameField sortGameField = SortableGameField.rating;
+
+  AppModel() {
+    this._settings = this._defaultSettings.clone();
+  }
 
   void toggleSortDirection() {
     sortDirection =
@@ -67,7 +73,11 @@ class AppModel extends Model {
   }
 
   void replaceSettings(Settings settings) {
-    _settings = settings;
+    var newSettings = this._defaultSettings.clone();
+    for (var setting in settings.allSettings.values) {
+      newSettings.updateSetting(setting);
+    }
+    _settings = newSettings;
     this.invalidateCache();
     this.updateStore();
   }
@@ -98,7 +108,7 @@ class AppModel extends Model {
   void loadStoredData() async {
     StoredPreferences store = await StorageFactory.getStoredPreferences();
     _items = await store.loadItems(AppCommon.maxItemsFromBgg);
-    _settings = await store.loadSettings(settings);
+    this.replaceSettings(await store.loadSettings(settings));
     this.hasLoadedPersistedData = true;
     this.notifyListeners();
   }

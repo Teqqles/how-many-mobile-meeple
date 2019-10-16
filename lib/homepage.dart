@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:how_many_mobile_meeple/components/toggleable_homepage_menu_item_widget.dart';
 import 'package:package_info/package_info.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:how_many_mobile_meeple/model/settings.dart';
@@ -61,84 +62,64 @@ class HomePage extends StatelessWidget with AppPage {
       ScopedModelDescendant<AppModel>(
         builder: (context, child, model) => Column(
           children: <Widget>[
-            Container(
-              height: 35,
-              color: Theme.of(context).highlightColor,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  AppDefaultPadding(
-                    child: Text(AppCommon.labelDifficulty,
-                        textAlign: TextAlign.left),
-                  ),
-                  Switch(
-                      onChanged: (bool value) {
-                        model.settings
+            ToggleableHomepageMenuItemWidget(
+                label: AppCommon.labelDifficulty,
+              setting: Settings.filterComplexity,
+              menuWidget: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: <Widget>[
+                  Container(
+                    height: 35,
+                    width: MediaQuery.of(context).size.width * 0.60,
+                    child: Slider(
+                        activeColor: Theme.of(context).accentColor,
+                        min: 0.0,
+                        max: 5.0,
+                        divisions: 10,
+                        onChanged: !model.settings
                             .setting(Settings.filterComplexity.name)
-                            .enabled = value;
-                        model.updateStore();
-                        model.invalidateCache();
-                      },
-                      value: model.settings
-                          .setting(Settings.filterComplexity.name)
-                          .enabled)
-                ],
-              ),
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: <Widget>[
-                Container(
-                  height: 35,
-                  width: MediaQuery.of(context).size.width * 0.60,
-                  child: Slider(
-                      activeColor: Theme.of(context).accentColor,
-                      min: 0.0,
-                      max: 5.0,
-                      divisions: 10,
-                      onChanged: !model.settings
-                              .setting(Settings.filterComplexity.name)
-                              .enabled
-                          ? null
-                          : (complexity) {
-                              model.settings
-                                  .setting(Settings.filterComplexity.name)
-                                  .value = complexity;
-                              model.updateStore();
-                              model.invalidateCache();
-                            },
-                      value: model.settings
-                          .setting(Settings.filterComplexity.name)
-                          .value,
-                      label:
-                          "${model.settings.setting(Settings.filterComplexity.name).value.toString()} weighting"),
-                ),
-                AppDefaultPadding(
-                  child: Container(
-                    decoration: ShapeDecoration(
-                        color: model.settings
-                                .setting(Settings.filterComplexity.name)
-                                .enabled
-                            ? Theme.of(context).accentColor
-                            : Theme.of(context).disabledColor,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8.0),
-                        )),
-                    child: AppDefaultPadding(
-                      child: Text(
+                            .enabled
+                            ? null
+                            : (complexity) {
                           model.settings
                               .setting(Settings.filterComplexity.name)
-                              .value
-                              .toString(),
-                          textAlign: TextAlign.right,
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Theme.of(context).selectedRowColor)),
+                              .value = complexity;
+                          model.updateStore();
+                          model.invalidateCache();
+                        },
+                        value: model.settings
+                            .setting(Settings.filterComplexity.name)
+                            .value,
+                        label:
+                        "${model.settings.setting(Settings.filterComplexity.name).value.toString()} weighting"),
+                  ),
+                  AppDefaultPadding(
+                    child: Container(
+                      decoration: ShapeDecoration(
+                          color: model.settings
+                              .setting(Settings.filterComplexity.name)
+                              .enabled
+                              ? Theme.of(context).accentColor
+                              : Theme.of(context).disabledColor,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8.0),
+                          )),
+                      child: AppDefaultPadding(
+                        child: Text(
+                            model.settings
+                                .setting(Settings.filterComplexity.name)
+                                .value
+                                .toString(),
+                            textAlign: TextAlign.right,
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Theme.of(context).selectedRowColor)),
+                      ),
                     ),
                   ),
-                ),
-              ],
-            ),
+                ],
+              ),
+            )
           ],
         ),
       );
@@ -147,86 +128,66 @@ class HomePage extends StatelessWidget with AppPage {
       ScopedModelDescendant<AppModel>(
         builder: (context, child, model) => Column(
           children: <Widget>[
-            Container(
-              height: 35,
-              color: Theme.of(context).highlightColor,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  AppDefaultPadding(
+            ToggleableHomepageMenuItemWidget(
+              label: AppCommon.labelPlayers,
+              setting: Settings.filterNumberOfPlayers,
+              menuWidget: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: <Widget>[
+                  Container(
+                    height: 35,
+                    width: MediaQuery.of(context).size.width * 0.60,
                     child:
-                        Text(AppCommon.labelPlayers, textAlign: TextAlign.left),
-                  ),
-                  Switch(
-                      onChanged: (bool value) {
-                        model.settings
+                    Slider(
+                        activeColor: Theme.of(context).accentColor,
+                        min: 1.0,
+                        max: 10.0,
+                        divisions: 10,
+                        onChanged: !model.settings
                             .setting(Settings.filterNumberOfPlayers.name)
-                            .enabled = value;
-                        model.updateStore();
-                        model.invalidateCache();
-                      },
-                      value: model.settings
-                          .setting(Settings.filterNumberOfPlayers.name)
-                          .enabled)
-                ],
-              ),
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: <Widget>[
-                Container(
-                  height: 35,
-                  width: MediaQuery.of(context).size.width * 0.60,
-                  child:
-                  Slider(
-                      activeColor: Theme.of(context).accentColor,
-                      min: 1.0,
-                      max: 10.0,
-                      divisions: 10,
-                      onChanged: !model.settings
-                              .setting(Settings.filterNumberOfPlayers.name)
-                              .enabled
-                          ? null
-                          : (players) {
-                              model.settings
-                                  .setting(Settings.filterNumberOfPlayers.name)
-                                  .value = players.floor();
-                              model.updateStore();
-                              model.invalidateCache();
-                            },
-                      value: model.settings
-                          .setting(Settings.filterNumberOfPlayers.name)
-                          .value
-                          .roundToDouble(),
-                      label:
-                          "${model.settings.setting(Settings.filterNumberOfPlayers.name).value.toString()} players"),
-                ),
-                AppDefaultPadding(
-                  child: Container(
-                    decoration: ShapeDecoration(
-                        color: model.settings
-                                .setting(Settings.filterNumberOfPlayers.name)
-                                .enabled
-                            ? Theme.of(context).accentColor
-                            : Theme.of(context).disabledColor,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8.0),
-                        )),
-                    child: AppDefaultPadding(
-                      child: Text(
+                            .enabled
+                            ? null
+                            : (players) {
                           model.settings
                               .setting(Settings.filterNumberOfPlayers.name)
-                              .value
-                              .toString(),
-                          textAlign: TextAlign.right,
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Theme.of(context).selectedRowColor)),
+                              .value = players.floor();
+                          model.updateStore();
+                          model.invalidateCache();
+                        },
+                        value: model.settings
+                            .setting(Settings.filterNumberOfPlayers.name)
+                            .value
+                            .roundToDouble(),
+                        label:
+                        "${model.settings.setting(Settings.filterNumberOfPlayers.name).value.toString()} players"),
+                  ),
+                  AppDefaultPadding(
+                    child: Container(
+                      decoration: ShapeDecoration(
+                          color: model.settings
+                              .setting(Settings.filterNumberOfPlayers.name)
+                              .enabled
+                              ? Theme.of(context).accentColor
+                              : Theme.of(context).disabledColor,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8.0),
+                          )),
+                      child: AppDefaultPadding(
+                        child: Text(
+                            model.settings
+                                .setting(Settings.filterNumberOfPlayers.name)
+                                .value
+                                .toString(),
+                            textAlign: TextAlign.right,
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Theme.of(context).selectedRowColor)),
+                      ),
                     ),
                   ),
-                ),
-              ],
-            ),
+                ],
+              ),
+            )
           ],
         ),
       );
@@ -235,84 +196,64 @@ class HomePage extends StatelessWidget with AppPage {
       ScopedModelDescendant<AppModel>(
         builder: (context, child, model) => Column(
           children: <Widget>[
-            Container(
-              height: 35,
-              color: Theme.of(context).highlightColor,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  AppDefaultPadding(
-                    child:
-                        Text(AppCommon.labelRating, textAlign: TextAlign.left),
-                  ),
-                  Switch(
-                      onChanged: (bool value) {
-                        model.settings
+            ToggleableHomepageMenuItemWidget(
+              label: AppCommon.labelRating,
+              setting: Settings.filterMinRating,
+              menuWidget: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: <Widget>[
+                  Container(
+                    height: 35,
+                    width: MediaQuery.of(context).size.width * 0.60,
+                    child: Slider(
+                        activeColor: Theme.of(context).accentColor,
+                        min: 0.0,
+                        max: 10.0,
+                        divisions: 20,
+                        onChanged: !model.settings
                             .setting(Settings.filterMinRating.name)
-                            .enabled = value;
-                        model.updateStore();
-                        model.invalidateCache();
-                      },
-                      value: model.settings
-                          .setting(Settings.filterMinRating.name)
-                          .enabled)
-                ],
-              ),
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: <Widget>[
-                Container(
-                  height: 35,
-                  width: MediaQuery.of(context).size.width * 0.60,
-                  child: Slider(
-                      activeColor: Theme.of(context).accentColor,
-                      min: 0.0,
-                      max: 10.0,
-                      divisions: 20,
-                      onChanged: !model.settings
-                              .setting(Settings.filterMinRating.name)
-                              .enabled
-                          ? null
-                          : (rating) {
-                              model.settings
-                                  .setting(Settings.filterMinRating.name)
-                                  .value = rating;
-                              model.updateStore();
-                              model.invalidateCache();
-                            },
-                      value: model.settings
-                          .setting(Settings.filterMinRating.name)
-                          .value,
-                      label:
-                          "${model.settings.setting(Settings.filterMinRating.name).value.toString()} rating"),
-                ),
-                AppDefaultPadding(
-                  child: Container(
-                    decoration: ShapeDecoration(
-                        color: model.settings
-                                .setting(Settings.filterMinRating.name)
-                                .enabled
-                            ? Theme.of(context).accentColor
-                            : Theme.of(context).disabledColor,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8.0),
-                        )),
-                    child: AppDefaultPadding(
-                      child: Text(
+                            .enabled
+                            ? null
+                            : (rating) {
                           model.settings
                               .setting(Settings.filterMinRating.name)
-                              .value
-                              .toString(),
-                          textAlign: TextAlign.right,
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Theme.of(context).selectedRowColor)),
+                              .value = rating;
+                          model.updateStore();
+                          model.invalidateCache();
+                        },
+                        value: model.settings
+                            .setting(Settings.filterMinRating.name)
+                            .value,
+                        label:
+                        "${model.settings.setting(Settings.filterMinRating.name).value.toString()} rating"),
+                  ),
+                  AppDefaultPadding(
+                    child: Container(
+                      decoration: ShapeDecoration(
+                          color: model.settings
+                              .setting(Settings.filterMinRating.name)
+                              .enabled
+                              ? Theme.of(context).accentColor
+                              : Theme.of(context).disabledColor,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8.0),
+                          )),
+                      child: AppDefaultPadding(
+                        child: Text(
+                            model.settings
+                                .setting(Settings.filterMinRating.name)
+                                .value
+                                .toString(),
+                            textAlign: TextAlign.right,
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Theme.of(context).selectedRowColor)),
+                      ),
                     ),
                   ),
-                ),
-              ],
-            ),
+                ],
+              ),
+            )
           ],
         ),
       );
@@ -468,66 +409,46 @@ class HomePage extends StatelessWidget with AppPage {
                 : Mechanics.popularMechanics;
         return Column(
           children: <Widget>[
-            Container(
-              height: 35,
-              color: Theme.of(context).highlightColor,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: <Widget>[
-                  AppDefaultPadding(
-                    child: Text(AppCommon.labelMechanics,
-                        textAlign: TextAlign.left),
-                  ),
-                  Switch(
-                      onChanged: (bool value) {
-                        model.settings
+            ToggleableHomepageMenuItemWidget(
+              label: AppCommon.labelMechanics,
+              setting: Settings.filterMechanics,
+              menuWidget: Wrap(
+                alignment: WrapAlignment.center,
+                spacing: 5,
+                children: mechanics.map((String value) {
+                  return ChoiceChip(
+                    labelStyle: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                        color: model.settings
                             .setting(Settings.filterMechanics.name)
-                            .enabled = value;
-                        model.updateStore();
-                        model.invalidateCache();
-                      },
-                      value: model.settings
-                          .setting(Settings.filterMechanics.name)
-                          .enabled)
-                ],
-              ),
-            ),
-            Wrap(
-              alignment: WrapAlignment.center,
-              spacing: 5,
-              children: mechanics.map((String value) {
-                return ChoiceChip(
-                  labelStyle: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                      color: model.settings
-                              .setting(Settings.filterMechanics.name)
-                              .enabled
-                          ? Theme.of(context).accentColor
-                          : Theme.of(context).disabledColor),
-                  label: Text(value),
-                  selected: model.settings
-                      .setting(Settings.filterMechanics.name)
-                      .value
-                      .contains(value),
-                  onSelected: (bool selected) {
-                    if (!model.settings
+                            .enabled
+                            ? Theme.of(context).accentColor
+                            : Theme.of(context).disabledColor),
+                    label: Text(value),
+                    selected: model.settings
                         .setting(Settings.filterMechanics.name)
-                        .enabled) return;
-                    selected
-                        ? model.settings
-                            .setting(Settings.filterMechanics.name)
-                            .value
-                            .add(value)
-                        : model.settings
-                            .setting(Settings.filterMechanics.name)
-                            .value
-                            .remove(value);
-                    model.invalidateCache();
-                    model.updateStore();
-                  },
-                );
-              }).toList(),
+                        .value
+                        .contains(value),
+                    onSelected: (bool selected) {
+                      if (!model.settings
+                          .setting(Settings.filterMechanics.name)
+                          .enabled) return;
+                      selected
+                          ? model.settings
+                          .setting(Settings.filterMechanics.name)
+                          .value
+                          .add(value)
+                          : model.settings
+                          .setting(Settings.filterMechanics.name)
+                          .value
+                          .remove(value);
+                      model.invalidateCache();
+                      model.updateStore();
+                    },
+                  );
+                }).toList(),
+              ),
             )
           ],
         );

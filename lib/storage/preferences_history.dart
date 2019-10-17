@@ -9,7 +9,7 @@ import 'meeple_database.dart';
 
 class PreferencesHistoryDb extends MeepleDatabase {
   static final String table = 'preference_history';
-  final version = 20191001;
+  final version = 20191002;
 
   PreferencesHistoryDb() : super(table);
 

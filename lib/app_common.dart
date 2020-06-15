@@ -20,4 +20,13 @@ abstract class AppCommon {
       "We'll next be playing this randomly selected game... $gameName";
   static const String itemHintTextMessage = "bgg username/geeklist id";
   static const String maxItemsMessage = "max items entered";
+
+  static String minutesToTime(int minutes) {
+    var hours = minutes ~/ 60;
+    if (hours == 0) {
+      return "${minutes}m";
+    }
+    var remainingMinutes = minutes.remainder(60);
+    return "${hours}h, ${remainingMinutes}m";
+  }
 }

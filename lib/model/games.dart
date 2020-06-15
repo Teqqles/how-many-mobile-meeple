@@ -10,6 +10,7 @@ class Games {
   Games({this.gamesByName: const {}});
 
   factory Games.fromJson(List<dynamic> parsedJson) {
+    print(parsedJson);
     var games = Map<String, Game>();
 
     games = Map.fromEntries(parsedJson.map((gameData) {
@@ -33,9 +34,10 @@ class Games {
     switch (field) {
       case SortableGameField.name:
         return getGamesByName(order);
-        break;
       case SortableGameField.weight:
         return getGamesByWeight(order);
+      case SortableGameField.maxPlaytime:
+        return getGamesByPlaytime(order);
       default:
         return getGamesByRating(order);
     }
@@ -82,6 +84,22 @@ class Games {
       case SortOrder.Desc:
         unsortedGames
             .sort((a, b) => b.averageWeight.compareTo(a.averageWeight));
+        break;
+    }
+    return unsortedGames;
+  }
+
+  List<Game> getGamesByPlaytime(SortOrder order) {
+    List<Game> unsortedGames = games;
+
+    switch (order) {
+      case SortOrder.Asc:
+        unsortedGames
+            .sort((a, b) => a.maxPlaytime.compareTo(b.maxPlaytime));
+        break;
+      case SortOrder.Desc:
+        unsortedGames
+            .sort((a, b) => b.maxPlaytime.compareTo(a.maxPlaytime));
         break;
     }
     return unsortedGames;

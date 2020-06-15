@@ -19,7 +19,7 @@ class AppPreferences {
   }
 
   static List<String> storedSettings = [
-    "setting_whitelist",
+    "setting_whitelist",  // we store whitelist but this is no longer loaded
     "setting_num_players",
     "setting_min_time",
     "setting_max_time",

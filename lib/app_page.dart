@@ -2,6 +2,7 @@ import 'dart:typed_data';
 
 import 'package:esys_flutter_share/esys_flutter_share.dart';
 import 'package:flutter/material.dart';
+import 'package:how_many_mobile_meeple/platform/pages.dart';
 import 'package:mime_type/mime_type.dart';
 import 'package:http/http.dart' as http;
 import 'package:scoped_model/scoped_model.dart';
@@ -11,8 +12,6 @@ import 'components/component_factory.dart';
 import 'model/game.dart';
 import 'model/model.dart';
 import 'model/settings.dart';
-import 'random_game_display.dart';
-import 'list_games_display.dart';
 import 'package:path/path.dart';
 
 abstract class AppPage {
@@ -105,7 +104,7 @@ abstract class AppPage {
                     size: 36,
                   ),
                   onPressed: () {
-                    var listGamesPage = materialisePage(ListGamesDisplayPage());
+                    var listGamesPage = materialisePage(Pages.platformPages().listGamesPage());
                     loadPage(context, listGamesPage);
                   }),
             ),
@@ -114,7 +113,7 @@ abstract class AppPage {
             padding: const EdgeInsets.only(left: 8, right: 8),
             child: MaterialButton(
               onPressed: () {
-                var randomGamePage = materialisePage(RandomGameDisplayPage());
+                var randomGamePage = materialisePage(Pages.platformPages().randomGamePage());
                 loadPage(context, randomGamePage);
               },
               child: Container(

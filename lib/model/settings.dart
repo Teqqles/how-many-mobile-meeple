@@ -3,7 +3,7 @@ import 'package:how_many_mobile_meeple/model/setting.dart';
 class Settings {
   static Setting fieldsToReturnFromApi = Setting("fieldsToUse",
       header: "Bgg-Field-Whitelist",
-      value: "name,maxplayers,minplayers,maxplaytime,image,thumbnail,stats",
+      value: "id,name,maxplayers,minplayers,maxplaytime,image,thumbnail,stats",
       enabled: true);
 
   static Setting filterNumberOfPlayers =
@@ -42,6 +42,7 @@ class Settings {
 
   Map<String, Setting> get enabledSettings {
     Map<String, Setting> filteredSettings = Map.from(_settings);
+    filteredSettings[fieldsToReturnFromApi.name] = fieldsToReturnFromApi;
     filteredSettings.removeWhere(
         (_, setting) => !setting.enabled || setting.header == null);
     return filteredSettings;

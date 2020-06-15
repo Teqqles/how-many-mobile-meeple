@@ -64,6 +64,7 @@ class PreferencesHistoryDb extends MeepleDatabase {
   }
 
   Future<AppPreferences> loadPreference(int preferenceId) async {
+    print("Preference: ${preferenceId}");
     String selectPreferenceStatement = "SELECT * "
         "FROM $tableName WHERE id = ?";
     var db = await getDb();

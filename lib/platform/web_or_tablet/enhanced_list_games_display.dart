@@ -2,18 +2,17 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:sprintf/sprintf.dart';
 import 'package:how_many_mobile_meeple/components/app_default_padding.dart';
-import 'app_page.dart';
+import 'package:url_launcher/url_launcher.dart';
+import '../../app_page.dart';
 import 'package:how_many_mobile_meeple/model/bgg_cache.dart';
-import 'app_common.dart';
+import '../../app_common.dart';
 import 'package:how_many_mobile_meeple/components/heading_text.dart';
-import 'how_many_meeple_app_bar.dart';
+import '../../how_many_meeple_app_bar.dart';
 import 'package:how_many_mobile_meeple/model/model.dart';
-import 'model/game.dart';
-import 'network_content_widget.dart';
+import '../../model/game.dart';
+import '../../network_content_widget.dart';
 
-class ListGamesDisplayPage extends NetworkWidget with AppPage {
-  static final String route = "List-games-page";
-
+class EnhancedListGamesDisplayPage extends NetworkWidget with AppPage {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -40,6 +39,21 @@ class ListGamesDisplayPage extends NetworkWidget with AppPage {
                 child: Container(
                     alignment: Alignment.bottomLeft,
                     child: HeadingText("Name", context))),
+          ),
+        ),
+        TableCell(
+          verticalAlignment: TableCellVerticalAlignment.middle,
+          child: AppDefaultPadding(
+            child: FlatButton(
+                padding: EdgeInsets.zero,
+                onPressed: () {
+                  model.toggleSortDirection();
+                  model.sortGameField = SortableGameField.maxPlaytime;
+                  model.refreshState();
+                },
+                child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [HeadingText("Max Playtime", context)])),
           ),
         ),
         TableCell(
@@ -81,7 +95,8 @@ class ListGamesDisplayPage extends NetworkWidget with AppPage {
         columnWidths: {
           0: FlexColumnWidth(4.0),
           1: FlexColumnWidth(1.0),
-          2: FlexColumnWidth(1.0)
+          2: FlexColumnWidth(1.0),
+          3: FlexColumnWidth(1.0)
         },
         children: heading +
             (cachedGames.games
@@ -100,9 +115,13 @@ class ListGamesDisplayPage extends NetworkWidget with AppPage {
                                 child: AppDefaultPadding(
                                   child: Container(
                                       alignment: Alignment.centerLeft,
-                                      child: Text(
-                                        game.name,
-                                      )),
+                                      child: InkWell(
+                                        child: Text(game.name,
+                                          style: TextStyle(
+                                          decoration: TextDecoration.underline,
+                                        )),
+                                        onTap: () => launch("https://www.boardgamegeek.com/boardgame/${game.id}")
+                                )),
                                 )),
                             TableCell(
                               verticalAlignment:
@@ -111,7 +130,19 @@ class ListGamesDisplayPage extends NetworkWidget with AppPage {
                                 child: Container(
                                   alignment: Alignment.centerRight,
                                   child: Text(
-                                    sprintf("%0.2f", [game.averageWeight]),
+                                    AppCommon.minutesToTime(game.maxPlaytime)
+                                  ),
+                                ),
+                              ),
+                            ),
+                            TableCell(
+                              verticalAlignment:
+                                  TableCellVerticalAlignment.middle,
+                              child: AppDefaultPadding(
+                                child: Container(
+                                  alignment: Alignment.centerRight,
+                                  child: Text(
+                                    sprintf("%0.2f", [game.averageWeight ?? 0.00]),
                                   ),
                                 ),
                               ),

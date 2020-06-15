@@ -1,4 +1,4 @@
-generate_all:   generate_fat_apk generate_split_apk generate_appbundle
+generate_all:   generate_fat_apk generate_split_apk generate_appbundle generate_web
 
 generate_fat_apk:
 	@echo "Building Amazon Appstore deployable..."
@@ -11,6 +11,11 @@ generate_split_apk:
 generate_appbundle:
 	@echo "Building Play store deployable..."
 	flutter build appbundle
+
+generate_web:
+	@echo "Creating Web deployment"
+	flutter build web
+	docker build . -t howmanymeeple/how-many-mobile-meeple
 
 clean:
 	flutter clean

@@ -1,6 +1,7 @@
-enum SortableGameField { name, rating, weight }
+enum SortableGameField { name, maxPlaytime, rating, weight }
 
 class Game {
+  final int id;
   final String name;
   final int maxPlayers;
   final int minPlayers;
@@ -10,7 +11,8 @@ class Game {
   final double averageWeight;
 
   Game(
-      {this.name,
+      {this.id,
+      this.name,
       this.maxPlayers,
       this.minPlayers,
       this.maxPlaytime,
@@ -20,10 +22,11 @@ class Game {
 
   factory Game.fromJson(Map<String, dynamic> json) {
     return Game(
+      id: json['id'],
       name: json['name'],
       maxPlayers: json['maxplayers'],
       minPlayers: json['minplayers'],
-      maxPlaytime: json['maxplaytime'],
+      maxPlaytime: json['maxplaytime'] ?? 0,
       imageUrl: json['image'],
       averageRating: json['stats']['average'] ?? 0,
       averageWeight: json['stats']['averageweight'] ?? 0,
@@ -32,7 +35,7 @@ class Game {
 
   @override
   String toString() {
-    return "$name, $minPlayers, $maxPlayers";
+    return "$name ($id), $minPlayers, $maxPlayers";
   }
 
   @override

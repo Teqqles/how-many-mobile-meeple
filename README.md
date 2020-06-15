@@ -4,7 +4,7 @@
 
 ## About
 
-How Many Mobile Meeple is the sister project to the web based [How Many Meeples](https://github.com/how-many-meeple/how-many-meeples).  We share a common [API](https://github.com/how-many-meeple/bgg-game-selector-api) and a common goal.  These are a group of passion projects created to help Board Gamers throughout the world play a better variety of games from their collections, or those of others.
+How Many Mobile Meeple is the sister project to [How Many Meeples](https://github.com/how-many-meeple/how-many-meeples) but utilising the Flutter UI tool.  We share a common [API](https://github.com/how-many-meeple/bgg-game-selector-api) and a common goal.  These are a group of passion projects created to help Board Gamers throughout the world play a better variety of games from their collections, or those of others.
 
 ## Features
 
@@ -19,7 +19,9 @@ How Many Mobile Meeple is the sister project to the web based [How Many Meeples]
 :heavy_check_mark: Randomly select a game based on your filters\
 :heavy_check_mark: List all games matching your filters\
 :heavy_check_mark: Caches game information to speed up page changes\
-:heavy_check_mark: Saves your preferences for the next time you load the app
+:heavy_check_mark: Saves your preferences for the next time you load the app\
+:heavy_check_mark: Save multiple different preferences (mobile only)\
+:heavy_check_mark: View the board game geek listing for a game
 
 ## Contributing
 

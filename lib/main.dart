@@ -2,14 +2,15 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:how_many_mobile_meeple/app_builder.dart';
+import 'package:how_many_mobile_meeple/platform/list_games_display_route.dart';
+import 'package:how_many_mobile_meeple/platform/pages.dart';
+import 'package:how_many_mobile_meeple/platform/random_game_display_route.dart';
 
 import 'package:scoped_model/scoped_model.dart';
 
 import 'package:how_many_mobile_meeple/model/model.dart';
-import 'package:how_many_mobile_meeple/random_game_display.dart';
 
 import 'homepage.dart';
-import 'list_games_display.dart';
 import 'meeple_theme.dart';
 
 void main() => runApp(MyApp());
@@ -17,10 +18,10 @@ void main() => runApp(MyApp());
 class MyApp extends StatelessWidget {
   final routes = <String, WidgetBuilder>{
     HomePage.route: (BuildContext context) => AppBuilder(),
-    RandomGameDisplayPage.route: (BuildContext context) =>
-        RandomGameDisplayPage(),
-    ListGamesDisplayPage.route: (BuildContext context) =>
-        ListGamesDisplayPage(),
+    RandomGameDisplayRoute.route: (BuildContext context) =>
+        Pages.platformPages().randomGamePage(),
+    ListGamesDisplayRoute.route: (BuildContext context) =>
+        Pages.platformPages().listGamesPage(),
   };
 
   final List<Color> swatchList = [
@@ -44,7 +45,7 @@ class MyApp extends StatelessWidget {
           theme: ThemeData(
             primarySwatch: swatch,
           ),
-          home: AppBuilder(),
+          home: Pages.platformPages().homePage(),
           routes: routes,
         ));
   }

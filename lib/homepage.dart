@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:how_many_mobile_meeple/components/toggleable_homepage_menu_item_widget.dart';
+import 'package:how_many_mobile_meeple/platform/web_or_tablet/web_version_info.dart';
 import 'package:package_info/package_info.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:how_many_mobile_meeple/model/settings.dart';
@@ -28,7 +30,7 @@ class HomePage extends StatelessWidget with AppPage {
     var textFieldWidth = MediaQuery.of(context).size.width * 0.65;
     return Scaffold(
         appBar: HowManyMeepleAppBar(AppCommon.optionsPageTitle,
-            hasSaveDialog: true, model: AppModel.of(context), context: context),
+            hasSaveDialog: kIsWeb? false : true, model: AppModel.of(context), context: context),
         drawer: pageDrawer(context),
         bottomNavigationBar: Container(
           color: Theme.of(context).highlightColor,
@@ -528,8 +530,17 @@ class HomePage extends StatelessWidget with AppPage {
     );
   }
 
+  Future<String> getAppVersion() async {
+    if (kIsWeb) {
+      return WebVersionInfo.name;
+    } else {
+      PackageInfo packageInfo = await PackageInfo.fromPlatform();
+      return packageInfo.version;
+    }
+  }
+
   Future<Widget> footerDisplay(BuildContext context) async {
-    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    var version = await getAppVersion();
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       crossAxisAlignment: CrossAxisAlignment.end,
@@ -538,7 +549,7 @@ class HomePage extends StatelessWidget with AppPage {
           padding: const EdgeInsets.only(right: 8.0),
           child: DisclaimerText(AppCommon.disclaimerText, context),
         ),
-        DisclaimerText("(v:${packageInfo.version})", context)
+        DisclaimerText("(v:$version)", context)
       ],
     );
   }

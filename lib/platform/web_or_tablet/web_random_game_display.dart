@@ -2,20 +2,19 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:how_many_mobile_meeple/components/platform_independent_image.dart';
 import 'package:how_many_mobile_meeple/screen_tools.dart';
 
 import 'package:how_many_mobile_meeple/components/app_default_padding.dart';
-import 'app_page.dart';
+import '../../app_page.dart';
 import 'package:how_many_mobile_meeple/model/bgg_cache.dart';
-import 'app_common.dart';
-import 'how_many_meeple_app_bar.dart';
+import '../../app_common.dart';
+import '../../how_many_meeple_app_bar.dart';
 import 'package:how_many_mobile_meeple/model/model.dart';
-import 'model/game.dart';
-import 'network_content_widget.dart';
+import '../../model/game.dart';
+import '../../network_content_widget.dart';
 
-class RandomGameDisplayPage extends NetworkWidget with AppPage {
-  static final String route = "Random-game-page";
-
+class WebRandomGameDisplayPage extends NetworkWidget with AppPage {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -48,24 +47,8 @@ class RandomGameDisplayPage extends NetworkWidget with AppPage {
                 ),
               ),
               AppDefaultPadding(
-                child: CachedNetworkImage(
-                  imageUrl: game.imageUrl,
-                  imageBuilder: (context, provider) => Container(
-                    height: getScreenHeightPercentageInPixels(
-                        context, ScreenTools.fiftyPercentScreen),
-                    decoration: BoxDecoration(
-                      image: DecorationImage(
-                          image: provider, fit: BoxFit.fitHeight),
-                    ),
-                  ),
-                  placeholder: (context, url) => SpinKitCubeGrid(
-                      color: Theme.of(context).accentColor,
-                      size: getScreenWidthPercentageInPixels(
-                          context, ScreenTools.fiftyPercentScreen)),
-                  errorWidget: (context, url, error) => Icon(Icons.error),
-                ),
+                child: PlatformIndependentImage(imageUrl: game.imageUrl)
               ),
-              shareButton(context, game),
             ]),
       ),
     );

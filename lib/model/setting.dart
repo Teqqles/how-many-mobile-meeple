@@ -19,11 +19,14 @@ class Setting {
   }
 
   @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-          other is Setting &&
-              toJson() == other.toJson();
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        other is Setting &&
+            toString() == other.toString();
+  }
 
   @override
   int get hashCode => toString().hashCode;
+
+  Setting clone() => Setting(this.name, value: this.value, header: this.header, enabled: this.enabled);
 }

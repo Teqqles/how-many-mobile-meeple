@@ -36,9 +36,31 @@ class Settings {
   static Setting filterMinRating =
       Setting("minimumRating", header: "Bgg-Filter-Min-Rating", value: 5.0);
 
+  static Settings defaultSettings() => Settings(Map.from({
+    Settings.fieldsToReturnFromApi.name: Settings.fieldsToReturnFromApi.clone(),
+    Settings.filterMinimumTimeToPlay.name: Settings.filterMinimumTimeToPlay.clone(),
+    Settings.filterMaximumTimeToPlay.name: Settings.filterMaximumTimeToPlay.clone(),
+    Settings.filterNumberOfPlayers.name: Settings.filterNumberOfPlayers.clone(),
+    Settings.filterUsingUserRecommendations.name:
+    Settings.filterUsingUserRecommendations.clone(),
+    Settings.filterIncludesExpansions.name: Settings.filterIncludesExpansions.clone(),
+    Settings.filterMechanics.name: Settings.filterMechanics.clone(),
+    Settings.filterUseAllMechanics.name: Settings.filterUseAllMechanics.clone(),
+    Settings.filterComplexity.name: Settings.filterComplexity.clone(),
+    Settings.filterMinRating.name: Settings.filterMinRating.clone(),
+  }));
+
   Map<String, Setting> _settings = Map<String, Setting>();
 
   Map<String, Setting> get allSettings => _settings;
+
+  Map<String, Setting> get changedSettings {
+    var defaults = defaultSettings();
+    Map<String, Setting> filteredSettings = Map.from(_settings);
+    filteredSettings.removeWhere(
+            (_, setting) => !setting.enabled || defaults.allSettings.values.contains(setting));
+    return filteredSettings;
+  }
 
   Map<String, Setting> get enabledSettings {
     Map<String, Setting> filteredSettings = Map.from(_settings);
@@ -48,17 +70,24 @@ class Settings {
     return filteredSettings;
   }
 
+  Settings(this._settings);
+
   Setting setting(String name) {
     return _settings[name];
   }
 
   void updateSetting(Setting setting) => _settings[setting.name] = setting;
 
-  Settings(this._settings);
+  void updateAllSettings(Settings settings) {
+     _settings.addAll(settings.allSettings);
+  }
 
   toJson() {
     return {'settings': allSettings};
   }
+
+  Map<String, String> toQueryParameters() =>
+    allSettings.map((_, setting) => MapEntry(setting.name, setting.value));
 
   @override
   bool operator ==(Object other) =>
@@ -73,5 +102,5 @@ class Settings {
   @override
   String toString() => allSettings.toString();
 
-  Settings clone() => Settings(Map<String, Setting>.from(allSettings));
+  Settings clone() => Settings(Map.from(allSettings));
 }

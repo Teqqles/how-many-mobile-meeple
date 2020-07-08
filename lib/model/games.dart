@@ -10,7 +10,6 @@ class Games {
   Games({this.gamesByName: const {}});
 
   factory Games.fromJson(List<dynamic> parsedJson) {
-    print(parsedJson);
     var games = Map<String, Game>();
 
     games = Map.fromEntries(parsedJson.map((gameData) {

@@ -13,7 +13,7 @@ abstract class AppCommon {
   static const String labelRating = 'Min Rating?';
   static const int maxItemsFromBgg = 5;
   static const String boardGameGeekProxyUrl =
-      "http://game-selector.sixfootsoftware.com:8080";
+      "https://how-many-meeple.sixfootsoftware.com:8443";
   static const String disclaimerText = "Powered by Board Game Geek";
 
   static String randomGameMessage(String gameName) =>

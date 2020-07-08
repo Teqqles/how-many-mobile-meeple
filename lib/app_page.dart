@@ -2,7 +2,8 @@ import 'dart:typed_data';
 
 import 'package:esys_flutter_share/esys_flutter_share.dart';
 import 'package:flutter/material.dart';
-import 'package:how_many_mobile_meeple/platform/pages.dart';
+import 'package:how_many_mobile_meeple/platform/router.dart';
+import 'package:how_many_mobile_meeple/platform/web/url_fragment_encoder.dart';
 import 'package:mime_type/mime_type.dart';
 import 'package:http/http.dart' as http;
 import 'package:scoped_model/scoped_model.dart';
@@ -10,6 +11,7 @@ import 'package:how_many_mobile_meeple/components/drawer_bgg_filter.dart';
 import 'app_common.dart';
 import 'components/component_factory.dart';
 import 'model/game.dart';
+import 'model/items.dart';
 import 'model/model.dart';
 import 'model/settings.dart';
 import 'package:path/path.dart';
@@ -74,80 +76,87 @@ abstract class AppPage {
         await drawerSettingsColumn.drawerContent(context, model);
   }
 
-  void loadPage(BuildContext context, MaterialPageRoute<dynamic> page) {
+  void loadPage(BuildContext context, RouteSettings pageSettings) {
     if (Navigator.of(context).canPop()) {
-      Navigator.of(context).pushReplacement(
-        page,
+      Navigator.of(context).pushReplacementNamed(
+        pageSettings.name,
+        arguments: pageSettings.arguments
       );
     } else {
-      Navigator.of(context).push(
-        page,
+      Navigator.of(context).pushNamed(
+        pageSettings.name,
+        arguments: pageSettings.arguments
       );
     }
   }
 
-  Widget iconButtonGroup(BuildContext context) => Row(
-        mainAxisAlignment: MainAxisAlignment.end,
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: <Widget>[
-          Container(
-            decoration: BoxDecoration(
-              color: Theme.of(context).accentColor,
-              borderRadius: BorderRadius.circular(40.0),
-            ),
-            child: Padding(
-              padding: EdgeInsets.only(left: 5, right: 5, top: 2, bottom: 2),
-              child: IconButton(
-                  color: Theme.of(context).selectedRowColor,
-                  icon: Icon(
-                    Icons.format_list_numbered,
-                    size: 36,
-                  ),
-                  onPressed: () {
-                    var listGamesPage = materialisePage(Pages.platformPages().listGamesPage());
-                    loadPage(context, listGamesPage);
-                  }),
-            ),
+  void startPage(BuildContext context) {
+    AppModel.of(context).refreshFromUrl();
+  }
+
+  Widget iconButtonGroup(BuildContext context) =>
+    Row(
+      mainAxisAlignment: MainAxisAlignment.end,
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: <Widget>[
+        Container(
+          decoration: BoxDecoration(
+            color: Theme.of(context).accentColor,
+            borderRadius: BorderRadius.circular(40.0),
           ),
-          Padding(
-            padding: const EdgeInsets.only(left: 8, right: 8),
-            child: MaterialButton(
-              onPressed: () {
-                var randomGamePage = materialisePage(Pages.platformPages().randomGamePage());
-                loadPage(context, randomGamePage);
-              },
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Theme.of(context).accentColor,
-                  borderRadius: BorderRadius.circular(40.0),
+          child: Padding(
+            padding: EdgeInsets.only(left: 5, right: 5, top: 2, bottom: 2),
+            child: IconButton(
+                color: Theme.of(context).selectedRowColor,
+                icon: Icon(
+                  Icons.format_list_numbered,
+                  size: 36,
                 ),
-                child: Padding(
-                  padding:
-                      EdgeInsets.only(left: 18, right: 12, top: 5, bottom: 5),
-                  child: Row(
-                    children: <Widget>[
-                      SizedBox(
-                        height: _imageButtonSize,
-                        width: _imageButtonSize,
-                        child: randomGameButtonIcon,
+                onPressed: () {
+                  var listPageSettings = generateRouteSettings(Router.listRoute, AppModel.of(context));
+                  loadPage(context, listPageSettings);
+                }),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.only(left: 8, right: 8),
+          child: MaterialButton(
+            onPressed: () {
+              var randomPageSettings = generateRouteSettings(Router.randomRoute, AppModel.of(context));
+              loadPage(context, randomPageSettings);
+            },
+            child: Container(
+              decoration: BoxDecoration(
+                color: Theme.of(context).accentColor,
+                borderRadius: BorderRadius.circular(40.0),
+              ),
+              child: Padding(
+                padding:
+                EdgeInsets.only(left: 18, right: 12, top: 5, bottom: 5),
+                child: Row(
+                  children: <Widget>[
+                    SizedBox(
+                      height: _imageButtonSize,
+                      width: _imageButtonSize,
+                      child: randomGameButtonIcon,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 8, right: 8),
+                      child: Text(
+                        randomGameLabel,
+                        style: TextStyle(
+                            color: Theme.of(context).selectedRowColor,
+                            fontWeight: FontWeight.bold),
                       ),
-                      Padding(
-                        padding: const EdgeInsets.only(left: 8, right: 8),
-                        child: Text(
-                          randomGameLabel,
-                          style: TextStyle(
-                              color: Theme.of(context).selectedRowColor,
-                              fontWeight: FontWeight.bold),
-                        ),
-                      )
-                    ],
-                  ),
+                    )
+                  ],
                 ),
               ),
             ),
           ),
-        ],
-      );
+        ),
+      ],
+    );
 
   RaisedButton shareButton(BuildContext context, Game game) {
     return RaisedButton(
@@ -168,8 +177,13 @@ abstract class AppPage {
             RoundedRectangleBorder(borderRadius: BorderRadius.circular(30.0)));
   }
 
-  MaterialPageRoute materialisePage(StatelessWidget page) =>
-      MaterialPageRoute(builder: (context) => page);
+  RouteSettings generateRouteSettings(String name, AppModel model) {
+    var items = model.items;
+    var settings = model.settings;
+    var encodedName = UrlFragmentEncoder.encode(name, items: items, settings: settings);
+    return RouteSettings(name: encodedName);
+  }
+
 
   Widget pageDrawer(BuildContext context) {
     var staticDataComponentLength = 5;

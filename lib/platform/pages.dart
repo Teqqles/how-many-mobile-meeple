@@ -48,7 +48,7 @@ class WebPages extends Pages {
 class MobilePages extends Pages {
   @override
   Widget homePage() {
-    return AppBuilder();
+    return HomePage();
   }
 
   @override

@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:how_many_mobile_meeple/components/toggleable_homepage_menu_item_widget.dart';
 import 'package:how_many_mobile_meeple/platform/web_or_tablet/web_version_info.dart';
+import 'package:how_many_mobile_meeple/str_cast.dart';
 import 'package:package_info/package_info.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:how_many_mobile_meeple/model/settings.dart';
@@ -26,6 +27,7 @@ class HomePage extends StatelessWidget with AppPage {
   Widget build(BuildContext context) {
     if (!AppModel.of(context).hasLoadedPersistedData) {
       AppModel.of(context).loadStoredData();
+      AppModel.of(context).refreshFromUrl();
     }
     var textFieldWidth = MediaQuery.of(context).size.width * 0.65;
     return Scaffold(
@@ -89,9 +91,9 @@ class HomePage extends StatelessWidget with AppPage {
                           model.updateStore();
                           model.invalidateCache();
                         },
-                        value: model.settings
+                        value: StrCast(model.settings
                             .setting(Settings.filterComplexity.name)
-                            .value,
+                            .value).castToDouble(),
                         label:
                         "${model.settings.setting(Settings.filterComplexity.name).value.toString()} weighting"),
                   ),
@@ -156,9 +158,9 @@ class HomePage extends StatelessWidget with AppPage {
                           model.updateStore();
                           model.invalidateCache();
                         },
-                        value: model.settings
+                        value: StrCast(model.settings
                             .setting(Settings.filterNumberOfPlayers.name)
-                            .value
+                            .value).castToInt()
                             .roundToDouble(),
                         label:
                         "${model.settings.setting(Settings.filterNumberOfPlayers.name).value.toString()} players"),
@@ -223,9 +225,9 @@ class HomePage extends StatelessWidget with AppPage {
                           model.updateStore();
                           model.invalidateCache();
                         },
-                        value: model.settings
+                        value: StrCast(model.settings
                             .setting(Settings.filterMinRating.name)
-                            .value,
+                            .value).castToDouble(),
                         label:
                         "${model.settings.setting(Settings.filterMinRating.name).value.toString()} rating"),
                   ),
@@ -360,13 +362,13 @@ class HomePage extends StatelessWidget with AppPage {
                           model.invalidateCache();
                         },
                   values: RangeValues(
-                      model.settings
+                      StrCast(model.settings
                           .setting(Settings.filterMinimumTimeToPlay.name)
-                          .value
+                          .value).castToInt()
                           .floorToDouble(),
-                      model.settings
+                      StrCast(model.settings
                           .setting(Settings.filterMaximumTimeToPlay.name)
-                          .value
+                          .value).castToInt()
                           .floorToDouble()),
                   labels: RangeLabels(
                       "${model.settings.setting(Settings.filterMinimumTimeToPlay.name).value.toString()} mins",

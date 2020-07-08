@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:how_many_mobile_meeple/platform/web/url_fragment_extractor.dart';
 import 'package:how_many_mobile_meeple/storage/storage_factory.dart';
 import 'package:how_many_mobile_meeple/storage/stored_preferences.dart';
 import 'package:scoped_model/scoped_model.dart';
@@ -8,6 +9,7 @@ import 'package:how_many_mobile_meeple/model/bgg_cache.dart';
 import 'package:how_many_mobile_meeple/model/item.dart';
 
 import '../app_common.dart';
+import '../str_cast.dart';
 import 'game.dart';
 import 'games.dart';
 import 'items.dart';
@@ -24,19 +26,6 @@ class AppModel extends Model {
 
   Items _items = Items([]);
   BggCache _bggCache = BggCache(Games(), _unsetCacheDurationInMinutes);
-  Settings _defaultSettings = Settings({
-    Settings.fieldsToReturnFromApi.name: Settings.fieldsToReturnFromApi,
-    Settings.filterMinimumTimeToPlay.name: Settings.filterMinimumTimeToPlay,
-    Settings.filterMaximumTimeToPlay.name: Settings.filterMaximumTimeToPlay,
-    Settings.filterNumberOfPlayers.name: Settings.filterNumberOfPlayers,
-    Settings.filterUsingUserRecommendations.name:
-        Settings.filterUsingUserRecommendations,
-    Settings.filterIncludesExpansions.name: Settings.filterIncludesExpansions,
-    Settings.filterMechanics.name: Settings.filterMechanics,
-    Settings.filterUseAllMechanics.name: Settings.filterUseAllMechanics,
-    Settings.filterComplexity.name: Settings.filterComplexity,
-    Settings.filterMinRating.name: Settings.filterMinRating,
-  });
 
   Settings _settings;
   Orientation screenOrientation;
@@ -51,8 +40,25 @@ class AppModel extends Model {
 
   SortableGameField sortGameField = SortableGameField.rating;
 
+  UrlFragmentExtractor _extractor = UrlFragmentExtractor(Uri.base);
+
   AppModel() {
-    this._settings = this._defaultSettings.clone();
+    _settings = Settings.defaultSettings();
+  }
+
+  void refreshFromUrl() {
+    if (_extractor.containsModel()) {
+      replaceItems(_extractor.extractItems());
+      var extractedSettings = _extractor.extractSettings();
+      extractedSettings = _rebuildUrlMechanics(extractedSettings);
+      _settings.updateAllSettings(extractedSettings);
+    }
+  }
+
+  Settings _rebuildUrlMechanics(Settings extractedSettings) {
+    extractedSettings.setting(Settings.filterMechanics.name).value =
+        StrCast(extractedSettings.setting(Settings.filterMechanics.name).value).castToList();
+    return extractedSettings;
   }
 
   void toggleSortDirection() {
@@ -73,7 +79,7 @@ class AppModel extends Model {
   }
 
   void replaceSettings(Settings settings) {
-    var newSettings = this._defaultSettings.clone();
+    var newSettings = Settings.defaultSettings();
     for (var setting in settings.allSettings.values) {
       newSettings.updateSetting(setting);
     }
@@ -106,6 +112,9 @@ class AppModel extends Model {
   void refreshState() => this.notifyListeners();
 
   void loadStoredData() async {
+    if (_extractor.containsModel()) {
+      return;
+    }
     StoredPreferences store = await StorageFactory.getStoredPreferences();
     _items = await store.loadItems(AppCommon.maxItemsFromBgg);
     this.replaceSettings(await store.loadSettings(settings));

@@ -1,6 +1,5 @@
 abstract class AppCommon {
   static const String appTitle = 'How Many Meeple?';
-  static const int splashScreenDisplayTime = 3600;
   static const double standardIconSize = 30.0;
   static const String optionsPageTitle = 'Game Options';
   static const String savedSettings = 'Saved Settings';

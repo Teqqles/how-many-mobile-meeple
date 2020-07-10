@@ -46,7 +46,6 @@ class UrlFragmentExtractor {
     if (!containsModel()) {
       return settings;
     }
-    print(uri.fragment);
     var firstQueryIndex = _calculateQueryPosition(uri.fragment);
     var potentialEncodedSettings = uri.fragment.substring(firstQueryIndex+1);
     var settingsFromString = potentialEncodedSettings.split("&");

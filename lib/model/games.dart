@@ -119,4 +119,12 @@ class Games {
   String toString() {
     return gamesByName.toString();
   }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) || other is Games && toString() == other.toString();
+
+  @override
+  int get hashCode => toString().hashCode;
+
 }

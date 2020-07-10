@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:how_many_mobile_meeple/model/model.dart';
 import 'package:how_many_mobile_meeple/platform/pages.dart';
+import 'package:how_many_mobile_meeple/platform/web/url_fragment_encoder.dart';
 
 class Router {
 
@@ -28,5 +30,12 @@ class Router {
         return MaterialPageRoute(
             builder: (_) => Pages.platformPages().homePage(), settings: settings);
     }
+  }
+
+  static RouteSettings generateRouteSettings(String name, AppModel model) {
+    var items = model.items;
+    var settings = model.settings;
+    var encodedName = UrlFragmentEncoder.encode(name, items: items, settings: settings);
+    return RouteSettings(name: encodedName);
   }
 }

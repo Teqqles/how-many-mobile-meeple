@@ -13,7 +13,6 @@ class LoadGames {
     Games games = Games(gamesByName: Map<String, Game>());
     Map<String, String> requestHeaders = settings.enabledSettings.map(
         (_, setting) => MapEntry(setting.header, setting.value.toString()));
-    print(requestHeaders);
     for (Item item in items) {
       var response = await http.get(
           "${AppCommon.boardGameGeekProxyUrl}/${item.itemType.name}/${item.name}",

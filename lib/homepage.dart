@@ -32,7 +32,7 @@ class HomePage extends StatelessWidget with AppPage {
     var textFieldWidth = MediaQuery.of(context).size.width * 0.65;
     return Scaffold(
         appBar: HowManyMeepleAppBar(AppCommon.optionsPageTitle,
-            hasSaveDialog: kIsWeb? false : true, model: AppModel.of(context), context: context),
+            hasSaveDialog: kIsWeb? false : true, isHomePage: true, model: AppModel.of(context), context: context),
         drawer: pageDrawer(context),
         bottomNavigationBar: Container(
           color: Theme.of(context).highlightColor,

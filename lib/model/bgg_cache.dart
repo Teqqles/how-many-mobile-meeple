@@ -39,9 +39,7 @@ class BggCache {
   Game get lastRandom => _stickyRandom ?? random;
 
   BggCache(this._games, this._durationMinutes) {
-    this._cacheTimestamp =
-        epochToSeconds(DateTime.now().millisecondsSinceEpoch) +
-            (this.durationInMinutes * 60);
+    refreshCacheTimestamp();
     _remainingGames = _games;
   }
 
@@ -52,4 +50,10 @@ class BggCache {
       epochToSeconds(DateTime.now().millisecondsSinceEpoch);
 
   void makeStale() => this._cacheTimestamp = 0;
+
+  void refreshCacheTimestamp() {
+    this._cacheTimestamp =
+        epochToSeconds(DateTime.now().millisecondsSinceEpoch) +
+            (this.durationInMinutes * 60);
+  }
 }

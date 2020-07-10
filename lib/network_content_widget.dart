@@ -5,7 +5,6 @@ import 'package:scoped_model/scoped_model.dart';
 import 'package:how_many_mobile_meeple/screen_tools.dart';
 
 import 'package:how_many_mobile_meeple/components/app_default_padding.dart';
-import 'package:how_many_mobile_meeple/model/bgg_cache.dart';
 import 'load_games.dart';
 import 'package:how_many_mobile_meeple/model/model.dart';
 
@@ -69,24 +68,24 @@ abstract class NetworkWidget extends StatelessWidget with ScreenTools {
       AsyncSnapshot<Games> snapshot,
       BuildContext context,
       Widget displayWidgetFn(
-          BuildContext context, AppModel model, BggCache cachedGames)) {
+          BuildContext context, AppModel model)) {
     if (snapshot.data.games.isEmpty) {
       return pageErrors(context, pageErrorNoGamesAvailable);
     }
     model.replaceCache(snapshot.data);
-    return displayWidgetFn(context, model, model.bggCache);
+    return displayWidgetFn(context, model);
   }
 
   Widget loadNetworkContent(
       Widget displayWidgetFn(
-          BuildContext context, AppModel model, BggCache cachedGames)) {
+          BuildContext context, AppModel model)) {
     return ScopedModelDescendant<AppModel>(
       builder: (context, child, model) {
         if (model.items.isEmpty) {
           return pageErrors(context, pageErrorNoItemsSupplied);
         }
         return contentFromNetworkOrCache(context, model, displayWidgetFn);
-      },
+      }
     );
   }
 
@@ -94,9 +93,9 @@ abstract class NetworkWidget extends StatelessWidget with ScreenTools {
       BuildContext context,
       AppModel model,
       Widget displayWidgetFn(
-          BuildContext context, AppModel model, BggCache cachedGames)) {
+          BuildContext context, AppModel model)) {
     if (!model.bggCache.isStale()) {
-      return displayWidgetFn(context, model, model.bggCache);
+      return displayWidgetFn(context, model);
     }
     return FutureBuilder<Games>(
       future: LoadGames.fetchGames(model.settings, model.items.itemList),

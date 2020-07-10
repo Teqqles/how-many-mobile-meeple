@@ -21,6 +21,7 @@ class AppModel extends Model {
   static int _unsetCacheDurationInMinutes = -1;
 
   bool hasLoadedPersistedData = false;
+  bool pageRefreshed = false;
 
   String title;
 
@@ -51,7 +52,10 @@ class AppModel extends Model {
       replaceItems(_extractor.extractItems());
       var extractedSettings = _extractor.extractSettings();
       extractedSettings = _rebuildUrlMechanics(extractedSettings);
-      _settings.updateAllSettings(extractedSettings);
+      if(_settings != extractedSettings) {
+        _settings.updateAllSettings(extractedSettings);
+        invalidateCache();
+      }
     }
   }
 
@@ -73,6 +77,9 @@ class AppModel extends Model {
   }
 
   void replaceItems(Items items) {
+    if (items == _items) {
+      return;
+    }
     _items = items;
     this.invalidateCache();
     this.updateStore();
@@ -93,7 +100,11 @@ class AppModel extends Model {
   }
 
   void replaceCache(Games games) {
-    _bggCache = BggCache(games, _defaultCacheDurationInMinutes);
+    if (games == _bggCache.games) {
+      _bggCache.refreshCacheTimestamp();
+    } else {
+      _bggCache = BggCache(games, _defaultCacheDurationInMinutes);
+    }
   }
 
   void deleteItem(Item item) {

@@ -3,7 +3,6 @@ import 'dart:typed_data';
 import 'package:esys_flutter_share/esys_flutter_share.dart';
 import 'package:flutter/material.dart';
 import 'package:how_many_mobile_meeple/platform/router.dart';
-import 'package:how_many_mobile_meeple/platform/web/url_fragment_encoder.dart';
 import 'package:mime_type/mime_type.dart';
 import 'package:http/http.dart' as http;
 import 'package:scoped_model/scoped_model.dart';
@@ -11,7 +10,6 @@ import 'package:how_many_mobile_meeple/components/drawer_bgg_filter.dart';
 import 'app_common.dart';
 import 'components/component_factory.dart';
 import 'model/game.dart';
-import 'model/items.dart';
 import 'model/model.dart';
 import 'model/settings.dart';
 import 'package:path/path.dart';
@@ -77,17 +75,11 @@ abstract class AppPage {
   }
 
   void loadPage(BuildContext context, RouteSettings pageSettings) {
-    if (Navigator.of(context).canPop()) {
-      Navigator.of(context).pushReplacementNamed(
-        pageSettings.name,
-        arguments: pageSettings.arguments
-      );
-    } else {
-      Navigator.of(context).pushNamed(
-        pageSettings.name,
-        arguments: pageSettings.arguments
-      );
-    }
+    AppModel.of(context).pageRefreshed = true;
+    Navigator.of(context).pushReplacementNamed(
+      pageSettings.name,
+      arguments: pageSettings.arguments
+    );
   }
 
   void startPage(BuildContext context) {
@@ -113,7 +105,7 @@ abstract class AppPage {
                   size: 36,
                 ),
                 onPressed: () {
-                  var listPageSettings = generateRouteSettings(Router.listRoute, AppModel.of(context));
+                  var listPageSettings = Router.generateRouteSettings(Router.listRoute, AppModel.of(context));
                   loadPage(context, listPageSettings);
                 }),
           ),
@@ -122,7 +114,7 @@ abstract class AppPage {
           padding: const EdgeInsets.only(left: 8, right: 8),
           child: MaterialButton(
             onPressed: () {
-              var randomPageSettings = generateRouteSettings(Router.randomRoute, AppModel.of(context));
+              var randomPageSettings = Router.generateRouteSettings(Router.randomRoute, AppModel.of(context));
               loadPage(context, randomPageSettings);
             },
             child: Container(
@@ -176,14 +168,6 @@ abstract class AppPage {
         shape:
             RoundedRectangleBorder(borderRadius: BorderRadius.circular(30.0)));
   }
-
-  RouteSettings generateRouteSettings(String name, AppModel model) {
-    var items = model.items;
-    var settings = model.settings;
-    var encodedName = UrlFragmentEncoder.encode(name, items: items, settings: settings);
-    return RouteSettings(name: encodedName);
-  }
-
 
   Widget pageDrawer(BuildContext context) {
     var staticDataComponentLength = 5;

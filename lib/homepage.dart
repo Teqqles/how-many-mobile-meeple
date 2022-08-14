@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:how_many_mobile_meeple/components/toggleable_homepage_menu_item_widget.dart';
@@ -76,7 +75,7 @@ class HomePage extends StatelessWidget with AppPage {
                     height: 35,
                     width: MediaQuery.of(context).size.width * 0.60,
                     child: Slider(
-                        activeColor: Theme.of(context).accentColor,
+                        activeColor: Theme.of(context).colorScheme.secondary,
                         min: 0.0,
                         max: 5.0,
                         divisions: 10,
@@ -103,7 +102,7 @@ class HomePage extends StatelessWidget with AppPage {
                           color: model.settings
                               .setting(Settings.filterComplexity.name)
                               .enabled
-                              ? Theme.of(context).accentColor
+                              ? Theme.of(context).colorScheme.secondary
                               : Theme.of(context).disabledColor,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8.0),
@@ -143,7 +142,7 @@ class HomePage extends StatelessWidget with AppPage {
                     width: MediaQuery.of(context).size.width * 0.60,
                     child:
                     Slider(
-                        activeColor: Theme.of(context).accentColor,
+                        activeColor: Theme.of(context).colorScheme.secondary,
                         min: 1.0,
                         max: 10.0,
                         divisions: 10,
@@ -171,7 +170,7 @@ class HomePage extends StatelessWidget with AppPage {
                           color: model.settings
                               .setting(Settings.filterNumberOfPlayers.name)
                               .enabled
-                              ? Theme.of(context).accentColor
+                              ? Theme.of(context).colorScheme.secondary
                               : Theme.of(context).disabledColor,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8.0),
@@ -210,7 +209,7 @@ class HomePage extends StatelessWidget with AppPage {
                     height: 35,
                     width: MediaQuery.of(context).size.width * 0.60,
                     child: Slider(
-                        activeColor: Theme.of(context).accentColor,
+                        activeColor: Theme.of(context).colorScheme.secondary,
                         min: 0.0,
                         max: 10.0,
                         divisions: 20,
@@ -237,7 +236,7 @@ class HomePage extends StatelessWidget with AppPage {
                           color: model.settings
                               .setting(Settings.filterMinRating.name)
                               .enabled
-                              ? Theme.of(context).accentColor
+                              ? Theme.of(context).colorScheme.secondary
                               : Theme.of(context).disabledColor,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8.0),
@@ -286,7 +285,7 @@ class HomePage extends StatelessWidget with AppPage {
             ),
             ScopedModelDescendant<AppModel>(
               builder: (context, child, model) => AppDefaultPadding(
-                child: RaisedButton(
+                child: ElevatedButton(
                   child: Text('Add'),
                   onPressed: () {
                     if (controller.text.isEmpty) return;
@@ -343,7 +342,7 @@ class HomePage extends StatelessWidget with AppPage {
               Container(
                 width: sliderWidth,
                 child: RangeSlider(
-                  activeColor: Theme.of(context).accentColor,
+                  activeColor: Theme.of(context).colorScheme.secondary,
                   min: sliderMinValue,
                   max: sliderMaxValue,
                   divisions: sliderSteps,
@@ -381,7 +380,7 @@ class HomePage extends StatelessWidget with AppPage {
                       color: model.settings
                               .setting(Settings.filterMinimumTimeToPlay.name)
                               .enabled
-                          ? Theme.of(context).accentColor
+                          ? Theme.of(context).colorScheme.secondary
                           : Theme.of(context).disabledColor,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8.0),
@@ -419,6 +418,7 @@ class HomePage extends StatelessWidget with AppPage {
               menuWidget: Wrap(
                 alignment: WrapAlignment.center,
                 spacing: 5,
+                runSpacing: 5,
                 children: mechanics.map((String value) {
                   return ChoiceChip(
                     labelStyle: TextStyle(
@@ -427,7 +427,7 @@ class HomePage extends StatelessWidget with AppPage {
                         color: model.settings
                             .setting(Settings.filterMechanics.name)
                             .enabled
-                            ? Theme.of(context).accentColor
+                            ? Theme.of(context).colorScheme.secondary
                             : Theme.of(context).disabledColor),
                     label: Text(value),
                     selected: model.settings
@@ -565,6 +565,6 @@ class HomePage extends StatelessWidget with AppPage {
 
   Color colorItem(BuildContext context, Item item, ItemType expectedType) =>
       expectedType == item.itemType
-          ? Theme.of(context).accentColor
+          ? Theme.of(context).colorScheme.secondary
           : Theme.of(context).disabledColor;
 }

@@ -15,7 +15,7 @@ class LoadGames {
         (_, setting) => MapEntry(setting.header, setting.value.toString()));
     for (Item item in items) {
       var response = await http.get(
-          "${AppCommon.boardGameGeekProxyUrl}/${item.itemType.name}/${item.name}",
+        Uri.parse("${AppCommon.boardGameGeekProxyUrl}/${item.itemType.name}/${item.name}"),
           headers: requestHeaders);
       if (response.statusCode != 200) {
         throw Exception('Failed to load games for ${item.name}');

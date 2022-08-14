@@ -2,7 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:how_many_mobile_meeple/platform/pages.dart';
-import 'package:how_many_mobile_meeple/platform/router.dart';
+import 'package:how_many_mobile_meeple/platform/router.dart' as r;
 
 import 'package:scoped_model/scoped_model.dart';
 
@@ -36,7 +36,7 @@ class MyApp extends StatelessWidget {
             primarySwatch: swatch,
           ),
           home: Pages.platformPages().homePage(),
-          onGenerateRoute: Router.generateRoute,
+          onGenerateRoute: r.Router.generateRoute,
         ));
   }
 }

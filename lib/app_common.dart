@@ -12,7 +12,7 @@ abstract class AppCommon {
   static const String labelRating = 'Min Rating?';
   static const int maxItemsFromBgg = 5;
   static const String boardGameGeekProxyUrl =
-      "https://how-many-meeple.sixfootsoftware.com:8443";
+      "https://api.howmanymeeple.com";
   static const String disclaimerText = "Powered by Board Game Geek";
 
   static String randomGameMessage(String gameName) =>

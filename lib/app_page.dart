@@ -2,7 +2,7 @@ import 'dart:typed_data';
 
 import 'package:esys_flutter_share/esys_flutter_share.dart';
 import 'package:flutter/material.dart';
-import 'package:how_many_mobile_meeple/platform/router.dart';
+import 'package:how_many_mobile_meeple/platform/router.dart' as r;
 import 'package:mime_type/mime_type.dart';
 import 'package:http/http.dart' as http;
 import 'package:scoped_model/scoped_model.dart';
@@ -41,7 +41,7 @@ abstract class AppPage {
             ],
           ),
           decoration: BoxDecoration(
-            color: Theme.of(context).accentColor,
+            color: Theme.of(context).colorScheme.secondary,
           ),
         ),
       );
@@ -76,97 +76,101 @@ abstract class AppPage {
 
   void loadPage(BuildContext context, RouteSettings pageSettings) {
     AppModel.of(context).pageRefreshed = true;
-    Navigator.of(context).pushReplacementNamed(
-      pageSettings.name,
-      arguments: pageSettings.arguments
-    );
+    Navigator.of(context).pushReplacementNamed(pageSettings.name,
+        arguments: pageSettings.arguments);
   }
 
   void startPage(BuildContext context) {
     AppModel.of(context).refreshFromUrl();
   }
 
-  Widget iconButtonGroup(BuildContext context) =>
-    Row(
-      mainAxisAlignment: MainAxisAlignment.end,
-      crossAxisAlignment: CrossAxisAlignment.end,
-      children: <Widget>[
-        Container(
-          decoration: BoxDecoration(
-            color: Theme.of(context).accentColor,
-            borderRadius: BorderRadius.circular(40.0),
+  Widget iconButtonGroup(BuildContext context) => Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: <Widget>[
+          Container(
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.secondary,
+              borderRadius: BorderRadius.circular(40.0),
+            ),
+            child: Padding(
+              padding: EdgeInsets.only(left: 5, right: 5, top: 5, bottom: 5),
+              child: IconButton(
+                  padding: EdgeInsets.all(0),
+                  color: Theme.of(context).selectedRowColor,
+                  icon: Icon(
+                    Icons.format_list_numbered,
+                    size: 36,
+                  ),
+                  onPressed: () {
+                    var listPageSettings = r.Router.generateRouteSettings(
+                        r.Router.listRoute, AppModel.of(context));
+                    loadPage(context, listPageSettings);
+                  }),
+            ),
           ),
-          child: Padding(
-            padding: EdgeInsets.only(left: 5, right: 5, top: 2, bottom: 2),
-            child: IconButton(
-                color: Theme.of(context).selectedRowColor,
-                icon: Icon(
-                  Icons.format_list_numbered,
-                  size: 36,
+          Padding(
+            padding: const EdgeInsets.only(left: 8, right: 8),
+            child: MaterialButton(
+              onPressed: () {
+                var randomPageSettings = r.Router.generateRouteSettings(
+                    r.Router.randomRoute, AppModel.of(context));
+                loadPage(context, randomPageSettings);
+              },
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.secondary,
+                  borderRadius: BorderRadius.circular(40.0),
                 ),
-                onPressed: () {
-                  var listPageSettings = Router.generateRouteSettings(Router.listRoute, AppModel.of(context));
-                  loadPage(context, listPageSettings);
-                }),
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.only(left: 8, right: 8),
-          child: MaterialButton(
-            onPressed: () {
-              var randomPageSettings = Router.generateRouteSettings(Router.randomRoute, AppModel.of(context));
-              loadPage(context, randomPageSettings);
-            },
-            child: Container(
-              decoration: BoxDecoration(
-                color: Theme.of(context).accentColor,
-                borderRadius: BorderRadius.circular(40.0),
-              ),
-              child: Padding(
-                padding:
-                EdgeInsets.only(left: 18, right: 12, top: 5, bottom: 5),
-                child: Row(
-                  children: <Widget>[
-                    SizedBox(
-                      height: _imageButtonSize,
-                      width: _imageButtonSize,
-                      child: randomGameButtonIcon,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(left: 8, right: 8),
-                      child: Text(
-                        randomGameLabel,
-                        style: TextStyle(
-                            color: Theme.of(context).selectedRowColor,
-                            fontWeight: FontWeight.bold),
+                child: Padding(
+                  padding:
+                      EdgeInsets.only(left: 18, right: 12, top: 5, bottom: 5),
+                  child: Row(
+                    children: <Widget>[
+                      SizedBox(
+                        height: _imageButtonSize,
+                        width: _imageButtonSize,
+                        child: randomGameButtonIcon,
                       ),
-                    )
-                  ],
+                      Padding(
+                        padding: const EdgeInsets.only(left: 8, right: 8),
+                        child: Text(
+                          randomGameLabel,
+                          style: TextStyle(
+                              color: Theme.of(context).selectedRowColor,
+                              fontWeight: FontWeight.bold),
+                        ),
+                      )
+                    ],
+                  ),
                 ),
               ),
             ),
           ),
-        ),
-      ],
-    );
+        ],
+      );
 
-  RaisedButton shareButton(BuildContext context, Game game) {
-    return RaisedButton(
-        color: Theme.of(context).accentColor,
-        child: Icon(
-          Icons.share,
-          color: Theme.of(context).selectedRowColor,
-        ),
-        onPressed: () async {
-          var response = await http.get(game.imageUrl);
-          var mimeType = mime(basename(game.imageUrl));
-          Uint8List bytes = response.bodyBytes;
-          await Share.file(
-              "${game.name}", basename(game.imageUrl), bytes, mimeType,
-              text: AppCommon.randomGameMessage(game.name));
-        },
-        shape:
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(30.0)));
+  ElevatedButton shareButton(BuildContext context, Game game) {
+    return ElevatedButton(
+      child: Icon(
+        Icons.share,
+        color: Theme.of(context).selectedRowColor,
+      ),
+      onPressed: () async {
+        var response = await http.get(Uri.parse(game.imageUrl));
+        var mimeType = mime(basename(game.imageUrl));
+        Uint8List bytes = response.bodyBytes;
+        await Share.file(
+            "${game.name}", basename(game.imageUrl), bytes, mimeType,
+            text: AppCommon.randomGameMessage(game.name));
+      },
+      style: ButtonStyle(
+          backgroundColor: MaterialStateProperty.all<Color>(
+              Theme.of(context).colorScheme.secondary),
+          shape: MaterialStateProperty.all<OutlinedBorder>(
+              RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(30.0)))),
+    );
   }
 
   Widget pageDrawer(BuildContext context) {

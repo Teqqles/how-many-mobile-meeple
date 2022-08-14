@@ -5,6 +5,7 @@ import 'package:how_many_mobile_meeple/model/setting.dart';
 import 'package:scoped_model/scoped_model.dart';
 
 import 'app_default_padding.dart';
+import 'app_home_menu_padding.dart';
 
 class ToggleableHomepageMenuItemWidget extends StatelessWidget {
   final String label;
@@ -38,6 +39,7 @@ class ToggleableHomepageMenuItemWidget extends StatelessWidget {
             ],
           ),
         ),
+        AppHomeMenuPadding(),
         menuWidget
       ]),
     );

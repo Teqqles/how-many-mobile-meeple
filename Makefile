@@ -15,7 +15,9 @@ generate_appbundle:
 generate_web:
 	@echo "Creating Web deployment"
 	flutter build web
-	docker build . -t howmanymeeple/how-many-mobile-meeple
+
+upload_web:
+	aws s3 cp ./build/web s3://www.howmanymeeple.com --recursive
 
 clean:
 	flutter clean

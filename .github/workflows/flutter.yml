@@ -1,24 +1,38 @@
 name: Flutter CI
 
-on: 
+on:
   push:
     branches:
-    - master
+      - master
   pull_request:
     branches:
-    - master
-    
+      - master
+
 jobs:
   build:
-
     runs-on: ubuntu-latest
-    
-    container:
-      image:  cirrusci/flutter:stable
-    
+
     steps:
-    - uses: actions/checkout@v1
-    - name: Install dependencies
-      run: flutter pub get
-    - name: Run tests
-      run: flutter test
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.24.x'
+          channel: 'stable'
+
+      - name: Verify Flutter installation
+        run: flutter --version
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Analyze code
+        run: flutter analyze
+
+      - name: Run tests
+        run: flutter test
+
+      - name: Check formatting
+        run: dart format --set-exit-if-changed .

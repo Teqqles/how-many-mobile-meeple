@@ -119,6 +119,7 @@ class _Step1SelectSourceState extends State<Step1SelectSource> {
                       ? 'Maximum ${AppCommon.maxItemsFromBgg} sources reached'
                       : null,
                 ),
+                onChanged: (value) => setState(() {}),
                 onSubmitted: (_) => _addSource(model),
               ),
 

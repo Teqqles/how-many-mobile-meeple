@@ -17,8 +17,7 @@ main() {
   var settings = Settings(
       {firstSetting.name: firstSetting, secondSetting.name: secondSetting});
 
-  var emptySettings =
-      Settings({firstSetting.name: null, secondSetting.name: null});
+  var emptySettings = Settings({});
 
   group('saveSettings', () {
     test('returns true and stores setting data when supplied', () async {

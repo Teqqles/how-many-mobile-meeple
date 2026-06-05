@@ -5,8 +5,26 @@ import 'package:test/test.dart';
 
 main() {
   var duration = 1;
-  var game1 = Game(name: 'game1');
-  var game2 = Game(name: 'game2');
+  var game1 = Game(
+    id: 1,
+    name: 'game1',
+    maxPlayers: 4,
+    minPlayers: 2,
+    maxPlaytime: 60,
+    imageUrl: 'http://example.com/game1.jpg',
+    averageRating: 7.5,
+    averageWeight: 2.5,
+  );
+  var game2 = Game(
+    id: 2,
+    name: 'game2',
+    maxPlayers: 6,
+    minPlayers: 2,
+    maxPlaytime: 90,
+    imageUrl: 'http://example.com/game2.jpg',
+    averageRating: 8.0,
+    averageWeight: 3.0,
+  );
   var games = Games(gamesByName: {game1.name: game1, game2.name: game2});
   group('BggCache', () {
     test('contains a list of games with a cache duration', () {

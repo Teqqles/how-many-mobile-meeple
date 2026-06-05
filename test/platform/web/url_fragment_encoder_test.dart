@@ -13,42 +13,54 @@ main() {
   var expectedName = '/pagename';
   group('encode', () {
     test('returns name when only a name given', () {
-      var encodedName = UrlFragmentEncoder.encode(expectedName);
+      final mockItems = MockItems();
+      final mockSettings = MockSettings();
+      when(mockItems.itemList).thenReturn([]);
+      when(mockSettings.changedSettings).thenReturn({});
+      var encodedName = UrlFragmentEncoder.encode(expectedName, items: mockItems, settings: mockSettings);
       expect(encodedName, expectedName);
     });
 
     test('returns name when empty items given', () {
       final mockItems = MockItems();
+      final mockSettings = MockSettings();
 
       when(mockItems.itemList).thenReturn([]);
-      var encodedName = UrlFragmentEncoder.encode(expectedName, items: mockItems);
+      when(mockSettings.changedSettings).thenReturn({});
+      var encodedName = UrlFragmentEncoder.encode(expectedName, items: mockItems, settings: mockSettings);
       expect(encodedName, expectedName);
     });
 
     test('returns name and single item', () {
       final mockItems = MockItems();
+      final mockSettings = MockSettings();
 
       when(mockItems.itemList).thenReturn([Item('test')]);
+      when(mockSettings.changedSettings).thenReturn({});
       var expectedEncodedName = expectedName + '/test';
-      var encodedName = UrlFragmentEncoder.encode(expectedName, items: mockItems);
+      var encodedName = UrlFragmentEncoder.encode(expectedName, items: mockItems, settings: mockSettings);
       expect(encodedName, expectedEncodedName);
     });
 
     test('returns name and plus separated items', () {
       final mockItems = MockItems();
+      final mockSettings = MockSettings();
 
       when(mockItems.itemList).thenReturn([Item('test'), Item('test2')]);
+      when(mockSettings.changedSettings).thenReturn({});
       var expectedEncodedName = expectedName + '/test+test2';
-      var encodedName = UrlFragmentEncoder.encode(expectedName, items: mockItems);
+      var encodedName = UrlFragmentEncoder.encode(expectedName, items: mockItems, settings: mockSettings);
       expect(encodedName, expectedEncodedName);
     });
 
 
     test('returns name when empty settings given', () {
+      final mockItems = MockItems();
       final mockSettings = MockSettings();
 
-      when(mockSettings.allSettings).thenReturn({});
-      var encodedName = UrlFragmentEncoder.encode(expectedName, settings: mockSettings);
+      when(mockItems.itemList).thenReturn([]);
+      when(mockSettings.changedSettings).thenReturn({});
+      var encodedName = UrlFragmentEncoder.encode(expectedName, items: mockItems, settings: mockSettings);
       expect(encodedName, expectedName);
     });
 

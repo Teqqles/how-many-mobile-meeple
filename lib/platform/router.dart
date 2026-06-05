@@ -15,7 +15,7 @@ class Router {
 
   static Route<dynamic> generateRoute(RouteSettings settings) {
     var secondSlash = settings.name!.substring(1).indexOf("/");
-    var path = secondSlash == -1 ? settings.name : settings.name!.substring(0, secondSlash+1);
+    var path = secondSlash == -1 ? settings.name! : settings.name!.substring(0, secondSlash+1);
 
     switch (path) {
       case Router.homeRoute:

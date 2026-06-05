@@ -25,7 +25,7 @@ class Settings {
       enabled: true);
 
   static Setting filterMechanics = Setting("mechanicsFilters",
-      header: "Bgg-Filter-Mechanic", value: List<String>());
+      header: "Bgg-Filter-Mechanic", value: <String>[]);
 
   static Setting filterUseAllMechanics =
       Setting("useAllMechanicsFilters", value: false, enabled: true);
@@ -35,6 +35,9 @@ class Settings {
 
   static Setting filterMinRating =
       Setting("minimumRating", header: "Bgg-Filter-Min-Rating", value: 5.0);
+
+  static Setting preferAdvancedMode =
+      Setting("preferAdvancedMode", value: false, enabled: true);
 
   static Settings defaultSettings() => Settings(Map.from({
     Settings.fieldsToReturnFromApi.name: Settings.fieldsToReturnFromApi.clone(),
@@ -48,6 +51,7 @@ class Settings {
     Settings.filterUseAllMechanics.name: Settings.filterUseAllMechanics.clone(),
     Settings.filterComplexity.name: Settings.filterComplexity.clone(),
     Settings.filterMinRating.name: Settings.filterMinRating.clone(),
+    Settings.preferAdvancedMode.name: Settings.preferAdvancedMode.clone(),
   }));
 
   Map<String, Setting> _settings = Map<String, Setting>();
@@ -66,14 +70,27 @@ class Settings {
     Map<String, Setting> filteredSettings = Map.from(_settings);
     filteredSettings[fieldsToReturnFromApi.name] = fieldsToReturnFromApi;
     filteredSettings.removeWhere(
-        (_, setting) => !setting.enabled || setting.header == null);
+        (_, setting) => !setting.enabled);
     return filteredSettings;
   }
 
   Settings(this._settings);
 
   Setting setting(String name) {
-    return _settings[name];
+    // Return the setting if it exists, otherwise try to get from defaults
+    // This handles cases where old URLs or persisted data reference removed settings
+    if (_settings.containsKey(name)) {
+      return _settings[name]!;
+    }
+
+    // Try to get from default settings
+    final defaults = defaultSettings();
+    if (defaults._settings.containsKey(name)) {
+      return defaults._settings[name]!;
+    }
+
+    // Setting doesn't exist - return a disabled placeholder to avoid crashes
+    return Setting(name, value: null, enabled: false);
   }
 
   void updateSetting(Setting setting) => _settings[setting.name] = setting;

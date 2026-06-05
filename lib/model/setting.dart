@@ -1,7 +1,7 @@
 class Setting {
   final String name;
   dynamic value;
-  String header;
+  String? header;
   bool enabled;
 
   Setting(this.name, {this.value, this.header, this.enabled = false});
@@ -14,8 +14,14 @@ class Setting {
   String toString() => "$name, $value, $header, $enabled";
 
   factory Setting.fromJson(Map<String, dynamic> json) {
+    // Handle enabled field which might be stored as string
+    final enabled = json['enabled'];
+    final enabledBool = enabled is String
+        ? enabled.toLowerCase() == 'true'
+        : (enabled as bool? ?? false);
+
     return Setting(json['name'],
-        value: json['value'], header: json['header'], enabled: json['enabled']);
+        value: json['value'], header: json['header'], enabled: enabledBool);
   }
 
   @override

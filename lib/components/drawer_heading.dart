@@ -1,13 +1,12 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
+import '../theme_extensions.dart';
 
 class DrawerHeading extends Container {
   DrawerHeading(String filterTitle, BuildContext context)
       : super(
           margin: EdgeInsets.only(top: 8),
           padding: EdgeInsets.all(12),
-          color: Theme.of(context).accentColor,
+          color: Theme.of(context).colorScheme.secondary,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: <Widget>[

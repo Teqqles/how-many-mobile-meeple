@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -13,7 +12,7 @@ class PlatformIndependentImage extends StatelessWidget with ScreenTools {
   final String imageUrl;
   final Codec<String, String> stringToBase64 = utf8.fuse(base64);
 
-  PlatformIndependentImage({this.imageUrl});
+  PlatformIndependentImage({super.key, required this.imageUrl});
 
   Widget buildWebImage(context) {
     return Image.network(

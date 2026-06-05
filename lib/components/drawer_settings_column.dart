@@ -1,16 +1,16 @@
 import 'package:flutter/cupertino.dart';
 import 'package:how_many_mobile_meeple/model/app_preferences.dart';
 import 'package:how_many_mobile_meeple/model/model.dart';
-import 'package:how_many_mobile_meeple/storage/preferences_history.dart';
+import 'package:how_many_mobile_meeple/storage/preferences_history_interface.dart';
 
 import 'drawer_heading.dart';
 import 'drawer_saved_setting.dart';
 
 class DrawerSettingsColumn {
-  final PreferencesHistoryDb historyDb;
+  final PreferencesHistoryInterface historyDb;
   final String drawerName;
 
-  DrawerSettingsColumn(this.drawerName, {this.historyDb}) : super();
+  DrawerSettingsColumn(this.drawerName, {required this.historyDb});
 
   Future<List<Widget>> drawerContent(
       BuildContext context, AppModel model) async {

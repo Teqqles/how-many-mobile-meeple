@@ -1,19 +1,19 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:how_many_mobile_meeple/storage/preferences_history.dart';
+import 'package:how_many_mobile_meeple/storage/storage_factory.dart';
 
 import 'model/app_preferences.dart';
 import 'model/model.dart';
+import 'theme_extensions.dart';
 
 class SaveDialog extends StatelessWidget {
   final TextEditingController controller = TextEditingController();
 
-  final PreferencesHistoryDb history = PreferencesHistoryDb();
+  final history = StorageFactory.getPreferencesHistory();
 
   final String title = 'Save Preferences';
   final AppModel model;
 
-  SaveDialog({this.model});
+  SaveDialog({super.key, required this.model});
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +37,7 @@ class SaveDialog extends StatelessWidget {
               padding: EdgeInsets.all(4),
               margin: EdgeInsets.only(top: 8),
               decoration: new BoxDecoration(
-                color: Theme.of(context).accentColor,
+                color: Theme.of(context).colorScheme.secondary,
                 shape: BoxShape.rectangle,
                 borderRadius: BorderRadius.only(
                     topLeft: Radius.circular(8), topRight: Radius.circular(8)),
@@ -56,7 +56,7 @@ class SaveDialog extends StatelessWidget {
                     padding: EdgeInsets.only(top: 4, bottom: 4),
                     margin: EdgeInsets.zero,
                     decoration: new BoxDecoration(
-                      color: Theme.of(context).accentColor,
+                      color: Theme.of(context).colorScheme.secondary,
                       shape: BoxShape.rectangle,
                     ),
                     child: Row(
@@ -105,7 +105,7 @@ class SaveDialog extends StatelessWidget {
                   SizedBox(height: 24.0),
                   Align(
                     alignment: Alignment.bottomRight,
-                    child: RaisedButton.icon(
+                    child: ElevatedButton.icon(
                         onPressed: () {
                           model.title = controller.text;
                           history
@@ -113,8 +113,8 @@ class SaveDialog extends StatelessWidget {
                           model.refreshState();
                           Navigator.pop(context);
                         },
-                        icon: Icon(Icons.save),
-                        label: Text("Save")),
+                        icon: const Icon(Icons.save),
+                        label: const Text("Save")),
                   ),
                 ],
               ),

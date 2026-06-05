@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:how_many_mobile_meeple/components/toggleable_homepage_menu_item_widget.dart';
 import 'package:how_many_mobile_meeple/platform/web_or_tablet/web_version_info.dart';
 import 'package:how_many_mobile_meeple/str_cast.dart';
-import 'package:package_info/package_info.dart';
-import 'package:scoped_model/scoped_model.dart';
+import 'package:package_info_plus/package_info_plus.dart';
+import 'package:provider/provider.dart';
 import 'package:how_many_mobile_meeple/model/settings.dart';
 
 import 'package:how_many_mobile_meeple/components/app_default_padding.dart';
@@ -17,6 +17,7 @@ import 'package:how_many_mobile_meeple/model/item.dart';
 import 'package:how_many_mobile_meeple/model/model.dart';
 
 import 'model/mechanics.dart';
+import 'theme_extensions.dart';
 
 class HomePage extends StatelessWidget with AppPage {
   static final String route = "Home-page";
@@ -24,14 +25,15 @@ class HomePage extends StatelessWidget with AppPage {
 
   @override
   Widget build(BuildContext context) {
-    if (!AppModel.of(context).hasLoadedPersistedData) {
-      AppModel.of(context).loadStoredData();
-      AppModel.of(context).refreshFromUrl();
+    final model = AppModel.of(context, listen: false);
+    if (!model.hasLoadedPersistedData) {
+      model.loadStoredData();
+      model.refreshFromUrl();
     }
     var textFieldWidth = MediaQuery.of(context).size.width * 0.65;
     return Scaffold(
         appBar: HowManyMeepleAppBar(AppCommon.optionsPageTitle,
-            hasSaveDialog: kIsWeb? false : true, isHomePage: true, model: AppModel.of(context), context: context),
+            hasSaveDialog: true, isHomePage: true, model: model, context: context),
         drawer: pageDrawer(context),
         bottomNavigationBar: Container(
           color: Theme.of(context).highlightColor,
@@ -39,10 +41,10 @@ class HomePage extends StatelessWidget with AppPage {
             child: Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: <Widget>[
-                  FutureBuilder(
+                  FutureBuilder<Widget>(
                       future: footerDisplay(context),
                       builder: (context, snapshot) {
-                        if (snapshot.hasData) return snapshot.data;
+                        if (snapshot.hasData) return snapshot.data!;
                         return EmptyWidget();
                       })
                 ]),
@@ -61,9 +63,9 @@ class HomePage extends StatelessWidget with AppPage {
         persistentFooterButtons: [iconButtonGroup(context)]);
   }
 
-  ScopedModelDescendant<AppModel> buildComplexitySliderDisplay() =>
-      ScopedModelDescendant<AppModel>(
-        builder: (context, child, model) => Column(
+  Consumer<AppModel> buildComplexitySliderDisplay() =>
+      Consumer<AppModel>(
+        builder: (context, model, child) => Column(
           children: <Widget>[
             ToggleableHomepageMenuItemWidget(
                 label: AppCommon.labelDifficulty,
@@ -127,9 +129,9 @@ class HomePage extends StatelessWidget with AppPage {
         ),
       );
 
-  ScopedModelDescendant<AppModel> buildPlayerSliderDisplay() =>
-      ScopedModelDescendant<AppModel>(
-        builder: (context, child, model) => Column(
+  Consumer<AppModel> buildPlayerSliderDisplay() =>
+      Consumer<AppModel>(
+        builder: (context, model, child) => Column(
           children: <Widget>[
             ToggleableHomepageMenuItemWidget(
               label: AppCommon.labelPlayers,
@@ -195,9 +197,9 @@ class HomePage extends StatelessWidget with AppPage {
         ),
       );
 
-  ScopedModelDescendant<AppModel> buildRatingSliderDisplay() =>
-      ScopedModelDescendant<AppModel>(
-        builder: (context, child, model) => Column(
+  Consumer<AppModel> buildRatingSliderDisplay() =>
+      Consumer<AppModel>(
+        builder: (context, model, child) => Column(
           children: <Widget>[
             ToggleableHomepageMenuItemWidget(
               label: AppCommon.labelRating,
@@ -269,8 +271,8 @@ class HomePage extends StatelessWidget with AppPage {
             Container(
               height: 35,
               width: textFieldWidth,
-              child: ScopedModelDescendant<AppModel>(
-                builder: (context, child, model) => TextFormField(
+              child: Consumer<AppModel>(
+                builder: (context, model, child) => TextFormField(
                   enabled:
                       model.items.itemList.length < AppCommon.maxItemsFromBgg,
                   controller: controller,
@@ -283,8 +285,8 @@ class HomePage extends StatelessWidget with AppPage {
                 ),
               ),
             ),
-            ScopedModelDescendant<AppModel>(
-              builder: (context, child, model) => AppDefaultPadding(
+            Consumer<AppModel>(
+              builder: (context, model, child) => AppDefaultPadding(
                 child: ElevatedButton(
                   child: Text('Add'),
                   onPressed: () {
@@ -301,41 +303,58 @@ class HomePage extends StatelessWidget with AppPage {
         ),
       ));
 
-  ScopedModelDescendant<AppModel> buildGameDurationSliderDisplay(
+  Consumer<AppModel> buildGameDurationSliderDisplay(
       BuildContext context) {
     var sliderWidth = MediaQuery.of(context).size.width * 0.60;
     var sliderMinValue = 15.0;
     var sliderMaxValue = 300.0;
     var sliderSteps = 19;
-    return ScopedModelDescendant<AppModel>(
-      builder: (context, child, model) => Column(
-        children: <Widget>[
-          Container(
-            height: 35,
-            color: Theme.of(context).highlightColor,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                AppDefaultPadding(
-                  child: Text(AppCommon.labelTime, textAlign: TextAlign.left),
-                ),
-                Switch(
-                    onChanged: (bool value) {
-                      model.settings
-                          .setting(Settings.filterMinimumTimeToPlay.name)
-                          .enabled = value;
-                      model.settings
-                          .setting(Settings.filterMaximumTimeToPlay.name)
-                          .enabled = value;
-                      model.updateStore();
-                      model.invalidateCache();
-                    },
-                    value: model.settings
-                        .setting(Settings.filterMinimumTimeToPlay.name)
-                        .enabled)
-              ],
+    return Consumer<AppModel>(
+      builder: (context, model, child) {
+        final isEnabled = model.settings
+            .setting(Settings.filterMinimumTimeToPlay.name)
+            .enabled;
+        return Column(
+          children: <Widget>[
+            Container(
+              height: 35,
+              color: isEnabled
+                  ? Theme.of(context).colorScheme.primaryContainer
+                  : Theme.of(context).colorScheme.primary.withOpacity(0.25),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  AppDefaultPadding(
+                    child: Text(
+                      AppCommon.labelTime,
+                      textAlign: TextAlign.left,
+                      style: TextStyle(
+                        fontWeight: isEnabled ? FontWeight.bold : FontWeight.normal,
+                        color: isEnabled
+                            ? Theme.of(context).colorScheme.onPrimaryContainer
+                            : Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ),
+                  Switch(
+                      activeColor: Colors.white,
+                      activeTrackColor: Theme.of(context).colorScheme.primary,
+                      inactiveThumbColor: Colors.grey[600],
+                      inactiveTrackColor: Theme.of(context).colorScheme.primary.withOpacity(0.5),
+                      onChanged: (bool value) {
+                        model.settings
+                            .setting(Settings.filterMinimumTimeToPlay.name)
+                            .enabled = value;
+                        model.settings
+                            .setting(Settings.filterMaximumTimeToPlay.name)
+                            .enabled = value;
+                        model.updateStore();
+                        model.invalidateCache();
+                      },
+                      value: isEnabled)
+                ],
+              ),
             ),
-          ),
           Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: <Widget>[
@@ -398,14 +417,15 @@ class HomePage extends StatelessWidget with AppPage {
             ],
           ),
         ],
-      ),
+      );
+      },
     );
   }
 
-  ScopedModelDescendant<AppModel> buildMechanicFilterDisplay(
+  Consumer<AppModel> buildMechanicFilterDisplay(
       BuildContext context) {
-    return ScopedModelDescendant<AppModel>(
-      builder: (context, child, model) {
+    return Consumer<AppModel>(
+      builder: (context, model, child) {
         var mechanics =
             model.settings.setting(Settings.filterUseAllMechanics.name).value
                 ? Mechanics.bggMechanics
@@ -420,24 +440,39 @@ class HomePage extends StatelessWidget with AppPage {
                 spacing: 5,
                 runSpacing: 5,
                 children: mechanics.map((String value) {
+                  final isSelected = model.settings
+                      .setting(Settings.filterMechanics.name)
+                      .value
+                      .contains(value);
+                  final isEnabled = model.settings
+                      .setting(Settings.filterMechanics.name)
+                      .enabled;
                   return ChoiceChip(
                     labelStyle: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.bold,
-                        color: model.settings
-                            .setting(Settings.filterMechanics.name)
-                            .enabled
-                            ? Theme.of(context).colorScheme.secondary
-                            : Theme.of(context).disabledColor),
+                        color: isSelected && isEnabled
+                            ? Colors.white
+                            : (isEnabled
+                                ? Colors.black87
+                                : Theme.of(context).disabledColor)),
+                    backgroundColor: isEnabled
+                        ? Colors.grey[200]
+                        : Colors.grey[100],
+                    selectedColor: Theme.of(context).colorScheme.secondary,
+                    disabledColor: Colors.grey[100],
+                    elevation: isEnabled ? 2 : 0,
+                    side: BorderSide(
+                        color: isEnabled
+                            ? (isSelected
+                                ? Theme.of(context).colorScheme.secondary
+                                : Colors.grey[400]!)
+                            : Colors.grey[300]!,
+                        width: 1.5),
                     label: Text(value),
-                    selected: model.settings
-                        .setting(Settings.filterMechanics.name)
-                        .value
-                        .contains(value),
+                    selected: isSelected,
                     onSelected: (bool selected) {
-                      if (!model.settings
-                          .setting(Settings.filterMechanics.name)
-                          .enabled) return;
+                      if (!isEnabled) return;
                       selected
                           ? model.settings
                           .setting(Settings.filterMechanics.name)
@@ -460,15 +495,23 @@ class HomePage extends StatelessWidget with AppPage {
     );
   }
 
-  ScopedModelDescendant<AppModel> buildBoardGameGeekItemDisplay() {
-    return ScopedModelDescendant<AppModel>(
-      builder: (context, child, model) => Column(
+  Consumer<AppModel> buildBoardGameGeekItemDisplay() {
+    return Consumer<AppModel>(
+      builder: (context, model, child) => Column(
         children: <Widget>[
           Container(
               height: 35,
-              color: Theme.of(context).highlightColor,
+              color: Theme.of(context).colorScheme.primaryContainer,
               child: AppDefaultPadding(
-                child: Row(children: [Text("Usernames/Geeklists Selected")]),
+                child: Row(children: [
+                  Text(
+                    "Usernames/Geeklists Selected",
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Theme.of(context).colorScheme.onPrimaryContainer,
+                    ),
+                  )
+                ]),
               )),
           Column(
             children: ListTile.divideTiles(
@@ -494,39 +537,48 @@ class HomePage extends StatelessWidget with AppPage {
     return model.items.itemList.map(
       (item) => ListTile(
         title: Text(limitTitleLength(item.name)),
-        trailing: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            IconButton(
-                icon: Icon(Icons.person,
-                    size: AppCommon.standardIconSize,
-                    color: colorItem(context, item, ItemType.collection)),
+        trailing: SizedBox(
+          width: 144, // Constrain to reasonable width for 3 icon buttons
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              IconButton(
+                  padding: EdgeInsets.all(4),
+                  constraints: BoxConstraints(),
+                  icon: Icon(Icons.person,
+                      size: AppCommon.standardIconSize,
+                      color: colorItem(context, item, ItemType.collection)),
+                  onPressed: () {
+                    item.itemType = ItemType.collection;
+                    model.invalidateCache();
+                    model.updateStore();
+                  }),
+              IconButton(
+                  padding: EdgeInsets.all(4),
+                  constraints: BoxConstraints(),
+                  icon: Icon(Icons.format_list_bulleted,
+                      size: AppCommon.standardIconSize,
+                      color: colorItem(context, item, ItemType.geekList)),
+                  onPressed: () {
+                    item.itemType = ItemType.geekList;
+                    model.invalidateCache();
+                    model.updateStore();
+                  }),
+              IconButton(
+                padding: EdgeInsets.all(4),
+                constraints: BoxConstraints(),
+                icon: Icon(
+                  Icons.delete,
+                  size: AppCommon.standardIconSize,
+                  color: Theme.of(context).colorScheme.error,
+                ),
                 onPressed: () {
-                  item.itemType = ItemType.collection;
-                  model.invalidateCache();
-                  model.updateStore();
-                }),
-            IconButton(
-                icon: Icon(Icons.format_list_bulleted,
-                    size: AppCommon.standardIconSize,
-                    color: colorItem(context, item, ItemType.geekList)),
-                onPressed: () {
-                  item.itemType = ItemType.geekList;
-                  model.invalidateCache();
-                  model.updateStore();
-                }),
-            IconButton(
-              icon: Icon(
-                Icons.delete,
-                size: AppCommon.standardIconSize,
-                color: Theme.of(context).errorColor,
+                  model.deleteItem(item);
+                },
               ),
-              onPressed: () {
-                model.deleteItem(item);
-              },
-            ),
-          ],
-          mainAxisSize: MainAxisSize.min,
+            ],
+          ),
         ),
       ),
     );
@@ -549,7 +601,7 @@ class HomePage extends StatelessWidget with AppPage {
       children: <Widget>[
         Padding(
           padding: const EdgeInsets.only(right: 8.0),
-          child: DisclaimerText(AppCommon.disclaimerText, context),
+          child: BGGAttribution(),
         ),
         DisclaimerText("(v:$version)", context)
       ],

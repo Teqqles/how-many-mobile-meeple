@@ -1,7 +1,6 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:scoped_model/scoped_model.dart';
+import 'package:provider/provider.dart';
 import 'package:how_many_mobile_meeple/screen_tools.dart';
 
 import 'package:how_many_mobile_meeple/components/app_default_padding.dart';
@@ -23,19 +22,23 @@ abstract class NetworkWidget extends StatelessWidget with ScreenTools {
   static const String findingGames = "Finding games to play";
 
   Widget pageErrors(BuildContext context, String error) {
+    // Constrain icon to reasonable size (max 200px or 50% of screen width, whichever is smaller)
+    final iconSize = getScreenWidthPercentageInPixels(
+            context, ScreenTools.fiftyPercentScreen)
+        .clamp(0.0, 200.0);
+
     return Center(
       child: Container(
         width: getScreenWidthPercentageInPixels(
             context, ScreenTools.fiftyPercentScreen),
         child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.end,
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               AppDefaultPadding(
                 child: Icon(Icons.error,
-                    color: Theme.of(context).errorColor,
-                    size: getScreenWidthPercentageInPixels(
-                        context, ScreenTools.fiftyPercentScreen)),
+                    color: Theme.of(context).colorScheme.error,
+                    size: iconSize),
               ),
               Text(
                 error,
@@ -48,19 +51,28 @@ abstract class NetworkWidget extends StatelessWidget with ScreenTools {
   }
 
   Widget loadingSpinner(BuildContext context) {
-    return Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-      AppDefaultPadding(
-        child: SpinKitCubeGrid(
-            color: Theme.of(context).accentColor,
-            size: getScreenWidthPercentageInPixels(
-                context, ScreenTools.fiftyPercentScreen)),
+    // Constrain spinner to reasonable size (max 200px or 50% of screen width, whichever is smaller)
+    final spinnerSize = getScreenWidthPercentageInPixels(
+            context, ScreenTools.fiftyPercentScreen)
+        .clamp(0.0, 200.0);
+
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          AppDefaultPadding(
+            child: SpinKitCubeGrid(
+                color: Theme.of(context).colorScheme.secondary,
+                size: spinnerSize),
+          ),
+          Text(findingGames, style: TextStyle(fontWeight: FontWeight.bold)),
+          Text(
+            speedDisclaimer,
+            style: TextStyle(fontSize: 12),
+          )
+        ],
       ),
-      Text(findingGames, style: TextStyle(fontWeight: FontWeight.bold)),
-      Text(
-        speedDisclaimer,
-        style: TextStyle(fontSize: 12),
-      )
-    ]);
+    );
   }
 
   Widget gameDataResponse(
@@ -69,18 +81,18 @@ abstract class NetworkWidget extends StatelessWidget with ScreenTools {
       BuildContext context,
       Widget displayWidgetFn(
           BuildContext context, AppModel model)) {
-    if (snapshot.data.games.isEmpty) {
+    if (snapshot.data!.games.isEmpty) {
       return pageErrors(context, pageErrorNoGamesAvailable);
     }
-    model.replaceCache(snapshot.data);
+    model.replaceCache(snapshot.data!);
     return displayWidgetFn(context, model);
   }
 
   Widget loadNetworkContent(
       Widget displayWidgetFn(
           BuildContext context, AppModel model)) {
-    return ScopedModelDescendant<AppModel>(
-      builder: (context, child, model) {
+    return Consumer<AppModel>(
+      builder: (context, model, child) {
         if (model.items.isEmpty) {
           return pageErrors(context, pageErrorNoItemsSupplied);
         }

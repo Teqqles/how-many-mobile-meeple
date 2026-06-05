@@ -8,8 +8,10 @@ import 'model/model.dart';
 
 class HowManyMeepleAppBar extends AppBar {
   HowManyMeepleAppBar(String subtitle,
-      {BuildContext context, bool hasSaveDialog = false, bool isHomePage = false, AppModel model})
+      {required BuildContext context, bool hasSaveDialog = false, bool isHomePage = false, AppModel? model})
       : super(
+          backgroundColor: Theme.of(context).colorScheme.primary,
+          foregroundColor: Theme.of(context).colorScheme.onPrimary,
           leading: isHomePage ? null : IconButton(
               icon: Icon(Icons.home),
               onPressed: () {
@@ -33,11 +35,11 @@ class HowManyMeepleAppBar extends AppBar {
               hasSaveDialog
                   ? IconButton(
                       icon: Icon(Icons.save),
-                      onPressed: () => showDialog(
+                      onPressed: model != null ? () => showDialog(
                           context: context,
                           builder: (context) => SaveDialog(
-                                model: model,
-                              )))
+                                model: model!,
+                              )) : null)
                   : EmptyWidget()
             ],
           ),

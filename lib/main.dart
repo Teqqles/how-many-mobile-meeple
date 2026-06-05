@@ -4,36 +4,47 @@ import 'package:flutter/material.dart';
 import 'package:how_many_mobile_meeple/platform/pages.dart';
 import 'package:how_many_mobile_meeple/platform/router.dart' as r;
 
-import 'package:scoped_model/scoped_model.dart';
+import 'package:provider/provider.dart';
 
 import 'package:how_many_mobile_meeple/model/model.dart';
+import 'package:how_many_mobile_meeple/app_config.dart';
 
 import 'meeple_theme.dart';
 
-void main() => runApp(MyApp());
+void main() async {
+  // Ensure Flutter bindings are initialized
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // Load configuration (API URL from config file for web)
+  await AppConfig.initialize();
+
+  runApp(const MyApp());
+}
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
 
-  final List<Color> swatchList = [
+  static final List<MaterialColor> _swatchList = [
     MeepleTheme.meepleBlue,
     MeepleTheme.meepleGreen,
     MeepleTheme.meepleRed
   ];
 
-  Color randomThemeColor() {
-    int swatchIndex = Random().nextInt(swatchList.length);
-    return swatchList[swatchIndex];
-  }
+  static final MaterialColor _swatch = _swatchList[Random().nextInt(_swatchList.length)];
 
   @override
   Widget build(BuildContext context) {
-    var swatch = randomThemeColor();
-    return ScopedModel<AppModel>(
-        model: AppModel(),
+    return ChangeNotifierProvider(
+        create: (_) => AppModel(),
         child: MaterialApp(
           title: 'How Many Meeple?',
           theme: ThemeData(
-            primarySwatch: swatch,
+            primarySwatch: _swatch,
+            colorScheme: ColorScheme.fromSwatch(
+              primarySwatch: _swatch,
+              brightness: Brightness.light,
+            ),
+            highlightColor: _swatch.shade50,
           ),
           home: Pages.platformPages().homePage(),
           onGenerateRoute: r.Router.generateRoute,

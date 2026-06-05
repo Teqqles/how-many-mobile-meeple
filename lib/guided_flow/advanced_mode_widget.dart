@@ -32,8 +32,8 @@ class AdvancedModeWidget extends StatelessWidget {
           ],
         ),
         subtitle: const Padding(
-          padding: EdgeInsets.only(top: 4),
-          child: Text('Full control over all filters'),
+          padding: const EdgeInsets.only(top: 4),
+          child: const Text('Full control over all filters'),
         ),
         initiallyExpanded: true,
         children: [

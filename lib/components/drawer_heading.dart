@@ -4,8 +4,8 @@ import '../theme_extensions.dart';
 class DrawerHeading extends Container {
   DrawerHeading(String filterTitle, BuildContext context)
       : super(
-          margin: EdgeInsets.only(top: 8),
-          padding: EdgeInsets.all(12),
+          margin: const EdgeInsets.only(top: 8),
+          padding: const EdgeInsets.all(12),
           color: Theme.of(context).colorScheme.secondary,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.end,

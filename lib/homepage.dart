@@ -544,8 +544,8 @@ class HomePage extends StatelessWidget with AppPage {
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               IconButton(
-                  padding: EdgeInsets.all(4),
-                  constraints: BoxConstraints(),
+                  padding: const EdgeInsets.all(4),
+                  constraints: const BoxConstraints(),
                   icon: Icon(Icons.person,
                       size: AppCommon.standardIconSize,
                       color: colorItem(context, item, ItemType.collection)),
@@ -555,8 +555,8 @@ class HomePage extends StatelessWidget with AppPage {
                     model.updateStore();
                   }),
               IconButton(
-                  padding: EdgeInsets.all(4),
-                  constraints: BoxConstraints(),
+                  padding: const EdgeInsets.all(4),
+                  constraints: const BoxConstraints(),
                   icon: Icon(Icons.format_list_bulleted,
                       size: AppCommon.standardIconSize,
                       color: colorItem(context, item, ItemType.geekList)),
@@ -566,8 +566,8 @@ class HomePage extends StatelessWidget with AppPage {
                     model.updateStore();
                   }),
               IconButton(
-                padding: EdgeInsets.all(4),
-                constraints: BoxConstraints(),
+                padding: const EdgeInsets.all(4),
+                constraints: const BoxConstraints(),
                 icon: Icon(
                   Icons.delete,
                   size: AppCommon.standardIconSize,

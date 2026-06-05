@@ -14,7 +14,7 @@ class DrawerSavedSetting extends Container {
   DrawerSavedSetting(
       this.preferencesTitle, this.preferences, BuildContext context)
       : super(
-          padding: EdgeInsets.only(top: 12, bottom: 12, left: 8, right: 8),
+          padding: const EdgeInsets.only(top: 12, bottom: 12, left: 8, right: 8),
           decoration: BoxDecoration(
               color: Theme.of(context).highlightColor,
               border: Border(

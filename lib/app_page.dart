@@ -28,7 +28,7 @@ mixin AppPage {
   Container drawerHeader(BuildContext context) => Container(
         height: 80.0,
         child: DrawerHeader(
-          padding: EdgeInsets.only(left: 8),
+          padding: const EdgeInsets.only(left: 8),
           margin: EdgeInsets.zero,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -138,9 +138,9 @@ mixin AppPage {
               borderRadius: BorderRadius.circular(40.0),
             ),
             child: Padding(
-              padding: EdgeInsets.only(left: 5, right: 5, top: 5, bottom: 5),
+              padding: const EdgeInsets.only(left: 5, right: 5, top: 5, bottom: 5),
               child: IconButton(
-                  padding: EdgeInsets.all(0),
+                  padding: const EdgeInsets.all(0),
                   color: Theme.of(context).selectedRowColor,
                   icon: Icon(
                     Icons.format_list_numbered,
@@ -168,7 +168,7 @@ mixin AppPage {
                 ),
                 child: Padding(
                   padding:
-                      EdgeInsets.only(left: 18, right: 12, top: 5, bottom: 5),
+                      const EdgeInsets.only(left: 18, right: 12, top: 5, bottom: 5),
                   child: Row(
                     children: <Widget>[
                       SizedBox(

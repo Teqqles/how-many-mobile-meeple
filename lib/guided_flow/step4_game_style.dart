@@ -1,0 +1,439 @@
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:how_many_mobile_meeple/model/model.dart';
+import 'package:how_many_mobile_meeple/model/settings.dart';
+import 'package:how_many_mobile_meeple/str_cast.dart';
+
+/// Step 4: Game Style
+/// Allows users to select difficulty and mechanics
+class Step4GameStyle extends StatefulWidget {
+  const Step4GameStyle({super.key});
+
+  @override
+  State<Step4GameStyle> createState() => _Step4GameStyleState();
+}
+
+class _Step4GameStyleState extends State<Step4GameStyle> {
+  // Mechanics grouped by category
+  final Map<String, List<String>> _mechanicsCategories = {
+    'Core Gameplay': [
+      'Hand Management',
+      'Set Collection',
+      'Tile Placement',
+      'Grid Movement',
+    ],
+    'Player Interaction': [
+      'Cooperative Play',
+      'Team-Based Game',
+      'Simultaneous Action Selection',
+    ],
+    'Randomness & Input': [
+      'Dice Rolling',
+      'Card Drafting',
+    ],
+  };
+
+  String _getDifficultyLabel(double weight) {
+    if (weight <= 1.5) return 'Light';
+    if (weight <= 2.5) return 'Gateway';
+    if (weight <= 3.5) return 'Strategy';
+    if (weight <= 4.0) return 'Heavy';
+    return 'Expert';
+  }
+
+  String _getDifficultyDescription(double weight) {
+    if (weight <= 1.5) return 'Easy to learn, quick to play';
+    if (weight <= 2.5) return 'Simple rules, engaging gameplay';
+    if (weight <= 3.5) return 'Deeper strategy, more complexity';
+    if (weight <= 4.0) return 'Complex rules, strategic depth';
+    return 'Maximum complexity and depth';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<AppModel>(
+      builder: (context, model, child) {
+        final difficultySetting = model.settings.setting(Settings.filterComplexity.name);
+        final mechanicsSetting = model.settings.setting(Settings.filterMechanics.name);
+
+        final difficulty = StrCast(difficultySetting.value).castToDouble();
+        final selectedMechanics = mechanicsSetting.value as List<dynamic>;
+
+        return Card(
+          elevation: 2,
+          child: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Header with icon
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.primaryContainer,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Icon(
+                        Icons.style,
+                        color: Theme.of(context).colorScheme.onPrimaryContainer,
+                        size: 28,
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Game Style',
+                            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            'Choose difficulty and mechanics',
+                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 32),
+
+                // Difficulty section
+                Text(
+                  'Difficulty',
+                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                ),
+                const SizedBox(height: 16),
+
+                // Clickable difficulty panels
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    _buildDifficultyPanel(
+                      context,
+                      'Light',
+                      0.75,
+                      difficulty,
+                      (value) => _updateDifficulty(model, difficultySetting, value),
+                    ),
+                    _buildDifficultyPanel(
+                      context,
+                      'Gateway',
+                      2.0,
+                      difficulty,
+                      (value) => _updateDifficulty(model, difficultySetting, value),
+                    ),
+                    _buildDifficultyPanel(
+                      context,
+                      'Strategy',
+                      3.0,
+                      difficulty,
+                      (value) => _updateDifficulty(model, difficultySetting, value),
+                    ),
+                    _buildDifficultyPanel(
+                      context,
+                      'Heavy',
+                      3.75,
+                      difficulty,
+                      (value) => _updateDifficulty(model, difficultySetting, value),
+                    ),
+                    _buildDifficultyPanel(
+                      context,
+                      'Expert',
+                      4.5,
+                      difficulty,
+                      (value) => _updateDifficulty(model, difficultySetting, value),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 16),
+
+                // Difficulty slider
+                Slider.adaptive(
+                  min: 0.0,
+                  max: 5.0,
+                  divisions: 10,
+                  value: difficulty,
+                  label: _getDifficultyLabel(difficulty),
+                  activeColor: Theme.of(context).colorScheme.primary,
+                  onChanged: (value) {
+                    setState(() {
+                      difficultySetting.value = value;
+                      difficultySetting.enabled = true;
+                      model.settings.updateSetting(difficultySetting);
+                      model.updateStore();
+                      model.invalidateCache();
+                    });
+                  },
+                ),
+
+                const SizedBox(height: 8),
+
+                // Difficulty description below slider
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.primaryContainer.withOpacity(0.3),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.info_outline,
+                        size: 20,
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
+                          _getDifficultyDescription(difficulty),
+                          style: Theme.of(context).textTheme.bodyMedium,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: 32),
+                const Divider(),
+                const SizedBox(height: 24),
+
+                // Mechanics section
+                Text(
+                  'Mechanics (Optional)',
+                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Select preferred game mechanics',
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
+                ),
+                const SizedBox(height: 16),
+
+                // Mechanics by category
+                ..._mechanicsCategories.entries.map((category) {
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 8),
+                        child: Row(
+                          children: [
+                            Icon(
+                              _getCategoryIcon(category.key),
+                              size: 20,
+                              color: Theme.of(context).colorScheme.primary,
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              category.key,
+                              style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                    color: Theme.of(context).colorScheme.primary,
+                                  ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        children: category.value.map((mechanic) {
+                          final isSelected = selectedMechanics.contains(mechanic);
+                          return FilterChip(
+                            label: Text(mechanic),
+                            selected: isSelected,
+                            showCheckmark: true,
+                            onSelected: (selected) {
+                              setState(() {
+                                if (selected) {
+                                  mechanicsSetting.value.add(mechanic);
+                                } else {
+                                  mechanicsSetting.value.remove(mechanic);
+                                }
+                                mechanicsSetting.enabled = mechanicsSetting.value.isNotEmpty;
+                                model.settings.updateSetting(mechanicsSetting);
+                                model.updateStore();
+                                model.invalidateCache();
+                              });
+                            },
+                            selectedColor: Theme.of(context).colorScheme.secondary,
+                            checkmarkColor: Theme.of(context).colorScheme.onSecondary,
+                            backgroundColor: Colors.grey[200],
+                            side: BorderSide(
+                              color: isSelected
+                                  ? Theme.of(context).colorScheme.secondary
+                                  : Colors.grey[400]!,
+                              width: 1.5,
+                            ),
+                            labelStyle: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                              color: isSelected
+                                  ? Colors.white
+                                  : Colors.black87,
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                      const SizedBox(height: 16),
+                    ],
+                  );
+                }).toList(),
+
+                // Info box
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.info_outline,
+                        size: 20,
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
+                          selectedMechanics.isEmpty
+                              ? 'Skip mechanics to see all game types'
+                              : '${selectedMechanics.length} mechanic(s) selected',
+                          style: Theme.of(context).textTheme.bodySmall,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  IconData _getCategoryIcon(String category) {
+    switch (category) {
+      case 'Core Gameplay':
+        return Icons.extension;
+      case 'Player Interaction':
+        return Icons.groups;
+      case 'Randomness & Input':
+        return Icons.casino;
+      default:
+        return Icons.category;
+    }
+  }
+
+  /// Builds a clickable difficulty panel
+  Widget _buildDifficultyPanel(
+    BuildContext context,
+    String label,
+    double targetValue,
+    double currentValue,
+    Function(double) onTap,
+  ) {
+    final isSelected = _isInRange(currentValue, targetValue);
+
+    return Expanded(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 2),
+        child: InkWell(
+          onTap: () => onTap(targetValue),
+          borderRadius: BorderRadius.circular(8),
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 4),
+            decoration: BoxDecoration(
+              color: isSelected
+                  ? Theme.of(context).colorScheme.primaryContainer
+                  : Theme.of(context).colorScheme.surfaceContainerHighest,
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(
+                color: isSelected
+                    ? Theme.of(context).colorScheme.primary
+                    : Theme.of(context).colorScheme.outline.withOpacity(0.3),
+                width: isSelected ? 2 : 1,
+              ),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (isSelected)
+                  Icon(
+                    Icons.check_circle,
+                    size: 16,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                if (isSelected) const SizedBox(height: 4),
+                Text(
+                  label,
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                        color: isSelected
+                            ? Theme.of(context).colorScheme.onPrimaryContainer
+                            : Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
+                  textAlign: TextAlign.center,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// Checks if current value is in the range for a given difficulty level
+  bool _isInRange(double currentValue, double targetValue) {
+    // Define ranges for each difficulty level
+    if (targetValue <= 0.75) {
+      // Light: 0 - 1.5
+      return currentValue <= 1.5;
+    } else if (targetValue <= 2.0) {
+      // Gateway: 1.5 - 2.5
+      return currentValue > 1.5 && currentValue <= 2.5;
+    } else if (targetValue <= 3.0) {
+      // Strategy: 2.5 - 3.5
+      return currentValue > 2.5 && currentValue <= 3.5;
+    } else if (targetValue <= 3.75) {
+      // Heavy: 3.5 - 4.0
+      return currentValue > 3.5 && currentValue <= 4.0;
+    } else {
+      // Expert: 4.0 - 5.0
+      return currentValue > 4.0;
+    }
+  }
+
+  /// Updates difficulty setting when panel is tapped
+  void _updateDifficulty(AppModel model, dynamic difficultySetting, double value) {
+    setState(() {
+      difficultySetting.value = value;
+      difficultySetting.enabled = true;
+      model.settings.updateSetting(difficultySetting);
+      model.updateStore();
+      model.invalidateCache();
+    });
+  }
+}

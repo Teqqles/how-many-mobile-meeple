@@ -1,20 +1,23 @@
 import 'dart:typed_data';
 
-import 'package:esys_flutter_share/esys_flutter_share.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:how_many_mobile_meeple/platform/router.dart' as r;
-import 'package:mime_type/mime_type.dart';
+import 'package:mime/mime.dart';
 import 'package:http/http.dart' as http;
-import 'package:scoped_model/scoped_model.dart';
+import 'package:provider/provider.dart';
 import 'package:how_many_mobile_meeple/components/drawer_bgg_filter.dart';
+import 'package:how_many_mobile_meeple/components/app_default_padding.dart';
+import 'package:how_many_mobile_meeple/guided_flow_homepage.dart';
 import 'app_common.dart';
 import 'components/component_factory.dart';
 import 'model/game.dart';
 import 'model/model.dart';
 import 'model/settings.dart';
 import 'package:path/path.dart';
+import 'theme_extensions.dart';
 
-abstract class AppPage {
+mixin AppPage {
   static const String randomGameLabel = "Random Game";
   static Image randomGameButtonIcon = Image.asset('lib/images/dice.png');
   static const String randomGameHeroTag = "random-game";
@@ -63,7 +66,48 @@ abstract class AppPage {
             model.settings.setting(Settings.filterUseAllMechanics.name),
             model,
             context),
+        _buildAdvancedModeToggle(model, context),
       ];
+
+  Widget _buildAdvancedModeToggle(AppModel model, BuildContext context) {
+    final setting = model.settings.setting(Settings.preferAdvancedMode.name);
+    final currentValue = setting.value is String
+        ? setting.value.toLowerCase() == 'true'
+        : setting.value as bool;
+
+    return Container(
+      color: Theme.of(context).highlightColor,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: <Widget>[
+          AppDefaultPadding(
+            child: Text(
+              "Always Use Advanced Mode",
+              textAlign: TextAlign.left,
+              style: TextStyle(fontSize: 13),
+            ),
+          ),
+          Switch(
+            onChanged: (bool value) async {
+              setting.value = value;
+              setting.enabled = true;
+              model.settings.updateSetting(setting);
+              await model.updateStore();
+              model.invalidateCache();
+
+              // Force reload from storage to pick up the new value
+              model.hasLoadedPersistedData = false;
+
+              // Close drawer and navigate to home
+              Navigator.of(context).pop();
+              Navigator.of(context).pushReplacementNamed('/');
+            },
+            value: currentValue,
+          )
+        ],
+      ),
+    );
+  }
 
   Future<List<Widget>> drawerFilters(
       BuildContext context, AppModel model) async {
@@ -75,13 +119,13 @@ abstract class AppPage {
   }
 
   void loadPage(BuildContext context, RouteSettings pageSettings) {
-    AppModel.of(context).pageRefreshed = true;
-    Navigator.of(context).pushReplacementNamed(pageSettings.name,
+    AppModel.of(context, listen: false).pageRefreshed = true;
+    Navigator.of(context).pushReplacementNamed(pageSettings.name!,
         arguments: pageSettings.arguments);
   }
 
   void startPage(BuildContext context) {
-    AppModel.of(context).refreshFromUrl();
+    AppModel.of(context, listen: false).refreshFromUrl();
   }
 
   Widget iconButtonGroup(BuildContext context) => Row(
@@ -104,7 +148,7 @@ abstract class AppPage {
                   ),
                   onPressed: () {
                     var listPageSettings = r.Router.generateRouteSettings(
-                        r.Router.listRoute, AppModel.of(context));
+                        r.Router.listRoute, AppModel.of(context, listen: false));
                     loadPage(context, listPageSettings);
                   }),
             ),
@@ -114,7 +158,7 @@ abstract class AppPage {
             child: MaterialButton(
               onPressed: () {
                 var randomPageSettings = r.Router.generateRouteSettings(
-                    r.Router.randomRoute, AppModel.of(context));
+                    r.Router.randomRoute, AppModel.of(context, listen: false));
                 loadPage(context, randomPageSettings);
               },
               child: Container(
@@ -158,25 +202,32 @@ abstract class AppPage {
       ),
       onPressed: () async {
         var response = await http.get(Uri.parse(game.imageUrl));
-        var mimeType = mime(basename(game.imageUrl));
+        var mimeType = lookupMimeType(basename(game.imageUrl));
         Uint8List bytes = response.bodyBytes;
-        await Share.file(
-            "${game.name}", basename(game.imageUrl), bytes, mimeType,
-            text: AppCommon.randomGameMessage(game.name));
+        await Share.shareXFiles(
+          [
+            XFile.fromData(
+              bytes,
+              name: basename(game.imageUrl),
+              mimeType: mimeType,
+            )
+          ],
+          text: AppCommon.randomGameMessage(game.name),
+        );
       },
       style: ButtonStyle(
-          backgroundColor: MaterialStateProperty.all<Color>(
+          backgroundColor: WidgetStateProperty.all<Color>(
               Theme.of(context).colorScheme.secondary),
-          shape: MaterialStateProperty.all<OutlinedBorder>(
+          shape: WidgetStateProperty.all<OutlinedBorder>(
               RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(30.0)))),
     );
   }
 
   Widget pageDrawer(BuildContext context) {
-    var staticDataComponentLength = 5;
-    return ScopedModelDescendant<AppModel>(
-      builder: (context, child, model) => Drawer(
+    var staticDataComponentLength = 6;
+    return Consumer<AppModel>(
+      builder: (context, model, child) => Drawer(
         child: FutureBuilder(
           future: drawerFilters(context, model),
           builder: (BuildContext context, AsyncSnapshot snapshot) {

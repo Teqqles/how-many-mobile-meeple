@@ -1,18 +1,19 @@
+import 'app_config.dart';
+
 abstract class AppCommon {
   static const String appTitle = 'How Many Meeple?';
   static const double standardIconSize = 30.0;
-  static const String optionsPageTitle = 'Game Options';
+  static const String optionsPageTitle = 'Find the Perfect Game';
   static const String savedSettings = 'Saved Settings';
   static const String randomGamePageTitle = 'Random Game';
   static const String listGamesPageTitle = 'List of Games';
   static const String labelDifficulty = 'How Difficult?';
-  static const String labelPlayers = 'Players?';
-  static const String labelTime = 'Time?';
+  static const String labelPlayers = 'How Many Players?';
+  static const String labelTime = 'Time Available?';
   static const String labelMechanics = 'Mechanics?';
   static const String labelRating = 'Min Rating?';
   static const int maxItemsFromBgg = 5;
-  static const String boardGameGeekProxyUrl =
-      "https://api.howmanymeeple.com";
+  static String get boardGameGeekProxyUrl => AppConfig.apiUrl;
   static const String disclaimerText = "Powered by Board Game Geek";
 
   static String randomGameMessage(String gameName) =>

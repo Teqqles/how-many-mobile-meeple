@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 
-abstract class ScreenTools {
+mixin ScreenTools {
   static const double fiftyPercentScreen = 0.5;
   static const double eightyPercentScreen = 0.8;
 

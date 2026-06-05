@@ -188,7 +188,10 @@ fabric.properties
 android/key.properties
 
 coverage/
-coverage.html/web/config.local.json
+coverage.html/
+
+# Local configuration overrides
+web/config.local.json
 
 # Flutter auto-generated files
 .flutter-plugins-dependencies

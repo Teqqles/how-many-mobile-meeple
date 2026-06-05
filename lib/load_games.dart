@@ -15,17 +15,28 @@ class LoadGames {
         settings.enabledSettings.entries
             .where((entry) => entry.value.header != null)
             .map((entry) => MapEntry(entry.value.header!, entry.value.value.toString())));
-    for (Item item in items) {
+
+    // Create parallel HTTP requests for all items
+    final futures = items.map((item) async {
       final itemName = Uri.encodeComponent(item.name);
       var response = await http.get(
         Uri.parse("${AppCommon.boardGameGeekProxyUrl}/${item.itemType.name}/$itemName"),
           headers: requestHeaders.map((k, v) => MapEntry(k, v.toString())));
+
       if (response.statusCode != 200) {
         throw Exception('Failed to load games for ${item.name}');
-      } else {
-        Games loadedGames = Games.fromJson(jsonDecode(response.body));
-        games.addGames(loadedGames);
       }
+
+      return response;
+    });
+
+    // Wait for all requests to complete in parallel
+    final responses = await Future.wait(futures);
+
+    // Process all responses
+    for (var response in responses) {
+      Games loadedGames = Games.fromJson(jsonDecode(response.body));
+      games.addGames(loadedGames);
     }
 
     return games;

@@ -188,4 +188,4 @@ fabric.properties
 android/key.properties
 
 coverage/
-coverage.html/
+coverage.html/web/config.local.json

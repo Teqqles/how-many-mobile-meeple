@@ -7,7 +7,7 @@ import 'package:how_many_mobile_meeple/platform/router.dart';
 
 class UrlFragmentExtractor {
 
-  Uri uri;
+  late Uri uri;
   bool hasModelData = false;
 
   UrlFragmentExtractor(Uri uri) {
@@ -60,7 +60,7 @@ class UrlFragmentExtractor {
     for (var settingStr in settingsFromString) {
       var parts = settingStr.split("=");
       if (parts.length == 2) {
-        var settingHeader = defaults.setting(parts[0])?.header;
+        var settingHeader = defaults.setting(parts[0]).header;
         var setting = Setting(parts[0], value: Uri.decodeComponent(parts[1]), header: settingHeader, enabled: true);
         settings.updateSetting(setting);
       }

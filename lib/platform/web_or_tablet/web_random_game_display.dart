@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:how_many_mobile_meeple/components/platform_independent_image.dart';
 import 'package:how_many_mobile_meeple/platform/common/game_display_page.dart';
@@ -22,7 +21,10 @@ class WebRandomGameDisplayPage extends GameDisplayPage {
   Widget displayGame(
       BuildContext context, AppModel model) {
     var cachedGames = model.bggCache;
-    Game game = hasPageRefreshed(model) ? cachedGames.random : cachedGames.lastRandom;
+    Game? game = hasPageRefreshed(model) ? cachedGames.random : cachedGames.lastRandom;
+    if (game == null) {
+      return const Center(child: Text('No game available'));
+    }
     updatePageRefreshedStatus(model);
     return Center(
       child: Container(

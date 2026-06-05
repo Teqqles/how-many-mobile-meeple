@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:sprintf/sprintf.dart';
 import 'package:how_many_mobile_meeple/components/app_default_padding.dart';
@@ -29,8 +28,8 @@ class BasicListGamesDisplayPage extends NetworkWidget with AppPage {
         TableCell(
           verticalAlignment: TableCellVerticalAlignment.middle,
           child: AppDefaultPadding(
-            child: FlatButton(
-                padding: EdgeInsets.zero,
+            child: TextButton(
+                style: TextButton.styleFrom(padding: EdgeInsets.zero),
                 onPressed: () {
                   model.toggleSortDirection();
                   model.sortGameField = SortableGameField.name;
@@ -44,8 +43,8 @@ class BasicListGamesDisplayPage extends NetworkWidget with AppPage {
         TableCell(
           verticalAlignment: TableCellVerticalAlignment.middle,
           child: AppDefaultPadding(
-            child: FlatButton(
-                padding: EdgeInsets.zero,
+            child: TextButton(
+                style: TextButton.styleFrom(padding: EdgeInsets.zero),
                 onPressed: () {
                   model.toggleSortDirection();
                   model.sortGameField = SortableGameField.weight;
@@ -59,8 +58,8 @@ class BasicListGamesDisplayPage extends NetworkWidget with AppPage {
         TableCell(
           verticalAlignment: TableCellVerticalAlignment.middle,
           child: AppDefaultPadding(
-            child: FlatButton(
-                padding: EdgeInsets.zero,
+            child: TextButton(
+                style: TextButton.styleFrom(padding: EdgeInsets.zero),
                 onPressed: () {
                   model.toggleSortDirection();
                   model.sortGameField = SortableGameField.rating;

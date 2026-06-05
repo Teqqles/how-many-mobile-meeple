@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:sprintf/sprintf.dart';
 import 'package:how_many_mobile_meeple/components/app_default_padding.dart';
@@ -28,8 +27,8 @@ class EnhancedListGamesDisplayPage extends NetworkWidget with AppPage {
         TableCell(
           verticalAlignment: TableCellVerticalAlignment.middle,
           child: AppDefaultPadding(
-            child: FlatButton(
-                padding: EdgeInsets.zero,
+            child: TextButton(
+                style: TextButton.styleFrom(padding: EdgeInsets.zero),
                 onPressed: () {
                   model.toggleSortDirection();
                   model.sortGameField = SortableGameField.name;
@@ -43,8 +42,8 @@ class EnhancedListGamesDisplayPage extends NetworkWidget with AppPage {
         TableCell(
           verticalAlignment: TableCellVerticalAlignment.middle,
           child: AppDefaultPadding(
-            child: FlatButton(
-                padding: EdgeInsets.zero,
+            child: TextButton(
+                style: TextButton.styleFrom(padding: EdgeInsets.zero),
                 onPressed: () {
                   model.toggleSortDirection();
                   model.sortGameField = SortableGameField.maxPlaytime;
@@ -58,8 +57,8 @@ class EnhancedListGamesDisplayPage extends NetworkWidget with AppPage {
         TableCell(
           verticalAlignment: TableCellVerticalAlignment.middle,
           child: AppDefaultPadding(
-            child: FlatButton(
-                padding: EdgeInsets.zero,
+            child: TextButton(
+                style: TextButton.styleFrom(padding: EdgeInsets.zero),
                 onPressed: () {
                   model.toggleSortDirection();
                   model.sortGameField = SortableGameField.weight;
@@ -73,8 +72,8 @@ class EnhancedListGamesDisplayPage extends NetworkWidget with AppPage {
         TableCell(
           verticalAlignment: TableCellVerticalAlignment.middle,
           child: AppDefaultPadding(
-            child: FlatButton(
-                padding: EdgeInsets.zero,
+            child: TextButton(
+                style: TextButton.styleFrom(padding: EdgeInsets.zero),
                 onPressed: () {
                   model.toggleSortDirection();
                   model.sortGameField = SortableGameField.rating;

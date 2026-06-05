@@ -1,8 +1,9 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:how_many_mobile_meeple/model/app_preferences.dart';
 import 'package:how_many_mobile_meeple/model/model.dart';
-import 'package:how_many_mobile_meeple/storage/preferences_history.dart';
+import 'package:how_many_mobile_meeple/model/settings.dart';
+import 'package:how_many_mobile_meeple/storage/storage_factory.dart';
+import 'package:how_many_mobile_meeple/platform/router.dart' as r;
 
 import '../app_common.dart';
 
@@ -29,24 +30,33 @@ class DrawerSavedSetting extends Container {
                   style: TextStyle(
                       fontSize: 13, decoration: TextDecoration.underline),
                 ),
-                onTap: () {
-                  var model = AppModel.of(context);
-                  model.replaceItems(preferences.items);
-                  model.replaceSettings(preferences.settings);
+                onTap: () async {
+                  var model = AppModel.of(context, listen: false);
+
+                  // Capture navigator before async operations
+                  final navigator = Navigator.of(context);
+
+                  await model.replaceItems(preferences.items);
+                  await model.replaceSettings(preferences.settings);
                   model.refreshState();
-                  Navigator.pop(context);
+                  navigator.pop();
+
+                  // Always show settings summary after loading saved settings
+                  Future.delayed(Duration(milliseconds: 300), () {
+                    navigator.pushNamed(r.Router.settingsRoute);
+                  });
                 }, // id},
               ),
               IconButton(
                 icon: Icon(
                   Icons.delete,
                   size: AppCommon.standardIconSize,
-                  color: Theme.of(context).errorColor,
+                  color: Theme.of(context).colorScheme.error,
                 ),
                 onPressed: () {
-                  var model = AppModel.of(context);
-                  var db = PreferencesHistoryDb();
-                  db.deletePreference(preferences.id);
+                  var model = AppModel.of(context, listen: false);
+                  var db = StorageFactory.getPreferencesHistory();
+                  db.deletePreference(preferences.id ?? '');
                   model.refreshState();
                 },
               ),

@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:how_many_mobile_meeple/platform/web/url_fragment_extractor.dart';
 import 'package:how_many_mobile_meeple/storage/storage_factory.dart';
 import 'package:how_many_mobile_meeple/storage/stored_preferences.dart';
-import 'package:scoped_model/scoped_model.dart';
+import 'package:provider/provider.dart';
 import 'package:how_many_mobile_meeple/model/settings.dart';
 
 import 'package:how_many_mobile_meeple/model/bgg_cache.dart';
@@ -14,8 +14,9 @@ import 'game.dart';
 import 'games.dart';
 import 'items.dart';
 
-class AppModel extends Model {
-  static AppModel of(BuildContext context) => ScopedModel.of<AppModel>(context);
+class AppModel extends ChangeNotifier {
+  static AppModel of(BuildContext context, {bool listen = true}) =>
+      Provider.of<AppModel>(context, listen: listen);
 
   static int _defaultCacheDurationInMinutes = 30;
   static int _unsetCacheDurationInMinutes = -1;
@@ -23,13 +24,13 @@ class AppModel extends Model {
   bool hasLoadedPersistedData = false;
   bool pageRefreshed = false;
 
-  String title;
+  String? title;
 
   Items _items = Items([]);
   BggCache _bggCache = BggCache(Games(), _unsetCacheDurationInMinutes);
 
-  Settings _settings;
-  Orientation screenOrientation;
+  late Settings _settings;
+  Orientation? screenOrientation;
 
   Items get items => _items;
 
@@ -47,9 +48,9 @@ class AppModel extends Model {
     _settings = Settings.defaultSettings();
   }
 
-  void refreshFromUrl() {
+  Future<void> refreshFromUrl() async {
     if (_extractor.containsModel()) {
-      replaceItems(_extractor.extractItems());
+      await replaceItems(_extractor.extractItems());
       var extractedSettings = _extractor.extractSettings();
       extractedSettings = _rebuildUrlMechanics(extractedSettings);
       if(_settings != extractedSettings) {
@@ -70,29 +71,29 @@ class AppModel extends Model {
         sortDirection == SortOrder.Asc ? SortOrder.Desc : SortOrder.Asc;
   }
 
-  void addItem(Item item) {
+  Future<void> addItem(Item item) async {
     _items.itemList.add(item);
-    this.invalidateCache();
-    this.updateStore();
+    invalidateCache();
+    await updateStore();
   }
 
-  void replaceItems(Items items) {
+  Future<void> replaceItems(Items items) async {
     if (items == _items) {
       return;
     }
     _items = items;
-    this.invalidateCache();
-    this.updateStore();
+    invalidateCache();
+    await updateStore();
   }
 
-  void replaceSettings(Settings settings) {
+  Future<void> replaceSettings(Settings settings) async {
     var newSettings = Settings.defaultSettings();
     for (var setting in settings.allSettings.values) {
       newSettings.updateSetting(setting);
     }
     _settings = newSettings;
-    this.invalidateCache();
-    this.updateStore();
+    invalidateCache();
+    await updateStore();
   }
 
   void invalidateCache() {
@@ -107,39 +108,41 @@ class AppModel extends Model {
     }
   }
 
-  void deleteItem(Item item) {
+  Future<void> deleteItem(Item item) async {
     _items.itemList.remove(item);
-    _storeItems(_items);
-    this.invalidateCache();
+    await _storeItems(_items);
+    invalidateCache();
     notifyListeners();
   }
 
-  void updateStore() {
-    _storeSettings(settings);
-    _storeItems(_items);
+  Future<void> updateStore() async {
+    await Future.wait([
+      _storeSettings(settings),
+      _storeItems(_items),
+    ]);
     notifyListeners();
   }
 
-  void refreshState() => this.notifyListeners();
+  void refreshState() => notifyListeners();
 
-  void loadStoredData() async {
+  Future<void> loadStoredData() async {
     if (_extractor.containsModel()) {
       return;
     }
     StoredPreferences store = await StorageFactory.getStoredPreferences();
     _items = await store.loadItems(AppCommon.maxItemsFromBgg);
-    this.replaceSettings(await store.loadSettings(settings));
-    this.hasLoadedPersistedData = true;
-    this.notifyListeners();
+    replaceSettings(await store.loadSettings(settings));
+    hasLoadedPersistedData = true;
+    notifyListeners();
   }
 
-  void _storeSettings(Settings settings) async {
+  Future<void> _storeSettings(Settings settings) async {
     StoredPreferences store = await StorageFactory.getStoredPreferences();
-    store.saveSettings(settings);
+    await store.saveSettings(settings);
   }
 
-  void _storeItems(Items items) async {
+  Future<void> _storeItems(Items items) async {
     StoredPreferences store = await StorageFactory.getStoredPreferences();
-    store.saveItems(items, AppCommon.maxItemsFromBgg);
+    await store.saveItems(items, AppCommon.maxItemsFromBgg);
   }
 }

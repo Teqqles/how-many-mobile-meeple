@@ -30,7 +30,9 @@ class Item {
   final String name;
   ItemType itemType;
 
-  Item(this.name, {this.itemType = ItemType.collection});
+  Item(this.name, {ItemType? itemType})
+    : itemType = itemType ??
+        (name.contains(RegExp(r"^\d+$")) ? ItemType.geekList : ItemType.collection);
 
   toJson() {
     return {'name': name, 'item_type': itemType};

@@ -1,0 +1,13 @@
+{
+  "name": "how-many-meeple-mock-api",
+  "version": "1.0.0",
+  "description": "Lightweight mock API server for testing How Many Meeple app locally",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": ["mock", "api", "boardgames", "testing"],
+  "author": "",
+  "license": "MIT"
+}

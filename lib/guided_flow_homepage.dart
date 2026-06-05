@@ -33,11 +33,7 @@ class _GuidedFlowHomePageState extends State<GuidedFlowHomePage> {
 
   bool _getPreferAdvancedMode(AppModel model) {
     final setting = model.settings.setting('preferAdvancedMode');
-    final value = setting.value;
-    if (value is String) {
-      return value.toLowerCase() == 'true';
-    }
-    return value as bool;
+    return setting.getBool();
   }
 
   @override

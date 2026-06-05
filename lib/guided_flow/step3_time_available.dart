@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:how_many_mobile_meeple/model/model.dart';
 import 'package:how_many_mobile_meeple/model/settings.dart';
-import 'package:how_many_mobile_meeple/str_cast.dart';
 import 'package:how_many_mobile_meeple/app_common.dart';
+import 'package:how_many_mobile_meeple/components/step_header_card.dart';
+import 'package:how_many_mobile_meeple/components/info_message_box.dart';
 
 /// Step 3: Time Available
 /// Allows users to select game duration with quick presets
@@ -40,8 +41,8 @@ class _Step3TimeAvailableState extends State<Step3TimeAvailable> {
         final maxTimeSetting =
             model.settings.setting(Settings.filterMaximumTimeToPlay.name);
 
-        final minTime = StrCast(minTimeSetting.value).castToInt();
-        final maxTime = StrCast(maxTimeSetting.value).castToInt();
+        final minTime = minTimeSetting.getInt();
+        final maxTime = maxTimeSetting.getInt();
 
         return Card(
           elevation: 2,
@@ -51,50 +52,10 @@ class _Step3TimeAvailableState extends State<Step3TimeAvailable> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Header with icon
-                Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.primaryContainer,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Icon(
-                        Icons.schedule,
-                        color: Theme.of(context).colorScheme.onPrimaryContainer,
-                        size: 28,
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Time Available',
-                            style: Theme.of(context)
-                                .textTheme
-                                .headlineSmall
-                                ?.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            'How long do you want to play?',
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodyMedium
-                                ?.copyWith(
-                                  color: Theme.of(context)
-                                      .colorScheme
-                                      .onSurfaceVariant,
-                                ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
+                const StepHeaderCard(
+                  icon: Icons.schedule,
+                  title: 'Time Available',
+                  subtitle: 'How long do you want to play?',
                 ),
 
                 const SizedBox(height: 32),
@@ -241,29 +202,8 @@ class _Step3TimeAvailableState extends State<Step3TimeAvailable> {
                 const SizedBox(height: 24),
 
                 // Info box
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color:
-                        Theme.of(context).colorScheme.surfaceContainerHighest,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.info_outline,
-                        size: 20,
-                        color: Theme.of(context).colorScheme.primary,
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Text(
-                          'We\'ll find games that fit within your time budget',
-                          style: Theme.of(context).textTheme.bodySmall,
-                        ),
-                      ),
-                    ],
-                  ),
+                const InfoMessageBox.info(
+                  message: 'We\'ll find games that fit within your time budget',
                 ),
               ],
             ),

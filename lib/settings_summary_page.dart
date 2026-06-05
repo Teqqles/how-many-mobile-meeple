@@ -5,7 +5,6 @@ import 'package:how_many_mobile_meeple/model/settings.dart';
 import 'package:how_many_mobile_meeple/how_many_meeple_app_bar.dart';
 import 'package:how_many_mobile_meeple/app_common.dart';
 import 'package:how_many_mobile_meeple/app_page.dart';
-import 'package:how_many_mobile_meeple/str_cast.dart';
 import 'package:how_many_mobile_meeple/components/disclaimer_text.dart';
 import 'package:how_many_mobile_meeple/components/empty_widget.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -231,7 +230,7 @@ class SettingsSummaryPage extends StatelessWidget with AppPage {
   Widget _buildPlayersSection(BuildContext context, AppModel model) {
     final playerSetting =
         model.settings.setting(Settings.filterNumberOfPlayers.name);
-    final players = StrCast(playerSetting.value).castToInt();
+    final players = playerSetting.getInt();
 
     return _buildSettingCard(
       context,
@@ -248,8 +247,8 @@ class SettingsSummaryPage extends StatelessWidget with AppPage {
         model.settings.setting(Settings.filterMinimumTimeToPlay.name);
     final maxSetting =
         model.settings.setting(Settings.filterMaximumTimeToPlay.name);
-    final min = StrCast(minSetting.value).castToInt();
-    final max = StrCast(maxSetting.value).castToInt();
+    final min = minSetting.getInt();
+    final max = maxSetting.getInt();
 
     return _buildSettingCard(
       context,
@@ -264,7 +263,7 @@ class SettingsSummaryPage extends StatelessWidget with AppPage {
 
   Widget _buildDifficultySection(BuildContext context, AppModel model) {
     final setting = model.settings.setting(Settings.filterComplexity.name);
-    final complexity = StrCast(setting.value).castToDouble();
+    final complexity = setting.getDouble();
 
     return _buildSettingCard(
       context,
@@ -279,7 +278,7 @@ class SettingsSummaryPage extends StatelessWidget with AppPage {
 
   Widget _buildRatingSection(BuildContext context, AppModel model) {
     final setting = model.settings.setting(Settings.filterMinRating.name);
-    final rating = StrCast(setting.value).castToDouble();
+    final rating = setting.getDouble();
 
     return _buildSettingCard(
       context,
@@ -392,18 +391,14 @@ class SettingsSummaryPage extends StatelessWidget with AppPage {
             _buildBooleanSetting(
               context,
               'Include Expansions',
-              expansions.value is String
-                  ? expansions.value.toLowerCase() == 'true'
-                  : expansions.value as bool,
+              expansions.getBool(),
               expansions.enabled,
             ),
             const SizedBox(height: 8),
             _buildBooleanSetting(
               context,
               'Use Recommended Player Counts',
-              recommended.value is String
-                  ? recommended.value.toLowerCase() == 'true'
-                  : recommended.value as bool,
+              recommended.getBool(),
               recommended.enabled,
             ),
           ],

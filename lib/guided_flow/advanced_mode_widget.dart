@@ -1,5 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:how_many_mobile_meeple/homepage.dart';
+import 'package:how_many_mobile_meeple/components/board_game_item_input_widget.dart';
+import 'package:how_many_mobile_meeple/components/board_game_item_list_widget.dart';
+import 'package:how_many_mobile_meeple/components/complexity_filter_widget.dart';
+import 'package:how_many_mobile_meeple/components/mechanic_filter_widget.dart';
+import 'package:how_many_mobile_meeple/components/player_filter_widget.dart';
+import 'package:how_many_mobile_meeple/components/rating_filter_widget.dart';
+import 'package:how_many_mobile_meeple/components/time_filter_widget.dart';
 
 /// Advanced Mode Widget
 /// Wraps the existing full-control homepage UI in an expandable panel
@@ -8,11 +14,6 @@ class AdvancedModeWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Use the existing HomePage widget content
-    // We'll create an instance and extract its UI components
-    final homePage = HomePage();
-    final textFieldWidth = MediaQuery.of(context).size.width * 0.65;
-
     return Card(
       elevation: 2,
       child: ExpansionTile(
@@ -32,41 +33,41 @@ class AdvancedModeWidget extends StatelessWidget {
           ],
         ),
         subtitle: const Padding(
-          padding: const EdgeInsets.only(top: 4),
-          child: const Text('Full control over all filters'),
+          padding: EdgeInsets.only(top: 4),
+          child: Text('Full control over all filters'),
         ),
         initiallyExpanded: true,
-        children: [
+        children: const [
           Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: EdgeInsets.all(16.0),
             child: Column(
               children: [
                 // Username/Geeklist input
-                homePage.buildBoardGameItemTextField(textFieldWidth),
-                const SizedBox(height: 8),
+                BoardGameItemInputWidget(),
+                SizedBox(height: 8),
 
                 // Board Game Geek Item Display
-                homePage.buildBoardGameGeekItemDisplay(),
-                const SizedBox(height: 8),
+                BoardGameItemListWidget(),
+                SizedBox(height: 8),
 
                 // Time slider
-                homePage.buildGameDurationSliderDisplay(context),
-                const SizedBox(height: 8),
+                TimeFilterWidget(),
+                SizedBox(height: 8),
 
                 // Player count slider
-                homePage.buildPlayerSliderDisplay(),
-                const SizedBox(height: 8),
+                PlayerFilterWidget(),
+                SizedBox(height: 8),
 
                 // Complexity slider
-                homePage.buildComplexitySliderDisplay(),
-                const SizedBox(height: 8),
+                ComplexityFilterWidget(),
+                SizedBox(height: 8),
 
                 // Rating slider
-                homePage.buildRatingSliderDisplay(),
-                const SizedBox(height: 8),
+                RatingFilterWidget(),
+                SizedBox(height: 8),
 
                 // Mechanics filter
-                homePage.buildMechanicFilterDisplay(context),
+                MechanicFilterWidget(),
               ],
             ),
           ),

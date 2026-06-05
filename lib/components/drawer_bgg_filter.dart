@@ -3,6 +3,7 @@ import 'package:how_many_mobile_meeple/model/model.dart';
 import 'package:how_many_mobile_meeple/model/setting.dart';
 
 import 'package:how_many_mobile_meeple/components/app_default_padding.dart';
+import 'package:how_many_mobile_meeple/components/drawer_switch.dart';
 
 class DrawerBggFilter extends Container {
   DrawerBggFilter(
@@ -19,14 +20,7 @@ class DrawerBggFilter extends Container {
                   style: TextStyle(fontSize: 13),
                 ),
               ),
-              Switch(
-                  activeThumbColor: Colors.white,
-                  activeTrackColor: Theme.of(context).colorScheme.primary,
-                  inactiveThumbColor: Colors.grey[600],
-                  inactiveTrackColor: Theme.of(context)
-                          .colorScheme
-                          .primary
-                          .withValues(alpha: 0.5),
+              DrawerSwitch(
                   onChanged: (bool value) {
                     setting.value = value;
                     setting.enabled = true;

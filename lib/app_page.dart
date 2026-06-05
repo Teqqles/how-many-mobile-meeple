@@ -7,6 +7,7 @@ import 'package:mime/mime.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 import 'package:how_many_mobile_meeple/components/drawer_bgg_filter.dart';
+import 'package:how_many_mobile_meeple/components/drawer_switch.dart';
 import 'package:how_many_mobile_meeple/components/app_default_padding.dart';
 import 'app_common.dart';
 import 'components/component_factory.dart';
@@ -70,9 +71,7 @@ mixin AppPage {
 
   Widget _buildAdvancedModeToggle(AppModel model, BuildContext context) {
     final setting = model.settings.setting(Settings.preferAdvancedMode.name);
-    final currentValue = setting.value is String
-        ? setting.value.toLowerCase() == 'true'
-        : setting.value as bool;
+    final currentValue = setting.getBool();
 
     return Container(
       color: Theme.of(context).highlightColor,
@@ -86,14 +85,7 @@ mixin AppPage {
               style: TextStyle(fontSize: 13),
             ),
           ),
-          Switch(
-            activeThumbColor: Colors.white,
-            activeTrackColor: Theme.of(context).colorScheme.primary,
-            inactiveThumbColor: Colors.grey[600],
-            inactiveTrackColor: Theme.of(context)
-                          .colorScheme
-                          .primary
-                          .withValues(alpha: 0.5),
+          DrawerSwitch(
             onChanged: (bool value) async {
               setting.value = value;
               setting.enabled = true;

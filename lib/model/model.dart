@@ -9,7 +9,6 @@ import 'package:how_many_mobile_meeple/model/bgg_cache.dart';
 import 'package:how_many_mobile_meeple/model/item.dart';
 
 import '../app_common.dart';
-import '../str_cast.dart';
 import 'game.dart';
 import 'games.dart';
 import 'items.dart';
@@ -61,9 +60,8 @@ class AppModel extends ChangeNotifier {
   }
 
   Settings _rebuildUrlMechanics(Settings extractedSettings) {
-    extractedSettings.setting(Settings.filterMechanics.name).value =
-        StrCast(extractedSettings.setting(Settings.filterMechanics.name).value)
-            .castToList();
+    final mechanicsSetting = extractedSettings.setting(Settings.filterMechanics.name);
+    mechanicsSetting.value = mechanicsSetting.getList();
     return extractedSettings;
   }
 

@@ -87,6 +87,13 @@ mixin AppPage {
             ),
           ),
           Switch(
+            activeThumbColor: Colors.white,
+            activeTrackColor: Theme.of(context).colorScheme.primary,
+            inactiveThumbColor: Colors.grey[600],
+            inactiveTrackColor: Theme.of(context)
+                          .colorScheme
+                          .primary
+                          .withValues(alpha: 0.5),
             onChanged: (bool value) async {
               setting.value = value;
               setting.enabled = true;

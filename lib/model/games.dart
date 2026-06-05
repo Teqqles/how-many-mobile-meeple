@@ -7,7 +7,7 @@ class Games {
 
   List<Game> get games => gamesByName.values.toList();
 
-  Games({this.gamesByName: const {}});
+  Games({this.gamesByName = const {}});
 
   factory Games.fromJson(List<dynamic> parsedJson) {
     var games = Map<String, Game>();

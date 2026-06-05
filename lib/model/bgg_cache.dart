@@ -6,19 +6,19 @@ import 'games.dart';
 class BggCache {
   Games _games;
   int _durationMinutes;
-  int _cacheTimestamp;
+  late int _cacheTimestamp;
 
   Games get games => _games;
-  Games _remainingGames;
+  late Games _remainingGames;
 
   int get durationInMinutes => _durationMinutes;
-  Game _stickyRandom;
+  Game? _stickyRandom;
 
-  Game get random {
+  Game? get random {
     if (games.games.isEmpty) {
       return null;
     }
-    if (_remainingGames.games.isEmpty && _stickyRandom != null) {
+    if (_remainingGames.games.isEmpty) {
       return _stickyRandom;
     }
     _stickyRandom = _nextRandom();
@@ -36,7 +36,7 @@ class BggCache {
     _remainingGames = _games.remove(game);
   }
 
-  Game get lastRandom => _stickyRandom ?? random;
+  Game? get lastRandom => _stickyRandom ?? random;
 
   BggCache(this._games, this._durationMinutes) {
     refreshCacheTimestamp();

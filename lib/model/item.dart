@@ -30,12 +30,7 @@ class Item {
   final String name;
   ItemType itemType;
 
-  Item(this.name, {this.itemType}) {
-    if (this.itemType == null) {
-      var isNumeric = this.name.contains(RegExp(r"^\d+$"));
-      this.itemType = isNumeric ? ItemType.geekList : ItemType.collection;
-    }
-  }
+  Item(this.name, {this.itemType = ItemType.collection});
 
   toJson() {
     return {'name': name, 'item_type': itemType};

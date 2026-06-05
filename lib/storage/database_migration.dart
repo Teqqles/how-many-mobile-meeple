@@ -4,10 +4,10 @@ abstract class DatabaseMigration {
   DatabaseMigration(this.patches);
 
   Map<int, String> upgradesForVersion(int oldVersion, int newVersion) =>
-      new Map.fromIterable(
-          this.patches.keys.where((k) => k <= newVersion && k > oldVersion),
+      Map.fromIterable(
+          patches.keys.where((k) => k <= newVersion && k > oldVersion),
           key: (k) => k,
-          value: (k) => this.patches[k]);
+          value: (k) => patches[k]!);
 
   bool hasUpgrade(int oldVersion, int newVersion) {
     var upgrades = upgradesForVersion(oldVersion, newVersion);

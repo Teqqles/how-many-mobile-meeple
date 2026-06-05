@@ -10,15 +10,16 @@ class Game {
   final double averageRating;
   final double averageWeight;
 
-  Game(
-      {this.id,
-      this.name,
-      this.maxPlayers,
-      this.minPlayers,
-      this.maxPlaytime,
-      this.imageUrl,
-      this.averageRating,
-      this.averageWeight});
+  Game({
+    required this.id,
+    required this.name,
+    required this.maxPlayers,
+    required this.minPlayers,
+    required this.maxPlaytime,
+    required this.imageUrl,
+    required this.averageRating,
+    required this.averageWeight,
+  });
 
   factory Game.fromJson(Map<String, dynamic> json) {
     return Game(

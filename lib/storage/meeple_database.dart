@@ -2,7 +2,11 @@ import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:path/path.dart';
 
-import 'package:sqflite/sqflite.dart';
+// Conditional import for sqflite
+import 'sqflite_stub.dart'
+    if (dart.library.io) 'package:sqflite/sqflite.dart';
+import 'sqflite_stub.dart' as sqflite_common
+    if (dart.library.io) 'package:sqflite/sqflite.dart';
 import 'package:synchronized/synchronized.dart';
 
 abstract class MeepleDatabase {
@@ -18,16 +22,16 @@ abstract class MeepleDatabase {
 
   void upgradeDb(Database db, int oldVersion, int newVersion);
 
-  _onCreate(Database db, int version) async {
+  Future<void> _onCreate(Database db, int version) async {
     createDatabase(db, version);
   }
 
-  _onUpdate(Database db, int oldVersion, int newVersion) async {
+  Future<void> _onUpdate(Database db, int oldVersion, int newVersion) async {
     upgradeDb(db, oldVersion, newVersion);
   }
 
-  Database _db;
-  final _lock = new Lock();
+  Database? _db;
+  final _lock = Lock();
 
   Future<Database> getDb() async {
     if (_db == null) {
@@ -45,11 +49,11 @@ abstract class MeepleDatabase {
         }
       });
     }
-    return _db;
+    return _db!;
   }
 
   Future<String> initDatabasePath() async {
-    final String databasePath = await getDatabasesPath();
+    final String databasePath = await sqflite_common.getDatabasesPath();
     final String path = join(databasePath, databaseName);
 
     if (!await Directory(dirname(path)).exists()) {

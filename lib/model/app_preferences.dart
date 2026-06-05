@@ -2,20 +2,41 @@ import 'dart:convert';
 
 import 'package:how_many_mobile_meeple/model/settings.dart';
 
+import 'item.dart';
 import 'items.dart';
 import 'model.dart';
 import 'setting.dart';
 
 class AppPreferences {
-  final String id;
+  final String? id;
   final String title;
   final Items items;
   final Settings settings;
 
   AppPreferences(this.id, this.title, this.items, this.settings);
 
-  toJson() {
-    return {'id': id, 'items': items, 'settings': settings};
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'title': title,
+      'items': items.itemList.map((item) => item.toJson()).toList(),
+      'settings': settings.allSettings.map((key, value) => MapEntry(key, value.toJson())),
+    };
+  }
+
+  factory AppPreferences.fromJson(Map<String, dynamic> json) {
+    final itemsList = (json['items'] as List)
+        .map((item) => Item.fromJson(item))
+        .toList();
+    final settingsMap = (json['settings'] as Map<String, dynamic>)
+        .map((key, value) => MapEntry(key, Setting.fromJson(value)));
+
+    return AppPreferences(
+      json['id'],
+      json['title'],
+      Items(itemsList),
+      Settings(settingsMap),
+    );
   }
 
   static List<String> storedSettings = [

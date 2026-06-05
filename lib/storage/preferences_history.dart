@@ -3,17 +3,22 @@ import 'dart:convert';
 import 'package:how_many_mobile_meeple/model/app_preferences.dart';
 import 'package:how_many_mobile_meeple/model/settings.dart';
 import 'package:how_many_mobile_meeple/storage/preference_history_db_migration.dart';
-import 'package:sqflite/sqflite.dart';
+
+// Conditional import for sqflite
+import 'sqflite_stub.dart'
+    if (dart.library.io) 'package:sqflite/sqflite.dart';
 
 import 'meeple_database.dart';
+import 'preferences_history_interface.dart';
 
-class PreferencesHistoryDb extends MeepleDatabase {
+class PreferencesHistoryDb extends MeepleDatabase implements PreferencesHistoryInterface {
   static final String table = 'preference_history';
   final version = 20191002;
 
   PreferencesHistoryDb() : super(table);
 
-  void storePreference(AppPreferences preferences) async {
+  @override
+  Future<void> storePreference(AppPreferences preferences) async {
     String insertStatement = "INSERT OR REPLACE INTO $tableName (id, "
         "title, "
         "timestamp, "
@@ -59,10 +64,11 @@ class PreferencesHistoryDb extends MeepleDatabase {
 
   List<AppPreferences> _tableDataToPreferences(List<Map> records) {
     Iterable<AppPreferences> prefs =
-        records.map((Map json) => AppPreferences.fromDb(json));
+        records.map((Map json) => AppPreferences.fromDb(json as Map<String, dynamic>));
     return prefs.toList();
   }
 
+  @override
   Future<AppPreferences> loadPreference(int preferenceId) async {
     String selectPreferenceStatement = "SELECT * "
         "FROM $tableName WHERE id = ?";
@@ -72,6 +78,7 @@ class PreferencesHistoryDb extends MeepleDatabase {
     return _tableDataToPreferences(list).first;
   }
 
+  @override
   Future<bool> deletePreference(String preferenceId) async {
     String selectPreferenceStatement = 'DELETE FROM $tableName WHERE id = ?';
     var db = await getDb();
@@ -80,6 +87,7 @@ class PreferencesHistoryDb extends MeepleDatabase {
     return deletions > 0;
   }
 
+  @override
   Future<List<AppPreferences>> loadAllPreferences() async {
     String selectPreferenceStatement =
         'SELECT * FROM $tableName ORDER BY timestamp DESC LIMIT 5';
@@ -122,7 +130,7 @@ class PreferencesHistoryDb extends MeepleDatabase {
     upgradeScripts.keys.toList()
       ..sort() //make sure to sort
       ..forEach((key) async {
-        var script = upgradeScripts[key];
+        var script = upgradeScripts[key]!;
         await db.execute(script);
       });
   }

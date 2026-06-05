@@ -11,7 +11,7 @@ class StoredPreferences {
     return await SharedPreferences.getInstance();
   }
 
-  SharedPreferences _prefs;
+  late SharedPreferences _prefs;
 
   StoredPreferences(SharedPreferences sharedPreferences) {
     _prefs = sharedPreferences;
@@ -29,7 +29,7 @@ class StoredPreferences {
     for (String settingName in settingsToRetrieve.allSettings.keys) {
       if (_prefs.containsKey(settingName)) {
         Setting loadedSetting =
-            Setting.fromJson(jsonDecode(_prefs.getString(settingName)));
+            Setting.fromJson(jsonDecode(_prefs.getString(settingName)!));
         settings.updateSetting(loadedSetting);
       }
     }
@@ -49,13 +49,15 @@ class StoredPreferences {
   }
 
   Future<Items> loadItems(int maxItemsToLoadFromStore) async {
-    List<Item> savedItems = List<Item>();
+    List<Item> savedItems = <Item>[];
     for (int i = 0; i < maxItemsToLoadFromStore; i++) {
       String itemId = "${Items.itemStoreNamePrefix}$i";
       if (_prefs.containsKey(itemId)) {
-        String item = _prefs.getString(itemId);
-        var loadedItem = Item.fromJson(jsonDecode(item));
-        savedItems.add(loadedItem);
+        String? item = _prefs.getString(itemId);
+        if (item != null) {
+          var loadedItem = Item.fromJson(jsonDecode(item));
+          savedItems.add(loadedItem);
+        }
       }
     }
     return Items(savedItems);

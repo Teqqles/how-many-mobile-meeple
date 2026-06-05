@@ -4,7 +4,8 @@ class Database {
     throw UnsupportedError('sqflite is not supported on web');
   }
 
-  Future<List<Map<String, Object?>>> rawQuery(String sql, [List<Object?>? arguments]) async {
+  Future<List<Map<String, Object?>>> rawQuery(String sql,
+      [List<Object?>? arguments]) async {
     throw UnsupportedError('sqflite is not supported on web');
   }
 
@@ -17,7 +18,8 @@ class Database {
   }
 }
 
-Future<Database> openDatabase(String path, {
+Future<Database> openDatabase(
+  String path, {
   int? version,
   Function? onCreate,
   Function? onUpgrade,

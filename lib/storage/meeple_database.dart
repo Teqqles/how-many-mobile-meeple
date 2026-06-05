@@ -3,10 +3,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:path/path.dart';
 
 // Conditional import for sqflite
-import 'sqflite_stub.dart'
-    if (dart.library.io) 'package:sqflite/sqflite.dart';
-import 'sqflite_stub.dart' as sqflite_common
-    if (dart.library.io) 'package:sqflite/sqflite.dart';
+import 'sqflite_stub.dart' if (dart.library.io) 'package:sqflite/sqflite.dart';
+import 'sqflite_stub.dart' if (dart.library.io) 'package:sqflite/sqflite.dart'
+    as sqflite_common;
 import 'package:synchronized/synchronized.dart';
 
 abstract class MeepleDatabase {

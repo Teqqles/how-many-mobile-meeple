@@ -78,7 +78,8 @@ class Step5FinalActions extends StatelessWidget {
                     style: TextStyle(fontSize: 16),
                   ),
                   style: FilledButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 24),
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 20, horizontal: 24),
                     backgroundColor: Theme.of(context).colorScheme.primary,
                   ),
                 ),
@@ -100,7 +101,8 @@ class Step5FinalActions extends StatelessWidget {
                     style: TextStyle(fontSize: 16),
                   ),
                   style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 24),
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 20, horizontal: 24),
                   ),
                 ),
 
@@ -117,7 +119,8 @@ class Step5FinalActions extends StatelessWidget {
                     style: TextStyle(fontSize: 16),
                   ),
                   style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 24),
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 20, horizontal: 24),
                   ),
                 ),
 
@@ -146,7 +149,8 @@ class Step5FinalActions extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                    color:
+                        Theme.of(context).colorScheme.surfaceContainerHighest,
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Column(
@@ -162,7 +166,10 @@ class Step5FinalActions extends StatelessWidget {
                           Expanded(
                             child: Text(
                               'Need more control?',
-                              style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .titleSmall
+                                  ?.copyWith(
                                     fontWeight: FontWeight.bold,
                                   ),
                             ),
@@ -173,7 +180,9 @@ class Step5FinalActions extends StatelessWidget {
                       Text(
                         'Switch to Advanced Mode for full control over all filters and settings',
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                              color: Theme.of(context).colorScheme.onSurfaceVariant,
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSurfaceVariant,
                             ),
                       ),
                       const SizedBox(height: 12),

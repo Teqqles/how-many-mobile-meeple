@@ -80,10 +80,8 @@ void main() {
     test('round-trip serialization preserves data', () {
       var original = Item('12345', itemType: ItemType.geekList);
       var json = original.toJson();
-      var restored = Item.fromJson({
-        'name': json['name'],
-        'item_type': json['item_type'].toJson()
-      });
+      var restored = Item.fromJson(
+          {'name': json['name'], 'item_type': json['item_type'].toJson()});
       expect(restored.name, original.name);
       expect(restored.itemType, original.itemType);
     });

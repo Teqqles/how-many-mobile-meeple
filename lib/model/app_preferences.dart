@@ -20,14 +20,14 @@ class AppPreferences {
       'id': id,
       'title': title,
       'items': items.itemList.map((item) => item.toJson()).toList(),
-      'settings': settings.allSettings.map((key, value) => MapEntry(key, value.toJson())),
+      'settings': settings.allSettings
+          .map((key, value) => MapEntry(key, value.toJson())),
     };
   }
 
   factory AppPreferences.fromJson(Map<String, dynamic> json) {
-    final itemsList = (json['items'] as List)
-        .map((item) => Item.fromJson(item))
-        .toList();
+    final itemsList =
+        (json['items'] as List).map((item) => Item.fromJson(item)).toList();
     final settingsMap = (json['settings'] as Map<String, dynamic>)
         .map((key, value) => MapEntry(key, Setting.fromJson(value)));
 
@@ -40,7 +40,7 @@ class AppPreferences {
   }
 
   static List<String> storedSettings = [
-    "setting_whitelist",  // we store whitelist but this is no longer loaded
+    "setting_whitelist", // we store whitelist but this is no longer loaded
     "setting_num_players",
     "setting_min_time",
     "setting_max_time",

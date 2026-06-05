@@ -37,8 +37,7 @@ abstract class NetworkWidget extends StatelessWidget with ScreenTools {
             children: [
               AppDefaultPadding(
                 child: Icon(Icons.error,
-                    color: Theme.of(context).colorScheme.error,
-                    size: iconSize),
+                    color: Theme.of(context).colorScheme.error, size: iconSize),
               ),
               Text(
                 error,
@@ -79,8 +78,7 @@ abstract class NetworkWidget extends StatelessWidget with ScreenTools {
       AppModel model,
       AsyncSnapshot<Games> snapshot,
       BuildContext context,
-      Widget displayWidgetFn(
-          BuildContext context, AppModel model)) {
+      Widget displayWidgetFn(BuildContext context, AppModel model)) {
     if (snapshot.data!.games.isEmpty) {
       return pageErrors(context, pageErrorNoGamesAvailable);
     }
@@ -89,23 +87,17 @@ abstract class NetworkWidget extends StatelessWidget with ScreenTools {
   }
 
   Widget loadNetworkContent(
-      Widget displayWidgetFn(
-          BuildContext context, AppModel model)) {
-    return Consumer<AppModel>(
-      builder: (context, model, child) {
-        if (model.items.isEmpty) {
-          return pageErrors(context, pageErrorNoItemsSupplied);
-        }
-        return contentFromNetworkOrCache(context, model, displayWidgetFn);
+      Widget displayWidgetFn(BuildContext context, AppModel model)) {
+    return Consumer<AppModel>(builder: (context, model, child) {
+      if (model.items.isEmpty) {
+        return pageErrors(context, pageErrorNoItemsSupplied);
       }
-    );
+      return contentFromNetworkOrCache(context, model, displayWidgetFn);
+    });
   }
 
-  Widget contentFromNetworkOrCache(
-      BuildContext context,
-      AppModel model,
-      Widget displayWidgetFn(
-          BuildContext context, AppModel model)) {
+  Widget contentFromNetworkOrCache(BuildContext context, AppModel model,
+      Widget displayWidgetFn(BuildContext context, AppModel model)) {
     if (!model.bggCache.isStale()) {
       return displayWidgetFn(context, model);
     }

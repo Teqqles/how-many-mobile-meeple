@@ -1,4 +1,3 @@
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:how_many_mobile_meeple/guided_flow_homepage.dart';
@@ -17,7 +16,8 @@ abstract class Pages {
   }
 
   static bool isLargeDevice() {
-    final data = MediaQueryData.fromView(WidgetsBinding.instance.window);
+    final data = MediaQueryData.fromView(
+        WidgetsBinding.instance.platformDispatcher.views.first);
     return data.size.shortestSide >= 600;
   }
 }
@@ -41,7 +41,6 @@ class WebPages extends Pages {
       return BasicListGamesDisplayPage();
     }
   }
-
 }
 
 class MobilePages extends Pages {

@@ -10,8 +10,7 @@ class DisclaimerText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Text(data,
-        style: TextStyle(color: Theme.of(context).disabledColor));
+    return Text(data, style: TextStyle(color: Theme.of(context).disabledColor));
   }
 }
 

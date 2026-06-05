@@ -6,7 +6,8 @@ import 'package:provider/provider.dart';
 
 void main() {
   group('Step1SelectSource', () {
-    testWidgets('Add Source button is disabled when text field is empty', (WidgetTester tester) async {
+    testWidgets('Add Source button is disabled when text field is empty',
+        (WidgetTester tester) async {
       final model = AppModel();
 
       await tester.pumpWidget(
@@ -29,7 +30,8 @@ void main() {
       expect(button.onPressed, isNull);
     });
 
-    testWidgets('Add Source button becomes enabled when text is entered', (WidgetTester tester) async {
+    testWidgets('Add Source button becomes enabled when text is entered',
+        (WidgetTester tester) async {
       final model = AppModel();
 
       await tester.pumpWidget(
@@ -60,7 +62,8 @@ void main() {
       expect(button.onPressed, isNotNull);
     });
 
-    testWidgets('Add Source button becomes disabled again when text is cleared', (WidgetTester tester) async {
+    testWidgets('Add Source button becomes disabled again when text is cleared',
+        (WidgetTester tester) async {
       final model = AppModel();
 
       await tester.pumpWidget(
@@ -82,7 +85,8 @@ void main() {
       await tester.pump();
 
       // Verify button is enabled
-      FilledButton button = tester.widget(find.widgetWithText(FilledButton, 'Add Source'));
+      FilledButton button =
+          tester.widget(find.widgetWithText(FilledButton, 'Add Source'));
       expect(button.onPressed, isNotNull);
 
       // Clear the text

@@ -5,13 +5,13 @@ import 'package:how_many_mobile_meeple/model/settings.dart';
 import 'package:how_many_mobile_meeple/storage/preference_history_db_migration.dart';
 
 // Conditional import for sqflite
-import 'sqflite_stub.dart'
-    if (dart.library.io) 'package:sqflite/sqflite.dart';
+import 'sqflite_stub.dart' if (dart.library.io) 'package:sqflite/sqflite.dart';
 
 import 'meeple_database.dart';
 import 'preferences_history_interface.dart';
 
-class PreferencesHistoryDb extends MeepleDatabase implements PreferencesHistoryInterface {
+class PreferencesHistoryDb extends MeepleDatabase
+    implements PreferencesHistoryInterface {
   static final String table = 'preference_history';
   final version = 20191002;
 
@@ -63,8 +63,8 @@ class PreferencesHistoryDb extends MeepleDatabase implements PreferencesHistoryI
   }
 
   List<AppPreferences> _tableDataToPreferences(List<Map> records) {
-    Iterable<AppPreferences> prefs =
-        records.map((Map json) => AppPreferences.fromDb(json as Map<String, dynamic>));
+    Iterable<AppPreferences> prefs = records
+        .map((Map json) => AppPreferences.fromDb(json as Map<String, dynamic>));
     return prefs.toList();
   }
 

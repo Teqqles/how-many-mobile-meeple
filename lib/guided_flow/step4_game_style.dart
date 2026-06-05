@@ -53,8 +53,10 @@ class _Step4GameStyleState extends State<Step4GameStyle> {
   Widget build(BuildContext context) {
     return Consumer<AppModel>(
       builder: (context, model, child) {
-        final difficultySetting = model.settings.setting(Settings.filterComplexity.name);
-        final mechanicsSetting = model.settings.setting(Settings.filterMechanics.name);
+        final difficultySetting =
+            model.settings.setting(Settings.filterComplexity.name);
+        final mechanicsSetting =
+            model.settings.setting(Settings.filterMechanics.name);
 
         final difficulty = StrCast(difficultySetting.value).castToDouble();
         final selectedMechanics = mechanicsSetting.value as List<dynamic>;
@@ -88,15 +90,23 @@ class _Step4GameStyleState extends State<Step4GameStyle> {
                         children: [
                           Text(
                             'Game Style',
-                            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                            style: Theme.of(context)
+                                .textTheme
+                                .headlineSmall
+                                ?.copyWith(
                                   fontWeight: FontWeight.bold,
                                 ),
                           ),
                           const SizedBox(height: 4),
                           Text(
                             'Choose difficulty and mechanics',
-                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyMedium
+                                ?.copyWith(
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .onSurfaceVariant,
                                 ),
                           ),
                         ],
@@ -125,35 +135,40 @@ class _Step4GameStyleState extends State<Step4GameStyle> {
                       'Light',
                       0.75,
                       difficulty,
-                      (value) => _updateDifficulty(model, difficultySetting, value),
+                      (value) =>
+                          _updateDifficulty(model, difficultySetting, value),
                     ),
                     _buildDifficultyPanel(
                       context,
                       'Gateway',
                       2.0,
                       difficulty,
-                      (value) => _updateDifficulty(model, difficultySetting, value),
+                      (value) =>
+                          _updateDifficulty(model, difficultySetting, value),
                     ),
                     _buildDifficultyPanel(
                       context,
                       'Strategy',
                       3.0,
                       difficulty,
-                      (value) => _updateDifficulty(model, difficultySetting, value),
+                      (value) =>
+                          _updateDifficulty(model, difficultySetting, value),
                     ),
                     _buildDifficultyPanel(
                       context,
                       'Heavy',
                       3.75,
                       difficulty,
-                      (value) => _updateDifficulty(model, difficultySetting, value),
+                      (value) =>
+                          _updateDifficulty(model, difficultySetting, value),
                     ),
                     _buildDifficultyPanel(
                       context,
                       'Expert',
                       4.5,
                       difficulty,
-                      (value) => _updateDifficulty(model, difficultySetting, value),
+                      (value) =>
+                          _updateDifficulty(model, difficultySetting, value),
                     ),
                   ],
                 ),
@@ -185,7 +200,10 @@ class _Step4GameStyleState extends State<Step4GameStyle> {
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.primaryContainer.withOpacity(0.3),
+                    color: Theme.of(context)
+                        .colorScheme
+                        .primaryContainer
+                        .withValues(alpha: 0.3),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Row(
@@ -243,9 +261,13 @@ class _Step4GameStyleState extends State<Step4GameStyle> {
                             const SizedBox(width: 8),
                             Text(
                               category.key,
-                              style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .titleSmall
+                                  ?.copyWith(
                                     fontWeight: FontWeight.bold,
-                                    color: Theme.of(context).colorScheme.primary,
+                                    color:
+                                        Theme.of(context).colorScheme.primary,
                                   ),
                             ),
                           ],
@@ -255,7 +277,8 @@ class _Step4GameStyleState extends State<Step4GameStyle> {
                         spacing: 8,
                         runSpacing: 8,
                         children: category.value.map((mechanic) {
-                          final isSelected = selectedMechanics.contains(mechanic);
+                          final isSelected =
+                              selectedMechanics.contains(mechanic);
                           return FilterChip(
                             label: Text(mechanic),
                             selected: isSelected,
@@ -267,14 +290,17 @@ class _Step4GameStyleState extends State<Step4GameStyle> {
                                 } else {
                                   mechanicsSetting.value.remove(mechanic);
                                 }
-                                mechanicsSetting.enabled = mechanicsSetting.value.isNotEmpty;
+                                mechanicsSetting.enabled =
+                                    mechanicsSetting.value.isNotEmpty;
                                 model.settings.updateSetting(mechanicsSetting);
                                 model.updateStore();
                                 model.invalidateCache();
                               });
                             },
-                            selectedColor: Theme.of(context).colorScheme.secondary,
-                            checkmarkColor: Theme.of(context).colorScheme.onSecondary,
+                            selectedColor:
+                                Theme.of(context).colorScheme.secondary,
+                            checkmarkColor:
+                                Theme.of(context).colorScheme.onSecondary,
                             backgroundColor: Colors.grey[200],
                             side: BorderSide(
                               color: isSelected
@@ -285,9 +311,7 @@ class _Step4GameStyleState extends State<Step4GameStyle> {
                             labelStyle: TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.bold,
-                              color: isSelected
-                                  ? Colors.white
-                                  : Colors.black87,
+                              color: isSelected ? Colors.white : Colors.black87,
                             ),
                           );
                         }).toList(),
@@ -301,7 +325,8 @@ class _Step4GameStyleState extends State<Step4GameStyle> {
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                    color:
+                        Theme.of(context).colorScheme.surfaceContainerHighest,
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Row(
@@ -371,7 +396,10 @@ class _Step4GameStyleState extends State<Step4GameStyle> {
               border: Border.all(
                 color: isSelected
                     ? Theme.of(context).colorScheme.primary
-                    : Theme.of(context).colorScheme.outline.withOpacity(0.3),
+                    : Theme.of(context)
+                        .colorScheme
+                        .outline
+                        .withValues(alpha: 0.3),
                 width: isSelected ? 2 : 1,
               ),
             ),
@@ -388,7 +416,8 @@ class _Step4GameStyleState extends State<Step4GameStyle> {
                 Text(
                   label,
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                        fontWeight:
+                            isSelected ? FontWeight.bold : FontWeight.normal,
                         color: isSelected
                             ? Theme.of(context).colorScheme.onPrimaryContainer
                             : Theme.of(context).colorScheme.onSurfaceVariant,
@@ -427,7 +456,8 @@ class _Step4GameStyleState extends State<Step4GameStyle> {
   }
 
   /// Updates difficulty setting when panel is tapped
-  void _updateDifficulty(AppModel model, dynamic difficultySetting, double value) {
+  void _updateDifficulty(
+      AppModel model, dynamic difficultySetting, double value) {
     setState(() {
       difficultySetting.value = value;
       difficultySetting.enabled = true;

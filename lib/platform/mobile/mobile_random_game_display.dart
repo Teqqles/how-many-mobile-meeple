@@ -13,15 +13,16 @@ class MobileRandomGameDisplayPage extends GameDisplayPage {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: HowManyMeepleAppBar(AppCommon.randomGamePageTitle, context: context),
+        appBar: HowManyMeepleAppBar(AppCommon.randomGamePageTitle,
+            context: context),
         persistentFooterButtons: [iconButtonGroup(context)],
         body: Container(child: loadNetworkContent(displayGame)));
   }
 
-  Widget displayGame(
-      BuildContext context, AppModel model) {
+  Widget displayGame(BuildContext context, AppModel model) {
     var cachedGames = model.bggCache;
-    Game? game = hasPageRefreshed(model) ? cachedGames.random : cachedGames.lastRandom;
+    Game? game =
+        hasPageRefreshed(model) ? cachedGames.random : cachedGames.lastRandom;
     if (game == null) {
       return const Center(child: Text('No game available'));
     }
@@ -42,8 +43,7 @@ class MobileRandomGameDisplayPage extends GameDisplayPage {
                 ),
               ),
               AppDefaultPadding(
-                child: PlatformIndependentImage(imageUrl: game.imageUrl)
-              ),
+                  child: PlatformIndependentImage(imageUrl: game.imageUrl)),
               shareButton(context, game),
             ]),
       ),

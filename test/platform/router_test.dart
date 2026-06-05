@@ -25,7 +25,8 @@ void main() {
     });
 
     test('handles route with nested path', () {
-      final route = r.Router.generateRoute(RouteSettings(name: '/list/some/nested/path'));
+      final route =
+          r.Router.generateRoute(RouteSettings(name: '/list/some/nested/path'));
       expect(route, isA<MaterialPageRoute>());
     });
 
@@ -36,7 +37,8 @@ void main() {
 
     test('extracts base route from nested path', () {
       // Route with nested path should extract the base route
-      final route = r.Router.generateRoute(RouteSettings(name: '/random/extra/path'));
+      final route =
+          r.Router.generateRoute(RouteSettings(name: '/random/extra/path'));
       expect(route, isA<MaterialPageRoute>());
     });
   });

@@ -53,7 +53,7 @@ class AppModel extends ChangeNotifier {
       await replaceItems(_extractor.extractItems());
       var extractedSettings = _extractor.extractSettings();
       extractedSettings = _rebuildUrlMechanics(extractedSettings);
-      if(_settings != extractedSettings) {
+      if (_settings != extractedSettings) {
         _settings.updateAllSettings(extractedSettings);
         invalidateCache();
       }
@@ -62,7 +62,8 @@ class AppModel extends ChangeNotifier {
 
   Settings _rebuildUrlMechanics(Settings extractedSettings) {
     extractedSettings.setting(Settings.filterMechanics.name).value =
-        StrCast(extractedSettings.setting(Settings.filterMechanics.name).value).castToList();
+        StrCast(extractedSettings.setting(Settings.filterMechanics.name).value)
+            .castToList();
     return extractedSettings;
   }
 

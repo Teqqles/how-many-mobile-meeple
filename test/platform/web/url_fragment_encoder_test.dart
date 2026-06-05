@@ -3,12 +3,13 @@ import 'package:how_many_mobile_meeple/model/items.dart';
 import 'package:how_many_mobile_meeple/model/setting.dart';
 import 'package:how_many_mobile_meeple/model/settings.dart';
 import 'package:how_many_mobile_meeple/platform/web/url_fragment_encoder.dart';
+import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:test/test.dart';
 
-class MockItems extends Mock implements Items {}
-class MockSettings extends Mock implements Settings {}
+import 'url_fragment_encoder_test.mocks.dart';
 
+@GenerateMocks([Items, Settings])
 main() {
   var expectedName = '/pagename';
   group('encode', () {
@@ -17,7 +18,8 @@ main() {
       final mockSettings = MockSettings();
       when(mockItems.itemList).thenReturn([]);
       when(mockSettings.changedSettings).thenReturn({});
-      var encodedName = UrlFragmentEncoder.encode(expectedName, items: mockItems, settings: mockSettings);
+      var encodedName = UrlFragmentEncoder.encode(expectedName,
+          items: mockItems, settings: mockSettings);
       expect(encodedName, expectedName);
     });
 
@@ -27,7 +29,8 @@ main() {
 
       when(mockItems.itemList).thenReturn([]);
       when(mockSettings.changedSettings).thenReturn({});
-      var encodedName = UrlFragmentEncoder.encode(expectedName, items: mockItems, settings: mockSettings);
+      var encodedName = UrlFragmentEncoder.encode(expectedName,
+          items: mockItems, settings: mockSettings);
       expect(encodedName, expectedName);
     });
 
@@ -38,7 +41,8 @@ main() {
       when(mockItems.itemList).thenReturn([Item('test')]);
       when(mockSettings.changedSettings).thenReturn({});
       var expectedEncodedName = expectedName + '/test';
-      var encodedName = UrlFragmentEncoder.encode(expectedName, items: mockItems, settings: mockSettings);
+      var encodedName = UrlFragmentEncoder.encode(expectedName,
+          items: mockItems, settings: mockSettings);
       expect(encodedName, expectedEncodedName);
     });
 
@@ -49,10 +53,10 @@ main() {
       when(mockItems.itemList).thenReturn([Item('test'), Item('test2')]);
       when(mockSettings.changedSettings).thenReturn({});
       var expectedEncodedName = expectedName + '/test+test2';
-      var encodedName = UrlFragmentEncoder.encode(expectedName, items: mockItems, settings: mockSettings);
+      var encodedName = UrlFragmentEncoder.encode(expectedName,
+          items: mockItems, settings: mockSettings);
       expect(encodedName, expectedEncodedName);
     });
-
 
     test('returns name when empty settings given', () {
       final mockItems = MockItems();
@@ -60,7 +64,8 @@ main() {
 
       when(mockItems.itemList).thenReturn([]);
       when(mockSettings.changedSettings).thenReturn({});
-      var encodedName = UrlFragmentEncoder.encode(expectedName, items: mockItems, settings: mockSettings);
+      var encodedName = UrlFragmentEncoder.encode(expectedName,
+          items: mockItems, settings: mockSettings);
       expect(encodedName, expectedName);
     });
 
@@ -69,9 +74,11 @@ main() {
       final mockSettings = MockSettings();
 
       when(mockItems.itemList).thenReturn([Item('test')]);
-      when(mockSettings.changedSettings).thenReturn({'test': Setting('setting', value: 'value')});
+      when(mockSettings.changedSettings)
+          .thenReturn({'test': Setting('setting', value: 'value')});
       var expectedEncodedName = expectedName + '/test?setting=value';
-      var encodedName = UrlFragmentEncoder.encode(expectedName, items: mockItems, settings: mockSettings);
+      var encodedName = UrlFragmentEncoder.encode(expectedName,
+          items: mockItems, settings: mockSettings);
       expect(encodedName, expectedEncodedName);
     });
 
@@ -82,11 +89,13 @@ main() {
       when(mockItems.itemList).thenReturn([Item('test')]);
       when(mockSettings.changedSettings).thenReturn({
         'test': Setting('setting', value: 'value'),
-        'test2': Setting('setting2', value: 'value2')});
-      var expectedEncodedName = expectedName + '/test?setting=value&setting2=value2';
-      var encodedName = UrlFragmentEncoder.encode(expectedName, items: mockItems, settings: mockSettings);
+        'test2': Setting('setting2', value: 'value2')
+      });
+      var expectedEncodedName =
+          expectedName + '/test?setting=value&setting2=value2';
+      var encodedName = UrlFragmentEncoder.encode(expectedName,
+          items: mockItems, settings: mockSettings);
       expect(encodedName, expectedEncodedName);
     });
-
   });
 }

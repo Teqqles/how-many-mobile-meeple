@@ -55,16 +55,22 @@ class _Step1SelectSourceState extends State<Step1SelectSource> {
                       children: [
                         Text(
                           'Select Source of Games',
-                          style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                          style: Theme.of(context)
+                              .textTheme
+                              .headlineSmall
+                              ?.copyWith(
                                 fontWeight: FontWeight.bold,
                               ),
                         ),
                         const SizedBox(height: 4),
                         Text(
                           'Add your BGG username or a geeklist',
-                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                color: Theme.of(context).colorScheme.onSurfaceVariant,
-                              ),
+                          style:
+                              Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurfaceVariant,
+                                  ),
                         ),
                       ],
                     ),
@@ -101,7 +107,8 @@ class _Step1SelectSourceState extends State<Step1SelectSource> {
               // Input field
               TextField(
                 controller: _controller,
-                enabled: model.items.itemList.length < AppCommon.maxItemsFromBgg,
+                enabled:
+                    model.items.itemList.length < AppCommon.maxItemsFromBgg,
                 decoration: InputDecoration(
                   labelText: _selectedType == ItemType.collection
                       ? 'BoardGameGeek Username'
@@ -115,7 +122,8 @@ class _Step1SelectSourceState extends State<Step1SelectSource> {
                         : Icons.format_list_numbered,
                   ),
                   border: const OutlineInputBorder(),
-                  helperText: model.items.itemList.length >= AppCommon.maxItemsFromBgg
+                  helperText: model.items.itemList.length >=
+                          AppCommon.maxItemsFromBgg
                       ? 'Maximum ${AppCommon.maxItemsFromBgg} sources reached'
                       : null,
                 ),
@@ -130,7 +138,8 @@ class _Step1SelectSourceState extends State<Step1SelectSource> {
                 width: double.infinity,
                 child: FilledButton.icon(
                   onPressed: _controller.text.isEmpty ||
-                          model.items.itemList.length >= AppCommon.maxItemsFromBgg
+                          model.items.itemList.length >=
+                              AppCommon.maxItemsFromBgg
                       ? null
                       : () => _addSource(model),
                   icon: const Icon(Icons.add_circle_outline),
@@ -146,7 +155,6 @@ class _Step1SelectSourceState extends State<Step1SelectSource> {
                 const SizedBox(height: 24),
                 const Divider(),
                 const SizedBox(height: 16),
-
                 Text(
                   'Added Sources (${model.items.itemList.length}/${AppCommon.maxItemsFromBgg})',
                   style: Theme.of(context).textTheme.titleSmall?.copyWith(
@@ -154,8 +162,8 @@ class _Step1SelectSourceState extends State<Step1SelectSource> {
                       ),
                 ),
                 const SizedBox(height: 12),
-
-                ...model.items.itemList.map((item) => _buildSourceChip(context, model, item)),
+                ...model.items.itemList
+                    .map((item) => _buildSourceChip(context, model, item)),
               ],
 
               // Required step message
@@ -164,10 +172,16 @@ class _Step1SelectSourceState extends State<Step1SelectSource> {
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.errorContainer.withOpacity(0.3),
+                    color: Theme.of(context)
+                        .colorScheme
+                        .errorContainer
+                        .withValues(alpha: 0.3),
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
-                      color: Theme.of(context).colorScheme.error.withOpacity(0.5),
+                      color: Theme.of(context)
+                          .colorScheme
+                          .error
+                          .withValues(alpha: 0.5),
                       width: 1,
                     ),
                   ),
@@ -182,9 +196,10 @@ class _Step1SelectSourceState extends State<Step1SelectSource> {
                       Expanded(
                         child: Text(
                           'Please add at least one source to find games',
-                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                fontWeight: FontWeight.bold,
-                              ),
+                          style:
+                              Theme.of(context).textTheme.bodySmall?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                  ),
                         ),
                       ),
                     ],
@@ -195,7 +210,10 @@ class _Step1SelectSourceState extends State<Step1SelectSource> {
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.primaryContainer.withOpacity(0.3),
+                    color: Theme.of(context)
+                        .colorScheme
+                        .primaryContainer
+                        .withValues(alpha: 0.3),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Row(
@@ -251,10 +269,13 @@ class _Step1SelectSourceState extends State<Step1SelectSource> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.primaryContainer.withOpacity(0.5),
+          color: Theme.of(context)
+              .colorScheme
+              .primaryContainer
+              .withValues(alpha: 0.5),
           borderRadius: BorderRadius.circular(8),
           border: Border.all(
-            color: Theme.of(context).colorScheme.outline.withOpacity(0.5),
+            color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.5),
           ),
         ),
         child: Row(

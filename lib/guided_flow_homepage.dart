@@ -13,7 +13,6 @@ import 'package:how_many_mobile_meeple/guided_flow/step5_final_actions.dart';
 import 'package:how_many_mobile_meeple/guided_flow/advanced_mode_widget.dart';
 import 'package:how_many_mobile_meeple/components/disclaimer_text.dart';
 import 'package:how_many_mobile_meeple/components/empty_widget.dart';
-import 'package:how_many_mobile_meeple/components/app_default_padding.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:how_many_mobile_meeple/platform/web_or_tablet/web_version_info.dart';
 
@@ -66,9 +65,10 @@ class _GuidedFlowHomePageState extends State<GuidedFlowHomePage> {
               ? _buildAdvancedMode(context)
               : _buildGuidedFlow(context),
           bottomNavigationBar: _buildFooter(context),
-          persistentFooterButtons: !showAdvancedMode && _currentStep == _totalSteps - 1
-              ? [widget.iconButtonGroup(context)]
-              : null,
+          persistentFooterButtons:
+              !showAdvancedMode && _currentStep == _totalSteps - 1
+                  ? [widget.iconButtonGroup(context)]
+                  : null,
         );
       },
     );
@@ -101,10 +101,10 @@ class _GuidedFlowHomePageState extends State<GuidedFlowHomePage> {
               Consumer<AppModel>(
                 builder: (context, model, child) => TextButton.icon(
                   onPressed: () {
-                    final setting = model.settings.setting('preferAdvancedMode');
+                    final setting =
+                        model.settings.setting('preferAdvancedMode');
                     setting.value = true;
                     model.updateStore();
-                    model.notifyListeners();
                   },
                   icon: const Icon(Icons.settings),
                   label: const Text('Switch to Advanced Mode'),
@@ -145,18 +145,22 @@ class _GuidedFlowHomePageState extends State<GuidedFlowHomePage> {
                         : null,
                     child: Container(
                       height: 8,
-                      margin: EdgeInsets.only(right: index < _totalSteps - 1 ? 4 : 0),
+                      margin: EdgeInsets.only(
+                          right: index < _totalSteps - 1 ? 4 : 0),
                       decoration: BoxDecoration(
                         color: isCompleted || isActive
                             ? Theme.of(context).colorScheme.primary
-                            : Theme.of(context).colorScheme.surfaceContainerHighest,
+                            : Theme.of(context)
+                                .colorScheme
+                                .surfaceContainerHighest,
                         borderRadius: BorderRadius.circular(4),
                       ),
                       child: isActive
                           ? Container(
                               decoration: BoxDecoration(
                                 border: Border.all(
-                                  color: Theme.of(context).colorScheme.onPrimary,
+                                  color:
+                                      Theme.of(context).colorScheme.onPrimary,
                                   width: 2,
                                 ),
                                 borderRadius: BorderRadius.circular(4),
@@ -175,7 +179,8 @@ class _GuidedFlowHomePageState extends State<GuidedFlowHomePage> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                _buildStepLabel(0, 'Source', canAccessSteps || _currentStep == 0),
+                _buildStepLabel(
+                    0, 'Source', canAccessSteps || _currentStep == 0),
                 _buildStepLabel(1, 'Players', canAccessSteps),
                 _buildStepLabel(2, 'Time', canAccessSteps),
                 _buildStepLabel(3, 'Style', canAccessSteps),
@@ -191,7 +196,8 @@ class _GuidedFlowHomePageState extends State<GuidedFlowHomePage> {
   Widget _buildStepLabel(int stepIndex, String label, bool isAccessible) {
     final isActive = stepIndex == _currentStep;
     return InkWell(
-      onTap: isAccessible ? () => setState(() => _currentStep = stepIndex) : null,
+      onTap:
+          isAccessible ? () => setState(() => _currentStep = stepIndex) : null,
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 2),
         child: Text(
@@ -203,7 +209,10 @@ class _GuidedFlowHomePageState extends State<GuidedFlowHomePage> {
                     ? (isActive
                         ? Theme.of(context).colorScheme.primary
                         : Theme.of(context).colorScheme.onSurface)
-                    : Theme.of(context).colorScheme.onSurfaceVariant.withOpacity(0.5),
+                    : Theme.of(context)
+                        .colorScheme
+                        .onSurfaceVariant
+                        .withValues(alpha: 0.5),
               ),
         ),
       ),
@@ -228,7 +237,6 @@ class _GuidedFlowHomePageState extends State<GuidedFlowHomePage> {
               final setting = model.settings.setting('preferAdvancedMode');
               setting.value = true;
               model.updateStore();
-              model.notifyListeners();
             },
           ),
         );
@@ -241,7 +249,8 @@ class _GuidedFlowHomePageState extends State<GuidedFlowHomePage> {
   Widget _buildStepNavigation() {
     return Consumer<AppModel>(
       builder: (context, model, child) {
-        final canProceedFromStep1 = _currentStep != 0 || model.items.itemList.isNotEmpty;
+        final canProceedFromStep1 =
+            _currentStep != 0 || model.items.itemList.isNotEmpty;
 
         return Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -335,8 +344,6 @@ class _GuidedFlowHomePageState extends State<GuidedFlowHomePage> {
     return Consumer<AppModel>(
       builder: (context, model, child) {
         // Only show "Back to Guided Flow" if user hasn't set "Always Use Advanced Mode"
-        final preferAdvancedMode = _getPreferAdvancedMode(model);
-
         return SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.all(16.0),
@@ -347,7 +354,8 @@ class _GuidedFlowHomePageState extends State<GuidedFlowHomePage> {
                   width: double.infinity,
                   child: OutlinedButton.icon(
                     onPressed: () async {
-                      final setting = model.settings.setting('preferAdvancedMode');
+                      final setting =
+                          model.settings.setting('preferAdvancedMode');
                       setting.value = false;
                       setting.enabled = true;
                       model.settings.updateSetting(setting);
@@ -383,5 +391,4 @@ class _GuidedFlowHomePageState extends State<GuidedFlowHomePage> {
       },
     );
   }
-
 }

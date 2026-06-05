@@ -75,10 +75,12 @@ class AppConfig {
   static String get apiUrl => _cachedApiUrl ?? _defaultApiUrl;
 
   /// Check if using mock API
-  static bool get isMockApi => apiUrl.contains('localhost') || apiUrl.contains('127.0.0.1');
+  static bool get isMockApi =>
+      apiUrl.contains('localhost') || apiUrl.contains('127.0.0.1');
 
   /// Get environment name
-  static String get environment => isMockApi ? 'Development (Mock)' : 'Production';
+  static String get environment =>
+      isMockApi ? 'Development (Mock)' : 'Production';
 
   /// Check if configuration is loaded
   static bool get isInitialized => _isInitialized;

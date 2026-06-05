@@ -33,7 +33,10 @@ class HomePage extends StatelessWidget with AppPage {
     var textFieldWidth = MediaQuery.of(context).size.width * 0.65;
     return Scaffold(
         appBar: HowManyMeepleAppBar(AppCommon.optionsPageTitle,
-            hasSaveDialog: true, isHomePage: true, model: model, context: context),
+            hasSaveDialog: true,
+            isHomePage: true,
+            model: model,
+            context: context),
         drawer: pageDrawer(context),
         bottomNavigationBar: Container(
           color: Theme.of(context).highlightColor,
@@ -63,12 +66,11 @@ class HomePage extends StatelessWidget with AppPage {
         persistentFooterButtons: [iconButtonGroup(context)]);
   }
 
-  Consumer<AppModel> buildComplexitySliderDisplay() =>
-      Consumer<AppModel>(
+  Consumer<AppModel> buildComplexitySliderDisplay() => Consumer<AppModel>(
         builder: (context, model, child) => Column(
           children: <Widget>[
             ToggleableHomepageMenuItemWidget(
-                label: AppCommon.labelDifficulty,
+              label: AppCommon.labelDifficulty,
               setting: Settings.filterComplexity,
               menuWidget: Row(
                 mainAxisAlignment: MainAxisAlignment.start,
@@ -82,28 +84,29 @@ class HomePage extends StatelessWidget with AppPage {
                         max: 5.0,
                         divisions: 10,
                         onChanged: !model.settings
-                            .setting(Settings.filterComplexity.name)
-                            .enabled
+                                .setting(Settings.filterComplexity.name)
+                                .enabled
                             ? null
                             : (complexity) {
-                          model.settings
-                              .setting(Settings.filterComplexity.name)
-                              .value = complexity;
-                          model.updateStore();
-                          model.invalidateCache();
-                        },
+                                model.settings
+                                    .setting(Settings.filterComplexity.name)
+                                    .value = complexity;
+                                model.updateStore();
+                                model.invalidateCache();
+                              },
                         value: StrCast(model.settings
-                            .setting(Settings.filterComplexity.name)
-                            .value).castToDouble(),
+                                .setting(Settings.filterComplexity.name)
+                                .value)
+                            .castToDouble(),
                         label:
-                        "${model.settings.setting(Settings.filterComplexity.name).value.toString()} weighting"),
+                            "${model.settings.setting(Settings.filterComplexity.name).value.toString()} weighting"),
                   ),
                   AppDefaultPadding(
                     child: Container(
                       decoration: ShapeDecoration(
                           color: model.settings
-                              .setting(Settings.filterComplexity.name)
-                              .enabled
+                                  .setting(Settings.filterComplexity.name)
+                                  .enabled
                               ? Theme.of(context).colorScheme.secondary
                               : Theme.of(context).disabledColor,
                           shape: RoundedRectangleBorder(
@@ -129,8 +132,7 @@ class HomePage extends StatelessWidget with AppPage {
         ),
       );
 
-  Consumer<AppModel> buildPlayerSliderDisplay() =>
-      Consumer<AppModel>(
+  Consumer<AppModel> buildPlayerSliderDisplay() => Consumer<AppModel>(
         builder: (context, model, child) => Column(
           children: <Widget>[
             ToggleableHomepageMenuItemWidget(
@@ -142,36 +144,37 @@ class HomePage extends StatelessWidget with AppPage {
                   Container(
                     height: 35,
                     width: MediaQuery.of(context).size.width * 0.60,
-                    child:
-                    Slider(
+                    child: Slider(
                         activeColor: Theme.of(context).colorScheme.secondary,
                         min: 1.0,
                         max: 10.0,
                         divisions: 10,
                         onChanged: !model.settings
-                            .setting(Settings.filterNumberOfPlayers.name)
-                            .enabled
+                                .setting(Settings.filterNumberOfPlayers.name)
+                                .enabled
                             ? null
                             : (players) {
-                          model.settings
-                              .setting(Settings.filterNumberOfPlayers.name)
-                              .value = players.floor();
-                          model.updateStore();
-                          model.invalidateCache();
-                        },
+                                model.settings
+                                    .setting(
+                                        Settings.filterNumberOfPlayers.name)
+                                    .value = players.floor();
+                                model.updateStore();
+                                model.invalidateCache();
+                              },
                         value: StrCast(model.settings
-                            .setting(Settings.filterNumberOfPlayers.name)
-                            .value).castToInt()
+                                .setting(Settings.filterNumberOfPlayers.name)
+                                .value)
+                            .castToInt()
                             .roundToDouble(),
                         label:
-                        "${model.settings.setting(Settings.filterNumberOfPlayers.name).value.toString()} players"),
+                            "${model.settings.setting(Settings.filterNumberOfPlayers.name).value.toString()} players"),
                   ),
                   AppDefaultPadding(
                     child: Container(
                       decoration: ShapeDecoration(
                           color: model.settings
-                              .setting(Settings.filterNumberOfPlayers.name)
-                              .enabled
+                                  .setting(Settings.filterNumberOfPlayers.name)
+                                  .enabled
                               ? Theme.of(context).colorScheme.secondary
                               : Theme.of(context).disabledColor,
                           shape: RoundedRectangleBorder(
@@ -197,8 +200,7 @@ class HomePage extends StatelessWidget with AppPage {
         ),
       );
 
-  Consumer<AppModel> buildRatingSliderDisplay() =>
-      Consumer<AppModel>(
+  Consumer<AppModel> buildRatingSliderDisplay() => Consumer<AppModel>(
         builder: (context, model, child) => Column(
           children: <Widget>[
             ToggleableHomepageMenuItemWidget(
@@ -216,28 +218,29 @@ class HomePage extends StatelessWidget with AppPage {
                         max: 10.0,
                         divisions: 20,
                         onChanged: !model.settings
-                            .setting(Settings.filterMinRating.name)
-                            .enabled
+                                .setting(Settings.filterMinRating.name)
+                                .enabled
                             ? null
                             : (rating) {
-                          model.settings
-                              .setting(Settings.filterMinRating.name)
-                              .value = rating;
-                          model.updateStore();
-                          model.invalidateCache();
-                        },
+                                model.settings
+                                    .setting(Settings.filterMinRating.name)
+                                    .value = rating;
+                                model.updateStore();
+                                model.invalidateCache();
+                              },
                         value: StrCast(model.settings
-                            .setting(Settings.filterMinRating.name)
-                            .value).castToDouble(),
+                                .setting(Settings.filterMinRating.name)
+                                .value)
+                            .castToDouble(),
                         label:
-                        "${model.settings.setting(Settings.filterMinRating.name).value.toString()} rating"),
+                            "${model.settings.setting(Settings.filterMinRating.name).value.toString()} rating"),
                   ),
                   AppDefaultPadding(
                     child: Container(
                       decoration: ShapeDecoration(
                           color: model.settings
-                              .setting(Settings.filterMinRating.name)
-                              .enabled
+                                  .setting(Settings.filterMinRating.name)
+                                  .enabled
                               ? Theme.of(context).colorScheme.secondary
                               : Theme.of(context).disabledColor,
                           shape: RoundedRectangleBorder(
@@ -303,8 +306,7 @@ class HomePage extends StatelessWidget with AppPage {
         ),
       ));
 
-  Consumer<AppModel> buildGameDurationSliderDisplay(
-      BuildContext context) {
+  Consumer<AppModel> buildGameDurationSliderDisplay(BuildContext context) {
     var sliderWidth = MediaQuery.of(context).size.width * 0.60;
     var sliderMinValue = 15.0;
     var sliderMaxValue = 300.0;
@@ -320,7 +322,10 @@ class HomePage extends StatelessWidget with AppPage {
               height: 35,
               color: isEnabled
                   ? Theme.of(context).colorScheme.primaryContainer
-                  : Theme.of(context).colorScheme.primary.withOpacity(0.25),
+                  : Theme.of(context)
+                      .colorScheme
+                      .primary
+                      .withValues(alpha: 0.25),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
@@ -329,7 +334,8 @@ class HomePage extends StatelessWidget with AppPage {
                       AppCommon.labelTime,
                       textAlign: TextAlign.left,
                       style: TextStyle(
-                        fontWeight: isEnabled ? FontWeight.bold : FontWeight.normal,
+                        fontWeight:
+                            isEnabled ? FontWeight.bold : FontWeight.normal,
                         color: isEnabled
                             ? Theme.of(context).colorScheme.onPrimaryContainer
                             : Theme.of(context).colorScheme.onSurfaceVariant,
@@ -337,10 +343,13 @@ class HomePage extends StatelessWidget with AppPage {
                     ),
                   ),
                   Switch(
-                      activeColor: Colors.white,
+                      activeThumbColor: Colors.white,
                       activeTrackColor: Theme.of(context).colorScheme.primary,
                       inactiveThumbColor: Colors.grey[600],
-                      inactiveTrackColor: Theme.of(context).colorScheme.primary.withOpacity(0.5),
+                      inactiveTrackColor: Theme.of(context)
+                          .colorScheme
+                          .primary
+                          .withValues(alpha: 0.5),
                       onChanged: (bool value) {
                         model.settings
                             .setting(Settings.filterMinimumTimeToPlay.name)
@@ -355,75 +364,76 @@ class HomePage extends StatelessWidget with AppPage {
                 ],
               ),
             ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: <Widget>[
-              Container(
-                width: sliderWidth,
-                child: RangeSlider(
-                  activeColor: Theme.of(context).colorScheme.secondary,
-                  min: sliderMinValue,
-                  max: sliderMaxValue,
-                  divisions: sliderSteps,
-                  onChanged: !model.settings
-                          .setting(Settings.filterMinimumTimeToPlay.name)
-                          .enabled
-                      ? null
-                      : (time) {
-                          model.settings
-                              .setting(Settings.filterMinimumTimeToPlay.name)
-                              .value = time.start.floor();
-                          model.settings
-                              .setting(Settings.filterMaximumTimeToPlay.name)
-                              .value = time.end.floor();
-                          model.updateStore();
-                          model.invalidateCache();
-                        },
-                  values: RangeValues(
-                      StrCast(model.settings
-                          .setting(Settings.filterMinimumTimeToPlay.name)
-                          .value).castToInt()
-                          .floorToDouble(),
-                      StrCast(model.settings
-                          .setting(Settings.filterMaximumTimeToPlay.name)
-                          .value).castToInt()
-                          .floorToDouble()),
-                  labels: RangeLabels(
-                      "${model.settings.setting(Settings.filterMinimumTimeToPlay.name).value.toString()} mins",
-                      "${model.settings.setting(Settings.filterMaximumTimeToPlay.name).value.toString()} mins"),
-                ),
-              ),
-              AppDefaultPadding(
-                child: Container(
-                  decoration: ShapeDecoration(
-                      color: model.settings
-                              .setting(Settings.filterMinimumTimeToPlay.name)
-                              .enabled
-                          ? Theme.of(context).colorScheme.secondary
-                          : Theme.of(context).disabledColor,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8.0),
-                      )),
-                  child: AppDefaultPadding(
-                    child: Text(
-                        "${model.settings.setting(Settings.filterMinimumTimeToPlay.name).value.toString()}-${model.settings.setting(Settings.filterMaximumTimeToPlay.name).value.toString()} mins",
-                        textAlign: TextAlign.right,
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Theme.of(context).selectedRowColor)),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: <Widget>[
+                Container(
+                  width: sliderWidth,
+                  child: RangeSlider(
+                    activeColor: Theme.of(context).colorScheme.secondary,
+                    min: sliderMinValue,
+                    max: sliderMaxValue,
+                    divisions: sliderSteps,
+                    onChanged: !model.settings
+                            .setting(Settings.filterMinimumTimeToPlay.name)
+                            .enabled
+                        ? null
+                        : (time) {
+                            model.settings
+                                .setting(Settings.filterMinimumTimeToPlay.name)
+                                .value = time.start.floor();
+                            model.settings
+                                .setting(Settings.filterMaximumTimeToPlay.name)
+                                .value = time.end.floor();
+                            model.updateStore();
+                            model.invalidateCache();
+                          },
+                    values: RangeValues(
+                        StrCast(model.settings
+                                .setting(Settings.filterMinimumTimeToPlay.name)
+                                .value)
+                            .castToInt()
+                            .floorToDouble(),
+                        StrCast(model.settings
+                                .setting(Settings.filterMaximumTimeToPlay.name)
+                                .value)
+                            .castToInt()
+                            .floorToDouble()),
+                    labels: RangeLabels(
+                        "${model.settings.setting(Settings.filterMinimumTimeToPlay.name).value.toString()} mins",
+                        "${model.settings.setting(Settings.filterMaximumTimeToPlay.name).value.toString()} mins"),
                   ),
                 ),
-              ),
-            ],
-          ),
-        ],
-      );
+                AppDefaultPadding(
+                  child: Container(
+                    decoration: ShapeDecoration(
+                        color: model.settings
+                                .setting(Settings.filterMinimumTimeToPlay.name)
+                                .enabled
+                            ? Theme.of(context).colorScheme.secondary
+                            : Theme.of(context).disabledColor,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8.0),
+                        )),
+                    child: AppDefaultPadding(
+                      child: Text(
+                          "${model.settings.setting(Settings.filterMinimumTimeToPlay.name).value.toString()}-${model.settings.setting(Settings.filterMaximumTimeToPlay.name).value.toString()} mins",
+                          textAlign: TextAlign.right,
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Theme.of(context).selectedRowColor)),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        );
       },
     );
   }
 
-  Consumer<AppModel> buildMechanicFilterDisplay(
-      BuildContext context) {
+  Consumer<AppModel> buildMechanicFilterDisplay(BuildContext context) {
     return Consumer<AppModel>(
       builder: (context, model, child) {
         var mechanics =
@@ -456,9 +466,8 @@ class HomePage extends StatelessWidget with AppPage {
                             : (isEnabled
                                 ? Colors.black87
                                 : Theme.of(context).disabledColor)),
-                    backgroundColor: isEnabled
-                        ? Colors.grey[200]
-                        : Colors.grey[100],
+                    backgroundColor:
+                        isEnabled ? Colors.grey[200] : Colors.grey[100],
                     selectedColor: Theme.of(context).colorScheme.secondary,
                     disabledColor: Colors.grey[100],
                     elevation: isEnabled ? 2 : 0,
@@ -475,13 +484,13 @@ class HomePage extends StatelessWidget with AppPage {
                       if (!isEnabled) return;
                       selected
                           ? model.settings
-                          .setting(Settings.filterMechanics.name)
-                          .value
-                          .add(value)
+                              .setting(Settings.filterMechanics.name)
+                              .value
+                              .add(value)
                           : model.settings
-                          .setting(Settings.filterMechanics.name)
-                          .value
-                          .remove(value);
+                              .setting(Settings.filterMechanics.name)
+                              .value
+                              .remove(value);
                       model.invalidateCache();
                       model.updateStore();
                     },

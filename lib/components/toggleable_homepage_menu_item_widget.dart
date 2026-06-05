@@ -28,7 +28,7 @@ class ToggleableHomepageMenuItemWidget extends StatelessWidget {
             height: 35,
             color: isEnabled
                 ? Theme.of(context).colorScheme.primaryContainer
-                : Theme.of(context).colorScheme.primary.withOpacity(0.25),
+                : Theme.of(context).colorScheme.primary.withValues(alpha: 0.25),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -37,7 +37,8 @@ class ToggleableHomepageMenuItemWidget extends StatelessWidget {
                     this.label,
                     textAlign: TextAlign.left,
                     style: TextStyle(
-                      fontWeight: isEnabled ? FontWeight.bold : FontWeight.normal,
+                      fontWeight:
+                          isEnabled ? FontWeight.bold : FontWeight.normal,
                       color: isEnabled
                           ? Theme.of(context).colorScheme.onPrimaryContainer
                           : Theme.of(context).colorScheme.onSurfaceVariant,
@@ -45,13 +46,18 @@ class ToggleableHomepageMenuItemWidget extends StatelessWidget {
                   ),
                 ),
                 Switch(
-                    activeColor: Colors.white,
-                    activeTrackColor: Theme.of(context).colorScheme.primary.withOpacity(0.5),
+                    activeThumbColor: Colors.white,
+                    activeTrackColor: Theme.of(context)
+                        .colorScheme
+                        .primary
+                        .withValues(alpha: 0.5),
                     inactiveThumbColor: Colors.grey[600],
-                    inactiveTrackColor: Theme.of(context).colorScheme.primary.withOpacity(0.5),
+                    inactiveTrackColor: Theme.of(context)
+                        .colorScheme
+                        .primary
+                        .withValues(alpha: 0.5),
                     onChanged: (bool value) {
-                      var setting = model.settings.setting(this.setting.name) ??
-                          this.setting;
+                      var setting = model.settings.setting(this.setting.name);
                       setting.enabled = value;
                       model.settings.updateSetting(setting);
                       model.updateStore();

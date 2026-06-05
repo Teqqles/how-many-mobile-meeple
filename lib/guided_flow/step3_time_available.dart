@@ -35,8 +35,10 @@ class _Step3TimeAvailableState extends State<Step3TimeAvailable> {
   Widget build(BuildContext context) {
     return Consumer<AppModel>(
       builder: (context, model, child) {
-        final minTimeSetting = model.settings.setting(Settings.filterMinimumTimeToPlay.name);
-        final maxTimeSetting = model.settings.setting(Settings.filterMaximumTimeToPlay.name);
+        final minTimeSetting =
+            model.settings.setting(Settings.filterMinimumTimeToPlay.name);
+        final maxTimeSetting =
+            model.settings.setting(Settings.filterMaximumTimeToPlay.name);
 
         final minTime = StrCast(minTimeSetting.value).castToInt();
         final maxTime = StrCast(maxTimeSetting.value).castToInt();
@@ -70,15 +72,23 @@ class _Step3TimeAvailableState extends State<Step3TimeAvailable> {
                         children: [
                           Text(
                             'Time Available',
-                            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                            style: Theme.of(context)
+                                .textTheme
+                                .headlineSmall
+                                ?.copyWith(
                                   fontWeight: FontWeight.bold,
                                 ),
                           ),
                           const SizedBox(height: 4),
                           Text(
                             'How long do you want to play?',
-                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyMedium
+                                ?.copyWith(
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .onSurfaceVariant,
                                 ),
                           ),
                         ],
@@ -97,17 +107,21 @@ class _Step3TimeAvailableState extends State<Step3TimeAvailable> {
                         AppCommon.minutesToTime(minTime) +
                             ' - ' +
                             AppCommon.minutesToTime(maxTime),
-                        style: Theme.of(context).textTheme.displayMedium?.copyWith(
-                              color: Theme.of(context).colorScheme.primary,
-                              fontWeight: FontWeight.bold,
-                            ),
+                        style:
+                            Theme.of(context).textTheme.displayMedium?.copyWith(
+                                  color: Theme.of(context).colorScheme.primary,
+                                  fontWeight: FontWeight.bold,
+                                ),
                       ),
                       const SizedBox(height: 8),
                       Text(
                         _getSemanticLabel(maxTime),
-                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                              color: Theme.of(context).colorScheme.onSurfaceVariant,
-                            ),
+                        style:
+                            Theme.of(context).textTheme.titleMedium?.copyWith(
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .onSurfaceVariant,
+                                ),
                       ),
                     ],
                   ),
@@ -150,14 +164,16 @@ class _Step3TimeAvailableState extends State<Step3TimeAvailable> {
                       'Quick\n(15m)',
                       textAlign: TextAlign.center,
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: Theme.of(context).colorScheme.onSurfaceVariant,
+                            color:
+                                Theme.of(context).colorScheme.onSurfaceVariant,
                           ),
                     ),
                     Text(
                       'Epic\n(5h)',
                       textAlign: TextAlign.center,
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: Theme.of(context).colorScheme.onSurfaceVariant,
+                            color:
+                                Theme.of(context).colorScheme.onSurfaceVariant,
                           ),
                     ),
                   ],
@@ -179,7 +195,8 @@ class _Step3TimeAvailableState extends State<Step3TimeAvailable> {
                   runSpacing: 8,
                   children: _timePresets.entries.map((preset) {
                     final targetTime = preset.value;
-                    final isSelected = maxTime == targetTime && minTime <= targetTime / 2;
+                    final isSelected =
+                        maxTime == targetTime && minTime <= targetTime / 2;
 
                     return ChoiceChip(
                       label: Text(preset.key),
@@ -208,12 +225,14 @@ class _Step3TimeAvailableState extends State<Step3TimeAvailable> {
                         }
                       },
                       selectedColor: Theme.of(context).colorScheme.secondary,
-                      backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
+                      backgroundColor:
+                          Theme.of(context).colorScheme.surfaceContainerHighest,
                       labelStyle: TextStyle(
                         color: isSelected
                             ? Theme.of(context).colorScheme.onSecondary
                             : Theme.of(context).colorScheme.onSurface,
-                        fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                        fontWeight:
+                            isSelected ? FontWeight.bold : FontWeight.normal,
                       ),
                     );
                   }).toList(),
@@ -225,7 +244,8 @@ class _Step3TimeAvailableState extends State<Step3TimeAvailable> {
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                    color:
+                        Theme.of(context).colorScheme.surfaceContainerHighest,
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Row(

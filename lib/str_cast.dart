@@ -1,5 +1,4 @@
 class StrCast {
-
   final _val;
 
   StrCast(this._val);
@@ -32,5 +31,4 @@ class StrCast {
     }
     return _val as bool;
   }
-
 }

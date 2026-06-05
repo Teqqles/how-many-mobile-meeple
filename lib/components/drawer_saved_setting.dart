@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:how_many_mobile_meeple/model/app_preferences.dart';
 import 'package:how_many_mobile_meeple/model/model.dart';
-import 'package:how_many_mobile_meeple/model/settings.dart';
 import 'package:how_many_mobile_meeple/storage/storage_factory.dart';
 import 'package:how_many_mobile_meeple/platform/router.dart' as r;
 
@@ -14,7 +13,8 @@ class DrawerSavedSetting extends Container {
   DrawerSavedSetting(
       this.preferencesTitle, this.preferences, BuildContext context)
       : super(
-          padding: const EdgeInsets.only(top: 12, bottom: 12, left: 8, right: 8),
+          padding:
+              const EdgeInsets.only(top: 12, bottom: 12, left: 8, right: 8),
           decoration: BoxDecoration(
               color: Theme.of(context).highlightColor,
               border: Border(

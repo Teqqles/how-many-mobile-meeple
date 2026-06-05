@@ -3,10 +3,10 @@ name: Flutter CI
 on:
   push:
     branches:
-      - master
+      - main
   pull_request:
     branches:
-      - master
+      - main
 
 jobs:
   build:
@@ -28,11 +28,11 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
+      - name: Check formatting
+        run: dart format --set-exit-if-changed .
+
       - name: Analyze code
         run: flutter analyze
 
       - name: Run tests
         run: flutter test
-
-      - name: Check formatting
-        run: dart format --set-exit-if-changed .

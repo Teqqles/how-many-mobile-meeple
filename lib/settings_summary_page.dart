@@ -1,6 +1,5 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:how_many_mobile_meeple/model/model.dart';
 import 'package:how_many_mobile_meeple/model/settings.dart';
 import 'package:how_many_mobile_meeple/how_many_meeple_app_bar.dart';
@@ -8,7 +7,6 @@ import 'package:how_many_mobile_meeple/app_common.dart';
 import 'package:how_many_mobile_meeple/app_page.dart';
 import 'package:how_many_mobile_meeple/str_cast.dart';
 import 'package:how_many_mobile_meeple/components/disclaimer_text.dart';
-import 'package:how_many_mobile_meeple/components/app_default_padding.dart';
 import 'package:how_many_mobile_meeple/components/empty_widget.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:how_many_mobile_meeple/platform/web_or_tablet/web_version_info.dart';
@@ -70,16 +68,19 @@ class SettingsSummaryPage extends StatelessWidget with AppPage {
                       const SizedBox(height: 16),
                       Text(
                         'Your Game Preferences',
-                        style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                              fontWeight: FontWeight.bold,
-                            ),
+                        style:
+                            Theme.of(context).textTheme.headlineSmall?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                ),
                         textAlign: TextAlign.center,
                       ),
                       const SizedBox(height: 8),
                       Text(
                         'Here\'s what you\'re looking for',
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              color: Theme.of(context).colorScheme.onSurfaceVariant,
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSurfaceVariant,
                             ),
                         textAlign: TextAlign.center,
                       ),
@@ -143,7 +144,6 @@ class SettingsSummaryPage extends StatelessWidget with AppPage {
                     child: FilledButton.icon(
                       onPressed: () {
                         // Navigate to game results
-                        final randomPageSettings = pageDrawer(context);
                         Navigator.of(context).pop();
                       },
                       icon: const Icon(Icons.casino),
@@ -172,7 +172,8 @@ class SettingsSummaryPage extends StatelessWidget with AppPage {
           children: [
             Row(
               children: [
-                Icon(Icons.source, color: Theme.of(context).colorScheme.primary),
+                Icon(Icons.source,
+                    color: Theme.of(context).colorScheme.primary),
                 const SizedBox(width: 12),
                 Text(
                   'Game Sources',
@@ -228,7 +229,8 @@ class SettingsSummaryPage extends StatelessWidget with AppPage {
   }
 
   Widget _buildPlayersSection(BuildContext context, AppModel model) {
-    final playerSetting = model.settings.setting(Settings.filterNumberOfPlayers.name);
+    final playerSetting =
+        model.settings.setting(Settings.filterNumberOfPlayers.name);
     final players = StrCast(playerSetting.value).castToInt();
 
     return _buildSettingCard(
@@ -242,8 +244,10 @@ class SettingsSummaryPage extends StatelessWidget with AppPage {
   }
 
   Widget _buildTimeSection(BuildContext context, AppModel model) {
-    final minSetting = model.settings.setting(Settings.filterMinimumTimeToPlay.name);
-    final maxSetting = model.settings.setting(Settings.filterMaximumTimeToPlay.name);
+    final minSetting =
+        model.settings.setting(Settings.filterMinimumTimeToPlay.name);
+    final maxSetting =
+        model.settings.setting(Settings.filterMaximumTimeToPlay.name);
     final min = StrCast(minSetting.value).castToInt();
     final max = StrCast(maxSetting.value).castToInt();
 
@@ -251,7 +255,8 @@ class SettingsSummaryPage extends StatelessWidget with AppPage {
       context,
       icon: Icons.schedule,
       title: 'Play Time',
-      friendlyValue: '${_getTimeLabel(min, max)} (${AppCommon.minutesToTime(min)} - ${AppCommon.minutesToTime(max)})',
+      friendlyValue:
+          '${_getTimeLabel(min, max)} (${AppCommon.minutesToTime(min)} - ${AppCommon.minutesToTime(max)})',
       technicalValue: 'Filter: $min ≤ maxplaytime ≤ $max minutes',
       isEnabled: minSetting.enabled,
     );
@@ -265,7 +270,8 @@ class SettingsSummaryPage extends StatelessWidget with AppPage {
       context,
       icon: Icons.style,
       title: 'Difficulty',
-      friendlyValue: '${_getDifficultyLabel(complexity)} (≤ ${complexity.toStringAsFixed(2)})',
+      friendlyValue:
+          '${_getDifficultyLabel(complexity)} (≤ ${complexity.toStringAsFixed(2)})',
       technicalValue: 'Filter: averageweight ≤ $complexity',
       isEnabled: setting.enabled,
     );
@@ -297,7 +303,8 @@ class SettingsSummaryPage extends StatelessWidget with AppPage {
           children: [
             Row(
               children: [
-                Icon(Icons.extension, color: Theme.of(context).colorScheme.primary),
+                Icon(Icons.extension,
+                    color: Theme.of(context).colorScheme.primary),
                 const SizedBox(width: 12),
                 Text(
                   'Game Mechanics',
@@ -308,7 +315,8 @@ class SettingsSummaryPage extends StatelessWidget with AppPage {
                 const Spacer(),
                 if (!setting.enabled)
                   Chip(
-                    label: const Text('Disabled', style: TextStyle(fontSize: 10)),
+                    label:
+                        const Text('Disabled', style: TextStyle(fontSize: 10)),
                     padding: const EdgeInsets.symmetric(horizontal: 4),
                   ),
               ],
@@ -328,7 +336,8 @@ class SettingsSummaryPage extends StatelessWidget with AppPage {
                 children: mechanics.map((mechanic) {
                   return Chip(
                     label: Text(mechanic.toString()),
-                    backgroundColor: Theme.of(context).colorScheme.secondaryContainer,
+                    backgroundColor:
+                        Theme.of(context).colorScheme.secondaryContainer,
                   );
                 }).toList(),
               ),
@@ -355,8 +364,10 @@ class SettingsSummaryPage extends StatelessWidget with AppPage {
   }
 
   Widget _buildOtherFiltersSection(BuildContext context, AppModel model) {
-    final expansions = model.settings.setting(Settings.filterIncludesExpansions.name);
-    final recommended = model.settings.setting(Settings.filterUsingUserRecommendations.name);
+    final expansions =
+        model.settings.setting(Settings.filterIncludesExpansions.name);
+    final recommended =
+        model.settings.setting(Settings.filterUsingUserRecommendations.name);
 
     return Card(
       child: Padding(
@@ -366,7 +377,8 @@ class SettingsSummaryPage extends StatelessWidget with AppPage {
           children: [
             Row(
               children: [
-                Icon(Icons.filter_list, color: Theme.of(context).colorScheme.primary),
+                Icon(Icons.filter_list,
+                    color: Theme.of(context).colorScheme.primary),
                 const SizedBox(width: 12),
                 Text(
                   'Additional Filters',
@@ -427,7 +439,8 @@ class SettingsSummaryPage extends StatelessWidget with AppPage {
                 const Spacer(),
                 if (!isEnabled)
                   Chip(
-                    label: const Text('Disabled', style: TextStyle(fontSize: 10)),
+                    label:
+                        const Text('Disabled', style: TextStyle(fontSize: 10)),
                     padding: const EdgeInsets.symmetric(horizontal: 4),
                   ),
               ],
@@ -459,7 +472,8 @@ class SettingsSummaryPage extends StatelessWidget with AppPage {
                       technicalValue,
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
                             fontFamily: 'monospace',
-                            color: Theme.of(context).colorScheme.onSurfaceVariant,
+                            color:
+                                Theme.of(context).colorScheme.onSurfaceVariant,
                           ),
                     ),
                   ),

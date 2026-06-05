@@ -27,7 +27,8 @@ class _Step2WhosPlayingState extends State<Step2WhosPlaying> {
   Widget build(BuildContext context) {
     return Consumer<AppModel>(
       builder: (context, model, child) {
-        final playerSetting = model.settings.setting(Settings.filterNumberOfPlayers.name);
+        final playerSetting =
+            model.settings.setting(Settings.filterNumberOfPlayers.name);
         final currentPlayers = StrCast(playerSetting.value).castToInt();
 
         return Card(
@@ -59,15 +60,23 @@ class _Step2WhosPlayingState extends State<Step2WhosPlaying> {
                         children: [
                           Text(
                             'Who\'s Playing?',
-                            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                            style: Theme.of(context)
+                                .textTheme
+                                .headlineSmall
+                                ?.copyWith(
                                   fontWeight: FontWeight.bold,
                                 ),
                           ),
                           const SizedBox(height: 4),
                           Text(
                             'Select the number of players',
-                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyMedium
+                                ?.copyWith(
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .onSurfaceVariant,
                                 ),
                           ),
                         ],
@@ -84,16 +93,20 @@ class _Step2WhosPlayingState extends State<Step2WhosPlaying> {
                     children: [
                       Text(
                         '$currentPlayers',
-                        style: Theme.of(context).textTheme.displayLarge?.copyWith(
-                              color: Theme.of(context).colorScheme.primary,
-                              fontWeight: FontWeight.bold,
-                            ),
+                        style:
+                            Theme.of(context).textTheme.displayLarge?.copyWith(
+                                  color: Theme.of(context).colorScheme.primary,
+                                  fontWeight: FontWeight.bold,
+                                ),
                       ),
                       Text(
                         currentPlayers == 1 ? 'player' : 'players',
-                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                              color: Theme.of(context).colorScheme.onSurfaceVariant,
-                            ),
+                        style:
+                            Theme.of(context).textTheme.titleMedium?.copyWith(
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .onSurfaceVariant,
+                                ),
                       ),
                     ],
                   ),
@@ -129,13 +142,15 @@ class _Step2WhosPlayingState extends State<Step2WhosPlaying> {
                     Text(
                       '1',
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: Theme.of(context).colorScheme.onSurfaceVariant,
+                            color:
+                                Theme.of(context).colorScheme.onSurfaceVariant,
                           ),
                     ),
                     Text(
                       '10+',
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: Theme.of(context).colorScheme.onSurfaceVariant,
+                            color:
+                                Theme.of(context).colorScheme.onSurfaceVariant,
                           ),
                     ),
                   ],
@@ -180,12 +195,14 @@ class _Step2WhosPlayingState extends State<Step2WhosPlaying> {
                         }
                       },
                       selectedColor: Theme.of(context).colorScheme.secondary,
-                      backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
+                      backgroundColor:
+                          Theme.of(context).colorScheme.surfaceContainerHighest,
                       labelStyle: TextStyle(
                         color: isSelected
                             ? Theme.of(context).colorScheme.onSecondary
                             : Theme.of(context).colorScheme.onSurface,
-                        fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                        fontWeight:
+                            isSelected ? FontWeight.bold : FontWeight.normal,
                       ),
                     );
                   }).toList(),
@@ -197,7 +214,8 @@ class _Step2WhosPlayingState extends State<Step2WhosPlaying> {
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                    color:
+                        Theme.of(context).colorScheme.surfaceContainerHighest,
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Row(

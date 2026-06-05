@@ -16,11 +16,12 @@ class PlatformIndependentImage extends StatelessWidget with ScreenTools {
 
   Widget buildWebImage(context) {
     return Image.network(
-        AppCommon.boardGameGeekProxyUrl + "/cors-proxy/_" + stringToBase64.encode(this.imageUrl),
+        AppCommon.boardGameGeekProxyUrl +
+            "/cors-proxy/_" +
+            stringToBase64.encode(this.imageUrl),
         height: getScreenHeightPercentageInPixels(
             context, ScreenTools.fiftyPercentScreen),
-        fit: BoxFit.fitHeight
-    );
+        fit: BoxFit.fitHeight);
   }
 
   Widget buildMobileCachedImage(context) {
@@ -30,8 +31,7 @@ class PlatformIndependentImage extends StatelessWidget with ScreenTools {
         height: getScreenHeightPercentageInPixels(
             context, ScreenTools.fiftyPercentScreen),
         decoration: BoxDecoration(
-          image: DecorationImage(
-              image: provider, fit: BoxFit.fitHeight),
+          image: DecorationImage(image: provider, fit: BoxFit.fitHeight),
         ),
       ),
       placeholder: (context, url) => SpinKitCubeGrid(

@@ -15,12 +15,12 @@ class PreferencesHistoryWeb implements PreferencesHistoryInterface {
 
     // Get current index list
     final indexJson = prefs.getString(_indexKey);
-    List<String> index = indexJson != null
-        ? List<String>.from(jsonDecode(indexJson))
-        : [];
+    List<String> index =
+        indexJson != null ? List<String>.from(jsonDecode(indexJson)) : [];
 
     // Add new preference ID to index
-    final id = preferences.id ?? DateTime.now().millisecondsSinceEpoch.toString();
+    final id =
+        preferences.id ?? DateTime.now().millisecondsSinceEpoch.toString();
     if (!index.contains(id)) {
       index.insert(0, id);
     }

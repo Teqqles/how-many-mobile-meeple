@@ -14,13 +14,13 @@ class EnhancedListGamesDisplayPage extends NetworkWidget with AppPage {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: HowManyMeepleAppBar(AppCommon.listGamesPageTitle, context: context),
+        appBar:
+            HowManyMeepleAppBar(AppCommon.listGamesPageTitle, context: context),
         persistentFooterButtons: [iconButtonGroup(context)],
         body: Container(child: loadNetworkContent(displayGame)));
   }
 
-  Widget displayGame(
-      BuildContext context, AppModel model) {
+  Widget displayGame(BuildContext context, AppModel model) {
     var cachedGames = model.bggCache;
     var heading = [
       TableRow(children: [
@@ -98,68 +98,64 @@ class EnhancedListGamesDisplayPage extends NetworkWidget with AppPage {
         },
         children: heading +
             (cachedGames.games
-                    .getGamesBy(
-                        field: model.sortGameField, order: model.sortDirection)
-                    .map(
-                      (game) => TableRow(
-                          decoration: BoxDecoration(
-                              border: Border(
-                                  bottom: BorderSide(
-                                      color: Theme.of(context).dividerColor))),
-                          children: [
-                            TableCell(
-                                verticalAlignment:
-                                    TableCellVerticalAlignment.middle,
-                                child: AppDefaultPadding(
-                                  child: Container(
-                                      alignment: Alignment.centerLeft,
-                                      child: InkWell(
-                                        child: Text(game.name,
+                .getGamesBy(
+                    field: model.sortGameField, order: model.sortDirection)
+                .map(
+                  (game) => TableRow(
+                      decoration: BoxDecoration(
+                          border: Border(
+                              bottom: BorderSide(
+                                  color: Theme.of(context).dividerColor))),
+                      children: [
+                        TableCell(
+                            verticalAlignment:
+                                TableCellVerticalAlignment.middle,
+                            child: AppDefaultPadding(
+                              child: Container(
+                                  alignment: Alignment.centerLeft,
+                                  child: InkWell(
+                                      child: Text(game.name,
                                           style: TextStyle(
-                                          decoration: TextDecoration.underline,
-                                        )),
-                                        onTap: () => launch("https://www.boardgamegeek.com/boardgame/${game.id}")
-                                )),
-                                )),
-                            TableCell(
-                              verticalAlignment:
-                                  TableCellVerticalAlignment.middle,
-                              child: AppDefaultPadding(
-                                child: Container(
-                                  alignment: Alignment.centerRight,
-                                  child: Text(
-                                    AppCommon.minutesToTime(game.maxPlaytime)
-                                  ),
-                                ),
+                                            decoration:
+                                                TextDecoration.underline,
+                                          )),
+                                      onTap: () => launchUrl(Uri.parse(
+                                          "https://www.boardgamegeek.com/boardgame/${game.id}")))),
+                            )),
+                        TableCell(
+                          verticalAlignment: TableCellVerticalAlignment.middle,
+                          child: AppDefaultPadding(
+                            child: Container(
+                              alignment: Alignment.centerRight,
+                              child: Text(
+                                  AppCommon.minutesToTime(game.maxPlaytime)),
+                            ),
+                          ),
+                        ),
+                        TableCell(
+                          verticalAlignment: TableCellVerticalAlignment.middle,
+                          child: AppDefaultPadding(
+                            child: Container(
+                              alignment: Alignment.centerRight,
+                              child: Text(
+                                sprintf("%0.2f", [game.averageWeight]),
                               ),
                             ),
-                            TableCell(
-                              verticalAlignment:
-                                  TableCellVerticalAlignment.middle,
-                              child: AppDefaultPadding(
-                                child: Container(
-                                  alignment: Alignment.centerRight,
-                                  child: Text(
-                                    sprintf("%0.2f", [game.averageWeight ?? 0.00]),
-                                  ),
-                                ),
+                          ),
+                        ),
+                        TableCell(
+                          verticalAlignment: TableCellVerticalAlignment.middle,
+                          child: AppDefaultPadding(
+                            child: Container(
+                              alignment: Alignment.centerRight,
+                              child: Text(
+                                sprintf("%0.2f", [game.averageRating]),
                               ),
                             ),
-                            TableCell(
-                              verticalAlignment:
-                                  TableCellVerticalAlignment.middle,
-                              child: AppDefaultPadding(
-                                child: Container(
-                                  alignment: Alignment.centerRight,
-                                  child: Text(
-                                    sprintf("%0.2f", [game.averageRating]),
-                                  ),
-                                ),
-                              ),
-                            )
-                          ]),
-                    ))
-                .toList(),
+                          ),
+                        )
+                      ]),
+                )).toList(),
       ),
     );
   }

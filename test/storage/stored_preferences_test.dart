@@ -3,21 +3,21 @@ import 'dart:convert';
 import 'package:how_many_mobile_meeple/model/setting.dart';
 import 'package:how_many_mobile_meeple/model/settings.dart';
 import 'package:how_many_mobile_meeple/storage/stored_preferences.dart';
+import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:how_many_mobile_meeple/model/items.dart';
 import 'package:how_many_mobile_meeple/model/item.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:test/test.dart';
 
-class MockSharedPreferences extends Mock implements SharedPreferences {}
+import 'stored_preferences_test.mocks.dart';
 
+@GenerateMocks([SharedPreferences])
 main() {
   var firstSetting = Setting("key-1", value: "value-1");
   var secondSetting = Setting("key-2", value: "value-2");
   var settings = Settings(
       {firstSetting.name: firstSetting, secondSetting.name: secondSetting});
-
-  var emptySettings = Settings({});
 
   group('saveSettings', () {
     test('returns true and stores setting data when supplied', () async {
@@ -50,8 +50,13 @@ main() {
           .thenAnswer(((_) => json.encode(secondSetting)));
 
       var storedPreferences = StoredPreferences(prefs);
+      // Pass settings with the keys we want to load
+      var settingsTemplate = Settings({
+        firstSetting.name: Setting(firstSetting.name),
+        secondSetting.name: Setting(secondSetting.name),
+      });
 
-      expect(await storedPreferences.loadSettings(emptySettings), settings);
+      expect(await storedPreferences.loadSettings(settingsTemplate), settings);
 
       verify(prefs.containsKey(firstSetting.name)).called(1);
       verify(prefs.getString(firstSetting.name)).called(1);
@@ -69,11 +74,17 @@ main() {
 
       var storedPreferences = StoredPreferences(prefs);
 
-      var expectedSetting = emptySettings.clone();
+      // Pass settings with the keys we want to load
+      var settingsTemplate = Settings({
+        firstSetting.name: Setting(firstSetting.name),
+        secondSetting.name: Setting(secondSetting.name),
+      });
+
+      var expectedSetting = settingsTemplate.clone();
       expectedSetting.updateSetting(firstSetting);
 
-      expect(
-          await storedPreferences.loadSettings(emptySettings), expectedSetting);
+      expect(await storedPreferences.loadSettings(settingsTemplate),
+          expectedSetting);
 
       verify(prefs.containsKey(firstSetting.name)).called(1);
       verify(prefs.getString(firstSetting.name)).called(1);
@@ -90,6 +101,12 @@ main() {
   group('saveItems', () {
     test('returns true and stores item data when supplied', () async {
       final prefs = MockSharedPreferences();
+
+      // Mock remove calls (saveItems removes old items first)
+      when(prefs.remove("${Items.itemStoreNamePrefix}0"))
+          .thenAnswer(((_) => Future(() => true)));
+      when(prefs.remove("${Items.itemStoreNamePrefix}1"))
+          .thenAnswer(((_) => Future(() => true)));
 
       when(prefs.setString(
               "${Items.itemStoreNamePrefix}0", json.encode(firstItem)))
@@ -112,6 +129,12 @@ main() {
 
     test('deletes existing keys first', () async {
       final prefs = MockSharedPreferences();
+
+      // Mock remove calls
+      when(prefs.remove("${Items.itemStoreNamePrefix}0"))
+          .thenAnswer(((_) => Future(() => true)));
+      when(prefs.remove("${Items.itemStoreNamePrefix}1"))
+          .thenAnswer(((_) => Future(() => true)));
 
       when(prefs.setString(
               "${Items.itemStoreNamePrefix}0", json.encode(firstItem)))

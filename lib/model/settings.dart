@@ -40,19 +40,25 @@ class Settings {
       Setting("preferAdvancedMode", value: false, enabled: true);
 
   static Settings defaultSettings() => Settings(Map.from({
-    Settings.fieldsToReturnFromApi.name: Settings.fieldsToReturnFromApi.clone(),
-    Settings.filterMinimumTimeToPlay.name: Settings.filterMinimumTimeToPlay.clone(),
-    Settings.filterMaximumTimeToPlay.name: Settings.filterMaximumTimeToPlay.clone(),
-    Settings.filterNumberOfPlayers.name: Settings.filterNumberOfPlayers.clone(),
-    Settings.filterUsingUserRecommendations.name:
-    Settings.filterUsingUserRecommendations.clone(),
-    Settings.filterIncludesExpansions.name: Settings.filterIncludesExpansions.clone(),
-    Settings.filterMechanics.name: Settings.filterMechanics.clone(),
-    Settings.filterUseAllMechanics.name: Settings.filterUseAllMechanics.clone(),
-    Settings.filterComplexity.name: Settings.filterComplexity.clone(),
-    Settings.filterMinRating.name: Settings.filterMinRating.clone(),
-    Settings.preferAdvancedMode.name: Settings.preferAdvancedMode.clone(),
-  }));
+        Settings.fieldsToReturnFromApi.name:
+            Settings.fieldsToReturnFromApi.clone(),
+        Settings.filterMinimumTimeToPlay.name:
+            Settings.filterMinimumTimeToPlay.clone(),
+        Settings.filterMaximumTimeToPlay.name:
+            Settings.filterMaximumTimeToPlay.clone(),
+        Settings.filterNumberOfPlayers.name:
+            Settings.filterNumberOfPlayers.clone(),
+        Settings.filterUsingUserRecommendations.name:
+            Settings.filterUsingUserRecommendations.clone(),
+        Settings.filterIncludesExpansions.name:
+            Settings.filterIncludesExpansions.clone(),
+        Settings.filterMechanics.name: Settings.filterMechanics.clone(),
+        Settings.filterUseAllMechanics.name:
+            Settings.filterUseAllMechanics.clone(),
+        Settings.filterComplexity.name: Settings.filterComplexity.clone(),
+        Settings.filterMinRating.name: Settings.filterMinRating.clone(),
+        Settings.preferAdvancedMode.name: Settings.preferAdvancedMode.clone(),
+      }));
 
   Map<String, Setting> _settings = Map<String, Setting>();
 
@@ -61,16 +67,15 @@ class Settings {
   Map<String, Setting> get changedSettings {
     var defaults = defaultSettings();
     Map<String, Setting> filteredSettings = Map.from(_settings);
-    filteredSettings.removeWhere(
-            (_, setting) => !setting.enabled || defaults.allSettings.values.contains(setting));
+    filteredSettings.removeWhere((_, setting) =>
+        !setting.enabled || defaults.allSettings.values.contains(setting));
     return filteredSettings;
   }
 
   Map<String, Setting> get enabledSettings {
     Map<String, Setting> filteredSettings = Map.from(_settings);
     filteredSettings[fieldsToReturnFromApi.name] = fieldsToReturnFromApi;
-    filteredSettings.removeWhere(
-        (_, setting) => !setting.enabled);
+    filteredSettings.removeWhere((_, setting) => !setting.enabled);
     return filteredSettings;
   }
 
@@ -96,7 +101,7 @@ class Settings {
   void updateSetting(Setting setting) => _settings[setting.name] = setting;
 
   void updateAllSettings(Settings settings) {
-     _settings.addAll(settings.allSettings);
+    _settings.addAll(settings.allSettings);
   }
 
   toJson() {
@@ -104,7 +109,7 @@ class Settings {
   }
 
   Map<String, String> toQueryParameters() =>
-    allSettings.map((_, setting) => MapEntry(setting.name, setting.value));
+      allSettings.map((_, setting) => MapEntry(setting.name, setting.value));
 
   @override
   bool operator ==(Object other) =>

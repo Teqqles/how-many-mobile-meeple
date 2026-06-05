@@ -93,12 +93,10 @@ class Games {
 
     switch (order) {
       case SortOrder.Asc:
-        unsortedGames
-            .sort((a, b) => a.maxPlaytime.compareTo(b.maxPlaytime));
+        unsortedGames.sort((a, b) => a.maxPlaytime.compareTo(b.maxPlaytime));
         break;
       case SortOrder.Desc:
-        unsortedGames
-            .sort((a, b) => b.maxPlaytime.compareTo(a.maxPlaytime));
+        unsortedGames.sort((a, b) => b.maxPlaytime.compareTo(a.maxPlaytime));
         break;
     }
     return unsortedGames;
@@ -122,9 +120,9 @@ class Games {
 
   @override
   bool operator ==(Object other) =>
-      identical(this, other) || other is Games && toString() == other.toString();
+      identical(this, other) ||
+      other is Games && toString() == other.toString();
 
   @override
   int get hashCode => toString().hashCode;
-
 }

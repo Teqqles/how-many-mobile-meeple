@@ -30,7 +30,8 @@ class MyApp extends StatelessWidget {
     MeepleTheme.meepleRed
   ];
 
-  static final MaterialColor _swatch = _swatchList[Random().nextInt(_swatchList.length)];
+  static final MaterialColor _swatch =
+      _swatchList[Random().nextInt(_swatchList.length)];
 
   @override
   Widget build(BuildContext context) {

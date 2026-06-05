@@ -8,16 +8,22 @@ import 'model/model.dart';
 
 class HowManyMeepleAppBar extends AppBar {
   HowManyMeepleAppBar(String subtitle,
-      {required BuildContext context, bool hasSaveDialog = false, bool isHomePage = false, AppModel? model})
+      {required BuildContext context,
+      bool hasSaveDialog = false,
+      bool isHomePage = false,
+      AppModel? model})
       : super(
           backgroundColor: Theme.of(context).colorScheme.primary,
           foregroundColor: Theme.of(context).colorScheme.onPrimary,
-          leading: isHomePage ? null : IconButton(
-              icon: Icon(Icons.home),
-              onPressed: () {
-                Navigator.of(context).push(
-                    MaterialPageRoute(builder: (BuildContext context) => Pages.platformPages().homePage()));
-              } ),
+          leading: isHomePage
+              ? null
+              : IconButton(
+                  icon: Icon(Icons.home),
+                  onPressed: () {
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: (BuildContext context) =>
+                            Pages.platformPages().homePage()));
+                  }),
           title: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
@@ -35,11 +41,13 @@ class HowManyMeepleAppBar extends AppBar {
               hasSaveDialog
                   ? IconButton(
                       icon: Icon(Icons.save),
-                      onPressed: model != null ? () => showDialog(
-                          context: context,
-                          builder: (context) => SaveDialog(
-                                model: model!,
-                              )) : null)
+                      onPressed: model != null
+                          ? () => showDialog(
+                              context: context,
+                              builder: (context) => SaveDialog(
+                                    model: model,
+                                  ))
+                          : null)
                   : EmptyWidget()
             ],
           ),

@@ -3,11 +3,13 @@ import 'package:how_many_mobile_meeple/model/items.dart';
 import 'package:how_many_mobile_meeple/model/setting.dart';
 import 'package:how_many_mobile_meeple/model/settings.dart';
 import 'package:how_many_mobile_meeple/platform/web/url_fragment_extractor.dart';
+import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:test/test.dart';
 
-class MockUri extends Mock implements Uri {}
+import 'url_fragment_extractor_test.mocks.dart';
 
+@GenerateMocks([Uri])
 main() {
   group('containsModel', () {
     test('returns true when any model data is present', () {
@@ -18,7 +20,8 @@ main() {
       expect(extractor.containsModel(), true);
     });
 
-    test('returns false when fragment exists but does not contain model info', () {
+    test('returns false when fragment exists but does not contain model info',
+        () {
       final mockUri = MockUri();
       when(mockUri.hasFragment).thenReturn(true);
       when(mockUri.fragment).thenReturn('/list');
@@ -34,7 +37,8 @@ main() {
     });
   });
 
-  var expectedItems = Items([Item("testuser"), Item("1234"), Item("testuser2")]);
+  var expectedItems =
+      Items([Item("testuser"), Item("1234"), Item("testuser2")]);
   var urlItems = expectedItems.itemList.map((item) => item.name).join("+");
 
   group('extractItems', () {
@@ -72,8 +76,7 @@ main() {
     "setting1": Setting("setting1", value: "value1", enabled: true),
     "setting2": Setting("setting2", value: "value2", enabled: true)
   });
-  var urlSettings = customExpectedSettings
-      .allSettings.values
+  var urlSettings = customExpectedSettings.allSettings.values
       .map((setting) => "${setting.name}=${setting.value}")
       .join("&");
   var expectedSettings = Settings.defaultSettings();
@@ -119,7 +122,8 @@ main() {
       expectedSettings.updateSetting(updatedSetting);
 
       when(mockUri.hasFragment).thenReturn(true);
-      when(mockUri.fragment).thenReturn("/list?${updatedSetting.name}=${updatedSetting.value}");
+      when(mockUri.fragment)
+          .thenReturn("/list?${updatedSetting.name}=${updatedSetting.value}");
 
       var extractor = UrlFragmentExtractor(mockUri);
       expect(extractor.extractSettings(), expectedSettings);
@@ -134,11 +138,11 @@ main() {
       expectedSettings.updateSetting(updatedSetting);
 
       when(mockUri.hasFragment).thenReturn(true);
-      when(mockUri.fragment).thenReturn("/list?${updatedSetting.name}=${Uri.encodeComponent(updatedSetting.value.toString())}");
+      when(mockUri.fragment).thenReturn(
+          "/list?${updatedSetting.name}=${Uri.encodeComponent(updatedSetting.value.toString())}");
 
       var extractor = UrlFragmentExtractor(mockUri);
       expect(extractor.extractSettings(), expectedSettings);
     });
-
   });
 }

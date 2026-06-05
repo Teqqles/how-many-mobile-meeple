@@ -17,7 +17,9 @@ class ItemType {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is ItemType && runtimeType == other.runtimeType && name == other.name;
+      other is ItemType &&
+          runtimeType == other.runtimeType &&
+          name == other.name;
 
   @override
   int get hashCode => name.hashCode;
@@ -31,8 +33,10 @@ class Item {
   ItemType itemType;
 
   Item(this.name, {ItemType? itemType})
-    : itemType = itemType ??
-        (name.contains(RegExp(r"^\d+$")) ? ItemType.geekList : ItemType.collection);
+      : itemType = itemType ??
+            (name.contains(RegExp(r"^\d+$"))
+                ? ItemType.geekList
+                : ItemType.collection);
 
   toJson() {
     return {'name': name, 'item_type': itemType};

@@ -1,4 +1,3 @@
-
 import 'package:how_many_mobile_meeple/model/item.dart';
 import 'package:how_many_mobile_meeple/model/items.dart';
 import 'package:how_many_mobile_meeple/model/setting.dart';
@@ -6,7 +5,6 @@ import 'package:how_many_mobile_meeple/model/settings.dart';
 import 'package:how_many_mobile_meeple/platform/router.dart';
 
 class UrlFragmentExtractor {
-
   late Uri uri;
   bool hasModelData = false;
 
@@ -24,7 +22,10 @@ class UrlFragmentExtractor {
       return Items([]);
     }
     var potentialEncodedItems = _removePageTypeFromFragment(uri.fragment);
-    var itemsFromString = potentialEncodedItems.split("+").map((strItem) => Item(strItem)).toList();
+    var itemsFromString = potentialEncodedItems
+        .split("+")
+        .map((strItem) => Item(strItem))
+        .toList();
     return Items(itemsFromString);
   }
 
@@ -32,11 +33,11 @@ class UrlFragmentExtractor {
     var lastPathIndex = fragment.lastIndexOf(new RegExp(r'/'));
     var firstQueryIndex = _calculateQueryPosition(fragment);
     if (firstQueryIndex > -1) {
-      return fragment.substring(lastPathIndex+1, firstQueryIndex);
+      return fragment.substring(lastPathIndex + 1, firstQueryIndex);
     }
-    return fragment.substring(lastPathIndex+1);
+    return fragment.substring(lastPathIndex + 1);
   }
-  
+
   int _calculateQueryPosition(String fragment) {
     return fragment.indexOf(new RegExp(r'\?'));
   }
@@ -47,7 +48,7 @@ class UrlFragmentExtractor {
       return settings;
     }
     var firstQueryIndex = _calculateQueryPosition(uri.fragment);
-    var potentialEncodedSettings = uri.fragment.substring(firstQueryIndex+1);
+    var potentialEncodedSettings = uri.fragment.substring(firstQueryIndex + 1);
     var settingsFromString = potentialEncodedSettings.split("&");
     var newSettings = _mapSettingsFromFragments(settingsFromString);
     settings.updateAllSettings(newSettings);
@@ -61,11 +62,13 @@ class UrlFragmentExtractor {
       var parts = settingStr.split("=");
       if (parts.length == 2) {
         var settingHeader = defaults.setting(parts[0]).header;
-        var setting = Setting(parts[0], value: Uri.decodeComponent(parts[1]), header: settingHeader, enabled: true);
+        var setting = Setting(parts[0],
+            value: Uri.decodeComponent(parts[1]),
+            header: settingHeader,
+            enabled: true);
         settings.updateSetting(setting);
       }
     }
     return settings;
   }
-
 }

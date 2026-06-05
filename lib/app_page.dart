@@ -8,7 +8,6 @@ import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 import 'package:how_many_mobile_meeple/components/drawer_bgg_filter.dart';
 import 'package:how_many_mobile_meeple/components/app_default_padding.dart';
-import 'package:how_many_mobile_meeple/guided_flow_homepage.dart';
 import 'app_common.dart';
 import 'components/component_factory.dart';
 import 'model/game.dart';
@@ -138,7 +137,8 @@ mixin AppPage {
               borderRadius: BorderRadius.circular(40.0),
             ),
             child: Padding(
-              padding: const EdgeInsets.only(left: 5, right: 5, top: 5, bottom: 5),
+              padding:
+                  const EdgeInsets.only(left: 5, right: 5, top: 5, bottom: 5),
               child: IconButton(
                   padding: const EdgeInsets.all(0),
                   color: Theme.of(context).selectedRowColor,
@@ -148,7 +148,8 @@ mixin AppPage {
                   ),
                   onPressed: () {
                     var listPageSettings = r.Router.generateRouteSettings(
-                        r.Router.listRoute, AppModel.of(context, listen: false));
+                        r.Router.listRoute,
+                        AppModel.of(context, listen: false));
                     loadPage(context, listPageSettings);
                   }),
             ),
@@ -167,8 +168,8 @@ mixin AppPage {
                   borderRadius: BorderRadius.circular(40.0),
                 ),
                 child: Padding(
-                  padding:
-                      const EdgeInsets.only(left: 18, right: 12, top: 5, bottom: 5),
+                  padding: const EdgeInsets.only(
+                      left: 18, right: 12, top: 5, bottom: 5),
                   child: Row(
                     children: <Widget>[
                       SizedBox(
@@ -204,23 +205,23 @@ mixin AppPage {
         var response = await http.get(Uri.parse(game.imageUrl));
         var mimeType = lookupMimeType(basename(game.imageUrl));
         Uint8List bytes = response.bodyBytes;
-        await Share.shareXFiles(
-          [
-            XFile.fromData(
-              bytes,
-              name: basename(game.imageUrl),
-              mimeType: mimeType,
-            )
-          ],
-          text: AppCommon.randomGameMessage(game.name),
+        final xFile = XFile.fromData(
+          bytes,
+          name: basename(game.imageUrl),
+          mimeType: mimeType,
+        );
+        await SharePlus.instance.share(
+          ShareParams(
+            files: [xFile],
+            text: AppCommon.randomGameMessage(game.name),
+          ),
         );
       },
       style: ButtonStyle(
           backgroundColor: WidgetStateProperty.all<Color>(
               Theme.of(context).colorScheme.secondary),
-          shape: WidgetStateProperty.all<OutlinedBorder>(
-              RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(30.0)))),
+          shape: WidgetStateProperty.all<OutlinedBorder>(RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(30.0)))),
     );
   }
 

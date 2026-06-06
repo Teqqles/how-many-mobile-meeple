@@ -36,6 +36,7 @@ class InfoMessageBox extends StatelessWidget {
   Widget build(BuildContext context) {
     final backgroundColor = _getBackgroundColor(context);
     final iconColor = _getIconColor(context);
+    final textColor = _getTextColor(context);
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -54,7 +55,9 @@ class InfoMessageBox extends StatelessWidget {
           Expanded(
             child: Text(
               message,
-              style: Theme.of(context).textTheme.bodySmall,
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: textColor,
+                  ),
             ),
           ),
         ],
@@ -81,6 +84,17 @@ class InfoMessageBox extends StatelessWidget {
         return Theme.of(context).colorScheme.onPrimaryContainer;
       case InfoMessageType.warning:
         return Theme.of(context).colorScheme.error;
+    }
+  }
+
+  Color _getTextColor(BuildContext context) {
+    switch (type) {
+      case InfoMessageType.info:
+        return Theme.of(context).colorScheme.onSurface;
+      case InfoMessageType.success:
+        return Theme.of(context).colorScheme.onPrimaryContainer;
+      case InfoMessageType.warning:
+        return Theme.of(context).colorScheme.onErrorContainer;
     }
   }
 }

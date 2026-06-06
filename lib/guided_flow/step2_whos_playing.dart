@@ -174,7 +174,8 @@ class _Step2WhosPlayingState extends State<Step2WhosPlaying> {
                 // Info box
                 const InfoMessageBox(
                   icon: Icons.lightbulb_outline,
-                  message: 'We\'ll find games that work well with this player count',
+                  message:
+                      'We\'ll find games that work well with this player count',
                 ),
               ],
             ),

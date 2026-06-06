@@ -139,7 +139,8 @@ class _Step1SelectSourceState extends State<Step1SelectSource> {
               ] else ...[
                 const SizedBox(height: 24),
                 const InfoMessageBox.success(
-                  message: 'Great! You can add more sources or continue to the next step',
+                  message:
+                      'Great! You can add more sources or continue to the next step',
                 ),
               ],
             ],

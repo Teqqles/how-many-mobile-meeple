@@ -80,7 +80,6 @@ class Step5FinalActions extends StatelessWidget {
                   style: FilledButton.styleFrom(
                     padding: const EdgeInsets.symmetric(
                         vertical: 20, horizontal: 24),
-                    backgroundColor: Theme.of(context).colorScheme.primary,
                   ),
                 ),
 

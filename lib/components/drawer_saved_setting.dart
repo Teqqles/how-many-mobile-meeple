@@ -11,15 +11,21 @@ class DrawerSavedSetting extends Container {
   final AppPreferences preferences;
 
   DrawerSavedSetting(
-      this.preferencesTitle, this.preferences, BuildContext context)
+      this.preferencesTitle, this.preferences, BuildContext context,
+      {int index = 0})
       : super(
           padding:
               const EdgeInsets.only(top: 12, bottom: 12, left: 8, right: 8),
           decoration: BoxDecoration(
-              color: Theme.of(context).highlightColor,
+              color: index % 2 == 0
+                  ? Theme.of(context).highlightColor
+                  : Colors.white,
               border: Border(
                   bottom: BorderSide(
-                      width: 1, color: Theme.of(context).highlightColor))),
+                      width: 1,
+                      color: index % 2 == 0
+                          ? Theme.of(context).highlightColor
+                          : Colors.white))),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
@@ -65,7 +71,9 @@ class DrawerSavedSetting extends Container {
         );
 
   static DrawerSavedSetting preferencesToDrawerSettings(
-      AppPreferences preferences, BuildContext context) {
-    return DrawerSavedSetting(preferences.title, preferences, context);
+      AppPreferences preferences, BuildContext context,
+      {int index = 0}) {
+    return DrawerSavedSetting(preferences.title, preferences, context,
+        index: index);
   }
 }

@@ -42,10 +42,10 @@ class _BoardGameItemInputWidgetState extends State<BoardGameItemInputWidget> {
                         model.items.itemList.length < AppCommon.maxItemsFromBgg,
                     controller: controller,
                     decoration: InputDecoration(
-                      hintText:
-                          model.items.itemList.length < AppCommon.maxItemsFromBgg
-                              ? AppCommon.itemHintTextMessage
-                              : AppCommon.maxItemsMessage,
+                      hintText: model.items.itemList.length <
+                              AppCommon.maxItemsFromBgg
+                          ? AppCommon.itemHintTextMessage
+                          : AppCommon.maxItemsMessage,
                     ),
                   ),
                 ),

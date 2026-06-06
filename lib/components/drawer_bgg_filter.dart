@@ -7,9 +7,11 @@ import 'package:how_many_mobile_meeple/components/drawer_switch.dart';
 
 class DrawerBggFilter extends Container {
   DrawerBggFilter(
-      String filterTitle, Setting setting, AppModel model, BuildContext context)
+      String filterTitle, Setting setting, AppModel model, BuildContext context,
+      {int index = 0})
       : super(
-          color: Theme.of(context).highlightColor,
+          color:
+              index % 2 == 0 ? Theme.of(context).highlightColor : Colors.white,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[

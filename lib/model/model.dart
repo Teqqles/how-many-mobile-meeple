@@ -60,7 +60,8 @@ class AppModel extends ChangeNotifier {
   }
 
   Settings _rebuildUrlMechanics(Settings extractedSettings) {
-    final mechanicsSetting = extractedSettings.setting(Settings.filterMechanics.name);
+    final mechanicsSetting =
+        extractedSettings.setting(Settings.filterMechanics.name);
     mechanicsSetting.value = mechanicsSetting.getList();
     return extractedSettings;
   }

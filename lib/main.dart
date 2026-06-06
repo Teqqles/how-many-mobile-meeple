@@ -44,8 +44,20 @@ class MyApp extends StatelessWidget {
             colorScheme: ColorScheme.fromSwatch(
               primarySwatch: _swatch,
               brightness: Brightness.light,
+            ).copyWith(
+              onPrimary: Colors.white, // White text on primary color buttons
             ),
             highlightColor: _swatch.shade50,
+            filledButtonTheme: FilledButtonThemeData(
+              style: FilledButton.styleFrom(
+                foregroundColor: Colors.white, // White text/icons
+              ),
+            ),
+            elevatedButtonTheme: ElevatedButtonThemeData(
+              style: ElevatedButton.styleFrom(
+                foregroundColor: Colors.white, // White text/icons
+              ),
+            ),
           ),
           home: Pages.platformPages().homePage(),
           onGenerateRoute: r.Router.generateRoute,

@@ -63,7 +63,6 @@ class HomePage extends StatelessWidget with AppPage {
         persistentFooterButtons: [iconButtonGroup(context)]);
   }
 
-
   Future<String> getAppVersion() async {
     if (kIsWeb) {
       return WebVersionInfo.name;
@@ -87,5 +86,4 @@ class HomePage extends StatelessWidget with AppPage {
       ],
     );
   }
-
 }

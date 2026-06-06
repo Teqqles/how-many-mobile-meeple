@@ -52,8 +52,9 @@ class RatingFilterWidget extends StatelessWidget {
                       .setting(Settings.filterMinRating.name)
                       .value
                       .toString(),
-                  isEnabled:
-                      model.settings.setting(Settings.filterMinRating.name).enabled,
+                  isEnabled: model.settings
+                      .setting(Settings.filterMinRating.name)
+                      .enabled,
                 ),
               ],
             ),

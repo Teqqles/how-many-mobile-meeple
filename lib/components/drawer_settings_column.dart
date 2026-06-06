@@ -13,17 +13,21 @@ class DrawerSettingsColumn {
   DrawerSettingsColumn(this.drawerName, {required this.historyDb});
 
   Future<List<Widget>> drawerContent(
-      BuildContext context, AppModel model) async {
+      BuildContext context, AppModel model, int startIndex) async {
     List<Widget> fixedDrawerItems = [DrawerHeading(drawerName, context)];
-    List<Widget> dynamicDrawerItems = await settingsFromDb(context);
+    List<Widget> dynamicDrawerItems = await settingsFromDb(context, startIndex);
     return fixedDrawerItems + dynamicDrawerItems;
   }
 
-  Future<List<DrawerSavedSetting>> settingsFromDb(BuildContext context) async {
+  Future<List<DrawerSavedSetting>> settingsFromDb(
+      BuildContext context, int startIndex) async {
     List<AppPreferences> settings = await historyDb.loadAllPreferences();
     return settings
-        .map((pref) =>
-            DrawerSavedSetting.preferencesToDrawerSettings(pref, context))
+        .asMap()
+        .entries
+        .map((entry) => DrawerSavedSetting.preferencesToDrawerSettings(
+            entry.value, context,
+            index: startIndex + entry.key))
         .toList();
   }
 }

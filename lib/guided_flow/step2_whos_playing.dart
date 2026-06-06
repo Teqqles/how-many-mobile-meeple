@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:how_many_mobile_meeple/model/model.dart';
 import 'package:how_many_mobile_meeple/model/settings.dart';
-import 'package:how_many_mobile_meeple/str_cast.dart';
+import 'package:how_many_mobile_meeple/components/step_header_card.dart';
+import 'package:how_many_mobile_meeple/components/info_message_box.dart';
 
 /// Step 2: Who's Playing?
 /// Allows users to select player count with presets
@@ -29,7 +30,7 @@ class _Step2WhosPlayingState extends State<Step2WhosPlaying> {
       builder: (context, model, child) {
         final playerSetting =
             model.settings.setting(Settings.filterNumberOfPlayers.name);
-        final currentPlayers = StrCast(playerSetting.value).castToInt();
+        final currentPlayers = playerSetting.getInt();
 
         return Card(
           elevation: 2,
@@ -39,50 +40,10 @@ class _Step2WhosPlayingState extends State<Step2WhosPlaying> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Header with icon
-                Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.primaryContainer,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Icon(
-                        Icons.people,
-                        color: Theme.of(context).colorScheme.onPrimaryContainer,
-                        size: 28,
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Who\'s Playing?',
-                            style: Theme.of(context)
-                                .textTheme
-                                .headlineSmall
-                                ?.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            'Select the number of players',
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodyMedium
-                                ?.copyWith(
-                                  color: Theme.of(context)
-                                      .colorScheme
-                                      .onSurfaceVariant,
-                                ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
+                const StepHeaderCard(
+                  icon: Icons.people,
+                  title: 'Who\'s Playing?',
+                  subtitle: 'Select the number of players',
                 ),
 
                 const SizedBox(height: 32),
@@ -211,29 +172,10 @@ class _Step2WhosPlayingState extends State<Step2WhosPlaying> {
                 const SizedBox(height: 24),
 
                 // Info box
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color:
-                        Theme.of(context).colorScheme.surfaceContainerHighest,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.lightbulb_outline,
-                        size: 20,
-                        color: Theme.of(context).colorScheme.primary,
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Text(
-                          'We\'ll find games that work well with this player count',
-                          style: Theme.of(context).textTheme.bodySmall,
-                        ),
-                      ),
-                    ],
-                  ),
+                const InfoMessageBox(
+                  icon: Icons.lightbulb_outline,
+                  message:
+                      'We\'ll find games that work well with this player count',
                 ),
               ],
             ),

@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:how_many_mobile_meeple/model/model.dart';
 import 'package:how_many_mobile_meeple/model/settings.dart';
-import 'package:how_many_mobile_meeple/str_cast.dart';
+import 'package:how_many_mobile_meeple/components/step_header_card.dart';
+import 'package:how_many_mobile_meeple/components/info_message_box.dart';
 
 /// Step 4: Game Style
 /// Allows users to select difficulty and mechanics
@@ -58,7 +59,7 @@ class _Step4GameStyleState extends State<Step4GameStyle> {
         final mechanicsSetting =
             model.settings.setting(Settings.filterMechanics.name);
 
-        final difficulty = StrCast(difficultySetting.value).castToDouble();
+        final difficulty = difficultySetting.getDouble();
         final selectedMechanics = mechanicsSetting.value as List<dynamic>;
 
         return Card(
@@ -69,50 +70,10 @@ class _Step4GameStyleState extends State<Step4GameStyle> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Header with icon
-                Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.primaryContainer,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Icon(
-                        Icons.style,
-                        color: Theme.of(context).colorScheme.onPrimaryContainer,
-                        size: 28,
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Game Style',
-                            style: Theme.of(context)
-                                .textTheme
-                                .headlineSmall
-                                ?.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            'Choose difficulty and mechanics',
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodyMedium
-                                ?.copyWith(
-                                  color: Theme.of(context)
-                                      .colorScheme
-                                      .onSurfaceVariant,
-                                ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
+                const StepHeaderCard(
+                  icon: Icons.style,
+                  title: 'Game Style',
+                  subtitle: 'Choose difficulty and mechanics',
                 ),
 
                 const SizedBox(height: 32),
@@ -197,31 +158,8 @@ class _Step4GameStyleState extends State<Step4GameStyle> {
                 const SizedBox(height: 8),
 
                 // Difficulty description below slider
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: Theme.of(context)
-                        .colorScheme
-                        .primaryContainer
-                        .withValues(alpha: 0.3),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.info_outline,
-                        size: 20,
-                        color: Theme.of(context).colorScheme.primary,
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Text(
-                          _getDifficultyDescription(difficulty),
-                          style: Theme.of(context).textTheme.bodyMedium,
-                        ),
-                      ),
-                    ],
-                  ),
+                InfoMessageBox(
+                  message: _getDifficultyDescription(difficulty),
                 ),
 
                 const SizedBox(height: 32),
@@ -322,31 +260,10 @@ class _Step4GameStyleState extends State<Step4GameStyle> {
                 }).toList(),
 
                 // Info box
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color:
-                        Theme.of(context).colorScheme.surfaceContainerHighest,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.info_outline,
-                        size: 20,
-                        color: Theme.of(context).colorScheme.primary,
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Text(
-                          selectedMechanics.isEmpty
-                              ? 'Skip mechanics to see all game types'
-                              : '${selectedMechanics.length} mechanic(s) selected',
-                          style: Theme.of(context).textTheme.bodySmall,
-                        ),
-                      ),
-                    ],
-                  ),
+                InfoMessageBox(
+                  message: selectedMechanics.isEmpty
+                      ? 'Skip mechanics to see all game types'
+                      : '${selectedMechanics.length} mechanic(s) selected',
                 ),
               ],
             ),

@@ -33,11 +33,7 @@ class _GuidedFlowHomePageState extends State<GuidedFlowHomePage> {
 
   bool _getPreferAdvancedMode(AppModel model) {
     final setting = model.settings.setting('preferAdvancedMode');
-    final value = setting.value;
-    if (value is String) {
-      return value.toLowerCase() == 'true';
-    }
-    return value as bool;
+    return setting.getBool();
   }
 
   @override
@@ -93,23 +89,6 @@ class _GuidedFlowHomePageState extends State<GuidedFlowHomePage> {
 
             // Navigation buttons (for steps 0-3)
             if (_currentStep < _totalSteps - 1) _buildStepNavigation(),
-
-            const SizedBox(height: 16),
-
-            // Link to advanced mode
-            if (_currentStep == _totalSteps - 1)
-              Consumer<AppModel>(
-                builder: (context, model, child) => TextButton.icon(
-                  onPressed: () {
-                    final setting =
-                        model.settings.setting('preferAdvancedMode');
-                    setting.value = true;
-                    model.updateStore();
-                  },
-                  icon: const Icon(Icons.settings),
-                  label: const Text('Switch to Advanced Mode'),
-                ),
-              ),
           ],
         ),
       ),

@@ -7,6 +7,7 @@ import 'package:mime/mime.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 import 'package:how_many_mobile_meeple/components/drawer_bgg_filter.dart';
+import 'package:how_many_mobile_meeple/components/drawer_switch.dart';
 import 'package:how_many_mobile_meeple/components/app_default_padding.dart';
 import 'app_common.dart';
 import 'components/component_factory.dart';
@@ -54,28 +55,30 @@ mixin AppPage {
             model.settings
                 .setting(Settings.filterUsingUserRecommendations.name),
             model,
-            context),
+            context,
+            index: 0),
         DrawerBggFilter(
             "Include Expansions in Filter",
             model.settings.setting(Settings.filterIncludesExpansions.name),
             model,
-            context),
+            context,
+            index: 1),
         DrawerBggFilter(
             "Show All Mechanics",
             model.settings.setting(Settings.filterUseAllMechanics.name),
             model,
-            context),
-        _buildAdvancedModeToggle(model, context),
+            context,
+            index: 2),
+        _buildAdvancedModeToggle(model, context, index: 3),
       ];
 
-  Widget _buildAdvancedModeToggle(AppModel model, BuildContext context) {
+  Widget _buildAdvancedModeToggle(AppModel model, BuildContext context,
+      {int index = 0}) {
     final setting = model.settings.setting(Settings.preferAdvancedMode.name);
-    final currentValue = setting.value is String
-        ? setting.value.toLowerCase() == 'true'
-        : setting.value as bool;
+    final currentValue = setting.getBool();
 
     return Container(
-      color: Theme.of(context).highlightColor,
+      color: index % 2 == 0 ? Theme.of(context).highlightColor : Colors.white,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: <Widget>[
@@ -86,7 +89,7 @@ mixin AppPage {
               style: TextStyle(fontSize: 13),
             ),
           ),
-          Switch(
+          DrawerSwitch(
             onChanged: (bool value) async {
               setting.value = value;
               setting.enabled = true;
@@ -112,9 +115,11 @@ mixin AppPage {
       BuildContext context, AppModel model) async {
     var drawerSettingsColumn =
         await ComponentFactory.getDrawerSettingsColumn(AppCommon.savedSettings);
+    final staticFiltersList = staticFilters(model, context);
     return <Widget>[drawerHeader(context)] +
-        staticFilters(model, context) +
-        await drawerSettingsColumn.drawerContent(context, model);
+        staticFiltersList +
+        await drawerSettingsColumn.drawerContent(
+            context, model, staticFiltersList.length);
   }
 
   void loadPage(BuildContext context, RouteSettings pageSettings) {

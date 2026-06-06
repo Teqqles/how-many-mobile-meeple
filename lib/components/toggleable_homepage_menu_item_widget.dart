@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 
 import 'app_default_padding.dart';
 import 'app_home_menu_padding.dart';
+import 'filter_switch.dart';
 
 class ToggleableHomepageMenuItemWidget extends StatelessWidget {
   final String label;
@@ -45,17 +46,7 @@ class ToggleableHomepageMenuItemWidget extends StatelessWidget {
                     ),
                   ),
                 ),
-                Switch(
-                    activeThumbColor: Colors.white,
-                    activeTrackColor: Theme.of(context)
-                        .colorScheme
-                        .primary
-                        .withValues(alpha: 0.5),
-                    inactiveThumbColor: Colors.grey[600],
-                    inactiveTrackColor: Theme.of(context)
-                        .colorScheme
-                        .primary
-                        .withValues(alpha: 0.5),
+                FilterSwitch(
                     onChanged: (bool value) {
                       var setting = model.settings.setting(this.setting.name);
                       setting.enabled = value;

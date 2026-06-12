@@ -130,6 +130,7 @@ class AppModel extends ChangeNotifier {
       return;
     }
     StoredPreferences store = await StorageFactory.getStoredPreferences();
+    await store.clearIfVersionChanged();
     _items = await store.loadItems(AppCommon.maxItemsFromBgg);
     replaceSettings(await store.loadSettings(settings));
     hasLoadedPersistedData = true;

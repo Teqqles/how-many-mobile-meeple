@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:how_many_mobile_meeple/model/model.dart';
 import 'package:how_many_mobile_meeple/model/settings.dart';
@@ -8,7 +7,6 @@ import 'package:how_many_mobile_meeple/app_page.dart';
 import 'package:how_many_mobile_meeple/components/disclaimer_text.dart';
 import 'package:how_many_mobile_meeple/components/empty_widget.dart';
 import 'package:package_info_plus/package_info_plus.dart';
-import 'package:how_many_mobile_meeple/platform/web_or_tablet/web_version_info.dart';
 
 /// Settings Summary Page
 /// Shows current settings in both friendly terms and raw values
@@ -547,11 +545,7 @@ class SettingsSummaryPage extends StatelessWidget with AppPage {
   }
 
   Future<String> _getAppVersion() async {
-    if (kIsWeb) {
-      return WebVersionInfo.name;
-    } else {
-      PackageInfo packageInfo = await PackageInfo.fromPlatform();
-      return packageInfo.version;
-    }
+    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    return packageInfo.version;
   }
 }

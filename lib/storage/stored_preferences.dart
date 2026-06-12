@@ -4,9 +4,12 @@ import 'package:how_many_mobile_meeple/model/setting.dart';
 import 'package:how_many_mobile_meeple/model/settings.dart';
 import 'package:how_many_mobile_meeple/model/items.dart';
 import 'package:how_many_mobile_meeple/model/item.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class StoredPreferences {
+  static const String _storageVersionKey = 'storage_version';
+
   static Future<SharedPreferences> getPrefs() async {
     return await SharedPreferences.getInstance();
   }
@@ -15,6 +18,16 @@ class StoredPreferences {
 
   StoredPreferences(SharedPreferences sharedPreferences) {
     _prefs = sharedPreferences;
+  }
+
+  Future<void> clearIfVersionChanged() async {
+    final packageInfo = await PackageInfo.fromPlatform();
+    final currentMajor = packageInfo.version.split('.').first;
+    final storedMajor = _prefs.getString(_storageVersionKey)?.split('.').first;
+    if (storedMajor != currentMajor) {
+      await _prefs.clear();
+      await _prefs.setString(_storageVersionKey, packageInfo.version);
+    }
   }
 
   Future<bool> saveSettings(Settings settings) async {

@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:how_many_mobile_meeple/components/board_game_item_input_widget.dart';
 import 'package:how_many_mobile_meeple/components/board_game_item_list_widget.dart';
@@ -7,7 +6,6 @@ import 'package:how_many_mobile_meeple/components/mechanic_filter_widget.dart';
 import 'package:how_many_mobile_meeple/components/player_filter_widget.dart';
 import 'package:how_many_mobile_meeple/components/rating_filter_widget.dart';
 import 'package:how_many_mobile_meeple/components/time_filter_widget.dart';
-import 'package:how_many_mobile_meeple/platform/web_or_tablet/web_version_info.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
 import 'package:how_many_mobile_meeple/components/app_default_padding.dart';
@@ -64,12 +62,8 @@ class HomePage extends StatelessWidget with AppPage {
   }
 
   Future<String> getAppVersion() async {
-    if (kIsWeb) {
-      return WebVersionInfo.name;
-    } else {
-      PackageInfo packageInfo = await PackageInfo.fromPlatform();
-      return packageInfo.version;
-    }
+    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    return packageInfo.version;
   }
 
   Future<Widget> footerDisplay(BuildContext context) async {

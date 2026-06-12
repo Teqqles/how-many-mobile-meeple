@@ -96,13 +96,7 @@ mixin AppPage {
               model.settings.updateSetting(setting);
               await model.updateStore();
               model.invalidateCache();
-
-              // Force reload from storage to pick up the new value
-              model.hasLoadedPersistedData = false;
-
-              // Close drawer and navigate to home
               Navigator.of(context).pop();
-              Navigator.of(context).pushReplacementNamed('/');
             },
             value: currentValue,
           )

@@ -10,7 +10,7 @@ import '../screen_tools.dart';
 
 class PlatformIndependentImage extends StatelessWidget with ScreenTools {
   final String imageUrl;
-  final Codec<String, String> stringToBase64 = utf8.fuse(base64);
+  final Codec<String, String> stringToBase64 = utf8.fuse(base64Url);
 
   PlatformIndependentImage({super.key, required this.imageUrl});
 

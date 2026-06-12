@@ -266,6 +266,18 @@ class _GuidedFlowHomePageState extends State<GuidedFlowHomePage> {
                   icon: const Icon(Icons.arrow_forward),
                   label: const Text('Next'),
                 ),
+
+                // Finish button — skip straight to results
+                if (_currentStep < _totalSteps - 1) ...[
+                  const SizedBox(width: 8),
+                  FilledButton.icon(
+                    onPressed: canProceedFromStep1
+                        ? () => setState(() => _currentStep = _totalSteps - 1)
+                        : null,
+                    icon: const Icon(Icons.check),
+                    label: const Text('Finish'),
+                  ),
+                ],
               ],
             ),
           ],

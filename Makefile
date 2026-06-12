@@ -17,7 +17,7 @@ generate_web:
 	flutter build web
 
 upload_web:
-	aws s3 cp ./build/web s3://www.howmanymeeple.com --recursive
+	aws s3 cp ./build/web s3://www.howmanymeeple.com --recursive --exclude "config.local.json" --profile howmanymeeple
 
 clean:
 	flutter clean

@@ -15,6 +15,7 @@ import 'model/game.dart';
 import 'model/model.dart';
 import 'model/settings.dart';
 import 'package:path/path.dart';
+import 'pwa/pwa_install_service.dart';
 import 'theme_extensions.dart';
 
 mixin AppPage {
@@ -110,10 +111,53 @@ mixin AppPage {
     var drawerSettingsColumn =
         await ComponentFactory.getDrawerSettingsColumn(AppCommon.savedSettings);
     final staticFiltersList = staticFilters(model, context);
-    return <Widget>[drawerHeader(context)] +
+    final allFilters = <Widget>[drawerHeader(context)] +
         staticFiltersList +
         await drawerSettingsColumn.drawerContent(
             context, model, staticFiltersList.length);
+    if (PwaInstallService.isWeb && !PwaInstallService.isAlreadyInstalled) {
+      allFilters.add(_buildInstallDrawerItem(context, allFilters.length));
+    }
+    return allFilters;
+  }
+
+  Widget _buildInstallDrawerItem(BuildContext context, int index) {
+    final bgColor =
+        index % 2 == 0 ? Theme.of(context).highlightColor : Colors.white;
+    return Material(
+      color: bgColor,
+      child: ListTile(
+        leading: const Icon(Icons.install_mobile),
+        title: const Text(
+          'Install on Home Screen',
+          style: TextStyle(fontSize: 13),
+        ),
+        onTap: () {
+          if (PwaInstallService.isInstallAvailable) {
+            Navigator.of(context).pop();
+            PwaInstallService.triggerInstall();
+          } else {
+            showDialog(
+              context: context,
+              builder: (dialogContext) => AlertDialog(
+                title: const Text('Install on Home Screen'),
+                content: const Text(
+                  'To install, use your browser\'s install option:\n\n'
+                  '• Chrome / Edge: tap the install icon (⊕) in the address bar\n'
+                  '• Safari (iOS): tap Share → Add to Home Screen',
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.of(dialogContext).pop(),
+                    child: const Text('OK'),
+                  ),
+                ],
+              ),
+            );
+          }
+        },
+      ),
+    );
   }
 
   void loadPage(BuildContext context, RouteSettings pageSettings) {

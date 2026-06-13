@@ -78,24 +78,37 @@ class _GuidedFlowHomePageState extends State<GuidedFlowHomePage> {
 
   /// Builds the guided flow with step progression
   Widget _buildGuidedFlow(BuildContext context) {
-    return SingleChildScrollView(
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            // Progress indicator
-            _buildProgressIndicator(),
-            const SizedBox(height: 24),
+    return GestureDetector(
+      onHorizontalDragEnd: (details) {
+        final velocity = details.primaryVelocity ?? 0;
+        final model = AppModel.of(context, listen: false);
+        if (velocity < -300 && _currentStep < _totalSteps - 1) {
+          final canProceed =
+              _currentStep != 0 || model.items.itemList.isNotEmpty;
+          if (canProceed) setState(() => _currentStep++);
+        } else if (velocity > 300 && _currentStep > 0) {
+          setState(() => _currentStep--);
+        }
+      },
+      child: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // Progress indicator
+              _buildProgressIndicator(),
+              const SizedBox(height: 24),
 
-            // Current step content
-            _buildCurrentStep(),
+              // Current step content
+              _buildCurrentStep(),
 
-            const SizedBox(height: 24),
+              const SizedBox(height: 24),
 
-            // Navigation buttons (for steps 0-3)
-            if (_currentStep < _totalSteps - 1) _buildStepNavigation(),
-          ],
+              // Navigation buttons (for steps 0-3)
+              if (_currentStep < _totalSteps - 1) _buildStepNavigation(),
+            ],
+          ),
         ),
       ),
     );
@@ -128,30 +141,34 @@ class _GuidedFlowHomePageState extends State<GuidedFlowHomePage> {
                     onTap: isAccessible
                         ? () => setState(() => _currentStep = index)
                         : null,
-                    child: Container(
-                      height: 8,
-                      margin: EdgeInsets.only(
-                          right: index < _totalSteps - 1 ? 4 : 0),
-                      decoration: BoxDecoration(
-                        color: isCompleted || isActive
-                            ? Theme.of(context).colorScheme.primary
-                            : Theme.of(context)
-                                .colorScheme
-                                .surfaceContainerHighest,
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                      child: isActive
-                          ? Container(
-                              decoration: BoxDecoration(
-                                border: Border.all(
-                                  color:
-                                      Theme.of(context).colorScheme.onPrimary,
-                                  width: 2,
+                    behavior: HitTestBehavior.opaque,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                      child: Container(
+                        height: 8,
+                        margin: EdgeInsets.only(
+                            right: index < _totalSteps - 1 ? 4 : 0),
+                        decoration: BoxDecoration(
+                          color: isCompleted || isActive
+                              ? Theme.of(context).colorScheme.primary
+                              : Theme.of(context)
+                                  .colorScheme
+                                  .surfaceContainerHighest,
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: isActive
+                            ? Container(
+                                decoration: BoxDecoration(
+                                  border: Border.all(
+                                    color:
+                                        Theme.of(context).colorScheme.onPrimary,
+                                    width: 2,
+                                  ),
+                                  borderRadius: BorderRadius.circular(4),
                                 ),
-                                borderRadius: BorderRadius.circular(4),
-                              ),
-                            )
-                          : null,
+                              )
+                            : null,
+                      ),
                     ),
                   ),
                 );
@@ -184,7 +201,7 @@ class _GuidedFlowHomePageState extends State<GuidedFlowHomePage> {
       onTap:
           isAccessible ? () => setState(() => _currentStep = stepIndex) : null,
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 2),
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
         child: Text(
           label,
           style: Theme.of(context).textTheme.bodySmall?.copyWith(

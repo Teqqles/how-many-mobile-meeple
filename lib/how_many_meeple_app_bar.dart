@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:how_many_mobile_meeple/platform/pages.dart';
 import 'package:how_many_mobile_meeple/save_dialog.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import 'app_common.dart';
 import 'components/empty_widget.dart';
@@ -38,17 +39,29 @@ class HowManyMeepleAppBar extends AppBar {
                   ),
                 ],
               ),
-              hasSaveDialog
-                  ? IconButton(
-                      icon: Icon(Icons.save),
-                      onPressed: model != null
-                          ? () => showDialog(
-                              context: context,
-                              builder: (context) => SaveDialog(
-                                    model: model,
-                                  ))
-                          : null)
-                  : EmptyWidget()
+              Row(
+                children: <Widget>[
+                  IconButton(
+                    icon: Icon(Icons.newspaper),
+                    tooltip: 'Board Game News',
+                    onPressed: () => launchUrl(
+                      Uri.parse('https://www.boardgamenews.co.uk/'),
+                      mode: LaunchMode.externalApplication,
+                    ),
+                  ),
+                  hasSaveDialog
+                      ? IconButton(
+                          icon: Icon(Icons.save),
+                          onPressed: model != null
+                              ? () => showDialog(
+                                  context: context,
+                                  builder: (context) => SaveDialog(
+                                        model: model,
+                                      ))
+                              : null)
+                      : EmptyWidget(),
+                ],
+              ),
             ],
           ),
         );

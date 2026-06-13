@@ -9,6 +9,7 @@ import 'package:how_many_mobile_meeple/components/time_filter_widget.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
 import 'package:how_many_mobile_meeple/components/app_default_padding.dart';
+import 'package:how_many_mobile_meeple/components/pwa_install_banner.dart';
 import 'app_page.dart';
 import 'package:how_many_mobile_meeple/components/disclaimer_text.dart';
 import 'app_common.dart';
@@ -48,16 +49,22 @@ class HomePage extends StatelessWidget with AppPage {
                 ]),
           ),
         ),
-        body: const SingleChildScrollView(
-            child: Column(children: <Widget>[
-          BoardGameItemInputWidget(),
-          BoardGameItemListWidget(),
-          TimeFilterWidget(),
-          PlayerFilterWidget(),
-          ComplexityFilterWidget(),
-          RatingFilterWidget(),
-          MechanicFilterWidget(),
-        ])),
+        body: const Column(children: <Widget>[
+          PwaInstallBanner(),
+          Expanded(
+            child: SingleChildScrollView(
+              child: Column(children: <Widget>[
+                BoardGameItemInputWidget(),
+                BoardGameItemListWidget(),
+                TimeFilterWidget(),
+                PlayerFilterWidget(),
+                ComplexityFilterWidget(),
+                RatingFilterWidget(),
+                MechanicFilterWidget(),
+              ]),
+            ),
+          ),
+        ]),
         persistentFooterButtons: [iconButtonGroup(context)]);
   }
 

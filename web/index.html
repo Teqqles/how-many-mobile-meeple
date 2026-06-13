@@ -2,7 +2,55 @@
 <html>
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="How Many Meeple?">
+  <link rel="manifest" href="manifest.json">
   <title>How Many Meeple?</title>
+  <script>
+    // Capture the beforeinstallprompt event so Flutter can trigger it later
+    window._pwaInstallPrompt = null;
+    window.addEventListener('beforeinstallprompt', function(e) {
+      e.preventDefault();
+      window._pwaInstallPrompt = e;
+      // Notify Flutter that the prompt is ready
+      if (window._pwaPromptReadyCallback) {
+        window._pwaPromptReadyCallback();
+      }
+    });
+
+    window.triggerPwaInstall = function() {
+      if (window._pwaInstallPrompt) {
+        window._pwaInstallPrompt.prompt();
+        window._pwaInstallPrompt.userChoice.then(function(choiceResult) {
+          window._pwaInstallPrompt = null;
+          if (window._pwaInstallResultCallback) {
+            window._pwaInstallResultCallback(choiceResult.outcome === 'accepted');
+          }
+        });
+      }
+    };
+
+    window.isPwaInstallAvailable = function() {
+      return window._pwaInstallPrompt !== null;
+    };
+
+    window.isPwaAlreadyInstalled = function() {
+      return localStorage.getItem('pwaInstalled') === 'true'
+          || window.matchMedia('(display-mode: standalone)').matches
+          || window.navigator.standalone === true;
+    };
+
+    window.addEventListener('appinstalled', function() {
+      localStorage.setItem('pwaInstalled', 'true');
+      window._pwaInstallPrompt = null;
+      if (window._pwaInstalledCallback) {
+        window._pwaInstalledCallback();
+      }
+    });
+  </script>
 </head>
 <body>
   <script src="main.dart.js" type="application/javascript"></script>

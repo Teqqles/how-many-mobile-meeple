@@ -35,6 +35,7 @@ class _Step4GameStyleState extends State<Step4GameStyle> {
   };
 
   String _getDifficultyLabel(double weight) {
+    if (weight == 0.0) return 'Any';
     if (weight <= 1.5) return 'Light';
     if (weight <= 2.5) return 'Gateway';
     if (weight <= 3.5) return 'Strategy';
@@ -43,11 +44,16 @@ class _Step4GameStyleState extends State<Step4GameStyle> {
   }
 
   String _getDifficultyDescription(double weight) {
-    if (weight <= 1.5) return 'Easy to learn, quick to play';
-    if (weight <= 2.5) return 'Simple rules, engaging gameplay';
-    if (weight <= 3.5) return 'Deeper strategy, more complexity';
-    if (weight <= 4.0) return 'Complex rules, strategic depth';
-    return 'Maximum complexity and depth';
+    if (weight == 0.0) return 'Show games of any complexity';
+    if (weight <= 1.5)
+      return 'Easy to learn, quick to play (~${weight.toStringAsFixed(1)} weight)';
+    if (weight <= 2.5)
+      return 'Simple rules, engaging gameplay (~${weight.toStringAsFixed(1)} weight)';
+    if (weight <= 3.5)
+      return 'Deeper strategy, more complexity (~${weight.toStringAsFixed(1)} weight)';
+    if (weight <= 4.0)
+      return 'Complex rules, strategic depth (~${weight.toStringAsFixed(1)} weight)';
+    return 'Maximum complexity and depth (~${weight.toStringAsFixed(1)} weight)';
   }
 
   @override
@@ -304,7 +310,7 @@ class _Step4GameStyleState extends State<Step4GameStyle> {
           borderRadius: BorderRadius.circular(8),
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 200),
-            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 4),
+            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 2),
             decoration: BoxDecoration(
               color: isSelected
                   ? Theme.of(context).colorScheme.primaryContainer
@@ -340,8 +346,8 @@ class _Step4GameStyleState extends State<Step4GameStyle> {
                             : Theme.of(context).colorScheme.onSurfaceVariant,
                       ),
                   textAlign: TextAlign.center,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
+                  maxLines: 2,
+                  softWrap: true,
                 ),
               ],
             ),

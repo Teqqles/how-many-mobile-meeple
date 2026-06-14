@@ -27,12 +27,16 @@ class GuidedFlowHomePage extends StatefulWidget with AppPage {
 
 class _GuidedFlowHomePageState extends State<GuidedFlowHomePage> {
   int _currentStep = 0;
+  bool _showAdvancedMode = false;
 
   final int _totalSteps = 5;
 
-  bool _getPreferAdvancedMode(AppModel model) {
-    final setting = model.settings.setting('preferAdvancedMode');
-    return setting.getBool();
+  void _syncAdvancedMode(AppModel model) {
+    final value = model.settings.setting('preferAdvancedMode').getBool();
+    if (value != _showAdvancedMode) {
+      WidgetsBinding.instance.addPostFrameCallback(
+          (_) => setState(() => _showAdvancedMode = value));
+    }
   }
 
   @override
@@ -44,8 +48,7 @@ class _GuidedFlowHomePageState extends State<GuidedFlowHomePage> {
           model.refreshFromUrl();
         }
 
-        // Use the setting as the single source of truth
-        final showAdvancedMode = _getPreferAdvancedMode(model);
+        _syncAdvancedMode(model);
 
         return Scaffold(
           appBar: HowManyMeepleAppBar(
@@ -60,7 +63,7 @@ class _GuidedFlowHomePageState extends State<GuidedFlowHomePage> {
             children: [
               const PwaInstallBanner(),
               Expanded(
-                child: showAdvancedMode
+                child: _showAdvancedMode
                     ? _buildAdvancedMode(context)
                     : _buildGuidedFlow(context),
               ),
@@ -68,7 +71,7 @@ class _GuidedFlowHomePageState extends State<GuidedFlowHomePage> {
           ),
           bottomNavigationBar: _buildFooter(context),
           persistentFooterButtons:
-              !showAdvancedMode && _currentStep == _totalSteps - 1
+              !_showAdvancedMode && _currentStep == _totalSteps - 1
                   ? [widget.iconButtonGroup(context)]
                   : null,
         );

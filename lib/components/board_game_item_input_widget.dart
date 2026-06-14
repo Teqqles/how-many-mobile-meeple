@@ -3,6 +3,7 @@ import 'package:how_many_mobile_meeple/app_common.dart';
 import 'package:how_many_mobile_meeple/components/app_default_padding.dart';
 import 'package:how_many_mobile_meeple/model/item.dart';
 import 'package:how_many_mobile_meeple/model/model.dart';
+import 'package:how_many_mobile_meeple/api/prefetch_service.dart';
 import 'package:provider/provider.dart';
 
 /// Reusable board game item input widget (username/geeklist entry)
@@ -60,6 +61,7 @@ class _BoardGameItemInputWidgetState extends State<BoardGameItemInputWidget> {
                       model.addItem(item);
                       controller.text = '';
                       model.updateStore();
+                      PrefetchService.warmCache(item);
                     },
                   ),
                 ),

@@ -27,9 +27,9 @@ class ComplexityFilterWidget extends StatelessWidget {
                   width: MediaQuery.of(context).size.width * 0.60,
                   child: Slider(
                       activeColor: Theme.of(context).colorScheme.secondary,
-                      min: 0.0,
+                      min: 0.5,
                       max: 5.0,
-                      divisions: 10,
+                      divisions: 9,
                       onChanged: !model.settings
                               .setting(Settings.filterComplexity.name)
                               .enabled
@@ -43,15 +43,14 @@ class ComplexityFilterWidget extends StatelessWidget {
                             },
                       value: model.settings
                           .setting(Settings.filterComplexity.name)
-                          .getDouble(),
+                          .getDouble()
+                          .clamp(0.5, 5.0),
                       label:
-                          "${model.settings.setting(Settings.filterComplexity.name).value.toString()} weighting"),
+                          "~${model.settings.setting(Settings.filterComplexity.name).value.toString()} weighting"),
                 ),
                 FilterValueBadge(
-                  value: model.settings
-                      .setting(Settings.filterComplexity.name)
-                      .value
-                      .toString(),
+                  value:
+                      "~${model.settings.setting(Settings.filterComplexity.name).value.toString()}",
                   isEnabled: model.settings
                       .setting(Settings.filterComplexity.name)
                       .enabled,

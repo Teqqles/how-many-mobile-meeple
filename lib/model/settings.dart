@@ -15,8 +15,8 @@ class Settings {
   static Setting filterMaximumTimeToPlay = Setting("maximumTimeToPlay",
       header: "Bgg-Filter-Max-Duration", value: 90);
 
-  static Setting filterComplexity = Setting("maximumComplexity",
-      header: "Bgg-Filter-Max-Complexity", value: 2.5);
+  static Setting filterComplexity =
+      Setting("complexity", header: "Bgg-Filter-Complexity", value: 0.0);
 
   static Setting filterUsingUserRecommendations = Setting(
       "useUserRecommendedFilters",

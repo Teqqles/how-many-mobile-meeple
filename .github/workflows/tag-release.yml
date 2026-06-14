@@ -1,0 +1,98 @@
+name: Tag Release
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  tag:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Determine version bump
+        id: bump
+        run: |
+          MSG=$(git log -1 --pretty=%s)
+          echo "Commit: $MSG"
+
+          # Skip version bump commits (prevent infinite loop)
+          if echo "$MSG" | grep -qiE '^\[skip ci\]|^chore: bump version'; then
+            echo "type=skip" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          # Skip doc-only commits
+          if echo "$MSG" | grep -qiE '^docs(\(.*\))?:'; then
+            echo "type=skip" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          if echo "$MSG" | grep -qiE '^feat(\(.*\))?:'; then
+            echo "type=minor" >> "$GITHUB_OUTPUT"
+          else
+            echo "type=patch" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Compute new version
+        if: steps.bump.outputs.type != 'skip'
+        id: version
+        run: |
+          BUMP="${{ steps.bump.outputs.type }}"
+
+          LATEST=$(git tag --sort=-version:refname | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | head -1)
+          if [ -z "$LATEST" ]; then
+            LATEST="v0.0.0"
+          fi
+          echo "Latest tag: $LATEST"
+
+          MAJOR=$(echo "$LATEST" | sed 's/v//' | cut -d. -f1)
+          MINOR=$(echo "$LATEST" | sed 's/v//' | cut -d. -f2)
+          PATCH=$(echo "$LATEST" | sed 's/v//' | cut -d. -f3)
+
+          if [ "$BUMP" = "minor" ]; then
+            MINOR=$((MINOR + 1))
+            PATCH=0
+          else
+            PATCH=$((PATCH + 1))
+          fi
+
+          NEW_TAG="v${MAJOR}.${MINOR}.${PATCH}"
+          echo "New tag: $NEW_TAG"
+          echo "tag=$NEW_TAG" >> "$GITHUB_OUTPUT"
+          echo "semver=${MAJOR}.${MINOR}.${PATCH}" >> "$GITHUB_OUTPUT"
+
+      - name: Update pubspec.yaml
+        if: steps.bump.outputs.type != 'skip'
+        run: |
+          SEMVER="${{ steps.version.outputs.semver }}"
+
+          # Extract current build number and increment it
+          CURRENT=$(grep '^version:' pubspec.yaml | sed 's/version: //')
+          BUILD=$(echo "$CURRENT" | cut -d+ -f2)
+          NEW_BUILD=$((BUILD + 1))
+
+          NEW_VERSION="${SEMVER}+${NEW_BUILD}"
+          echo "Updating pubspec.yaml version to $NEW_VERSION"
+
+          sed -i "s/^version: .*/version: ${NEW_VERSION}/" pubspec.yaml
+
+      - name: Commit and tag
+        if: steps.bump.outputs.type != 'skip'
+        run: |
+          TAG="${{ steps.version.outputs.tag }}"
+
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git add pubspec.yaml
+          git commit -m "chore: bump version to ${TAG} [skip ci]"
+          git tag "$TAG"
+          git push origin main "$TAG"

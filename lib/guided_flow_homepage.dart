@@ -11,6 +11,7 @@ import 'package:how_many_mobile_meeple/guided_flow/step4_game_style.dart';
 import 'package:how_many_mobile_meeple/guided_flow/step5_final_actions.dart';
 import 'package:how_many_mobile_meeple/guided_flow/advanced_mode_widget.dart';
 import 'package:how_many_mobile_meeple/components/pwa_install_banner.dart';
+import 'package:how_many_mobile_meeple/components/pwa_update_banner.dart';
 import 'package:how_many_mobile_meeple/components/disclaimer_text.dart';
 import 'package:how_many_mobile_meeple/components/empty_widget.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -61,6 +62,7 @@ class _GuidedFlowHomePageState extends State<GuidedFlowHomePage> {
           drawer: widget.pageDrawer(context),
           body: Column(
             children: [
+              const PwaUpdateBanner(),
               const PwaInstallBanner(),
               Expanded(
                 child: _showAdvancedMode

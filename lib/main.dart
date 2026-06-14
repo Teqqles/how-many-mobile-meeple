@@ -8,15 +8,16 @@ import 'package:provider/provider.dart';
 
 import 'package:how_many_mobile_meeple/model/model.dart';
 import 'package:how_many_mobile_meeple/app_config.dart';
+import 'package:how_many_mobile_meeple/pwa/pwa_update_service.dart';
 
 import 'meeple_theme.dart';
 
 void main() async {
-  // Ensure Flutter bindings are initialized
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Load configuration (API URL from config file for web)
   await AppConfig.initialize();
+
+  PwaUpdateService.start();
 
   runApp(const MyApp());
 }

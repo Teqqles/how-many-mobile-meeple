@@ -8,6 +8,7 @@ import 'package:how_many_mobile_meeple/model/settings.dart';
 import 'package:how_many_mobile_meeple/model/bgg_cache.dart';
 import 'package:how_many_mobile_meeple/model/item.dart';
 
+import '../api/prefetch_service.dart';
 import '../app_common.dart';
 import 'game.dart';
 import 'games.dart';
@@ -135,6 +136,9 @@ class AppModel extends ChangeNotifier {
     replaceSettings(await store.loadSettings(settings));
     hasLoadedPersistedData = true;
     notifyListeners();
+    for (final item in _items.itemList) {
+      PrefetchService.warmCache(item);
+    }
   }
 
   Future<void> _storeSettings(Settings settings) async {

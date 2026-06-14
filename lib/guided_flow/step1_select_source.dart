@@ -5,6 +5,7 @@ import 'package:how_many_mobile_meeple/model/item.dart';
 import 'package:how_many_mobile_meeple/app_common.dart';
 import 'package:how_many_mobile_meeple/components/step_header_card.dart';
 import 'package:how_many_mobile_meeple/components/info_message_box.dart';
+import 'package:how_many_mobile_meeple/api/prefetch_service.dart';
 
 /// Step 1: Select Source of Games
 /// Allows users to add BGG usernames or geeklist IDs
@@ -157,6 +158,7 @@ class _Step1SelectSourceState extends State<Step1SelectSource> {
     item.itemType = _selectedType;
     model.addItem(item);
     model.updateStore();
+    PrefetchService.warmCache(item);
 
     _controller.clear();
 

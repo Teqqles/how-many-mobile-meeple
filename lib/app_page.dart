@@ -95,8 +95,8 @@ mixin AppPage {
               setting.value = value;
               setting.enabled = true;
               model.settings.updateSetting(setting);
-              await model.updateStore();
               model.invalidateCache();
+              await model.updateStore();
               Navigator.of(context).pop();
             },
             value: currentValue,

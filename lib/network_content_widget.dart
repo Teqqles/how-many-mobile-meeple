@@ -5,6 +5,7 @@ import 'package:how_many_mobile_meeple/screen_tools.dart';
 
 import 'package:how_many_mobile_meeple/components/app_default_padding.dart';
 import 'load_games.dart';
+import 'package:how_many_mobile_meeple/model/game_request.dart';
 import 'package:how_many_mobile_meeple/model/model.dart';
 
 import 'model/games.dart';
@@ -91,8 +92,8 @@ abstract class NetworkWidget extends StatelessWidget with ScreenTools {
 
 /// Stateful widget that owns the fetch Future so that model notifications
 /// (notifyListeners) do not abandon an in-flight request and restart it.
-/// A new fetch is only started when the cache transitions to stale AND
-/// no fetch is already in progress.
+/// A new fetch is started when the cache is stale and no fetch is in progress,
+/// or when the request (items + headers) has changed from the one in-flight.
 class _GameFetcher extends StatefulWidget {
   final AppModel model;
   final Widget Function(BuildContext, String) pageErrors;
@@ -113,8 +114,9 @@ class _GameFetcher extends StatefulWidget {
 }
 
 class _GameFetcherState extends State<_GameFetcher> {
-  Future<Games>? _future;
+  Future<(Games, GameRequest)>? _future;
   bool _fetching = false;
+  GameRequest? _inflightRequest;
 
   @override
   void initState() {
@@ -127,16 +129,21 @@ class _GameFetcherState extends State<_GameFetcher> {
   @override
   void didUpdateWidget(_GameFetcher old) {
     super.didUpdateWidget(old);
-    // Only start a new fetch when the cache has become stale and no fetch is running.
-    if (widget.model.bggCache.isStale() && !_fetching) {
+    final currentRequest = widget.model.buildRequest();
+    final cacheIsStale = widget.model.bggCache.isStale();
+    final requestChanged =
+        _inflightRequest != null && _inflightRequest != currentRequest;
+
+    if ((cacheIsStale && !_fetching) || requestChanged) {
       setState(_startFetch);
     }
   }
 
   void _startFetch() {
+    final request = widget.model.buildRequest();
     _fetching = true;
-    _future = LoadGames.fetchGames(
-        widget.model.settings, widget.model.items.itemList);
+    _inflightRequest = request;
+    _future = LoadGames.fetchGames(request).then((games) => (games, request));
     _future!.then(
       (_) {
         if (mounted) setState(() => _fetching = false);
@@ -152,16 +159,21 @@ class _GameFetcherState extends State<_GameFetcher> {
     if (!widget.model.bggCache.isStale()) {
       return widget.displayWidgetFn(context, widget.model);
     }
-    return FutureBuilder<Games>(
+    return FutureBuilder<(Games, GameRequest)>(
       future: _future,
       builder: (context, snapshot) {
         if (snapshot.hasData) {
-          if (snapshot.data!.games.isEmpty) {
+          final (games, request) = snapshot.data!;
+          if (games.games.isEmpty) {
             return widget.pageErrors(
                 context, NetworkWidget.pageErrorNoGamesAvailable);
           }
-          widget.model.replaceCache(snapshot.data!);
-          return widget.displayWidgetFn(context, widget.model);
+          widget.model.replaceCache(games, request);
+          if (!widget.model.bggCache.isStale()) {
+            return widget.displayWidgetFn(context, widget.model);
+          }
+          return widget.pageFrameOutline(
+              context, widget.loadingSpinner(context));
         } else if (snapshot.hasError) {
           return widget.pageErrors(
               context, NetworkWidget.pageErrorOneOrMoreItemsInvalid);

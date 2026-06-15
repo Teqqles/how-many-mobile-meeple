@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:how_many_mobile_meeple/model/settings.dart';
 
 import 'package:how_many_mobile_meeple/model/bgg_cache.dart';
+import 'package:how_many_mobile_meeple/model/game_request.dart';
 import 'package:how_many_mobile_meeple/model/item.dart';
 
 import '../api/prefetch_service.dart';
@@ -97,11 +98,17 @@ class AppModel extends ChangeNotifier {
     await updateStore();
   }
 
+  GameRequest buildRequest() => GameRequest.from(_settings, _items);
+
   void invalidateCache() {
     _bggCache.makeStale();
+    notifyListeners();
   }
 
-  void replaceCache(Games games) {
+  void replaceCache(Games games, GameRequest request) {
+    if (request != buildRequest()) {
+      return;
+    }
     if (games == _bggCache.games) {
       _bggCache.refreshCacheTimestamp();
     } else {

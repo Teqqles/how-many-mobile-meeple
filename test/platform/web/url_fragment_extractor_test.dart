@@ -70,6 +70,47 @@ main() {
       var extractor = UrlFragmentExtractor(mockUri);
       expect(extractor.extractItems(), expectedItems);
     });
+
+    test('numeric item in fragment is extracted as geeklist type', () {
+      final mockUri = MockUri();
+
+      when(mockUri.hasFragment).thenReturn(true);
+      when(mockUri.fragment).thenReturn("/list/12345");
+
+      var extractor = UrlFragmentExtractor(mockUri);
+      var items = extractor.extractItems();
+
+      expect(items.itemList.length, 1);
+      expect(items.itemList.first.name, '12345');
+      expect(items.itemList.first.itemType, ItemType.geekList);
+    });
+
+    test('alpha item in fragment is extracted as collection type', () {
+      final mockUri = MockUri();
+
+      when(mockUri.hasFragment).thenReturn(true);
+      when(mockUri.fragment).thenReturn("/list/testuser");
+
+      var extractor = UrlFragmentExtractor(mockUri);
+      var items = extractor.extractItems();
+
+      expect(items.itemList.first.itemType, ItemType.collection);
+    });
+
+    test('mixed geeklist and collection items are extracted with correct types',
+        () {
+      final mockUri = MockUri();
+
+      when(mockUri.hasFragment).thenReturn(true);
+      when(mockUri.fragment).thenReturn("/list/testuser+12345");
+
+      var extractor = UrlFragmentExtractor(mockUri);
+      var items = extractor.extractItems();
+
+      expect(items.itemList.length, 2);
+      expect(items.itemList[0].itemType, ItemType.collection);
+      expect(items.itemList[1].itemType, ItemType.geekList);
+    });
   });
 
   var customExpectedSettings = Settings({

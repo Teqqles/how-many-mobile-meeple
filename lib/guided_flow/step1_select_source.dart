@@ -157,7 +157,6 @@ class _Step1SelectSourceState extends State<Step1SelectSource> {
     final item = Item(_controller.text.trim());
     item.itemType = _selectedType;
     model.addItem(item);
-    model.updateStore();
     PrefetchService.warmCache(item);
 
     _controller.clear();
@@ -211,7 +210,6 @@ class _Step1SelectSourceState extends State<Step1SelectSource> {
               icon: const Icon(Icons.close, size: 20),
               onPressed: () {
                 model.deleteItem(item);
-                model.updateStore();
               },
               tooltip: 'Remove',
             ),

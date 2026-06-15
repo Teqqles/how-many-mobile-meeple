@@ -24,6 +24,7 @@ class AppModel extends ChangeNotifier {
 
   bool hasLoadedPersistedData = false;
   bool pageRefreshed = false;
+  bool _urlConsumed = false;
 
   String? title;
 
@@ -50,7 +51,9 @@ class AppModel extends ChangeNotifier {
   }
 
   Future<void> refreshFromUrl() async {
+    if (_urlConsumed) return;
     if (_extractor.containsModel()) {
+      _urlConsumed = true;
       await replaceItems(_extractor.extractItems());
       var extractedSettings = _extractor.extractSettings();
       extractedSettings = _rebuildUrlMechanics(extractedSettings);
@@ -118,9 +121,8 @@ class AppModel extends ChangeNotifier {
 
   Future<void> deleteItem(Item item) async {
     _items.itemList.remove(item);
-    await _storeItems(_items);
     invalidateCache();
-    notifyListeners();
+    await _storeItems(_items);
   }
 
   Future<void> updateStore() async {
@@ -136,6 +138,7 @@ class AppModel extends ChangeNotifier {
   Future<void> loadStoredData() async {
     if (_extractor.containsModel()) {
       hasLoadedPersistedData = true;
+      _urlConsumed = true;
       return;
     }
     StoredPreferences store = await StorageFactory.getStoredPreferences();

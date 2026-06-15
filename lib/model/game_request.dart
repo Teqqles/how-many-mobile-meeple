@@ -13,7 +13,10 @@ class GameRequest {
           .where((e) => e.value.header != null)
           .map((e) => MapEntry(e.value.header!, e.value.value.toString())),
     );
-    return GameRequest(items: items, headers: headers);
+    // Snapshot the items list so mutations after this point don't affect the
+    // request's identity (e.g. deleteItem removing from the live list).
+    final snapshot = Items(List.unmodifiable(items.itemList));
+    return GameRequest(items: snapshot, headers: headers);
   }
 
   String get _headersKey {

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:how_many_mobile_meeple/platform/pages.dart';
+import 'package:how_many_mobile_meeple/platform/router.dart' as r;
 import 'package:how_many_mobile_meeple/save_dialog.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -21,9 +21,8 @@ class HowManyMeepleAppBar extends AppBar {
               : IconButton(
                   icon: Icon(Icons.home),
                   onPressed: () {
-                    Navigator.of(context).push(MaterialPageRoute(
-                        builder: (BuildContext context) =>
-                            Pages.platformPages().homePage()));
+                    Navigator.of(context).pushNamedAndRemoveUntil(
+                        r.Router.homeRoute, (route) => false);
                   }),
           title: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,

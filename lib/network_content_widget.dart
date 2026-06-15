@@ -60,8 +60,17 @@ abstract class NetworkWidget extends StatelessWidget with ScreenTools {
         children: [
           AppDefaultPadding(
             child: SpinKitCubeGrid(
-                color: Theme.of(context).colorScheme.secondary,
-                size: spinnerSize),
+              size: spinnerSize,
+              itemBuilder: (context, index) {
+                final isLight = (index ~/ 3 + index % 3) % 2 == 0;
+                final color = Theme.of(context).colorScheme.secondary;
+                return DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: isLight ? color : color.withValues(alpha: 0.5),
+                  ),
+                );
+              },
+            ),
           ),
           Text(findingGames, style: TextStyle(fontWeight: FontWeight.bold)),
           Text(

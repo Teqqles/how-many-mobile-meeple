@@ -135,6 +135,7 @@ class AppModel extends ChangeNotifier {
 
   Future<void> loadStoredData() async {
     if (_extractor.containsModel()) {
+      hasLoadedPersistedData = true;
       return;
     }
     StoredPreferences store = await StorageFactory.getStoredPreferences();

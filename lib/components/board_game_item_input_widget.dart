@@ -60,7 +60,6 @@ class _BoardGameItemInputWidgetState extends State<BoardGameItemInputWidget> {
                       Item item = Item(controller.text.trim());
                       model.addItem(item);
                       controller.text = '';
-                      model.updateStore();
                       PrefetchService.warmCache(item);
                     },
                   ),

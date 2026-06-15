@@ -97,5 +97,29 @@ main() {
           items: mockItems, settings: mockSettings);
       expect(encodedName, expectedEncodedName);
     });
+
+    test('encodes geeklist item by name', () {
+      final mockItems = MockItems();
+      final mockSettings = MockSettings();
+
+      when(mockItems.itemList).thenReturn([Item('12345')]);
+      when(mockSettings.changedSettings).thenReturn({});
+      var expectedEncodedName = expectedName + '/12345';
+      var encodedName = UrlFragmentEncoder.encode(expectedName,
+          items: mockItems, settings: mockSettings);
+      expect(encodedName, expectedEncodedName);
+    });
+
+    test('encodes mixed geeklist and collection items separated by plus', () {
+      final mockItems = MockItems();
+      final mockSettings = MockSettings();
+
+      when(mockItems.itemList).thenReturn([Item('testuser'), Item('12345')]);
+      when(mockSettings.changedSettings).thenReturn({});
+      var expectedEncodedName = expectedName + '/testuser+12345';
+      var encodedName = UrlFragmentEncoder.encode(expectedName,
+          items: mockItems, settings: mockSettings);
+      expect(encodedName, expectedEncodedName);
+    });
   });
 }

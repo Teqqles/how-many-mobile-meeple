@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:how_many_mobile_meeple/model/model.dart';
+import 'package:how_many_mobile_meeple/platform/common/game_detail_page.dart';
 import 'package:how_many_mobile_meeple/platform/pages.dart';
 import 'package:how_many_mobile_meeple/platform/web/url_fragment_encoder.dart';
 import 'package:how_many_mobile_meeple/settings_summary_page.dart';
@@ -9,6 +10,7 @@ class Router {
   static const String listRoute = '/list';
   static const String randomRoute = '/random';
   static const String settingsRoute = '/settings';
+  static const String gameDetailRoute = '/game';
 
   static List<String> routeList = [
     randomRoute,
@@ -22,6 +24,17 @@ class Router {
     var path = secondSlash == -1
         ? settings.name!
         : settings.name!.substring(0, secondSlash + 1);
+
+    if (path == Router.gameDetailRoute) {
+      final segments =
+          settings.name!.split('/').where((s) => s.isNotEmpty).toList();
+      final idStr = segments.last;
+      final gameId = int.tryParse(idStr);
+      if (gameId != null) {
+        return MaterialPageRoute(
+            builder: (_) => GameDetailPage(gameId: gameId), settings: settings);
+      }
+    }
 
     switch (path) {
       case Router.homeRoute:

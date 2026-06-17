@@ -2,6 +2,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:how_many_mobile_meeple/components/platform_independent_image.dart';
+import 'package:how_many_mobile_meeple/components/rating_badge.dart';
 import 'package:how_many_mobile_meeple/model/game.dart';
 import 'package:how_many_mobile_meeple/screen_tools.dart';
 
@@ -27,6 +28,56 @@ class GameImageWithStats extends StatelessWidget with ScreenTools {
                 fit: BoxFit.fitWidth,
               ),
             ),
+            Positioned(
+              left: 0,
+              right: 0,
+              top: maxHeight * 0.65,
+              height: maxHeight * 0.40,
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    stops: const [0.0, 0.85, 1.0],
+                    colors: [
+                      Colors.transparent,
+                      Theme.of(context).scaffoldBackgroundColor,
+                      Theme.of(context).scaffoldBackgroundColor,
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            if (MediaQuery.of(context).size.width >= 1024 &&
+                game.thumbnail != null)
+              Positioned(
+                left: 24,
+                top: 0,
+                bottom: 0,
+                child: Center(
+                  child: Container(
+                    height: maxHeight * 0.80,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: Colors.white, width: 2),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withAlpha(100),
+                          blurRadius: 12,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(6),
+                      child: PlatformIndependentImage(
+                        imageUrl: game.imageUrl,
+                        fit: BoxFit.contain,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
             Positioned(
               right: 8,
               top: 8,
@@ -102,39 +153,9 @@ class _RatingBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final (Color bgColor, Color textColor, Color borderColor, bool isStar) =
-        switch (rating) {
-      >= 7.5 => (
-          const Color(0xFFFFD700),
-          Colors.black,
-          Colors.black,
-          true,
-        ),
-      >= 6.5 => (
-          const Color(0xFFC0C0C0),
-          Colors.black,
-          Colors.black,
-          true,
-        ),
-      >= 5.5 => (
-          const Color(0xFFCD7F32),
-          Colors.white,
-          Colors.black,
-          true,
-        ),
-      >= 4.5 => (
-          Colors.orange,
-          Colors.white,
-          Colors.black,
-          false,
-        ),
-      _ => (
-          Colors.red,
-          Colors.white,
-          Colors.black,
-          false,
-        ),
-    };
+    final (Color bgColor, Color textColor) = ratingColors(rating);
+    const borderColor = Colors.black;
+    final isStar = rating >= 5.5;
 
     final ratingText = rating.toStringAsFixed(1);
     const badgeSize = 56.0;

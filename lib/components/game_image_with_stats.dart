@@ -1,3 +1,4 @@
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:how_many_mobile_meeple/components/platform_independent_image.dart';
@@ -25,6 +26,11 @@ class GameImageWithStats extends StatelessWidget with ScreenTools {
                 imageUrl: game.imageUrl,
                 fit: BoxFit.fitWidth,
               ),
+            ),
+            Positioned(
+              right: 8,
+              top: 8,
+              child: _RatingBadge(rating: game.averageRating),
             ),
             Positioned(
               right: 0,
@@ -87,6 +93,148 @@ class GameImageWithStats extends StatelessWidget with ScreenTools {
       ),
     );
   }
+}
+
+class _RatingBadge extends StatelessWidget {
+  final double rating;
+
+  const _RatingBadge({required this.rating});
+
+  @override
+  Widget build(BuildContext context) {
+    final (Color bgColor, Color textColor, Color borderColor, bool isStar) =
+        switch (rating) {
+      >= 7.5 => (
+          const Color(0xFFFFD700),
+          Colors.black,
+          Colors.black,
+          true,
+        ),
+      >= 6.5 => (
+          const Color(0xFFC0C0C0),
+          Colors.black,
+          Colors.black,
+          true,
+        ),
+      >= 5.5 => (
+          const Color(0xFFCD7F32),
+          Colors.white,
+          Colors.black,
+          true,
+        ),
+      >= 4.5 => (
+          Colors.orange,
+          Colors.white,
+          Colors.black,
+          false,
+        ),
+      _ => (
+          Colors.red,
+          Colors.white,
+          Colors.black,
+          false,
+        ),
+    };
+
+    final ratingText = rating.toStringAsFixed(1);
+    const badgeSize = 56.0;
+    final textWidget = Text(
+      ratingText,
+      style: TextStyle(
+        color: textColor,
+        fontSize: 17,
+        fontWeight: FontWeight.w800,
+      ),
+    );
+
+    if (isStar) {
+      return SizedBox(
+        width: badgeSize + 16,
+        height: badgeSize + 16,
+        child: CustomPaint(
+          painter: _StarPainter(fillColor: bgColor, borderColor: borderColor),
+          child: Center(child: textWidget),
+        ),
+      );
+    }
+
+    return Container(
+      width: badgeSize,
+      height: badgeSize,
+      decoration: BoxDecoration(
+        color: bgColor,
+        shape: BoxShape.circle,
+        border: Border.all(color: borderColor, width: 2),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withAlpha(80),
+            blurRadius: 6,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Center(child: textWidget),
+    );
+  }
+}
+
+class _StarPainter extends CustomPainter {
+  final Color fillColor;
+  final Color borderColor;
+
+  _StarPainter({required this.fillColor, required this.borderColor});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final path = _starPath(size);
+    canvas.drawPath(
+      path,
+      Paint()
+        ..color = fillColor
+        ..style = PaintingStyle.fill,
+    );
+    canvas.drawPath(
+      path,
+      Paint()
+        ..color = borderColor
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 2,
+    );
+    canvas.drawPath(
+      path,
+      Paint()
+        ..color = Colors.black.withAlpha(80)
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 3)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 1,
+    );
+  }
+
+  Path _starPath(Size size) {
+    final cx = size.width / 2;
+    final cy = size.height / 2;
+    final outerRadius = size.width / 2;
+    final innerRadius = outerRadius * 0.45;
+    const points = 5;
+    final path = Path();
+
+    for (var i = 0; i < points * 2; i++) {
+      final radius = i.isEven ? outerRadius : innerRadius;
+      final angle = (i * math.pi / points) - (math.pi / 2);
+      final x = cx + radius * math.cos(angle);
+      final y = cy + radius * math.sin(angle);
+      if (i == 0) {
+        path.moveTo(x, y);
+      } else {
+        path.lineTo(x, y);
+      }
+    }
+    path.close();
+    return path;
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
 class _StatChip extends StatelessWidget {

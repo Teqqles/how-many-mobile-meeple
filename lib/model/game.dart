@@ -7,6 +7,7 @@ class Game {
   final int minPlayers;
   final int maxPlaytime;
   final String imageUrl;
+  final String? thumbnail;
   final double averageRating;
   final double averageWeight;
 
@@ -17,6 +18,7 @@ class Game {
     required this.minPlayers,
     required this.maxPlaytime,
     required this.imageUrl,
+    this.thumbnail,
     required this.averageRating,
     required this.averageWeight,
   });
@@ -29,6 +31,7 @@ class Game {
       minPlayers: json['minplayers'],
       maxPlaytime: json['maxplaytime'] ?? 0,
       imageUrl: json['image'],
+      thumbnail: json['thumbnail'],
       averageRating: json['stats']['average'] ?? 0,
       averageWeight: json['stats']['averageweight'] ?? 0,
     );

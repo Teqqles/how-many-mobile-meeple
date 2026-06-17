@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:sprintf/sprintf.dart';
 import 'package:how_many_mobile_meeple/components/app_default_padding.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:how_many_mobile_meeple/platform/router.dart' as r;
 import '../../app_page.dart';
 import '../../app_common.dart';
 import 'package:how_many_mobile_meeple/components/heading_text.dart';
@@ -101,8 +101,8 @@ class BasicListGamesDisplayPage extends NetworkWidget with AppPage {
                                       style: TextStyle(
                                         decoration: TextDecoration.underline,
                                       )),
-                                  onTap: () => launchUrl(Uri.parse(
-                                      "https://www.boardgamegeek.com/boardgame/${game.id}"))),
+                                  onTap: () => Navigator.of(context).pushNamed(
+                                      '${r.Router.gameDetailRoute}/${game.name.replaceAll(' ', '+')}/${game.id}')),
                             ),
                           ),
                         ),

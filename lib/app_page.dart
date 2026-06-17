@@ -1,10 +1,7 @@
-import 'dart:typed_data';
-
-import 'package:share_plus/share_plus.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:how_many_mobile_meeple/platform/router.dart' as r;
-import 'package:mime/mime.dart';
-import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 import 'package:how_many_mobile_meeple/components/drawer_bgg_filter.dart';
 import 'package:how_many_mobile_meeple/components/drawer_switch.dart';
@@ -14,7 +11,6 @@ import 'components/component_factory.dart';
 import 'model/game.dart';
 import 'model/model.dart';
 import 'model/settings.dart';
-import 'package:path/path.dart';
 import 'pwa/pwa_install_service.dart';
 import 'theme_extensions.dart';
 
@@ -245,26 +241,57 @@ mixin AppPage {
         color: Theme.of(context).selectedRowColor,
       ),
       onPressed: () async {
-        var response = await http.get(Uri.parse(game.imageUrl));
-        var mimeType = lookupMimeType(basename(game.imageUrl));
-        Uint8List bytes = response.bodyBytes;
-        final xFile = XFile.fromData(
-          bytes,
-          name: basename(game.imageUrl),
-          mimeType: mimeType,
-        );
-        await SharePlus.instance.share(
-          ShareParams(
-            files: [xFile],
-            text: AppCommon.randomGameMessage(game.name),
-          ),
-        );
+        final baseUri = Uri.base.removeFragment();
+        final uri = baseUri.replace(
+            fragment: '/game/${game.name.replaceAll(' ', '+')}/${game.id}');
+        final url = uri.toString();
+        try {
+          final result = await SharePlus.instance.share(
+            ShareParams(
+              title: game.name,
+              text: AppCommon.randomGameMessage(game.name),
+              uri: uri,
+            ),
+          );
+          if (result.status == ShareResultStatus.unavailable) {
+            _showCopyLinkDialog(context, url);
+          }
+        } catch (_) {
+          _showCopyLinkDialog(context, url);
+        }
       },
       style: ButtonStyle(
           backgroundColor: WidgetStateProperty.all<Color>(
               Theme.of(context).colorScheme.secondary),
           shape: WidgetStateProperty.all<OutlinedBorder>(RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(30.0)))),
+    );
+  }
+
+  void _showCopyLinkDialog(BuildContext context, String url) {
+    showDialog(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Share Link'),
+        content: SelectableText(url),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(),
+            child: const Text('Close'),
+          ),
+          FilledButton.icon(
+            onPressed: () {
+              Clipboard.setData(ClipboardData(text: url));
+              Navigator.of(dialogContext).pop();
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Link copied to clipboard')),
+              );
+            },
+            icon: const Icon(Icons.copy),
+            label: const Text('Copy Link'),
+          ),
+        ],
+      ),
     );
   }
 

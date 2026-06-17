@@ -10,28 +10,37 @@ import '../screen_tools.dart';
 
 class PlatformIndependentImage extends StatelessWidget with ScreenTools {
   final String imageUrl;
+  final BoxFit? fit;
   final Codec<String, String> stringToBase64 = utf8.fuse(base64Url);
 
-  PlatformIndependentImage({super.key, required this.imageUrl});
+  PlatformIndependentImage({super.key, required this.imageUrl, this.fit});
 
   Widget buildWebImage(context) {
     return Image.network(
         AppCommon.boardGameGeekProxyUrl +
             "/cors-proxy/_" +
             stringToBase64.encode(this.imageUrl),
-        height: getScreenHeightPercentageInPixels(
-            context, ScreenTools.fiftyPercentScreen),
-        fit: BoxFit.fitHeight);
+        height: fit == null
+            ? getScreenHeightPercentageInPixels(
+                context, ScreenTools.fiftyPercentScreen)
+            : null,
+        alignment: Alignment.topCenter,
+        fit: fit ?? BoxFit.fitHeight);
   }
 
   Widget buildMobileCachedImage(context) {
     return CachedNetworkImage(
       imageUrl: this.imageUrl,
       imageBuilder: (context, provider) => Container(
-        height: getScreenHeightPercentageInPixels(
-            context, ScreenTools.fiftyPercentScreen),
+        height: fit == null
+            ? getScreenHeightPercentageInPixels(
+                context, ScreenTools.fiftyPercentScreen)
+            : null,
         decoration: BoxDecoration(
-          image: DecorationImage(image: provider, fit: BoxFit.fitHeight),
+          image: DecorationImage(
+              image: provider,
+              fit: fit ?? BoxFit.fitHeight,
+              alignment: Alignment.topCenter),
         ),
       ),
       placeholder: (context, url) => SpinKitCubeGrid(

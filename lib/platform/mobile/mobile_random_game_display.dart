@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:how_many_mobile_meeple/components/platform_independent_image.dart';
+import 'package:how_many_mobile_meeple/components/game_image_with_stats.dart';
+import 'package:how_many_mobile_meeple/components/recommendations_widget.dart';
 import 'package:how_many_mobile_meeple/platform/common/game_display_page.dart';
 import 'package:how_many_mobile_meeple/screen_tools.dart';
 
@@ -27,25 +28,27 @@ class MobileRandomGameDisplayPage extends GameDisplayPage {
       return const Center(child: Text('No game available'));
     }
     updatePageRefreshedStatus(model);
-    return Center(
-      child: Container(
-        width: getScreenWidthPercentageInPixels(
-            context, ScreenTools.eightyPercentScreen),
-        child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              AppDefaultPadding(
-                child: Text(
-                  game.name,
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                  textAlign: TextAlign.center,
+    return SingleChildScrollView(
+      child: Center(
+        child: Container(
+          width: getScreenWidthPercentageInPixels(
+              context, ScreenTools.eightyPercentScreen),
+          child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                AppDefaultPadding(
+                  child: Text(
+                    game.name,
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                    textAlign: TextAlign.center,
+                  ),
                 ),
-              ),
-              AppDefaultPadding(
-                  child: PlatformIndependentImage(imageUrl: game.imageUrl)),
-              shareButton(context, game),
-            ]),
+                AppDefaultPadding(child: GameImageWithStats(game: game)),
+                shareButton(context, game),
+                RecommendationsWidget(sourceGame: game, model: model),
+              ]),
+        ),
       ),
     );
   }

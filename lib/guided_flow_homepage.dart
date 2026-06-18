@@ -14,6 +14,9 @@ import 'package:how_many_mobile_meeple/components/pwa_install_banner.dart';
 import 'package:how_many_mobile_meeple/components/pwa_update_banner.dart';
 import 'package:how_many_mobile_meeple/components/disclaimer_text.dart';
 import 'package:how_many_mobile_meeple/components/empty_widget.dart';
+import 'package:how_many_mobile_meeple/tour_tips/tour_tip_service.dart';
+import 'package:how_many_mobile_meeple/tour_tips/tour_tip_definitions.dart';
+import 'package:how_many_mobile_meeple/tour_tips/tour_tip_keys.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
 /// Main guided flow homepage supporting two modes:
@@ -29,6 +32,7 @@ class GuidedFlowHomePage extends StatefulWidget with AppPage {
 class _GuidedFlowHomePageState extends State<GuidedFlowHomePage> {
   int _currentStep = 0;
   bool _showAdvancedMode = false;
+  final Set<String> _tourTipTriggered = {};
 
   final int _totalSteps = 5;
 
@@ -38,6 +42,30 @@ class _GuidedFlowHomePageState extends State<GuidedFlowHomePage> {
       WidgetsBinding.instance.addPostFrameCallback(
           (_) => setState(() => _showAdvancedMode = value));
     }
+  }
+
+  void _triggerTourTips(AppModel model) {
+    final isAdvanced = model.settings.setting('preferAdvancedMode').getBool();
+    if (isAdvanced) return;
+
+    final pageId = _currentStep == 0
+        ? TourTipDefinitions.pageAppBar
+        : 'step${_currentStep + 1}';
+
+    if (_tourTipTriggered.contains(pageId)) return;
+    _tourTipTriggered.add(pageId);
+
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (!mounted) return;
+      final service = await TourTipService.instance();
+      if (!service.isEnabled) return;
+
+      await service.showTipsForPage(
+        context: context,
+        pageId: pageId,
+        targets: TourTipKeys.forPage(pageId),
+      );
+    });
   }
 
   @override
@@ -50,16 +78,17 @@ class _GuidedFlowHomePageState extends State<GuidedFlowHomePage> {
         }
 
         _syncAdvancedMode(model);
+        _triggerTourTips(model);
 
         return Scaffold(
           appBar: HowManyMeepleAppBar(
             AppCommon.optionsPageTitle,
-            hasSaveDialog: true,
+            hasSaveDialog: _showAdvancedMode,
             isHomePage: true,
             model: model,
             context: context,
           ),
-          drawer: widget.pageDrawer(context),
+          endDrawer: widget.pageDrawer(context),
           body: Column(
             children: [
               const PwaUpdateBanner(),
@@ -295,7 +324,7 @@ class _GuidedFlowHomePageState extends State<GuidedFlowHomePage> {
                   label: const Text('Next'),
                 ),
 
-                // Finish button — skip straight to results
+                // Finish button - skip straight to results
                 if (_currentStep < _totalSteps - 1) ...[
                   const SizedBox(width: 8),
                   FilledButton.icon(

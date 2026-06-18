@@ -1,8 +1,5 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
 import 'package:how_many_mobile_meeple/guided_flow_homepage.dart';
-import 'package:how_many_mobile_meeple/platform/mobile/basic_list_games_display.dart';
-import 'package:how_many_mobile_meeple/platform/mobile/mobile_random_game_display.dart';
 import 'package:how_many_mobile_meeple/platform/web_or_tablet/enhanced_list_games_display.dart';
 import 'package:how_many_mobile_meeple/platform/web_or_tablet/web_random_game_display.dart';
 
@@ -12,7 +9,7 @@ abstract class Pages {
   Widget listGamesPage();
 
   static Pages platformPages() {
-    return kIsWeb ? WebPages() : MobilePages();
+    return WebPages();
   }
 
   static bool isLargeDevice() {
@@ -35,31 +32,6 @@ class WebPages extends Pages {
 
   @override
   Widget listGamesPage() {
-    if (Pages.isLargeDevice()) {
-      return EnhancedListGamesDisplayPage();
-    } else {
-      return BasicListGamesDisplayPage();
-    }
-  }
-}
-
-class MobilePages extends Pages {
-  @override
-  Widget homePage() {
-    return GuidedFlowHomePage();
-  }
-
-  @override
-  Widget randomGamePage() {
-    return MobileRandomGameDisplayPage();
-  }
-
-  @override
-  Widget listGamesPage() {
-    if (Pages.isLargeDevice()) {
-      return EnhancedListGamesDisplayPage();
-    } else {
-      return BasicListGamesDisplayPage();
-    }
+    return EnhancedListGamesDisplayPage();
   }
 }

@@ -43,31 +43,29 @@ class AppConfig {
 
   /// Load configuration from web/config.json or web/config.local.json
   static Future<void> _loadWebConfig() async {
-    try {
-      // Try local config first (for development)
-      var response = await http.get(Uri.parse('/config.local.json'));
-      if (response.statusCode == 200) {
-        final config = jsonDecode(response.body);
-        _cachedApiUrl = config['apiUrl'] as String;
-        return;
-      }
-    } catch (e) {
-      // Local config not found, try production config
+    final isLocalhost =
+        Uri.base.host == 'localhost' || Uri.base.host == '127.0.0.1';
+
+    if (isLocalhost) {
+      try {
+        var response = await http.get(Uri.parse('/config.local.json'));
+        if (response.statusCode == 200) {
+          final config = jsonDecode(response.body);
+          _cachedApiUrl = config['apiUrl'] as String;
+          return;
+        }
+      } catch (_) {}
     }
 
     try {
-      // Fall back to production config
       var response = await http.get(Uri.parse('/config.json'));
       if (response.statusCode == 200) {
         final config = jsonDecode(response.body);
         _cachedApiUrl = config['apiUrl'] as String;
         return;
       }
-    } catch (e) {
-      // Config file not found, use default
-    }
+    } catch (_) {}
 
-    // Ultimate fallback
     _cachedApiUrl = productionApiUrl;
   }
 

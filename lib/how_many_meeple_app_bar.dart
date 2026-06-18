@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:how_many_mobile_meeple/platform/router.dart' as r;
-import 'package:how_many_mobile_meeple/save_dialog.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'app_common.dart';
-import 'components/empty_widget.dart';
 import 'model/model.dart';
+import 'platform/router.dart' as r;
+import 'save_dialog.dart';
+import 'tour_tips/tour_tip_keys.dart';
 
 class HowManyMeepleAppBar extends AppBar {
   HowManyMeepleAppBar(String subtitle,
@@ -19,49 +19,52 @@ class HowManyMeepleAppBar extends AppBar {
           leading: isHomePage
               ? null
               : IconButton(
-                  icon: Icon(Icons.home),
+                  icon: const Icon(Icons.arrow_back),
                   onPressed: () {
-                    Navigator.of(context).pushNamedAndRemoveUntil(
-                        r.Router.homeRoute, (route) => false);
+                    if (Navigator.of(context).canPop()) {
+                      Navigator.of(context).pop();
+                    } else {
+                      Navigator.of(context).pushNamedAndRemoveUntil(
+                          r.Router.homeRoute, (route) => false);
+                    }
                   }),
-          title: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          title: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Text(AppCommon.appTitle),
-                  Text(
-                    subtitle,
-                    style: TextStyle(fontSize: 12),
-                  ),
-                ],
-              ),
-              Row(
-                children: <Widget>[
-                  IconButton(
-                    icon: Icon(Icons.newspaper),
-                    tooltip: 'Board Game News',
-                    onPressed: () => launchUrl(
-                      Uri.parse('https://www.boardgamenews.co.uk/'),
-                      mode: LaunchMode.externalApplication,
-                    ),
-                  ),
-                  hasSaveDialog
-                      ? IconButton(
-                          icon: Icon(Icons.save),
-                          onPressed: model != null
-                              ? () => showDialog(
-                                  context: context,
-                                  builder: (context) => SaveDialog(
-                                        model: model,
-                                      ))
-                              : null)
-                      : EmptyWidget(),
-                ],
+              Text(AppCommon.appTitle),
+              Text(
+                subtitle,
+                style: const TextStyle(fontSize: 12),
               ),
             ],
           ),
+          actions: [
+            IconButton(
+              key: isHomePage ? TourTipKeys.appBarNewsButton : null,
+              icon: const Icon(Icons.newspaper),
+              tooltip: 'Board Game News',
+              onPressed: () => launchUrl(
+                Uri.parse('https://www.boardgamenews.co.uk/'),
+                mode: LaunchMode.externalApplication,
+              ),
+            ),
+            if (hasSaveDialog && model != null)
+              IconButton(
+                icon: const Icon(Icons.save),
+                onPressed: () => showDialog(
+                  context: context,
+                  builder: (context) => SaveDialog(model: model),
+                ),
+              ),
+            Builder(
+              builder: (ctx) => IconButton(
+                key: isHomePage ? TourTipKeys.appBarSettingsButton : null,
+                icon: const Icon(Icons.settings),
+                tooltip: 'Settings',
+                onPressed: () => Scaffold.of(ctx).openEndDrawer(),
+              ),
+            ),
+          ],
         );
 }

@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:how_many_mobile_meeple/guided_flow_homepage.dart';
 import 'package:how_many_mobile_meeple/model/model.dart';
 import 'package:how_many_mobile_meeple/model/settings.dart';
+import 'package:how_many_mobile_meeple/tour_tips/tour_tip_service.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -19,7 +20,8 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   setUp(() {
-    SharedPreferences.setMockInitialValues({});
+    TourTipService.resetForTesting();
+    SharedPreferences.setMockInitialValues({'tour_tips_disabled': true});
   });
 
   group('GuidedFlowHomePage advanced mode stability', () {
@@ -46,7 +48,7 @@ void main() {
       model.refreshState();
       await tester.pump(const Duration(milliseconds: 100));
 
-      // Must still be in advanced mode — not flipped back to guided flow
+      // Must still be in advanced mode - not flipped back to guided flow
       expect(find.text('Step 1 of 5'), findsNothing);
     });
 

@@ -41,7 +41,7 @@ class _PwaUpdateBannerState extends State<PwaUpdateBanner> {
   Widget build(BuildContext context) {
     if (!_visible) return const SizedBox.shrink();
 
-    const bannerColor = Color(0xFF1565C0); // blue 800 — matches theme_color
+    const bannerColor = Color(0xFF1565C0); // blue 800 - matches theme_color
     const textColor = Colors.white;
 
     return Material(

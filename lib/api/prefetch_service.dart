@@ -19,7 +19,7 @@ class PrefetchService {
         }),
       );
     } catch (_) {
-      // Fire-and-forget — failures are non-fatal
+      // Fire-and-forget - failures are non-fatal
       _warmed.remove(key);
     }
   }

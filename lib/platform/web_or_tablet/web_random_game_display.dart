@@ -16,6 +16,7 @@ class WebRandomGameDisplayPage extends GameDisplayPage {
     return Scaffold(
         appBar: HowManyMeepleAppBar(AppCommon.randomGamePageTitle,
             context: context),
+        endDrawer: pageDrawer(context),
         persistentFooterButtons: [iconButtonGroup(context)],
         body: Container(child: loadNetworkContent(displayGame)));
   }

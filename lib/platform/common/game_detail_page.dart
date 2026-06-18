@@ -33,6 +33,7 @@ class _GameDetailPageState extends State<GameDetailPage>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: HowManyMeepleAppBar('Game Details', context: context),
+      endDrawer: pageDrawer(context),
       persistentFooterButtons: [iconButtonGroup(context)],
       body: FutureBuilder<Game>(
         future: _future,

@@ -36,7 +36,7 @@ class PwaUpdateService {
         _updateController.add(true);
       }
     } catch (_) {
-      // Network errors are expected — silently ignore
+      // Network errors are expected - silently ignore
     }
   }
 }

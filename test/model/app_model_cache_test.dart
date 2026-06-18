@@ -30,7 +30,7 @@ void main() {
     });
 
     test(
-        'rejects response when items have changed since fetch started — '
+        'rejects response when items have changed since fetch started - '
         'simulates background fetcher refilling cache after deleteItem', () {
       final model = AppModel()..hasLoadedPersistedData = true;
       // Setup: two items
@@ -41,20 +41,20 @@ void main() {
       final staleRequest = model.buildRequest();
       final staleGames = TestHelpers.twoGames();
 
-      // User removes dragonc — cache becomes stale, items shrink to [teqqles]
+      // User removes dragonc - cache becomes stale, items shrink to [teqqles]
       model.items.itemList.remove(Item('dragonc'));
       model.invalidateCache();
 
       // Stale fetch completes and tries to fill the cache
       model.replaceCache(staleGames, staleRequest);
 
-      // Cache must remain stale — stale response was rejected
+      // Cache must remain stale - stale response was rejected
       expect(model.bggCache.isStale(), true,
           reason: 'stale response from old items set must be rejected');
     });
 
     test(
-        'rejects response when headers have changed since fetch started — '
+        'rejects response when headers have changed since fetch started - '
         'simulates in-flight fetch completing after a filter change', () {
       final model = AppModel()..hasLoadedPersistedData = true;
       model.items.itemList.add(Item('teqqles'));

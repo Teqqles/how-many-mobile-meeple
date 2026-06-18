@@ -26,6 +26,7 @@ dependencies:
   universal_html: ^2.2.4
   path: ^1.9.0
   synchronized: ^3.3.0+3
+  tutorial_coach_mark: ^1.3.3
 
 dev_dependencies:
   flutter_test:
@@ -51,6 +52,7 @@ flutter:
   assets:
     - lib/images/dice.png
     - lib/images/powered_by_bgg.png
+    - lib/assets/fun_facts.txt
 
   # To add assets to your application, add an assets section, like this:
   # assets:

@@ -33,7 +33,7 @@ class HomePage extends StatelessWidget with AppPage {
             isHomePage: true,
             model: model,
             context: context),
-        drawer: pageDrawer(context),
+        endDrawer: pageDrawer(context),
         bottomNavigationBar: Container(
           color: Theme.of(context).highlightColor,
           child: AppDefaultPadding(

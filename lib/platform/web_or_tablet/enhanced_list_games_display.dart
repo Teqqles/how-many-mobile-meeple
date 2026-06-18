@@ -18,6 +18,7 @@ class EnhancedListGamesDisplayPage extends NetworkWidget with AppPage {
     return Scaffold(
         appBar:
             HowManyMeepleAppBar(AppCommon.listGamesPageTitle, context: context),
+        endDrawer: pageDrawer(context),
         persistentFooterButtons: [iconButtonGroup(context)],
         body: Container(child: loadNetworkContent(displayGame)));
   }

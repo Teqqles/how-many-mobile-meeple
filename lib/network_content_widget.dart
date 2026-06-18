@@ -4,19 +4,35 @@ import 'package:provider/provider.dart';
 import 'package:how_many_mobile_meeple/screen_tools.dart';
 
 import 'package:how_many_mobile_meeple/components/app_default_padding.dart';
+import 'package:how_many_mobile_meeple/components/loading_fun_facts.dart';
 import 'load_games.dart';
 import 'package:how_many_mobile_meeple/model/game_request.dart';
+import 'package:how_many_mobile_meeple/model/item.dart';
 import 'package:how_many_mobile_meeple/model/model.dart';
 
 import 'model/games.dart';
 
 abstract class NetworkWidget extends StatelessWidget with ScreenTools {
   static const String speedDisclaimer =
-      "this may take some time as board game geek is slow";
+      "Waiting for BoardGameGeek to respond - hang tight!";
   static const String pageErrorNoItemsSupplied =
-      "You must provide at least one geeklist or user collection";
+      "You must provide at least one source of games";
   static const String pageErrorOneOrMoreItemsInvalid =
-      "One or more of your geeklists or user collections cannot be loaded";
+      "One or more of your sources cannot be loaded";
+
+  static String errorForItems(AppModel model) {
+    final hasHot =
+        model.items.itemList.any((i) => i.itemType == ItemType.hotList);
+    final hasBgg =
+        model.items.itemList.any((i) => i.itemType != ItemType.hotList);
+    if (hasHot && !hasBgg) {
+      return "Unable to load trending games - BGG may be unavailable";
+    } else if (!hasHot && hasBgg) {
+      return "One or more of your collections or geeklists cannot be loaded";
+    }
+    return pageErrorOneOrMoreItemsInvalid;
+  }
+
   static const String pageErrorNoGamesAvailable =
       "Your filters have eliminated all games, try relaxing them to be able to select a game";
 
@@ -76,7 +92,9 @@ abstract class NetworkWidget extends StatelessWidget with ScreenTools {
           Text(
             speedDisclaimer,
             style: TextStyle(fontSize: 12),
-          )
+          ),
+          const SizedBox(height: 16),
+          const LoadingFunFacts(),
         ],
       ),
     );
@@ -185,7 +203,7 @@ class _GameFetcherState extends State<_GameFetcher> {
               context, widget.loadingSpinner(context));
         } else if (snapshot.hasError) {
           return widget.pageErrors(
-              context, NetworkWidget.pageErrorOneOrMoreItemsInvalid);
+              context, NetworkWidget.errorForItems(widget.model));
         }
         return widget.pageFrameOutline(context, widget.loadingSpinner(context));
       },

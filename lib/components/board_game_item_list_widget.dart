@@ -52,36 +52,16 @@ class BoardGameItemListWidget extends StatelessWidget {
     }
     return model.items.itemList.map(
       (item) => ListTile(
-        title: Text(_limitTitleLength(item.name)),
-        trailing: SizedBox(
-          width: 144, // Constrain to reasonable width for 3 icon buttons
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              IconButton(
-                  padding: const EdgeInsets.all(4),
-                  constraints: const BoxConstraints(),
-                  icon: Icon(Icons.person,
-                      size: AppCommon.standardIconSize,
-                      color: _colorItem(context, item, ItemType.collection)),
-                  onPressed: () {
-                    item.itemType = ItemType.collection;
-                    model.invalidateCache();
-                    model.updateStore();
-                  }),
-              IconButton(
-                  padding: const EdgeInsets.all(4),
-                  constraints: const BoxConstraints(),
-                  icon: Icon(Icons.format_list_bulleted,
-                      size: AppCommon.standardIconSize,
-                      color: _colorItem(context, item, ItemType.geekList)),
-                  onPressed: () {
-                    item.itemType = ItemType.geekList;
-                    model.invalidateCache();
-                    model.updateStore();
-                  }),
-              IconButton(
+        leading: item.itemType == ItemType.hotList
+            ? Icon(Icons.local_fire_department,
+                size: AppCommon.standardIconSize,
+                color: Theme.of(context).colorScheme.secondary)
+            : null,
+        title: Text(item.itemType == ItemType.hotList
+            ? 'Trending Games'
+            : _limitTitleLength(item.name)),
+        trailing: item.itemType == ItemType.hotList
+            ? IconButton(
                 padding: const EdgeInsets.all(4),
                 constraints: const BoxConstraints(),
                 icon: Icon(
@@ -92,10 +72,52 @@ class BoardGameItemListWidget extends StatelessWidget {
                 onPressed: () {
                   model.deleteItem(item);
                 },
+              )
+            : SizedBox(
+                width: 144,
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    IconButton(
+                        padding: const EdgeInsets.all(4),
+                        constraints: const BoxConstraints(),
+                        icon: Icon(Icons.person,
+                            size: AppCommon.standardIconSize,
+                            color:
+                                _colorItem(context, item, ItemType.collection)),
+                        onPressed: () {
+                          item.itemType = ItemType.collection;
+                          model.invalidateCache();
+                          model.updateStore();
+                        }),
+                    IconButton(
+                        padding: const EdgeInsets.all(4),
+                        constraints: const BoxConstraints(),
+                        icon: Icon(Icons.format_list_bulleted,
+                            size: AppCommon.standardIconSize,
+                            color:
+                                _colorItem(context, item, ItemType.geekList)),
+                        onPressed: () {
+                          item.itemType = ItemType.geekList;
+                          model.invalidateCache();
+                          model.updateStore();
+                        }),
+                    IconButton(
+                      padding: const EdgeInsets.all(4),
+                      constraints: const BoxConstraints(),
+                      icon: Icon(
+                        Icons.delete,
+                        size: AppCommon.standardIconSize,
+                        color: Theme.of(context).colorScheme.error,
+                      ),
+                      onPressed: () {
+                        model.deleteItem(item);
+                      },
+                    ),
+                  ],
+                ),
               ),
-            ],
-          ),
-        ),
       ),
     );
   }

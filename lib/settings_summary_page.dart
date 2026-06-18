@@ -43,7 +43,7 @@ class SettingsSummaryPage extends StatelessWidget with AppPage {
         model: model,
         context: context,
       ),
-      drawer: pageDrawer(context),
+      endDrawer: pageDrawer(context),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(16.0),

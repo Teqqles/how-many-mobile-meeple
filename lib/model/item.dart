@@ -1,6 +1,7 @@
 class ItemType {
   static const collection = ItemType("collection");
   static const geekList = ItemType("geeklist");
+  static const hotList = ItemType("hot");
 
   final String name;
 

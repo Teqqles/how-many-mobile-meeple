@@ -5,6 +5,7 @@ import 'package:how_many_mobile_meeple/model/settings.dart';
 import 'package:how_many_mobile_meeple/app_common.dart';
 import 'package:how_many_mobile_meeple/components/step_header_card.dart';
 import 'package:how_many_mobile_meeple/components/info_message_box.dart';
+import 'package:how_many_mobile_meeple/tour_tips/tour_tip_keys.dart';
 
 /// Step 3: Time Available
 /// Allows users to select game duration with quick presets
@@ -68,6 +69,7 @@ class _Step3TimeAvailableState extends State<Step3TimeAvailable> {
                         AppCommon.minutesToTime(minTime) +
                             ' - ' +
                             AppCommon.minutesToTime(maxTime),
+                        key: TourTipKeys.timeRangeSlider,
                         style:
                             Theme.of(context).textTheme.displayMedium?.copyWith(
                                   color: Theme.of(context).colorScheme.primary,

@@ -148,6 +148,7 @@ class AppModel extends ChangeNotifier {
     hasLoadedPersistedData = true;
     notifyListeners();
     for (final item in _items.itemList) {
+      if (item.itemType == ItemType.hotList) continue;
       PrefetchService.warmCache(item);
     }
   }

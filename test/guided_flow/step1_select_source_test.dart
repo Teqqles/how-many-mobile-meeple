@@ -13,16 +13,22 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: ChangeNotifierProvider.value(
-              value: model,
-              child: const Step1SelectSource(),
+            body: SingleChildScrollView(
+              child: ChangeNotifierProvider.value(
+                value: model,
+                child: const Step1SelectSource(),
+              ),
             ),
           ),
         ),
       );
 
+      // Switch to My Collection tab
+      await tester.tap(find.text('My Collection'));
+      await tester.pump();
+
       // Find the Add Source button
-      final addButton = find.widgetWithText(FilledButton, 'Add Source');
+      final addButton = find.widgetWithText(FilledButton, 'Add Collection');
       expect(addButton, findsOneWidget);
 
       // Button should be disabled (onPressed is null)
@@ -37,13 +43,19 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: ChangeNotifierProvider.value(
-              value: model,
-              child: const Step1SelectSource(),
+            body: SingleChildScrollView(
+              child: ChangeNotifierProvider.value(
+                value: model,
+                child: const Step1SelectSource(),
+              ),
             ),
           ),
         ),
       );
+
+      // Switch to My Collection tab
+      await tester.tap(find.text('My Collection'));
+      await tester.pump();
 
       // Find the text field
       final textField = find.byType(TextField);
@@ -54,7 +66,7 @@ void main() {
       await tester.pump();
 
       // Find the Add Source button
-      final addButton = find.widgetWithText(FilledButton, 'Add Source');
+      final addButton = find.widgetWithText(FilledButton, 'Add Collection');
       expect(addButton, findsOneWidget);
 
       // Button should now be enabled (onPressed is not null)
@@ -69,13 +81,19 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: ChangeNotifierProvider.value(
-              value: model,
-              child: const Step1SelectSource(),
+            body: SingleChildScrollView(
+              child: ChangeNotifierProvider.value(
+                value: model,
+                child: const Step1SelectSource(),
+              ),
             ),
           ),
         ),
       );
+
+      // Switch to My Collection tab
+      await tester.tap(find.text('My Collection'));
+      await tester.pump();
 
       // Find the text field
       final textField = find.byType(TextField);
@@ -86,7 +104,7 @@ void main() {
 
       // Verify button is enabled
       FilledButton button =
-          tester.widget(find.widgetWithText(FilledButton, 'Add Source'));
+          tester.widget(find.widgetWithText(FilledButton, 'Add Collection'));
       expect(button.onPressed, isNotNull);
 
       // Clear the text
@@ -94,7 +112,8 @@ void main() {
       await tester.pump();
 
       // Button should be disabled again
-      button = tester.widget(find.widgetWithText(FilledButton, 'Add Source'));
+      button =
+          tester.widget(find.widgetWithText(FilledButton, 'Add Collection'));
       expect(button.onPressed, isNull);
     });
   });

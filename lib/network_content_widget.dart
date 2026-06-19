@@ -71,31 +71,34 @@ abstract class NetworkWidget extends StatelessWidget with ScreenTools {
         .clamp(0.0, 200.0);
 
     return Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          AppDefaultPadding(
-            child: SpinKitCubeGrid(
-              size: spinnerSize,
-              itemBuilder: (context, index) {
-                final isLight = (index ~/ 3 + index % 3) % 2 == 0;
-                final color = Theme.of(context).colorScheme.secondary;
-                return DecoratedBox(
-                  decoration: BoxDecoration(
-                    color: isLight ? color : color.withValues(alpha: 0.5),
-                  ),
-                );
-              },
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 480),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            AppDefaultPadding(
+              child: SpinKitCubeGrid(
+                size: spinnerSize,
+                itemBuilder: (context, index) {
+                  final isLight = (index ~/ 3 + index % 3) % 2 == 0;
+                  final color = Theme.of(context).colorScheme.secondary;
+                  return DecoratedBox(
+                    decoration: BoxDecoration(
+                      color: isLight ? color : color.withValues(alpha: 0.5),
+                    ),
+                  );
+                },
+              ),
             ),
-          ),
-          Text(findingGames, style: TextStyle(fontWeight: FontWeight.bold)),
-          Text(
-            speedDisclaimer,
-            style: TextStyle(fontSize: 12),
-          ),
-          const SizedBox(height: 16),
-          const LoadingFunFacts(),
-        ],
+            Text(findingGames, style: TextStyle(fontWeight: FontWeight.bold)),
+            Text(
+              speedDisclaimer,
+              style: TextStyle(fontSize: 12),
+            ),
+            const SizedBox(height: 16),
+            const LoadingFunFacts(),
+          ],
+        ),
       ),
     );
   }

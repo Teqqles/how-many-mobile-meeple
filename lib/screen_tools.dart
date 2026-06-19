@@ -7,7 +7,7 @@ mixin ScreenTools {
   Row pageFrameOutline(BuildContext context, Widget frameContent) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
-      children: [frameContent],
+      children: [Flexible(child: frameContent)],
     );
   }
 

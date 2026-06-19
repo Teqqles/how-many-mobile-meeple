@@ -46,6 +46,7 @@ class WebRandomGameDisplayPage extends GameDisplayPage {
                   ),
                 ),
                 AppDefaultPadding(child: GameImageWithStats(game: game)),
+                shareButton(context, game),
                 RecommendationsWidget(sourceGame: game, model: model),
               ]),
         ),

@@ -302,7 +302,7 @@ class _Step1SelectSourceState extends State<Step1SelectSource> {
       builder: (context, model, child) => Card(
         elevation: 2,
         child: Padding(
-          padding: const EdgeInsets.all(20.0),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 20),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -359,21 +359,29 @@ class _Step1SelectSourceState extends State<Step1SelectSource> {
 
   Widget _buildTabSelector(BuildContext context) {
     return SegmentedButton<int>(
+      showSelectedIcon: false,
+      style: ButtonStyle(
+        visualDensity: VisualDensity.compact,
+        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+        padding: WidgetStatePropertyAll(
+          const EdgeInsets.symmetric(horizontal: 8),
+        ),
+      ),
       segments: [
         ButtonSegment(
           value: 0,
           label: Text('Trending', key: _tabSelectorKey),
-          icon: const Icon(Icons.local_fire_department),
+          icon: const Icon(Icons.local_fire_department, size: 18),
         ),
         const ButtonSegment(
           value: 1,
           label: Text('My Collection'),
-          icon: Icon(Icons.person),
+          icon: Icon(Icons.person, size: 18),
         ),
         const ButtonSegment(
           value: 2,
           label: Text('Geeklist'),
-          icon: Icon(Icons.list),
+          icon: Icon(Icons.list, size: 18),
         ),
       ],
       selected: {_tabIndex},

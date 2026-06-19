@@ -51,8 +51,10 @@ flutter:
 
   assets:
     - lib/images/dice.png
+    - lib/images/launcher_icon.png
     - lib/images/powered_by_bgg.png
     - lib/assets/fun_facts.txt
+    - lib/assets/about_data.json
 
   # To add assets to your application, add an assets section, like this:
   # assets:

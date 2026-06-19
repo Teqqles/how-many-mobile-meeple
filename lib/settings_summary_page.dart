@@ -7,6 +7,7 @@ import 'package:how_many_mobile_meeple/app_page.dart';
 import 'package:how_many_mobile_meeple/components/disclaimer_text.dart';
 import 'package:how_many_mobile_meeple/components/empty_widget.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:how_many_mobile_meeple/about_page.dart';
 
 /// Settings Summary Page
 /// Shows current settings in both friendly terms and raw values
@@ -537,8 +538,24 @@ class SettingsSummaryPage extends StatelessWidget with AppPage {
           child: BGGAttribution(),
         ),
         Padding(
-          padding: const EdgeInsets.only(right: 16.0),
-          child: DisclaimerText("(v:$version)", context),
+          padding: const EdgeInsets.only(right: 8.0),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              DisclaimerText("(v:$version)", context),
+              const SizedBox(width: 4),
+              GestureDetector(
+                onTap: () => Navigator.of(context).push(
+                  MaterialPageRoute(builder: (_) => const AboutPage()),
+                ),
+                child: Icon(
+                  Icons.info_outline,
+                  size: 20,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+              ),
+            ],
+          ),
         ),
       ],
     );

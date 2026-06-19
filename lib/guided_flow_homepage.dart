@@ -18,6 +18,7 @@ import 'package:how_many_mobile_meeple/tour_tips/tour_tip_service.dart';
 import 'package:how_many_mobile_meeple/tour_tips/tour_tip_definitions.dart';
 import 'package:how_many_mobile_meeple/tour_tips/tour_tip_keys.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:how_many_mobile_meeple/about_page.dart';
 
 /// Main guided flow homepage supporting two modes:
 /// 1. Guided Flow Mode (default) - step-by-step onboarding
@@ -364,15 +365,29 @@ class _GuidedFlowHomePageState extends State<GuidedFlowHomePage> {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: <Widget>[
-        // BGG Attribution on the left, taking full vertical height
         Container(
           height: double.infinity,
           child: BGGAttribution(),
         ),
-        // Version on the right, vertically centered
         Padding(
-          padding: const EdgeInsets.only(right: 16.0),
-          child: DisclaimerText("(v:$version)", context),
+          padding: const EdgeInsets.only(right: 8.0),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              DisclaimerText("(v:$version)", context),
+              const SizedBox(width: 4),
+              GestureDetector(
+                onTap: () => Navigator.of(context).push(
+                  MaterialPageRoute(builder: (_) => const AboutPage()),
+                ),
+                child: Icon(
+                  Icons.info_outline,
+                  size: 20,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+              ),
+            ],
+          ),
         ),
       ],
     );

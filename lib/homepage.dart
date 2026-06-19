@@ -13,6 +13,7 @@ import 'package:how_many_mobile_meeple/components/pwa_install_banner.dart';
 import 'app_page.dart';
 import 'package:how_many_mobile_meeple/components/disclaimer_text.dart';
 import 'app_common.dart';
+import 'package:how_many_mobile_meeple/about_page.dart';
 import 'components/empty_widget.dart';
 import 'how_many_meeple_app_bar.dart';
 import 'package:how_many_mobile_meeple/model/model.dart';
@@ -83,7 +84,23 @@ class HomePage extends StatelessWidget with AppPage {
           padding: const EdgeInsets.only(right: 8.0),
           child: BGGAttribution(),
         ),
-        DisclaimerText("(v:$version)", context)
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            DisclaimerText("(v:$version)", context),
+            const SizedBox(width: 4),
+            GestureDetector(
+              onTap: () => Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => const AboutPage()),
+              ),
+              child: Icon(
+                Icons.info_outline,
+                size: 20,
+                color: Theme.of(context).colorScheme.primary,
+              ),
+            ),
+          ],
+        ),
       ],
     );
   }

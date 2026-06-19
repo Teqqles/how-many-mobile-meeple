@@ -1,0 +1,104 @@
+{
+  "version": "2.8.1",
+  "since_version": "v2.7.0",
+  "recent_changes": [
+    {
+      "type": "fix",
+      "scope": "",
+      "description": "center loading screen on mobile viewports"
+    },
+    {
+      "type": "feat",
+      "scope": "",
+      "description": "add tour tips, trending games, fun facts, and remove legacy mobile"
+    }
+  ],
+  "upcoming": [
+    {
+      "number": 64,
+      "title": "Hide details when we have no data",
+      "labels": []
+    },
+    {
+      "number": 63,
+      "title": "Sharer always using fallback to copy link feature",
+      "labels": [
+        "bug"
+      ]
+    },
+    {
+      "number": 62,
+      "title": "Losing filter details if hitting refresh on detail pages",
+      "labels": [
+        "bug"
+      ]
+    },
+    {
+      "number": 61,
+      "title": "List screen should show current filtering",
+      "labels": []
+    },
+    {
+      "number": 60,
+      "title": "Listing page should react to mobile gestures",
+      "labels": []
+    },
+    {
+      "number": 45,
+      "title": "Recommended because...",
+      "labels": []
+    },
+    {
+      "number": 44,
+      "title": "Adventure Mode - Explore Outside Your Comfort Zone",
+      "labels": []
+    },
+    {
+      "number": 43,
+      "title": "Compare Two Choices",
+      "labels": []
+    },
+    {
+      "number": 42,
+      "title": "Why This Game?",
+      "labels": []
+    },
+    {
+      "number": 41,
+      "title": "Mood\u2011Based Discovery",
+      "labels": []
+    },
+    {
+      "number": 39,
+      "title": "Game Night",
+      "labels": []
+    },
+    {
+      "number": 31,
+      "title": "Clicking a Saved Setting Reverts to Flow",
+      "labels": [
+        "bug"
+      ]
+    },
+    {
+      "number": 29,
+      "title": "Delete preference with null ID silently fails",
+      "labels": []
+    },
+    {
+      "number": 28,
+      "title": "FutureBuilder rebuilds on every drawer open",
+      "labels": []
+    },
+    {
+      "number": 27,
+      "title": "Redundant storage factory calls",
+      "labels": []
+    },
+    {
+      "number": 26,
+      "title": "Repeated widget patterns not extracted",
+      "labels": []
+    }
+  ]
+}

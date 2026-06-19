@@ -19,8 +19,12 @@ OUTPUT = "lib/assets/about_data.json"
 def fetch_github_issues():
     url = f"https://api.github.com/repos/{REPO}/issues?state=open&per_page=30"
     req = urllib.request.Request(url, headers={"Accept": "application/vnd.github.v3+json"})
-    with urllib.request.urlopen(req) as resp:
-        issues = json.loads(resp.read())
+    try:
+        with urllib.request.urlopen(req, timeout=30) as resp:
+            issues = json.loads(resp.read())
+    except Exception as e:
+        print(f"  Warning: GitHub API request failed ({e}), using empty issues list")
+        return []
 
     result = []
     for issue in issues:

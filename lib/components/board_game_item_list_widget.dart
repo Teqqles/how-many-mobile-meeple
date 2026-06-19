@@ -52,74 +52,34 @@ class BoardGameItemListWidget extends StatelessWidget {
     }
     return model.items.itemList.map(
       (item) => ListTile(
-        leading: item.itemType == ItemType.hotList
-            ? Icon(Icons.local_fire_department,
-                size: AppCommon.standardIconSize,
-                color: Theme.of(context).colorScheme.secondary)
-            : null,
+        leading: Icon(
+          _iconForItemType(item.itemType),
+          size: AppCommon.standardIconSize,
+          color: Theme.of(context).colorScheme.secondary,
+        ),
         title: Text(item.itemType == ItemType.hotList
             ? 'Trending Games'
             : _limitTitleLength(item.name)),
-        trailing: item.itemType == ItemType.hotList
-            ? IconButton(
-                padding: const EdgeInsets.all(4),
-                constraints: const BoxConstraints(),
-                icon: Icon(
-                  Icons.delete,
-                  size: AppCommon.standardIconSize,
-                  color: Theme.of(context).colorScheme.error,
-                ),
-                onPressed: () {
-                  model.deleteItem(item);
-                },
-              )
-            : SizedBox(
-                width: 144,
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    IconButton(
-                        padding: const EdgeInsets.all(4),
-                        constraints: const BoxConstraints(),
-                        icon: Icon(Icons.person,
-                            size: AppCommon.standardIconSize,
-                            color:
-                                _colorItem(context, item, ItemType.collection)),
-                        onPressed: () {
-                          item.itemType = ItemType.collection;
-                          model.invalidateCache();
-                          model.updateStore();
-                        }),
-                    IconButton(
-                        padding: const EdgeInsets.all(4),
-                        constraints: const BoxConstraints(),
-                        icon: Icon(Icons.format_list_bulleted,
-                            size: AppCommon.standardIconSize,
-                            color:
-                                _colorItem(context, item, ItemType.geekList)),
-                        onPressed: () {
-                          item.itemType = ItemType.geekList;
-                          model.invalidateCache();
-                          model.updateStore();
-                        }),
-                    IconButton(
-                      padding: const EdgeInsets.all(4),
-                      constraints: const BoxConstraints(),
-                      icon: Icon(
-                        Icons.delete,
-                        size: AppCommon.standardIconSize,
-                        color: Theme.of(context).colorScheme.error,
-                      ),
-                      onPressed: () {
-                        model.deleteItem(item);
-                      },
-                    ),
-                  ],
-                ),
-              ),
+        trailing: IconButton(
+          padding: const EdgeInsets.all(4),
+          constraints: const BoxConstraints(),
+          icon: Icon(
+            Icons.delete,
+            size: AppCommon.standardIconSize,
+            color: Theme.of(context).colorScheme.error,
+          ),
+          onPressed: () {
+            model.deleteItem(item);
+          },
+        ),
       ),
     );
+  }
+
+  IconData _iconForItemType(ItemType type) {
+    if (type == ItemType.hotList) return Icons.local_fire_department;
+    if (type == ItemType.geekList) return Icons.format_list_bulleted;
+    return Icons.person;
   }
 
   String _limitTitleLength(String text) {
@@ -128,9 +88,4 @@ class BoardGameItemListWidget extends StatelessWidget {
     }
     return text;
   }
-
-  Color _colorItem(BuildContext context, Item item, ItemType expectedType) =>
-      expectedType == item.itemType
-          ? Theme.of(context).colorScheme.secondary
-          : Theme.of(context).disabledColor;
 }

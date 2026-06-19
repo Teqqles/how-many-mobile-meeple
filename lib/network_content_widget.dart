@@ -106,8 +106,11 @@ abstract class NetworkWidget extends StatelessWidget with ScreenTools {
   Widget loadNetworkContent(
       Widget displayWidgetFn(BuildContext context, AppModel model)) {
     return Consumer<AppModel>(builder: (context, model, child) {
+      if (model.items.isEmpty && !model.hasLoadedPersistedData) {
+        return _DataLoader(model: model, child: loadingSpinner(context));
+      }
       if (model.items.isEmpty) {
-        return pageErrors(context, pageErrorNoItemsSupplied);
+        return _noSourcesMessage(context);
       }
       return _GameFetcher(
         model: model,
@@ -118,6 +121,64 @@ abstract class NetworkWidget extends StatelessWidget with ScreenTools {
       );
     });
   }
+
+  Widget _noSourcesMessage(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.casino_outlined,
+                size: 64, color: Theme.of(context).colorScheme.primary),
+            const SizedBox(height: 16),
+            Text(
+              'No game sources set up yet',
+              style: Theme.of(context)
+                  .textTheme
+                  .titleMedium
+                  ?.copyWith(fontWeight: FontWeight.bold),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Add a BGG collection or geeklist to get started',
+              style: Theme.of(context).textTheme.bodyMedium,
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 24),
+            FilledButton.icon(
+              onPressed: () => Navigator.of(context)
+                  .pushNamedAndRemoveUntil('/', (_) => false),
+              icon: const Icon(Icons.home),
+              label: const Text('Go to Home'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _DataLoader extends StatefulWidget {
+  final AppModel model;
+  final Widget child;
+
+  const _DataLoader({required this.model, required this.child});
+
+  @override
+  State<_DataLoader> createState() => _DataLoaderState();
+}
+
+class _DataLoaderState extends State<_DataLoader> {
+  @override
+  void initState() {
+    super.initState();
+    widget.model.loadStoredData();
+  }
+
+  @override
+  Widget build(BuildContext context) => widget.child;
 }
 
 /// Stateful widget that owns the fetch Future so that model notifications

@@ -106,11 +106,24 @@ def get_version():
     return "unknown"
 
 
+def parse_args():
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--issues-file", help="Path to pre-fetched issues JSON file")
+    return parser.parse_args()
+
+
 def main():
+    args = parse_args()
     version = get_version()
 
-    print("Fetching open issues from GitHub...")
-    issues = fetch_github_issues()
+    if args.issues_file:
+        print(f"Loading issues from {args.issues_file}...")
+        with open(args.issues_file) as f:
+            issues = json.load(f)
+    else:
+        print("Fetching open issues from GitHub...")
+        issues = fetch_github_issues()
 
     print(f"Getting recent changes since previous minor (current: {version})...")
     changes, since_tag = get_recent_changes(version)

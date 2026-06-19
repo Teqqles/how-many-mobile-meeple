@@ -84,9 +84,31 @@ jobs:
 
           sed -i "s/^version: .*/version: ${NEW_VERSION}/" pubspec.yaml
 
+      - name: Fetch GitHub issues
+        if: steps.bump.outputs.type != 'skip'
+        id: issues
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issues = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              per_page: 30,
+            });
+            const result = issues.data
+              .filter(i => !i.pull_request)
+              .map(i => ({
+                number: i.number,
+                title: i.title,
+                labels: i.labels.map(l => l.name),
+              }));
+            const fs = require('fs');
+            fs.writeFileSync('/tmp/github_issues.json', JSON.stringify(result));
+
       - name: Generate about page data
         if: steps.bump.outputs.type != 'skip'
-        run: python3 scripts/generate_about_data.py
+        run: python3 scripts/generate_about_data.py --issues-file /tmp/github_issues.json
 
       - name: Commit, tag, and push
         if: steps.bump.outputs.type != 'skip'

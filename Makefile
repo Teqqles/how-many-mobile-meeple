@@ -1,4 +1,4 @@
-generate_all:   generate_fat_apk generate_split_apk generate_appbundle generate_web
+generate_all:   generate_about_data generate_fat_apk generate_split_apk generate_appbundle generate_web
 
 generate_fat_apk:
 	@echo "Building Amazon Appstore deployable..."
@@ -18,6 +18,9 @@ generate_web:
 
 upload_web:
 	aws s3 cp ./build/web s3://www.howmanymeeple.com --recursive --exclude "config.local.json" --exclude "config.local.json.bak" --profile howmanymeeple
+
+generate_about_data:
+	@python scripts/generate_about_data.py
 
 clean:
 	flutter clean

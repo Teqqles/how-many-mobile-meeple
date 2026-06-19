@@ -84,7 +84,11 @@ jobs:
 
           sed -i "s/^version: .*/version: ${NEW_VERSION}/" pubspec.yaml
 
-      - name: Commit and tag
+      - name: Generate about page data
+        if: steps.bump.outputs.type != 'skip'
+        run: python3 scripts/generate_about_data.py
+
+      - name: Commit, tag, and push
         if: steps.bump.outputs.type != 'skip'
         run: |
           TAG="${{ steps.version.outputs.tag }}"
@@ -92,7 +96,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          git add pubspec.yaml
+          git add pubspec.yaml lib/assets/about_data.json
           git commit -m "chore: bump version to ${TAG} [skip ci]"
           git tag "$TAG"
           git push origin main "$TAG"

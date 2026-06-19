@@ -5,6 +5,41 @@
     {
       "type": "fix",
       "scope": "",
+      "description": "handle GitHub API timeout in about data generation"
+    },
+    {
+      "type": "fix",
+      "scope": "",
+      "description": "load saved sources on refresh and show friendly empty state"
+    },
+    {
+      "type": "fix",
+      "scope": "",
+      "description": "share button on random game page and remove false fallback dialog"
+    },
+    {
+      "type": "feat",
+      "scope": "",
+      "description": "auto-generate about page data in CI on tag release"
+    },
+    {
+      "type": "feat",
+      "scope": "",
+      "description": "add about page with version info, upcoming features, and contributors"
+    },
+    {
+      "type": "feat",
+      "scope": "",
+      "description": "replace collection/geeklist toggle with auto-detected leading icon"
+    },
+    {
+      "type": "fix",
+      "scope": "",
+      "description": "compact step 1 tabs to prevent text wrapping on mobile"
+    },
+    {
+      "type": "fix",
+      "scope": "",
       "description": "center loading screen on mobile viewports"
     },
     {
@@ -18,13 +53,6 @@
       "number": 64,
       "title": "Hide details when we have no data",
       "labels": []
-    },
-    {
-      "number": 63,
-      "title": "Sharer always using fallback to copy link feature",
-      "labels": [
-        "bug"
-      ]
     },
     {
       "number": 62,
@@ -72,13 +100,6 @@
       "number": 39,
       "title": "Game Night",
       "labels": []
-    },
-    {
-      "number": 31,
-      "title": "Clicking a Saved Setting Reverts to Flow",
-      "labels": [
-        "bug"
-      ]
     },
     {
       "number": 29,

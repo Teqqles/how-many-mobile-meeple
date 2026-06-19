@@ -281,15 +281,12 @@ mixin AppPage {
             fragment: '/game/${game.name.replaceAll(' ', '+')}/${game.id}');
         final url = uri.toString();
         try {
-          final result = await SharePlus.instance.share(
+          await SharePlus.instance.share(
             ShareParams(
               title: AppCommon.randomGameMessage(game.name),
               uri: uri,
             ),
           );
-          if (result.status == ShareResultStatus.unavailable) {
-            _showCopyLinkDialog(context, url);
-          }
         } catch (_) {
           _showCopyLinkDialog(context, url);
         }

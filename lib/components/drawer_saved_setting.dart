@@ -70,7 +70,7 @@ class DrawerSavedSetting extends Container {
                   var model = AppModel.of(context, listen: false);
                   var db = StorageFactory.getPreferencesHistory();
                   db.deletePreference(preferences.id!);
-                  model.refreshState();
+                  model.invalidatePreferencesCache();
                 },
               ),
             ],

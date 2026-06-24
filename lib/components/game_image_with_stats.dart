@@ -11,6 +11,12 @@ class GameImageWithStats extends StatelessWidget with ScreenTools {
 
   GameImageWithStats({super.key, required this.game});
 
+  bool get _hasImage => game.imageUrl.isNotEmpty;
+  bool get _hasRating => game.averageRating > 0;
+  bool get _hasPlayers => game.minPlayers > 0 || game.maxPlayers > 0;
+  bool get _hasPlaytime => game.maxPlaytime > 0;
+  bool get _hasWeight => game.averageWeight > 0;
+
   @override
   Widget build(BuildContext context) {
     final maxHeight = getScreenHeightPercentageInPixels(
@@ -21,34 +27,37 @@ class GameImageWithStats extends StatelessWidget with ScreenTools {
         child: Stack(
           clipBehavior: Clip.hardEdge,
           children: [
-            SizedBox(
-              width: double.infinity,
-              child: PlatformIndependentImage(
-                imageUrl: game.imageUrl,
-                fit: BoxFit.fitWidth,
+            if (_hasImage)
+              SizedBox(
+                width: double.infinity,
+                child: PlatformIndependentImage(
+                  imageUrl: game.imageUrl,
+                  fit: BoxFit.fitWidth,
+                ),
               ),
-            ),
-            Positioned(
-              left: 0,
-              right: 0,
-              top: maxHeight * 0.65,
-              height: maxHeight * 0.40,
-              child: DecoratedBox(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    stops: const [0.0, 0.85, 1.0],
-                    colors: [
-                      Colors.transparent,
-                      Theme.of(context).scaffoldBackgroundColor,
-                      Theme.of(context).scaffoldBackgroundColor,
-                    ],
+            if (_hasImage)
+              Positioned(
+                left: 0,
+                right: 0,
+                top: maxHeight * 0.65,
+                height: maxHeight * 0.40,
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      stops: const [0.0, 0.85, 1.0],
+                      colors: [
+                        Colors.transparent,
+                        Theme.of(context).scaffoldBackgroundColor,
+                        Theme.of(context).scaffoldBackgroundColor,
+                      ],
+                    ),
                   ),
                 ),
               ),
-            ),
-            if (MediaQuery.of(context).size.width >= 1024 &&
+            if (_hasImage &&
+                MediaQuery.of(context).size.width >= 1024 &&
                 game.thumbnail != null)
               Positioned(
                 left: 24,
@@ -78,11 +87,12 @@ class GameImageWithStats extends StatelessWidget with ScreenTools {
                   ),
                 ),
               ),
-            Positioned(
-              right: 8,
-              top: 8,
-              child: _RatingBadge(rating: game.averageRating),
-            ),
+            if (_hasRating)
+              Positioned(
+                right: 8,
+                top: 8,
+                child: _RatingBadge(rating: game.averageRating),
+              ),
             Positioned(
               right: 0,
               bottom: 0,
@@ -107,23 +117,29 @@ class GameImageWithStats extends StatelessWidget with ScreenTools {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    _StatChip(
-                      icon: Icons.people,
-                      label: game.minPlayers == game.maxPlayers
-                          ? '${game.minPlayers} players'
-                          : '${game.minPlayers}-${game.maxPlayers} players',
-                    ),
-                    const SizedBox(height: 14),
-                    _StatChip(
-                      icon: Icons.timer,
-                      label: '${game.maxPlaytime} min',
-                    ),
-                    const SizedBox(height: 14),
-                    _StatChip(
-                      icon: Icons.fitness_center,
-                      label: '${game.averageWeight.toStringAsFixed(1)} / 5',
-                    ),
-                    const SizedBox(height: 14),
+                    if (_hasPlayers) ...[
+                      _StatChip(
+                        icon: Icons.people,
+                        label: game.minPlayers == game.maxPlayers
+                            ? '${game.minPlayers} players'
+                            : '${game.minPlayers}-${game.maxPlayers} players',
+                      ),
+                      const SizedBox(height: 14),
+                    ],
+                    if (_hasPlaytime) ...[
+                      _StatChip(
+                        icon: Icons.timer,
+                        label: '${game.maxPlaytime} min',
+                      ),
+                      const SizedBox(height: 14),
+                    ],
+                    if (_hasWeight) ...[
+                      _StatChip(
+                        icon: Icons.fitness_center,
+                        label: '${game.averageWeight.toStringAsFixed(1)} / 5',
+                      ),
+                      const SizedBox(height: 14),
+                    ],
                     MouseRegion(
                       cursor: SystemMouseCursors.click,
                       child: GestureDetector(

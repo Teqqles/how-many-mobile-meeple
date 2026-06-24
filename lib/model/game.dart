@@ -27,13 +27,13 @@ class Game {
     return Game(
       id: json['id'],
       name: json['name'],
-      maxPlayers: json['maxplayers'],
-      minPlayers: json['minplayers'],
+      maxPlayers: json['maxplayers'] ?? 0,
+      minPlayers: json['minplayers'] ?? 0,
       maxPlaytime: json['maxplaytime'] ?? 0,
-      imageUrl: json['image'],
+      imageUrl: json['image'] ?? '',
       thumbnail: json['thumbnail'],
-      averageRating: json['stats']['average'] ?? 0,
-      averageWeight: json['stats']['averageweight'] ?? 0,
+      averageRating: (json['stats']['average'] ?? 0).toDouble(),
+      averageWeight: (json['stats']['averageweight'] ?? 0).toDouble(),
     );
   }
 

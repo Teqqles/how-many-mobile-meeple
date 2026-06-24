@@ -1,69 +1,19 @@
 {
-  "version": "2.8.3",
-  "since_version": "v2.7.0",
+  "version": "2.9.0",
+  "since_version": "v2.8.3",
   "recent_changes": [
     {
-      "type": "fix",
-      "scope": "",
-      "description": "handle null fields in hot games API response"
-    },
-    {
-      "type": "fix",
-      "scope": "",
-      "description": "guard null preference delete and cache StoredPreferences instance"
-    },
-    {
-      "type": "fix",
-      "scope": "",
-      "description": "use GitHub Actions API for issues instead of HTTP request"
-    },
-    {
-      "type": "fix",
-      "scope": "",
-      "description": "handle GitHub API timeout in about data generation"
-    },
-    {
-      "type": "fix",
-      "scope": "",
-      "description": "load saved sources on refresh and show friendly empty state"
-    },
-    {
-      "type": "fix",
-      "scope": "",
-      "description": "share button on random game page and remove false fallback dialog"
-    },
-    {
       "type": "feat",
       "scope": "",
-      "description": "auto-generate about page data in CI on tag release"
-    },
-    {
-      "type": "feat",
-      "scope": "",
-      "description": "add about page with version info, upcoming features, and contributors"
-    },
-    {
-      "type": "feat",
-      "scope": "",
-      "description": "replace collection/geeklist toggle with auto-detected leading icon"
-    },
-    {
-      "type": "fix",
-      "scope": "",
-      "description": "compact step 1 tabs to prevent text wrapping on mobile"
-    },
-    {
-      "type": "fix",
-      "scope": "",
-      "description": "center loading screen on mobile viewports"
-    },
-    {
-      "type": "feat",
-      "scope": "",
-      "description": "add tour tips, trending games, fun facts, and remove legacy mobile"
+      "description": "cache drawer preferences and hide empty game stats"
     }
   ],
   "upcoming": [
+    {
+      "number": 68,
+      "title": "Game detail page shows a synopsis",
+      "labels": []
+    },
     {
       "number": 64,
       "title": "Hide details when we have no data",
@@ -114,11 +64,6 @@
     {
       "number": 39,
       "title": "Game Night",
-      "labels": []
-    },
-    {
-      "number": 28,
-      "title": "FutureBuilder rebuilds on every drawer open",
       "labels": []
     },
     {

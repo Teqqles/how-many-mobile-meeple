@@ -30,6 +30,7 @@ class AppModel extends ChangeNotifier {
 
   Items _items = Items([]);
   BggCache _bggCache = BggCache(Games(), _unsetCacheDurationInMinutes);
+  StoredPreferences? _store;
 
   late Settings _settings;
   Orientation? screenOrientation;
@@ -135,13 +136,18 @@ class AppModel extends ChangeNotifier {
 
   void refreshState() => notifyListeners();
 
+  Future<StoredPreferences> _getStore() async {
+    _store ??= await StorageFactory.getStoredPreferences();
+    return _store!;
+  }
+
   Future<void> loadStoredData() async {
     if (_extractor.containsModel()) {
       hasLoadedPersistedData = true;
       _urlConsumed = true;
       return;
     }
-    StoredPreferences store = await StorageFactory.getStoredPreferences();
+    final store = await _getStore();
     await store.clearIfVersionChanged();
     _items = await store.loadItems(AppCommon.maxItemsFromBgg);
     replaceSettings(await store.loadSettings(settings));
@@ -154,12 +160,12 @@ class AppModel extends ChangeNotifier {
   }
 
   Future<void> _storeSettings(Settings settings) async {
-    StoredPreferences store = await StorageFactory.getStoredPreferences();
+    final store = await _getStore();
     await store.saveSettings(settings);
   }
 
   Future<void> _storeItems(Items items) async {
-    StoredPreferences store = await StorageFactory.getStoredPreferences();
+    final store = await _getStore();
     await store.saveItems(items, AppCommon.maxItemsFromBgg);
   }
 }

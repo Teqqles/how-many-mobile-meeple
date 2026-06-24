@@ -60,9 +60,16 @@ class DrawerSavedSetting extends Container {
                   color: Theme.of(context).colorScheme.error,
                 ),
                 onPressed: () {
+                  if (preferences.id == null) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                          content: Text('Cannot delete unsaved preference')),
+                    );
+                    return;
+                  }
                   var model = AppModel.of(context, listen: false);
                   var db = StorageFactory.getPreferencesHistory();
-                  db.deletePreference(preferences.id ?? '');
+                  db.deletePreference(preferences.id!);
                   model.refreshState();
                 },
               ),

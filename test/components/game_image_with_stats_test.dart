@@ -14,6 +14,28 @@ Game _gameWithRating(double rating) => Game(
       averageWeight: 2.5,
     );
 
+Game _gameWithNoData() => Game(
+      id: 1,
+      name: 'Mystery Game',
+      maxPlayers: 0,
+      minPlayers: 0,
+      maxPlaytime: 0,
+      imageUrl: '',
+      averageRating: 0,
+      averageWeight: 0,
+    );
+
+Game _gameWithPartialData() => Game(
+      id: 1,
+      name: 'Partial Game',
+      maxPlayers: 4,
+      minPlayers: 2,
+      maxPlaytime: 0,
+      imageUrl: 'http://example.com/test.jpg',
+      averageRating: 7.5,
+      averageWeight: 0,
+    );
+
 Widget _wrapWidget(Widget child) => MaterialApp(
       home: Scaffold(
         body: SizedBox(width: 400, height: 600, child: child),
@@ -122,6 +144,71 @@ void main() {
       );
 
       expect(find.text('4.4'), findsOneWidget);
+    });
+  });
+
+  group('GameImageWithStats hides missing data', () {
+    setUp(() {
+      FlutterError.onError = (details) {
+        if (details.toString().contains('overflowed')) return;
+        FlutterError.presentError(details);
+      };
+    });
+
+    tearDown(() {
+      FlutterError.onError = FlutterError.presentError;
+    });
+
+    testWidgets('hides rating badge when rating is 0', (tester) async {
+      await tester.pumpWidget(
+        _wrapWidget(GameImageWithStats(game: _gameWithNoData())),
+      );
+
+      expect(find.text('0.0'), findsNothing);
+    });
+
+    testWidgets('hides player count when both min and max are 0',
+        (tester) async {
+      await tester.pumpWidget(
+        _wrapWidget(GameImageWithStats(game: _gameWithNoData())),
+      );
+
+      expect(find.byIcon(Icons.people), findsNothing);
+    });
+
+    testWidgets('hides playtime when maxPlaytime is 0', (tester) async {
+      await tester.pumpWidget(
+        _wrapWidget(GameImageWithStats(game: _gameWithNoData())),
+      );
+
+      expect(find.byIcon(Icons.timer), findsNothing);
+    });
+
+    testWidgets('hides weight when averageWeight is 0', (tester) async {
+      await tester.pumpWidget(
+        _wrapWidget(GameImageWithStats(game: _gameWithNoData())),
+      );
+
+      expect(find.byIcon(Icons.fitness_center), findsNothing);
+    });
+
+    testWidgets('always shows BoardGameGeek link', (tester) async {
+      await tester.pumpWidget(
+        _wrapWidget(GameImageWithStats(game: _gameWithNoData())),
+      );
+
+      expect(find.text('BoardGameGeek'), findsOneWidget);
+    });
+
+    testWidgets('shows only stats that have data', (tester) async {
+      await tester.pumpWidget(
+        _wrapWidget(GameImageWithStats(game: _gameWithPartialData())),
+      );
+
+      expect(find.byIcon(Icons.people), findsOneWidget);
+      expect(find.byIcon(Icons.timer), findsNothing);
+      expect(find.byIcon(Icons.fitness_center), findsNothing);
+      expect(find.text('BoardGameGeek'), findsOneWidget);
     });
   });
 }

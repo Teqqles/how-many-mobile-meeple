@@ -140,7 +140,7 @@ mixin AppPage {
   Future<List<Widget>> drawerFilters(
       BuildContext context, AppModel model) async {
     var drawerSettingsColumn =
-        await ComponentFactory.getDrawerSettingsColumn(AppCommon.savedSettings);
+        ComponentFactory.getDrawerSettingsColumn(AppCommon.savedSettings);
     final staticFiltersList = staticFilters(model, context);
     final allFilters = <Widget>[drawerHeader(context)] +
         staticFiltersList +

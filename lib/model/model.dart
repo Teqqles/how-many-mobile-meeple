@@ -1,10 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:how_many_mobile_meeple/platform/web/url_fragment_extractor.dart';
+import 'package:how_many_mobile_meeple/storage/preferences_history_interface.dart';
 import 'package:how_many_mobile_meeple/storage/storage_factory.dart';
 import 'package:how_many_mobile_meeple/storage/stored_preferences.dart';
 import 'package:provider/provider.dart';
 import 'package:how_many_mobile_meeple/model/settings.dart';
 
+import 'package:how_many_mobile_meeple/model/app_preferences.dart';
 import 'package:how_many_mobile_meeple/model/bgg_cache.dart';
 import 'package:how_many_mobile_meeple/model/game_request.dart';
 import 'package:how_many_mobile_meeple/model/item.dart';
@@ -28,9 +30,12 @@ class AppModel extends ChangeNotifier {
 
   String? title;
 
+  final PreferencesHistoryInterface _preferencesHistory;
+
   Items _items = Items([]);
   BggCache _bggCache = BggCache(Games(), _unsetCacheDurationInMinutes);
   StoredPreferences? _store;
+  List<AppPreferences>? _cachedPreferences;
 
   late Settings _settings;
   Orientation? screenOrientation;
@@ -47,7 +52,9 @@ class AppModel extends ChangeNotifier {
 
   UrlFragmentExtractor _extractor = UrlFragmentExtractor(Uri.base);
 
-  AppModel() {
+  AppModel({PreferencesHistoryInterface? preferencesHistory})
+      : _preferencesHistory =
+            preferencesHistory ?? StorageFactory.getPreferencesHistory() {
     _settings = Settings.defaultSettings();
   }
 
@@ -131,6 +138,16 @@ class AppModel extends ChangeNotifier {
       _storeSettings(settings),
       _storeItems(_items),
     ]);
+    notifyListeners();
+  }
+
+  Future<List<AppPreferences>> getSavedPreferences() async {
+    _cachedPreferences ??= await _preferencesHistory.loadAllPreferences();
+    return _cachedPreferences!;
+  }
+
+  void invalidatePreferencesCache() {
+    _cachedPreferences = null;
     notifyListeners();
   }
 

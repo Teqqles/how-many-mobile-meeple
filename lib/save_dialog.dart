@@ -110,7 +110,7 @@ class SaveDialog extends StatelessWidget {
                           model.title = controller.text;
                           history
                               .storePreference(AppPreferences.fromModel(model));
-                          model.refreshState();
+                          model.invalidatePreferencesCache();
                           Navigator.pop(context);
                         },
                         icon: const Icon(Icons.save),

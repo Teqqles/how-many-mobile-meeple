@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:how_many_mobile_meeple/app_common.dart';
+import 'package:how_many_mobile_meeple/components/app_choice_chip.dart';
 import 'package:how_many_mobile_meeple/components/toggleable_homepage_menu_item_widget.dart';
 import 'package:how_many_mobile_meeple/model/mechanics.dart';
 import 'package:how_many_mobile_meeple/model/model.dart';
@@ -36,31 +37,11 @@ class MechanicFilterWidget extends StatelessWidget {
                   final isEnabled = model.settings
                       .setting(Settings.filterMechanics.name)
                       .enabled;
-                  return ChoiceChip(
-                    labelStyle: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                        color: isSelected && isEnabled
-                            ? Colors.white
-                            : (isEnabled
-                                ? Colors.black87
-                                : Theme.of(context).disabledColor)),
-                    backgroundColor:
-                        isEnabled ? Colors.grey[200] : Colors.grey[100],
-                    selectedColor: Theme.of(context).colorScheme.secondary,
-                    disabledColor: Colors.grey[100],
-                    elevation: isEnabled ? 2 : 0,
-                    side: BorderSide(
-                        color: isEnabled
-                            ? (isSelected
-                                ? Theme.of(context).colorScheme.secondary
-                                : Colors.grey[400]!)
-                            : Colors.grey[300]!,
-                        width: 1.5),
-                    label: Text(value),
+                  return AppMechanicChip(
+                    label: value,
                     selected: isSelected,
+                    enabled: isEnabled,
                     onSelected: (bool selected) {
-                      if (!isEnabled) return;
                       selected
                           ? model.settings
                               .setting(Settings.filterMechanics.name)

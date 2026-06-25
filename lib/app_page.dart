@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:how_many_mobile_meeple/components/drawer_bgg_filter.dart';
 import 'package:how_many_mobile_meeple/components/drawer_switch.dart';
 import 'package:how_many_mobile_meeple/components/app_default_padding.dart';
+import 'package:how_many_mobile_meeple/components/quick_pick_sheet.dart';
 import 'app_common.dart';
 import 'components/component_factory.dart';
 import 'model/game.dart';
@@ -201,31 +202,51 @@ mixin AppPage {
     AppModel.of(context, listen: false).refreshFromUrl();
   }
 
+  Widget _floatingIconButton(
+    BuildContext context, {
+    required IconData icon,
+    required String tooltip,
+    required VoidCallback onPressed,
+  }) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.secondary,
+        borderRadius: BorderRadius.circular(40.0),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(5),
+        child: IconButton(
+          padding: const EdgeInsets.all(0),
+          color: Theme.of(context).selectedRowColor,
+          tooltip: tooltip,
+          icon: Icon(icon, size: 36),
+          onPressed: onPressed,
+        ),
+      ),
+    );
+  }
+
   Widget iconButtonGroup(BuildContext context) => Row(
         mainAxisAlignment: MainAxisAlignment.end,
         crossAxisAlignment: CrossAxisAlignment.end,
         children: <Widget>[
-          Container(
-            decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.secondary,
-              borderRadius: BorderRadius.circular(40.0),
-            ),
-            child: Padding(
-              padding:
-                  const EdgeInsets.only(left: 5, right: 5, top: 5, bottom: 5),
-              child: IconButton(
-                  padding: const EdgeInsets.all(0),
-                  color: Theme.of(context).selectedRowColor,
-                  icon: Icon(
-                    Icons.format_list_numbered,
-                    size: 36,
-                  ),
-                  onPressed: () {
-                    var listPageSettings = r.Router.generateRouteSettings(
-                        r.Router.listRoute,
-                        AppModel.of(context, listen: false));
-                    loadPage(context, listPageSettings);
-                  }),
+          _floatingIconButton(
+            context,
+            icon: Icons.format_list_numbered,
+            tooltip: 'View List',
+            onPressed: () {
+              var listPageSettings = r.Router.generateRouteSettings(
+                  r.Router.listRoute, AppModel.of(context, listen: false));
+              loadPage(context, listPageSettings);
+            },
+          ),
+          Padding(
+            padding: const EdgeInsets.only(left: 8),
+            child: _floatingIconButton(
+              context,
+              icon: Icons.bolt,
+              tooltip: 'Quick Pick',
+              onPressed: () => QuickPickSheet.show(context),
             ),
           ),
           Padding(
@@ -271,9 +292,12 @@ mixin AppPage {
 
   ElevatedButton shareButton(BuildContext context, Game game) {
     return ElevatedButton(
-      child: Icon(
-        Icons.share,
-        color: Theme.of(context).selectedRowColor,
+      child: Tooltip(
+        message: 'Share',
+        child: Icon(
+          Icons.share,
+          color: Theme.of(context).selectedRowColor,
+        ),
       ),
       onPressed: () async {
         final baseUri = Uri.base.removeFragment();

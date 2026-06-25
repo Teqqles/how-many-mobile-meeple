@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'app_common.dart';
+import 'components/quick_pick_sheet.dart';
 import 'model/model.dart';
 import 'platform/router.dart' as r;
 import 'save_dialog.dart';
@@ -20,6 +21,7 @@ class HowManyMeepleAppBar extends AppBar {
               ? null
               : IconButton(
                   icon: const Icon(Icons.arrow_back),
+                  tooltip: 'Back',
                   onPressed: () {
                     if (Navigator.of(context).canPop()) {
                       Navigator.of(context).pop();
@@ -49,9 +51,17 @@ class HowManyMeepleAppBar extends AppBar {
                 mode: LaunchMode.externalApplication,
               ),
             ),
+            Builder(
+              builder: (ctx) => IconButton(
+                icon: const Icon(Icons.bolt),
+                tooltip: 'Quick Pick',
+                onPressed: () => QuickPickSheet.show(ctx),
+              ),
+            ),
             if (hasSaveDialog && model != null)
               IconButton(
                 icon: const Icon(Icons.save),
+                tooltip: 'Save Settings',
                 onPressed: () => showDialog(
                   context: context,
                   builder: (context) => SaveDialog(model: model),

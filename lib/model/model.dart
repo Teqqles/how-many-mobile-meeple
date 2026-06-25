@@ -165,7 +165,6 @@ class AppModel extends ChangeNotifier {
       return;
     }
     final store = await _getStore();
-    await store.clearIfVersionChanged();
     _items = await store.loadItems(AppCommon.maxItemsFromBgg);
     replaceSettings(await store.loadSettings(settings));
     hasLoadedPersistedData = true;

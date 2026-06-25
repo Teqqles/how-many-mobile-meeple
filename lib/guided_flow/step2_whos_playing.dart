@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:how_many_mobile_meeple/model/model.dart';
 import 'package:how_many_mobile_meeple/model/settings.dart';
+import 'package:how_many_mobile_meeple/components/app_choice_chip.dart';
 import 'package:how_many_mobile_meeple/components/step_header_card.dart';
 import 'package:how_many_mobile_meeple/components/info_message_box.dart';
 import 'package:how_many_mobile_meeple/tour_tips/tour_tip_keys.dart';
@@ -135,10 +136,9 @@ class _Step2WhosPlayingState extends State<Step2WhosPlaying> {
                   runSpacing: 8,
                   children: _presets.entries.map((preset) {
                     final isSelected = currentPlayers == preset.value;
-                    return FilterChip(
-                      label: Text('${preset.key} (${preset.value})'),
+                    return AppFilterChip(
+                      label: '${preset.key} (${preset.value})',
                       selected: isSelected,
-                      showCheckmark: false,
                       avatar: isSelected
                           ? Icon(
                               Icons.check_circle,
@@ -157,16 +157,6 @@ class _Step2WhosPlayingState extends State<Step2WhosPlaying> {
                           });
                         }
                       },
-                      selectedColor: Theme.of(context).colorScheme.secondary,
-                      backgroundColor:
-                          Theme.of(context).colorScheme.surfaceContainerHighest,
-                      labelStyle: TextStyle(
-                        color: isSelected
-                            ? Theme.of(context).colorScheme.onSecondary
-                            : Theme.of(context).colorScheme.onSurface,
-                        fontWeight:
-                            isSelected ? FontWeight.bold : FontWeight.normal,
-                      ),
                     );
                   }).toList(),
                 ),

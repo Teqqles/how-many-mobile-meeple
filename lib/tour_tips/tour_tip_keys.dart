@@ -7,6 +7,8 @@ class TourTipKeys {
       GlobalKey(debugLabel: 'appbar_news');
   static final GlobalKey appBarSettingsButton =
       GlobalKey(debugLabel: 'appbar_settings');
+  static final GlobalKey appBarQuickPick =
+      GlobalKey(debugLabel: 'appbar_quick_pick');
 
   // Step 2
   static final GlobalKey playerSlider =
@@ -36,6 +38,7 @@ class TourTipKeys {
         return {
           'appbar_news': appBarNewsButton,
           'appbar_settings': appBarSettingsButton,
+          'appbar_quick_pick': appBarQuickPick,
         };
       case TourTipDefinitions.pageStep2:
         return {

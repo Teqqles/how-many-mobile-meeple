@@ -20,32 +20,36 @@ jobs:
       - name: Determine version bump
         id: bump
         run: |
-          MSG=$(git log -1 --pretty=%s)
-          echo "Commit: $MSG"
+          LATEST=$(git tag --sort=-version:refname | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | head -1)
+          if [ -z "$LATEST" ]; then
+            LATEST=$(git rev-list --max-parents=0 HEAD)
+          fi
 
-          # Skip version bump commits (prevent infinite loop)
-          if echo "$MSG" | grep -qiE '^\[skip ci\]|^chore: bump version'; then
+          COMMITS=$(git log "${LATEST}..HEAD" --pretty=%s)
+          echo "Commits since $LATEST:"
+          echo "$COMMITS"
+
+          # Filter out skip/docs commits
+          RELEVANT=$(echo "$COMMITS" | grep -viE '^\[skip ci\]|^chore: bump version|^docs(\(.*\))?:' || true)
+
+          if [ -z "$RELEVANT" ]; then
             echo "type=skip" >> "$GITHUB_OUTPUT"
             exit 0
           fi
 
-          # Skip doc-only commits
-          if echo "$MSG" | grep -qiE '^docs(\(.*\))?:'; then
-            echo "type=skip" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
+          MINOR_COUNT=$(echo "$RELEVANT" | grep -ciE '^feat(\(.*\))?:' || true)
+          PATCH_COUNT=$(echo "$RELEVANT" | grep -cviE '^feat(\(.*\))?:' || true)
 
-          if echo "$MSG" | grep -qiE '^feat(\(.*\))?:'; then
-            echo "type=minor" >> "$GITHUB_OUTPUT"
-          else
-            echo "type=patch" >> "$GITHUB_OUTPUT"
-          fi
+          echo "minor_count=$MINOR_COUNT" >> "$GITHUB_OUTPUT"
+          echo "patch_count=$PATCH_COUNT" >> "$GITHUB_OUTPUT"
+          echo "type=bump" >> "$GITHUB_OUTPUT"
 
       - name: Compute new version
         if: steps.bump.outputs.type != 'skip'
         id: version
         run: |
-          BUMP="${{ steps.bump.outputs.type }}"
+          MINOR_COUNT="${{ steps.bump.outputs.minor_count }}"
+          PATCH_COUNT="${{ steps.bump.outputs.patch_count }}"
 
           LATEST=$(git tag --sort=-version:refname | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | head -1)
           if [ -z "$LATEST" ]; then
@@ -57,11 +61,11 @@ jobs:
           MINOR=$(echo "$LATEST" | sed 's/v//' | cut -d. -f2)
           PATCH=$(echo "$LATEST" | sed 's/v//' | cut -d. -f3)
 
-          if [ "$BUMP" = "minor" ]; then
-            MINOR=$((MINOR + 1))
-            PATCH=0
+          if [ "$MINOR_COUNT" -gt 0 ]; then
+            MINOR=$((MINOR + MINOR_COUNT))
+            PATCH=$PATCH_COUNT
           else
-            PATCH=$((PATCH + 1))
+            PATCH=$((PATCH + PATCH_COUNT))
           fi
 
           NEW_TAG="v${MAJOR}.${MINOR}.${PATCH}"

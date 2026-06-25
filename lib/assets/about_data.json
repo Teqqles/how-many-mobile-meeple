@@ -1,6 +1,5 @@
 {
   "version": "2.10.1",
-  "since_version": "v2.9.0",
   "recent_changes": [
     {
       "type": "fix",
@@ -16,6 +15,186 @@
       "type": "feat",
       "scope": "",
       "description": "add Quick Pick for fast random game selection"
+    },
+    {
+      "type": "feat",
+      "scope": "",
+      "description": "cache drawer preferences and hide empty game stats"
+    },
+    {
+      "type": "fix",
+      "scope": "",
+      "description": "handle null fields in hot games API response"
+    },
+    {
+      "type": "fix",
+      "scope": "",
+      "description": "guard null preference delete and cache StoredPreferences instance"
+    },
+    {
+      "type": "fix",
+      "scope": "",
+      "description": "use GitHub Actions API for issues instead of HTTP request"
+    },
+    {
+      "type": "fix",
+      "scope": "",
+      "description": "handle GitHub API timeout in about data generation"
+    },
+    {
+      "type": "fix",
+      "scope": "",
+      "description": "load saved sources on refresh and show friendly empty state"
+    },
+    {
+      "type": "fix",
+      "scope": "",
+      "description": "share button on random game page and remove false fallback dialog"
+    },
+    {
+      "type": "feat",
+      "scope": "",
+      "description": "auto-generate about page data in CI on tag release"
+    },
+    {
+      "type": "feat",
+      "scope": "",
+      "description": "add about page with version info, upcoming features, and contributors"
+    },
+    {
+      "type": "feat",
+      "scope": "",
+      "description": "replace collection/geeklist toggle with auto-detected leading icon"
+    },
+    {
+      "type": "fix",
+      "scope": "",
+      "description": "compact step 1 tabs to prevent text wrapping on mobile"
+    },
+    {
+      "type": "fix",
+      "scope": "",
+      "description": "center loading screen on mobile viewports"
+    },
+    {
+      "type": "feat",
+      "scope": "",
+      "description": "add tour tips, trending games, fun facts, and remove legacy mobile"
+    },
+    {
+      "type": "feat",
+      "scope": "",
+      "description": "redesign list pages with thumbnails, stats, rating badges, and sort indicators"
+    },
+    {
+      "type": "feat",
+      "scope": "",
+      "description": "add rating badge to game image overlay"
+    },
+    {
+      "type": "feat",
+      "scope": "",
+      "description": "add game detail page with cached API, share permalink, and image alignment"
+    },
+    {
+      "type": "fix",
+      "scope": "",
+      "description": "stale cache served after removing a collection/geeklist"
+    },
+    {
+      "type": "fix",
+      "scope": "",
+      "description": "cache invalidation & url reload stopping user changes"
+    },
+    {
+      "type": "feat",
+      "scope": "",
+      "description": "prefetch cache warming for collections and geeklists"
+    },
+    {
+      "type": "feat",
+      "scope": "",
+      "description": "replace max complexity filter with around-complexity filter"
+    },
+    {
+      "type": "feat",
+      "scope": "",
+      "description": "add Board Game News link to app bar"
+    },
+    {
+      "type": "feat",
+      "scope": "",
+      "description": "swipe gestures, larger step hit targets, full-width advanced mode"
+    },
+    {
+      "type": "feat",
+      "scope": "",
+      "description": "PWA install banner and home screen prompt"
+    },
+    {
+      "type": "feat",
+      "scope": "",
+      "description": "add Finish button to guided flow for direct navigation to results"
+    },
+    {
+      "type": "feat",
+      "scope": "",
+      "description": "UI consistency improvements"
+    },
+    {
+      "type": "fix",
+      "scope": "",
+      "description": "update code to correct analysis warnings from flutter upgrade"
+    },
+    {
+      "type": "fix",
+      "scope": "",
+      "description": "upgrade Flutter version in CI to 3.44.x for Dart 3.12 compatibility"
+    },
+    {
+      "type": "fix",
+      "scope": "",
+      "description": "update GitHub Actions workflow for Flutter 3.0"
+    },
+    {
+      "type": "fix",
+      "scope": "",
+      "description": "enable Add Source button when text is entered"
+    },
+    {
+      "type": "fix",
+      "scope": "",
+      "description": "restore automatic ItemType detection for numeric IDs"
+    },
+    {
+      "type": "fix",
+      "scope": "",
+      "description": "add missing null assertion in router path extraction"
+    },
+    {
+      "type": "feat",
+      "scope": "",
+      "description": "add mock BGG API server for development"
+    },
+    {
+      "type": "feat",
+      "scope": "",
+      "description": "add BGG attribution and theme extensions"
+    },
+    {
+      "type": "feat",
+      "scope": "",
+      "description": "add guided flow UI for game selection"
+    },
+    {
+      "type": "fix",
+      "scope": "",
+      "description": "handle unknown setting keys gracefully"
+    },
+    {
+      "type": "fix",
+      "scope": "",
+      "description": "prevent race conditions in async data operations"
     }
   ],
   "upcoming": [
@@ -89,11 +268,6 @@
     {
       "number": 43,
       "title": "Compare Two Choices",
-      "labels": []
-    },
-    {
-      "number": 42,
-      "title": "Why This Game?",
       "labels": []
     },
     {

@@ -46,38 +46,9 @@ def git(*args):
     return result.stdout.strip()
 
 
-def find_previous_minor_tag(version):
-    """Find the latest tag from the previous minor version.
-
-    E.g. if version is 2.8.1, find the highest 2.7.x tag.
-    """
-    match = re.match(r"^(\d+)\.(\d+)\.", version)
-    if not match:
-        return None
-
-    major = int(match.group(1))
-    minor = int(match.group(2))
-
-    tags_output = git("tag", "--list", "--sort=-version:refname")
-    tags = [t.strip() for t in tags_output.splitlines() if t.strip()]
-
-    prev_minor = minor - 1
-    prefix = f"v{major}.{prev_minor}."
-
-    for tag in tags:
-        if tag.startswith(prefix):
-            return tag
-
-    return None
-
-
-def get_recent_changes(version):
-    prev_tag = find_previous_minor_tag(version)
-    if not prev_tag:
-        return [], ""
-
-    log_range = f"{prev_tag}..HEAD"
-    log_output = git("log", log_range, "--format=%s")
+def get_recent_changes():
+    """Get all feat/fix commits from the last 30 days."""
+    log_output = git("log", "--since=30 days ago", "--format=%s")
     lines = [line.strip() for line in log_output.splitlines() if line.strip()]
 
     changes = []
@@ -94,7 +65,7 @@ def get_recent_changes(version):
                 "description": match.group(3).strip(),
             })
 
-    return changes, prev_tag
+    return changes
 
 
 def get_version():
@@ -125,12 +96,11 @@ def main():
         print("Fetching open issues from GitHub...")
         issues = fetch_github_issues()
 
-    print(f"Getting recent changes since previous minor (current: {version})...")
-    changes, since_tag = get_recent_changes(version)
+    print(f"Getting recent changes from last 30 days (current: {version})...")
+    changes = get_recent_changes()
 
     data = {
         "version": version,
-        "since_version": since_tag,
         "recent_changes": changes,
         "upcoming": issues,
     }
@@ -139,9 +109,9 @@ def main():
         json.dump(data, f, indent=2)
 
     print(f"\nWritten to: {OUTPUT}")
-    print(f"Version: {version} (changes since: {since_tag})")
+    print(f"Version: {version}")
 
-    print(f"\n--- Recent Changes since {since_tag} ({len(changes)}) ---")
+    print(f"\n--- What's New (last 30 days, {len(changes)}) ---")
     for change in changes:
         prefix = "+" if change["type"] == "feat" else "*"
         scope = f"({change['scope']}) " if change["scope"] else ""

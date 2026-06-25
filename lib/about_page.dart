@@ -41,8 +41,7 @@ class AboutPage extends StatelessWidget {
               const SizedBox(height: 24),
               _buildDescription(context),
               const SizedBox(height: 24),
-              _buildRecentChanges(
-                  context, data['since_version'], recentChanges),
+              _buildRecentChanges(context, recentChanges),
               const SizedBox(height: 24),
               _buildUpcoming(context, upcoming),
               const SizedBox(height: 24),
@@ -103,8 +102,7 @@ class AboutPage extends StatelessWidget {
     );
   }
 
-  Widget _buildRecentChanges(
-      BuildContext context, String sinceVersion, List<dynamic> changes) {
+  Widget _buildRecentChanges(BuildContext context, List<dynamic> changes) {
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -112,7 +110,7 @@ class AboutPage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              "What's New (since $sinceVersion)",
+              "What's New",
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),

@@ -30,11 +30,15 @@ class HowManyMeepleAppBar extends AppBar {
                           r.Router.homeRoute, (route) => false);
                     }
                   }),
+          titleSpacing: isHomePage ? null : 0,
           title: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              Text(AppCommon.appTitle),
+              FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Text(AppCommon.appTitle),
+              ),
               Text(
                 subtitle,
                 style: const TextStyle(fontSize: 12),
@@ -49,8 +53,9 @@ class HowManyMeepleAppBar extends AppBar {
               mainAxisSize: MainAxisSize.min,
               children: [
                 IconButton(
-                  icon: const Icon(Icons.newspaper),
+                  icon: const Icon(Icons.newspaper, size: 20),
                   tooltip: 'Board Game News',
+                  visualDensity: VisualDensity.compact,
                   onPressed: () => launchUrl(
                     Uri.parse('https://www.boardgamenews.co.uk/'),
                     mode: LaunchMode.externalApplication,
@@ -58,23 +63,26 @@ class HowManyMeepleAppBar extends AppBar {
                 ),
                 Builder(
                   builder: (ctx) => IconButton(
-                    icon: const Icon(Icons.bolt),
+                    icon: const Icon(Icons.bolt, size: 20),
                     tooltip: 'Quick Pick',
+                    visualDensity: VisualDensity.compact,
                     onPressed: () => QuickPickSheet.show(ctx),
                   ),
                 ),
                 Builder(
                   builder: (ctx) => IconButton(
-                    icon: const Icon(Icons.favorite),
+                    icon: const Icon(Icons.favorite, size: 20),
                     tooltip: 'Favourites',
+                    visualDensity: VisualDensity.compact,
                     onPressed: () =>
                         Navigator.of(ctx).pushNamed(r.Router.favouritesRoute),
                   ),
                 ),
                 if (hasSaveDialog && model != null)
                   IconButton(
-                    icon: const Icon(Icons.save),
+                    icon: const Icon(Icons.save, size: 20),
                     tooltip: 'Save Settings',
+                    visualDensity: VisualDensity.compact,
                     onPressed: () => showDialog(
                       context: context,
                       builder: (context) => SaveDialog(model: model),
@@ -82,8 +90,9 @@ class HowManyMeepleAppBar extends AppBar {
                   ),
                 Builder(
                   builder: (ctx) => IconButton(
-                    icon: const Icon(Icons.settings),
+                    icon: const Icon(Icons.settings, size: 20),
                     tooltip: 'Settings',
+                    visualDensity: VisualDensity.compact,
                     onPressed: () => Scaffold.of(ctx).openEndDrawer(),
                   ),
                 ),

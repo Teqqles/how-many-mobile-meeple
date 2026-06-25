@@ -60,27 +60,26 @@ class _GameActionButtonsState extends State<GameActionButtons> {
         FavouriteGame(id: game.id, name: game.name, thumbnail: game.thumbnail);
     final isFav = _favService!.contains(game.id);
     final isIgnored = _ignoreService!.contains(game.id);
+    final compact = MediaQuery.of(context).size.width < 480;
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          ElevatedButton.icon(
+          _actionButton(
+            context,
             onPressed: () => _favService!.toggle(favGame),
             icon: Icon(isFav ? Icons.favorite : Icons.favorite_border),
-            label: Text(isFav ? 'Unfavourite' : 'Favourite'),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: isFav
-                  ? Colors.amber.shade700
-                  : Theme.of(context).colorScheme.secondary,
-              foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(30)),
-            ),
+            label: isFav ? 'Unfavourite' : 'Favourite',
+            compact: compact,
+            backgroundColor: isFav
+                ? Colors.amber.shade700
+                : Theme.of(context).colorScheme.secondary,
           ),
           const SizedBox(width: 12),
-          ElevatedButton.icon(
+          _actionButton(
+            context,
             onPressed: () {
               _ignoreService!.toggle(favGame);
               if (!isIgnored && Navigator.of(context).canPop()) {
@@ -88,30 +87,57 @@ class _GameActionButtonsState extends State<GameActionButtons> {
               }
             },
             icon: Icon(isIgnored ? Icons.visibility : Icons.visibility_off),
-            label: Text(isIgnored ? 'Unignore' : 'Ignore'),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: isIgnored
-                  ? Theme.of(context).colorScheme.secondary
-                  : Theme.of(context).colorScheme.error,
-              foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(30)),
-            ),
+            label: isIgnored ? 'Unignore' : 'Ignore',
+            compact: compact,
+            backgroundColor: isIgnored
+                ? Theme.of(context).colorScheme.secondary
+                : Theme.of(context).colorScheme.error,
           ),
           const SizedBox(width: 12),
-          ElevatedButton.icon(
+          _actionButton(
+            context,
             onPressed: () => _share(context, game),
             icon: const Icon(Icons.share),
-            label: const Text('Share'),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Theme.of(context).colorScheme.secondary,
-              foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(30)),
-            ),
+            label: 'Share',
+            compact: compact,
+            backgroundColor: Theme.of(context).colorScheme.secondary,
           ),
         ],
       ),
+    );
+  }
+
+  Widget _actionButton(
+    BuildContext context, {
+    required VoidCallback onPressed,
+    required Widget icon,
+    required String label,
+    required bool compact,
+    required Color backgroundColor,
+  }) {
+    final style = ElevatedButton.styleFrom(
+      backgroundColor: backgroundColor,
+      foregroundColor: Colors.white,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+    );
+
+    if (compact) {
+      return IconButton(
+        onPressed: onPressed,
+        icon: icon,
+        tooltip: label,
+        style: IconButton.styleFrom(
+          backgroundColor: backgroundColor,
+          foregroundColor: Colors.white,
+        ),
+      );
+    }
+
+    return ElevatedButton.icon(
+      onPressed: onPressed,
+      icon: icon,
+      label: Text(label),
+      style: style,
     );
   }
 

@@ -7,6 +7,7 @@ import 'model/model.dart';
 import 'platform/router.dart' as r;
 import 'save_dialog.dart';
 import 'tour_tips/tour_tip_keys.dart';
+import 'favourites/favourites_service.dart';
 
 class HowManyMeepleAppBar extends AppBar {
   HowManyMeepleAppBar(String subtitle,
@@ -43,7 +44,9 @@ class HowManyMeepleAppBar extends AppBar {
           ),
           actions: [
             IconButton(
-              key: isHomePage ? TourTipKeys.appBarNewsButton : null,
+              key: isHomePage && (ModalRoute.of(context)?.isCurrent ?? true)
+                  ? TourTipKeys.appBarNewsButton
+                  : null,
               icon: const Icon(Icons.newspaper),
               tooltip: 'Board Game News',
               onPressed: () => launchUrl(
@@ -58,6 +61,20 @@ class HowManyMeepleAppBar extends AppBar {
                 onPressed: () => QuickPickSheet.show(ctx),
               ),
             ),
+            Builder(
+              builder: (ctx) => FutureBuilder<FavouritesService>(
+                future: FavouritesService.instance(),
+                builder: (context, snapshot) => IconButton(
+                  key: isHomePage && (ModalRoute.of(ctx)?.isCurrent ?? true)
+                      ? TourTipKeys.appBarFavourites
+                      : null,
+                  icon: const Icon(Icons.favorite),
+                  tooltip: 'Favourites',
+                  onPressed: () =>
+                      Navigator.of(ctx).pushNamed(r.Router.favouritesRoute),
+                ),
+              ),
+            ),
             if (hasSaveDialog && model != null)
               IconButton(
                 icon: const Icon(Icons.save),
@@ -69,7 +86,9 @@ class HowManyMeepleAppBar extends AppBar {
               ),
             Builder(
               builder: (ctx) => IconButton(
-                key: isHomePage ? TourTipKeys.appBarSettingsButton : null,
+                key: isHomePage && (ModalRoute.of(ctx)?.isCurrent ?? true)
+                    ? TourTipKeys.appBarSettingsButton
+                    : null,
                 icon: const Icon(Icons.settings),
                 tooltip: 'Settings',
                 onPressed: () => Scaffold.of(ctx).openEndDrawer(),

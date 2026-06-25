@@ -330,7 +330,9 @@ class _GuidedFlowHomePageState extends State<GuidedFlowHomePage> {
                 if (_currentStep < _totalSteps - 1) ...[
                   const SizedBox(width: 8),
                   FilledButton.tonalIcon(
-                    key: TourTipKeys.appBarQuickPick,
+                    key: (ModalRoute.of(context)?.isCurrent ?? true)
+                        ? TourTipKeys.appBarQuickPick
+                        : null,
                     onPressed: canProceedFromStep1
                         ? () => QuickPickSheet.show(context)
                         : null,

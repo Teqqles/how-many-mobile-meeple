@@ -32,6 +32,14 @@ class TourTipDefinitions {
       pageId: pageAppBar,
       order: 2,
     ),
+    TourTip(
+      id: 'appbar_favourites',
+      title: 'Favourites',
+      description:
+          'View your favourite games here. Swipe right on a game in the list or tap the heart on a game page to add favourites.',
+      pageId: pageAppBar,
+      order: 3,
+    ),
 
     // Step 2 tips
     TourTip(

@@ -4,6 +4,7 @@ import 'package:how_many_mobile_meeple/api/game_detail_service.dart';
 import 'package:how_many_mobile_meeple/components/app_default_padding.dart';
 import 'package:how_many_mobile_meeple/components/game_image_with_stats.dart';
 import 'package:how_many_mobile_meeple/components/recommendations_widget.dart';
+import 'package:how_many_mobile_meeple/favourites/game_action_buttons.dart';
 import 'package:how_many_mobile_meeple/how_many_meeple_app_bar.dart';
 import 'package:how_many_mobile_meeple/model/game.dart';
 import 'package:how_many_mobile_meeple/model/model.dart';
@@ -69,7 +70,7 @@ class _GameDetailPageState extends State<GameDetailPage>
                 ),
               ),
               AppDefaultPadding(child: GameImageWithStats(game: game)),
-              shareButton(context, game),
+              GameActionButtons(game: game),
               RecommendationsWidget(sourceGame: game, model: model),
             ],
           ),

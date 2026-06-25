@@ -7,6 +7,7 @@ import 'package:how_many_mobile_meeple/components/drawer_bgg_filter.dart';
 import 'package:how_many_mobile_meeple/components/drawer_switch.dart';
 import 'package:how_many_mobile_meeple/components/app_default_padding.dart';
 import 'package:how_many_mobile_meeple/components/quick_pick_sheet.dart';
+import 'package:how_many_mobile_meeple/favourites/ignored_games_service.dart';
 import 'app_common.dart';
 import 'components/component_factory.dart';
 import 'model/game.dart';
@@ -70,6 +71,7 @@ mixin AppPage {
             index: 2),
         _buildAdvancedModeToggle(model, context, index: 3),
         _buildTourTipsToggle(context, index: 4),
+        _buildIgnoredGamesLink(context, index: 5),
       ];
 
   Widget _buildAdvancedModeToggle(AppModel model, BuildContext context,
@@ -132,6 +134,32 @@ mixin AppPage {
                 value: isEnabled,
               ),
             ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildIgnoredGamesLink(BuildContext context, {int index = 0}) {
+    return FutureBuilder<IgnoredGamesService>(
+      future: IgnoredGamesService.instance(),
+      builder: (context, snapshot) {
+        final count = snapshot.hasData ? snapshot.data!.games.length : 0;
+        return Material(
+          color:
+              index % 2 == 0 ? Theme.of(context).highlightColor : Colors.white,
+          child: ListTile(
+            dense: true,
+            leading: Icon(Icons.visibility_off,
+                size: 20, color: Theme.of(context).colorScheme.secondary),
+            title: Text(
+              'Ignored Games${count > 0 ? ' ($count)' : ''}',
+              style: const TextStyle(fontSize: 13),
+            ),
+            onTap: () {
+              Navigator.of(context).pop();
+              Navigator.of(context).pushNamed(r.Router.ignoredRoute);
+            },
           ),
         );
       },

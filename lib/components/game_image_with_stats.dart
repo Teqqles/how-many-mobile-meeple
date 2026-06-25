@@ -56,9 +56,7 @@ class GameImageWithStats extends StatelessWidget with ScreenTools {
                   ),
                 ),
               ),
-            if (_hasImage &&
-                MediaQuery.of(context).size.width >= 1024 &&
-                game.thumbnail != null)
+            if (_hasImage && isWideScreen(context) && game.thumbnail != null)
               Positioned(
                 left: 24,
                 top: 0,

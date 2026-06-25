@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:how_many_mobile_meeple/components/game_image_with_stats.dart';
 import 'package:how_many_mobile_meeple/components/recommendations_widget.dart';
+import 'package:how_many_mobile_meeple/favourites/game_action_buttons.dart';
+import 'package:how_many_mobile_meeple/favourites/ignored_games_service.dart';
 import 'package:how_many_mobile_meeple/platform/common/game_display_page.dart';
+import 'package:how_many_mobile_meeple/platform/router.dart' as r;
 import 'package:how_many_mobile_meeple/screen_tools.dart';
 
 import 'package:how_many_mobile_meeple/components/app_default_padding.dart';
@@ -26,7 +29,7 @@ class WebRandomGameDisplayPage extends GameDisplayPage {
     Game? game =
         hasPageRefreshed(model) ? cachedGames.random : cachedGames.lastRandom;
     if (game == null) {
-      return const Center(child: Text('No game available'));
+      return _buildExhaustedState(context, model);
     }
     updatePageRefreshedStatus(model);
     return SingleChildScrollView(
@@ -46,9 +49,52 @@ class WebRandomGameDisplayPage extends GameDisplayPage {
                   ),
                 ),
                 AppDefaultPadding(child: GameImageWithStats(game: game)),
-                shareButton(context, game),
+                GameActionButtons(game: game),
                 RecommendationsWidget(sourceGame: game, model: model),
               ]),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildExhaustedState(BuildContext context, AppModel model) {
+    final hasIgnored = (IgnoredGamesService.cached?.games.length ?? 0) > 0;
+
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.casino_outlined,
+                size: 64, color: Theme.of(context).colorScheme.secondary),
+            const SizedBox(height: 16),
+            Text(
+              "You've seen all available games",
+              style: Theme.of(context).textTheme.titleMedium,
+              textAlign: TextAlign.center,
+            ),
+            if (hasIgnored) ...[
+              const SizedBox(height: 12),
+              Text(
+                'Want to try again including your ignored games?',
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.bodyMedium,
+              ),
+              const SizedBox(height: 16),
+              FilledButton.icon(
+                onPressed: () {
+                  final game = model.bggCache.randomIncludingIgnored();
+                  if (game != null) {
+                    Navigator.of(context).pushReplacementNamed(
+                        '${r.Router.gameDetailRoute}/${game.name.replaceAll(' ', '+')}/${game.id}');
+                  }
+                },
+                icon: const Icon(Icons.refresh),
+                label: const Text('Include ignored games'),
+              ),
+            ],
+          ],
         ),
       ),
     );

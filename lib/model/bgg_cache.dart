@@ -1,5 +1,8 @@
 import 'dart:math';
 
+import 'package:how_many_mobile_meeple/favourites/favourites_service.dart';
+import 'package:how_many_mobile_meeple/favourites/ignored_games_service.dart';
+
 import 'game.dart';
 import 'games.dart';
 
@@ -9,38 +12,86 @@ class BggCache {
   late int _cacheTimestamp;
 
   Games get games => _games;
-  late Games _remainingGames;
+  late List<Game> _remainingPool;
 
   int get durationInMinutes => _durationMinutes;
   Game? _stickyRandom;
+
+  static const int _favouriteWeight = 3;
 
   Game? get random {
     if (games.games.isEmpty) {
       return null;
     }
-    if (_remainingGames.games.isEmpty) {
-      return _stickyRandom;
+    _removeIgnoredFromPool();
+    if (_remainingPool.isEmpty) {
+      return _validatedSticky;
     }
     _stickyRandom = _nextRandom();
     return _stickyRandom;
   }
 
   Game _nextRandom() {
-    var randomGameId = Random().nextInt(_remainingGames.games.length);
-    var selectedGame = _remainingGames.games[randomGameId];
-    _cacheRemaining(selectedGame);
+    var randomIndex = Random().nextInt(_remainingPool.length);
+    var selectedGame = _remainingPool[randomIndex];
+    _remainingPool.removeWhere((g) => g.id == selectedGame.id);
     return selectedGame;
   }
 
-  void _cacheRemaining(Game game) {
-    _remainingGames = _games.remove(game);
+  void _removeIgnoredFromPool() {
+    final ignoredService = IgnoredGamesService.cached;
+    if (ignoredService == null) return;
+    _remainingPool.removeWhere((g) => ignoredService.contains(g.id));
   }
 
-  Game? get lastRandom => _stickyRandom ?? random;
+  Game? get _validatedSticky {
+    if (_stickyRandom == null) return null;
+    final ignoredService = IgnoredGamesService.cached;
+    if (ignoredService != null && ignoredService.contains(_stickyRandom!.id)) {
+      _stickyRandom = null;
+    }
+    return _stickyRandom;
+  }
+
+  Game? get lastRandom => _validatedSticky ?? random;
 
   BggCache(this._games, this._durationMinutes) {
     refreshCacheTimestamp();
-    _remainingGames = _games;
+    _remainingPool = _buildWeightedPool();
+  }
+
+  Game? randomIncludingIgnored() {
+    final pool = _buildWeightedPool(includeIgnored: true);
+    if (pool.isEmpty) return null;
+    final index = Random().nextInt(pool.length);
+    return pool[index];
+  }
+
+  List<Game> _buildWeightedPool({bool includeIgnored = false}) {
+    final ignoredService = IgnoredGamesService.cached;
+    final favouritesService = FavouritesService.cached;
+
+    var pool = _games.games;
+    if (!includeIgnored) {
+      pool = pool
+          .where((g) => !(ignoredService?.contains(g.id) ?? false))
+          .toList();
+    }
+
+    if (favouritesService != null) {
+      final extras = <Game>[];
+      for (final game in pool) {
+        if (favouritesService.contains(game.id)) {
+          for (var i = 1; i < _favouriteWeight; i++) {
+            extras.add(game);
+          }
+        }
+      }
+      pool = [...pool, ...extras];
+    }
+
+    pool.shuffle();
+    return pool;
   }
 
   int epochToSeconds(int millisEpoch) => (millisEpoch / 1000).floor();

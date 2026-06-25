@@ -37,7 +37,7 @@ class _Step2WhosPlayingState extends State<Step2WhosPlaying> {
         return Card(
           elevation: 2,
           child: Padding(
-            padding: const EdgeInsets.all(20.0),
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [

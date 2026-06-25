@@ -70,36 +70,14 @@ class TourTipService {
       return;
     }
 
-    final targetFocusList = _buildTargets(unseen, targets);
-    if (targetFocusList.isEmpty) {
-      _finishAndDrainQueue();
-      return;
-    }
+    await _showTipsSequentially(
+      context: context,
+      tips: unseen,
+      targets: targets,
+    );
 
-    final showCompleter = Completer<void>();
-
-    _activeMark = TutorialCoachMark(
-      targets: targetFocusList,
-      colorShadow: Colors.black,
-      opacityShadow: 0.8,
-      paddingFocus: 10,
-      hideSkip: true,
-      onFinish: () async {
-        await _markTipsAsSeen(unseen);
-        _activeMark = null;
-        _finishAndDrainQueue();
-        showCompleter.complete();
-      },
-      onSkip: () {
-        _markTipsAsSeen(unseen);
-        _activeMark = null;
-        _finishAndDrainQueue();
-        showCompleter.complete();
-        return true;
-      },
-    )..show(context: context);
-
-    await showCompleter.future;
+    await _markTipsAsSeen(unseen);
+    _finishAndDrainQueue();
   }
 
   void _finishAndDrainQueue() {
@@ -127,22 +105,174 @@ class TourTipService {
     return math.max(padding, 4);
   }
 
-  List<TargetFocus> _buildTargets(
-    List<TourTip> tips,
-    Map<String, GlobalKey> targets,
-  ) {
-    final result = <TargetFocus>[];
+  ContentAlign _contentAlignForKey(GlobalKey key) {
+    final renderBox = key.currentContext?.findRenderObject() as RenderBox?;
+    if (renderBox == null) return ContentAlign.bottom;
+    final position = renderBox.localToGlobal(Offset.zero);
+    final screenHeight = MediaQuery.of(key.currentContext!).size.height;
+    return position.dy > screenHeight * 0.5
+        ? ContentAlign.top
+        : ContentAlign.bottom;
+  }
 
+  Future<void> _ensureVisible(GlobalKey key) async {
+    final ctx = key.currentContext;
+    if (ctx == null) return;
+    await Scrollable.ensureVisible(
+      ctx,
+      duration: const Duration(milliseconds: 300),
+      alignmentPolicy: ScrollPositionAlignmentPolicy.keepVisibleAtEnd,
+    );
+  }
+
+  Future<void> _showTipsSequentially({
+    required BuildContext context,
+    required List<TourTip> tips,
+    required Map<String, GlobalKey> targets,
+  }) async {
     for (final tip in tips) {
       final key = targets[tip.id];
       if (key == null || key.currentContext == null) continue;
 
+      await _ensureVisible(key);
+      await Future.delayed(const Duration(milliseconds: 100));
+
+      if (!context.mounted || !isEnabled) break;
+      if (key.currentContext == null) continue;
+
       final screenWidth = MediaQuery.of(key.currentContext!).size.width;
       final padding = _cappedPaddingForKey(key, screenWidth);
+      final contentAlign = _contentAlignForKey(key);
 
-      result.add(
+      final completer = Completer<void>();
+
+      _activeMark = TutorialCoachMark(
+        targets: [
+          TargetFocus(
+            identify: tip.id,
+            keyTarget: key,
+            alignSkip: Alignment.topRight,
+            enableOverlayTab: true,
+            enableTargetTab: true,
+            paddingFocus: padding,
+            contents: [
+              TargetContent(
+                align: contentAlign,
+                builder: (ctx, controller) {
+                  final sw = MediaQuery.of(ctx).size.width;
+                  return _buildTipContent(sw, tip);
+                },
+              ),
+            ],
+          ),
+        ],
+        colorShadow: Colors.black,
+        opacityShadow: 0.8,
+        paddingFocus: 10,
+        hideSkip: true,
+        onFinish: () => completer.complete(),
+        onSkip: () {
+          completer.complete();
+          return true;
+        },
+      )..show(context: context);
+
+      await completer.future;
+      _activeMark = null;
+
+      if (!context.mounted || !isEnabled) break;
+    }
+  }
+
+  Widget _buildTipContent(double screenWidth, TourTip tip) {
+    return Container(
+      constraints: BoxConstraints(maxWidth: screenWidth * 0.7),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.black87,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            tip.title,
+            style: const TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+              fontSize: 20,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            tip.description,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 15,
+            ),
+          ),
+          const SizedBox(height: 16),
+          Wrap(
+            alignment: WrapAlignment.spaceBetween,
+            spacing: 8,
+            runSpacing: 4,
+            children: [
+              const Text(
+                'Tap anywhere to continue',
+                style: TextStyle(
+                  color: Colors.white70,
+                  fontSize: 12,
+                  fontStyle: FontStyle.italic,
+                ),
+              ),
+              GestureDetector(
+                onTap: () => dismissAll(),
+                child: const Text(
+                  'Dismiss Tour',
+                  style: TextStyle(
+                    color: Colors.white70,
+                    fontSize: 12,
+                    decoration: TextDecoration.underline,
+                    decorationColor: Colors.white70,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<bool> showSingleTip({
+    required BuildContext context,
+    required GlobalKey key,
+    required String id,
+    required String title,
+    required String description,
+  }) async {
+    if (!isEnabled) return false;
+    if (key.currentContext == null) return false;
+
+    await _ensureVisible(key);
+    await Future.delayed(const Duration(milliseconds: 100));
+
+    if (!context.mounted || !isEnabled) return false;
+    if (key.currentContext == null) return false;
+
+    final tip =
+        TourTip(id: id, title: title, description: description, pageId: '');
+    final screenWidth = MediaQuery.of(key.currentContext!).size.width;
+    final padding = _cappedPaddingForKey(key, screenWidth);
+    final contentAlign = _contentAlignForKey(key);
+
+    final completer = Completer<void>();
+
+    _activeMark = TutorialCoachMark(
+      targets: [
         TargetFocus(
-          identify: tip.id,
+          identify: id,
           keyTarget: key,
           alignSkip: Alignment.topRight,
           enableOverlayTab: true,
@@ -150,75 +280,29 @@ class TourTipService {
           paddingFocus: padding,
           contents: [
             TargetContent(
-              align: ContentAlign.bottom,
-              builder: (context, controller) {
-                final screenWidth = MediaQuery.of(context).size.width;
-                return Container(
-                  constraints: BoxConstraints(maxWidth: screenWidth * 0.7),
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: Colors.black87,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        tip.title,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 20,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        tip.description,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 15,
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      Wrap(
-                        alignment: WrapAlignment.spaceBetween,
-                        spacing: 8,
-                        runSpacing: 4,
-                        children: [
-                          const Text(
-                            'Tap anywhere to continue',
-                            style: TextStyle(
-                              color: Colors.white70,
-                              fontSize: 12,
-                              fontStyle: FontStyle.italic,
-                            ),
-                          ),
-                          GestureDetector(
-                            onTap: () => dismissAll(),
-                            child: const Text(
-                              'Dismiss Tour',
-                              style: TextStyle(
-                                color: Colors.white70,
-                                fontSize: 12,
-                                decoration: TextDecoration.underline,
-                                decorationColor: Colors.white70,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                );
+              align: contentAlign,
+              builder: (ctx, controller) {
+                final sw = MediaQuery.of(ctx).size.width;
+                return _buildTipContent(sw, tip);
               },
             ),
           ],
         ),
-      );
-    }
+      ],
+      colorShadow: Colors.black,
+      opacityShadow: 0.8,
+      paddingFocus: 10,
+      hideSkip: true,
+      onFinish: () => completer.complete(),
+      onSkip: () {
+        completer.complete();
+        return true;
+      },
+    )..show(context: context);
 
-    return result;
+    await completer.future;
+    _activeMark = null;
+    return true;
   }
 
   Future<void> _markTipsAsSeen(List<TourTip> tips) async {

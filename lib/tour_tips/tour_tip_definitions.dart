@@ -8,37 +8,16 @@ class TourTipDefinitions {
   static const String pageStep5 = 'step5';
 
   static const List<TourTip> all = [
-    // App bar tips (shown on first homepage visit)
+    // App bar tip (shown on first homepage visit)
     TourTip(
-      id: 'appbar_news',
-      title: 'Board Game News',
-      description: 'Tap here to read the latest board game news from the web.',
+      id: 'appbar_actions',
+      title: 'Your Top Bar',
+      description: '📰 News: latest board game news\n'
+          '⚡ Quick Pick: skip steps, pick a random game fast\n'
+          '❤️ Favourites: your saved games\n'
+          '⚙️ Settings: advanced options and filters',
       pageId: pageAppBar,
       order: 0,
-    ),
-    TourTip(
-      id: 'appbar_settings',
-      title: 'Settings Drawer',
-      description:
-          'Open the settings drawer for advanced options like expansions, recommended player counts, and advanced mode.',
-      pageId: pageAppBar,
-      order: 1,
-    ),
-    TourTip(
-      id: 'appbar_quick_pick',
-      title: 'Quick Pick',
-      description:
-          'Skip the steps and pick a random game fast. Choose players, time, or weight and go.',
-      pageId: pageAppBar,
-      order: 2,
-    ),
-    TourTip(
-      id: 'appbar_favourites',
-      title: 'Favourites',
-      description:
-          'View your favourite games here. Swipe right on a game in the list or tap the heart on a game page to add favourites.',
-      pageId: pageAppBar,
-      order: 3,
     ),
 
     // Step 2 tips

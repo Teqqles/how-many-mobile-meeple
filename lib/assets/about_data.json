@@ -1,7 +1,17 @@
 {
-  "version": "2.10.0",
+  "version": "2.10.1",
   "since_version": "v2.9.0",
   "recent_changes": [
+    {
+      "type": "fix",
+      "scope": "",
+      "description": "tour tips scroll into view, consolidate app bar tip, reduce padding"
+    },
+    {
+      "type": "feat",
+      "scope": "",
+      "description": "add favourites and ignored games with swipe gestures"
+    },
     {
       "type": "feat",
       "scope": "",
@@ -10,6 +20,11 @@
   ],
   "upcoming": [
     {
+      "number": 80,
+      "title": "Update to latest dependencies (breaking changes)",
+      "labels": []
+    },
+    {
       "number": 78,
       "title": "Dark mode with theme colour options",
       "labels": []
@@ -17,11 +32,6 @@
     {
       "number": 77,
       "title": "Shelf-of-shame",
-      "labels": []
-    },
-    {
-      "number": 76,
-      "title": "Wishlist - Star games for later",
       "labels": []
     },
     {
@@ -64,11 +74,6 @@
     {
       "number": 61,
       "title": "List screen should show current filtering",
-      "labels": []
-    },
-    {
-      "number": 60,
-      "title": "Listing page should react to mobile gestures",
       "labels": []
     },
     {

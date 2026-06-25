@@ -29,7 +29,7 @@ Have an idea for a feature that you think will make this app amazing?  Feel free
 
 ## Contributors
 
-- [@SWH30](https://github.com/SWH30)
+- [@oldstevekenobi](https://github.com/oldstevekenobi)
 - [@Teqqles](https://github.com/teqqles)
 - [@tjforryan](https://github.com/tjforryan)
 

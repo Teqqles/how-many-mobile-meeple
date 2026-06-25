@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:how_many_mobile_meeple/components/quick_pick_sheet.dart';
 import 'package:how_many_mobile_meeple/model/model.dart';
 import 'package:how_many_mobile_meeple/platform/router.dart' as r;
 import 'package:how_many_mobile_meeple/save_dialog.dart';
@@ -64,8 +65,24 @@ class Step5FinalActions extends StatelessWidget {
 
                 const SizedBox(height: 32),
 
-                // Primary action - Random Game
+                // Primary action - Quick Pick
                 FilledButton.icon(
+                  onPressed: () => QuickPickSheet.show(context),
+                  icon: const Icon(Icons.bolt, size: 24),
+                  label: const Text(
+                    'Quick Pick',
+                    style: TextStyle(fontSize: 16),
+                  ),
+                  style: FilledButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 20, horizontal: 24),
+                  ),
+                ),
+
+                const SizedBox(height: 12),
+
+                // Secondary action - Random Game
+                OutlinedButton.icon(
                   onPressed: () {
                     final randomPageSettings = r.Router.generateRouteSettings(
                       r.Router.randomRoute,
@@ -79,7 +96,7 @@ class Step5FinalActions extends StatelessWidget {
                     key: TourTipKeys.randomButton,
                     style: const TextStyle(fontSize: 16),
                   ),
-                  style: FilledButton.styleFrom(
+                  style: OutlinedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(
                         vertical: 20, horizontal: 24),
                   ),

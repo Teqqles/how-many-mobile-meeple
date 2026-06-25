@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:how_many_mobile_meeple/model/model.dart';
 import 'package:how_many_mobile_meeple/model/settings.dart';
 import 'package:how_many_mobile_meeple/app_common.dart';
+import 'package:how_many_mobile_meeple/components/app_choice_chip.dart';
 import 'package:how_many_mobile_meeple/components/step_header_card.dart';
 import 'package:how_many_mobile_meeple/components/info_message_box.dart';
 import 'package:how_many_mobile_meeple/tour_tips/tour_tip_keys.dart';
@@ -161,10 +162,9 @@ class _Step3TimeAvailableState extends State<Step3TimeAvailable> {
                     final isSelected =
                         maxTime == targetTime && minTime <= targetTime / 2;
 
-                    return ChoiceChip(
-                      label: Text(preset.key),
+                    return AppChoiceChip(
+                      label: preset.key,
                       selected: isSelected,
-                      showCheckmark: false,
                       avatar: Icon(
                         _getTimeIcon(targetTime),
                         size: 18,
@@ -175,7 +175,6 @@ class _Step3TimeAvailableState extends State<Step3TimeAvailable> {
                       onSelected: (selected) {
                         if (selected) {
                           setState(() {
-                            // Set time range around the preset
                             minTimeSetting.value = (targetTime * 0.5).floor();
                             maxTimeSetting.value = targetTime;
                             minTimeSetting.enabled = true;
@@ -187,16 +186,6 @@ class _Step3TimeAvailableState extends State<Step3TimeAvailable> {
                           });
                         }
                       },
-                      selectedColor: Theme.of(context).colorScheme.secondary,
-                      backgroundColor:
-                          Theme.of(context).colorScheme.surfaceContainerHighest,
-                      labelStyle: TextStyle(
-                        color: isSelected
-                            ? Theme.of(context).colorScheme.onSecondary
-                            : Theme.of(context).colorScheme.onSurface,
-                        fontWeight:
-                            isSelected ? FontWeight.bold : FontWeight.normal,
-                      ),
                     );
                   }).toList(),
                 ),

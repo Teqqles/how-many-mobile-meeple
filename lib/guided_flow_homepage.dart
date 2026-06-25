@@ -4,6 +4,7 @@ import 'package:how_many_mobile_meeple/model/model.dart';
 import 'package:how_many_mobile_meeple/how_many_meeple_app_bar.dart';
 import 'package:how_many_mobile_meeple/app_common.dart';
 import 'package:how_many_mobile_meeple/app_page.dart';
+import 'package:how_many_mobile_meeple/components/quick_pick_sheet.dart';
 import 'package:how_many_mobile_meeple/guided_flow/step1_select_source.dart';
 import 'package:how_many_mobile_meeple/guided_flow/step2_whos_playing.dart';
 import 'package:how_many_mobile_meeple/guided_flow/step3_time_available.dart';
@@ -325,6 +326,19 @@ class _GuidedFlowHomePageState extends State<GuidedFlowHomePage> {
                   label: const Text('Next'),
                 ),
 
+                // Quick Pick button
+                if (_currentStep < _totalSteps - 1) ...[
+                  const SizedBox(width: 8),
+                  FilledButton.tonalIcon(
+                    key: TourTipKeys.appBarQuickPick,
+                    onPressed: canProceedFromStep1
+                        ? () => QuickPickSheet.show(context)
+                        : null,
+                    icon: const Icon(Icons.bolt),
+                    label: const Text('Quick Pick'),
+                  ),
+                ],
+
                 // Finish button - skip straight to results
                 if (_currentStep < _totalSteps - 1) ...[
                   const SizedBox(width: 8),
@@ -376,14 +390,17 @@ class _GuidedFlowHomePageState extends State<GuidedFlowHomePage> {
             children: [
               DisclaimerText("(v:$version)", context),
               const SizedBox(width: 4),
-              GestureDetector(
-                onTap: () => Navigator.of(context).push(
-                  MaterialPageRoute(builder: (_) => const AboutPage()),
-                ),
-                child: Icon(
-                  Icons.info_outline,
-                  size: 20,
-                  color: Theme.of(context).colorScheme.primary,
+              Tooltip(
+                message: 'About',
+                child: GestureDetector(
+                  onTap: () => Navigator.of(context).push(
+                    MaterialPageRoute(builder: (_) => const AboutPage()),
+                  ),
+                  child: Icon(
+                    Icons.info_outline,
+                    size: 20,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
                 ),
               ),
             ],

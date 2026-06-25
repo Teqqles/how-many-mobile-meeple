@@ -54,6 +54,7 @@ class DrawerSavedSetting extends Container {
                 }, // id},
               ),
               IconButton(
+                tooltip: 'Delete',
                 icon: Icon(
                   Icons.delete,
                   size: AppCommon.standardIconSize,

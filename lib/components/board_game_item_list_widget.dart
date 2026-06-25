@@ -63,6 +63,7 @@ class BoardGameItemListWidget extends StatelessWidget {
         trailing: IconButton(
           padding: const EdgeInsets.all(4),
           constraints: const BoxConstraints(),
+          tooltip: 'Remove',
           icon: Icon(
             Icons.delete,
             size: AppCommon.standardIconSize,

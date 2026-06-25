@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:how_many_mobile_meeple/model/model.dart';
 import 'package:how_many_mobile_meeple/model/settings.dart';
+import 'package:how_many_mobile_meeple/components/app_choice_chip.dart';
 import 'package:how_many_mobile_meeple/components/step_header_card.dart';
 import 'package:how_many_mobile_meeple/components/info_message_box.dart';
 import 'package:how_many_mobile_meeple/tour_tips/tour_tip_keys.dart';
@@ -226,10 +227,9 @@ class _Step4GameStyleState extends State<Step4GameStyle> {
                         children: category.value.map((mechanic) {
                           final isSelected =
                               selectedMechanics.contains(mechanic);
-                          return FilterChip(
-                            label: Text(mechanic),
+                          return AppMechanicChip(
+                            label: mechanic,
                             selected: isSelected,
-                            showCheckmark: true,
                             onSelected: (selected) {
                               setState(() {
                                 if (selected) {
@@ -244,22 +244,6 @@ class _Step4GameStyleState extends State<Step4GameStyle> {
                                 model.invalidateCache();
                               });
                             },
-                            selectedColor:
-                                Theme.of(context).colorScheme.secondary,
-                            checkmarkColor:
-                                Theme.of(context).colorScheme.onSecondary,
-                            backgroundColor: Colors.grey[200],
-                            side: BorderSide(
-                              color: isSelected
-                                  ? Theme.of(context).colorScheme.secondary
-                                  : Colors.grey[400]!,
-                              width: 1.5,
-                            ),
-                            labelStyle: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
-                              color: isSelected ? Colors.white : Colors.black87,
-                            ),
                           );
                         }).toList(),
                       ),

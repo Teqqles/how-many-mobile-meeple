@@ -227,10 +227,10 @@ class AboutPage extends StatelessWidget {
 
   Widget _buildContributors(BuildContext context) {
     const contributors = [
-      {'name': 'David Long', 'github': 'Teqqles'},
-      {'name': 'DragonC', 'github': 'DragonC'},
-      {'name': 'SWH30', 'github': 'SWH30'},
-      {'name': 'tjforryan', 'github': 'tjforryan'},
+      {'name': 'David Long', 'url': 'https://github.com/Teqqles'},
+      {'name': 'DragonC', 'url': 'https://boardgamegeek.com/profile/DragonC'},
+      {'name': 'Steve Whalley', 'url': 'https://github.com/oldstevekenobi'},
+      {'name': 'tjforryan', 'url': 'https://github.com/tjforryan'},
     ];
 
     return Card(
@@ -249,8 +249,7 @@ class AboutPage extends StatelessWidget {
             ...contributors.map((c) => Padding(
                   padding: const EdgeInsets.only(bottom: 6),
                   child: InkWell(
-                    onTap: () =>
-                        _launchUrl('https://github.com/${c['github']}'),
+                    onTap: () => _launchUrl(c['url']!),
                     child: Row(
                       children: [
                         Icon(Icons.person_outline,

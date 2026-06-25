@@ -24,6 +24,14 @@ class TourTipDefinitions {
       pageId: pageAppBar,
       order: 1,
     ),
+    TourTip(
+      id: 'appbar_quick_pick',
+      title: 'Quick Pick',
+      description:
+          'Skip the steps and pick a random game fast. Choose players, time, or weight and go.',
+      pageId: pageAppBar,
+      order: 2,
+    ),
 
     // Step 2 tips
     TourTip(

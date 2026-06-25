@@ -1,22 +1,57 @@
 {
-  "version": "2.9.0",
-  "since_version": "v2.8.3",
+  "version": "2.10.0",
+  "since_version": "v2.9.0",
   "recent_changes": [
     {
       "type": "feat",
       "scope": "",
-      "description": "cache drawer preferences and hide empty game stats"
+      "description": "add Quick Pick for fast random game selection"
     }
   ],
   "upcoming": [
     {
-      "number": 68,
-      "title": "Game detail page shows a synopsis",
+      "number": 78,
+      "title": "Dark mode with theme colour options",
       "labels": []
     },
     {
-      "number": 64,
-      "title": "Hide details when we have no data",
+      "number": 77,
+      "title": "Shelf-of-shame",
+      "labels": []
+    },
+    {
+      "number": 76,
+      "title": "Wishlist - Star games for later",
+      "labels": []
+    },
+    {
+      "number": 75,
+      "title": "Play log - Track games played with BGG integration",
+      "labels": []
+    },
+    {
+      "number": 73,
+      "title": "Collection overlap - Games we both own",
+      "labels": []
+    },
+    {
+      "number": 72,
+      "title": "Quick filter chips on list page",
+      "labels": []
+    },
+    {
+      "number": 71,
+      "title": "Share a filtered search link",
+      "labels": []
+    },
+    {
+      "number": 70,
+      "title": "Recently viewed games history",
+      "labels": []
+    },
+    {
+      "number": 68,
+      "title": "Game detail page shows a synopsis",
       "labels": []
     },
     {
@@ -58,7 +93,7 @@
     },
     {
       "number": 41,
-      "title": "Mood\u2011Based Discovery",
+      "title": "Mood-Based Discovery",
       "labels": []
     },
     {

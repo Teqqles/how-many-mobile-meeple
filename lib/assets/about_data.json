@@ -1,6 +1,11 @@
 {
-  "version": "2.10.2",
+  "version": "2.10.3",
   "recent_changes": [
+    {
+      "type": "fix",
+      "scope": "",
+      "description": "prevent app title truncation and compact detail buttons on mobile"
+    },
     {
       "type": "fix",
       "scope": "",

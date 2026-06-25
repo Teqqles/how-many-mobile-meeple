@@ -128,7 +128,7 @@ class _GuidedFlowHomePageState extends State<GuidedFlowHomePage> {
       },
       child: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
@@ -330,9 +330,6 @@ class _GuidedFlowHomePageState extends State<GuidedFlowHomePage> {
                 if (_currentStep < _totalSteps - 1) ...[
                   const SizedBox(width: 8),
                   FilledButton.tonalIcon(
-                    key: (ModalRoute.of(context)?.isCurrent ?? true)
-                        ? TourTipKeys.appBarQuickPick
-                        : null,
                     onPressed: canProceedFromStep1
                         ? () => QuickPickSheet.show(context)
                         : null,

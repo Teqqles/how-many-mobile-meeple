@@ -1,10 +1,6 @@
-import 'dart:async';
-import 'dart:math' as math;
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
 import 'package:how_many_mobile_meeple/model/model.dart';
 import 'package:how_many_mobile_meeple/model/item.dart';
 import 'package:how_many_mobile_meeple/app_common.dart';
@@ -137,7 +133,14 @@ class _Step1SelectSourceState extends State<Step1SelectSource> {
 
         if (step.key.currentContext == null) continue;
 
-        await _showSingleTip(step, service, storage, tipIds);
+        final shown = await service.showSingleTip(
+          context: context,
+          key: step.key,
+          id: step.id,
+          title: step.title,
+          description: step.description,
+        );
+        if (!shown) _dismissed = true;
       }
 
       if (mounted) _switchToTab(0);
@@ -148,132 +151,7 @@ class _Step1SelectSourceState extends State<Step1SelectSource> {
     });
   }
 
-  static const double _maxFocusRadius = 150.0;
-
-  double _cappedPaddingForKey(GlobalKey key) {
-    final renderBox = key.currentContext?.findRenderObject() as RenderBox?;
-    if (renderBox == null) return 10;
-    final screenWidth = MediaQuery.of(key.currentContext!).size.width;
-    final targetSize = renderBox.size;
-    final maxDimension = math.max(targetSize.width, targetSize.height);
-    final maxRadius = math.min(_maxFocusRadius, screenWidth * 0.2);
-    final padding = maxRadius - maxDimension * 0.6;
-    return math.max(padding, 4);
-  }
-
   bool _dismissed = false;
-
-  Future<void> _showSingleTip(
-    _Step1TipStep step,
-    TourTipService service,
-    TourTipStorage storage,
-    List<String> tipIds,
-  ) async {
-    final completer = Completer<void>();
-
-    final padding = _cappedPaddingForKey(step.key);
-
-    final target = TargetFocus(
-      identify: step.id,
-      keyTarget: step.key,
-      alignSkip: Alignment.topRight,
-      enableOverlayTab: true,
-      enableTargetTab: true,
-      paddingFocus: padding,
-      contents: [
-        TargetContent(
-          align: ContentAlign.bottom,
-          builder: (context, controller) {
-            final screenWidth = MediaQuery.of(context).size.width;
-            return Container(
-              constraints: BoxConstraints(maxWidth: screenWidth * 0.7),
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.black87,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    step.title,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 20,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    step.description,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 15,
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  Wrap(
-                    alignment: WrapAlignment.spaceBetween,
-                    spacing: 8,
-                    runSpacing: 4,
-                    children: [
-                      const Text(
-                        'Tap anywhere to continue',
-                        style: TextStyle(
-                          color: Colors.white70,
-                          fontSize: 12,
-                          fontStyle: FontStyle.italic,
-                        ),
-                      ),
-                      GestureDetector(
-                        onTap: () async {
-                          _dismissed = true;
-                          await service.dismissAll();
-                          for (final tid in tipIds) {
-                            await storage.markSeen(tid);
-                          }
-                          _activeCoachMark?.skip();
-                        },
-                        child: const Text(
-                          'Dismiss Tour',
-                          style: TextStyle(
-                            color: Colors.white70,
-                            fontSize: 12,
-                            decoration: TextDecoration.underline,
-                            decorationColor: Colors.white70,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            );
-          },
-        ),
-      ],
-    );
-
-    _activeCoachMark = TutorialCoachMark(
-      targets: [target],
-      colorShadow: Colors.black,
-      opacityShadow: 0.8,
-      paddingFocus: 10,
-      hideSkip: true,
-      onFinish: () => completer.complete(),
-      onSkip: () {
-        _dismissed = true;
-        completer.complete();
-        return true;
-      },
-    )..show(context: context);
-
-    await completer.future;
-    _activeCoachMark = null;
-  }
-
-  TutorialCoachMark? _activeCoachMark;
 
   void _switchToTab(int index) {
     if (mounted) {
@@ -302,7 +180,7 @@ class _Step1SelectSourceState extends State<Step1SelectSource> {
       builder: (context, model, child) => Card(
         elevation: 2,
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 20),
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -364,24 +242,28 @@ class _Step1SelectSourceState extends State<Step1SelectSource> {
         visualDensity: VisualDensity.compact,
         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
         padding: WidgetStatePropertyAll(
-          const EdgeInsets.symmetric(horizontal: 8),
+          const EdgeInsets.symmetric(horizontal: 2),
         ),
       ),
       segments: [
         ButtonSegment(
           value: 0,
-          label: Text('Trending', key: _tabSelectorKey),
-          icon: const Icon(Icons.local_fire_department, size: 18),
+          label: Text('Trending',
+              key: _tabSelectorKey,
+              overflow: TextOverflow.ellipsis,
+              maxLines: 1),
+          icon: const Icon(Icons.local_fire_department, size: 16),
         ),
         const ButtonSegment(
           value: 1,
-          label: Text('My Collection'),
-          icon: Icon(Icons.person, size: 18),
+          label:
+              Text('Collection', overflow: TextOverflow.ellipsis, maxLines: 1),
+          icon: Icon(Icons.person, size: 16),
         ),
         const ButtonSegment(
           value: 2,
-          label: Text('Geeklist'),
-          icon: Icon(Icons.list, size: 18),
+          label: Text('Geeklist', overflow: TextOverflow.ellipsis, maxLines: 1),
+          icon: Icon(Icons.list, size: 16),
         ),
       ],
       selected: {_tabIndex},

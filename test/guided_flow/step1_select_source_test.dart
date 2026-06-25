@@ -23,8 +23,8 @@ void main() {
         ),
       );
 
-      // Switch to My Collection tab
-      await tester.tap(find.text('My Collection'));
+      // Switch to Collection tab
+      await tester.tap(find.text('Collection'));
       await tester.pump();
 
       // Find the Add Source button
@@ -53,8 +53,8 @@ void main() {
         ),
       );
 
-      // Switch to My Collection tab
-      await tester.tap(find.text('My Collection'));
+      // Switch to Collection tab
+      await tester.tap(find.text('Collection'));
       await tester.pump();
 
       // Find the text field
@@ -91,8 +91,8 @@ void main() {
         ),
       );
 
-      // Switch to My Collection tab
-      await tester.tap(find.text('My Collection'));
+      // Switch to Collection tab
+      await tester.tap(find.text('Collection'));
       await tester.pump();
 
       // Find the text field

@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:share_plus/share_plus.dart';
 import 'package:how_many_mobile_meeple/platform/router.dart' as r;
 import 'package:provider/provider.dart';
 import 'package:how_many_mobile_meeple/components/drawer_bgg_filter.dart';
@@ -10,7 +8,6 @@ import 'package:how_many_mobile_meeple/components/quick_pick_sheet.dart';
 import 'package:how_many_mobile_meeple/favourites/ignored_games_service.dart';
 import 'app_common.dart';
 import 'components/component_factory.dart';
-import 'model/game.dart';
 import 'model/model.dart';
 import 'model/settings.dart';
 import 'pwa/pwa_install_service.dart';
@@ -317,66 +314,6 @@ mixin AppPage {
           ),
         ],
       );
-
-  ElevatedButton shareButton(BuildContext context, Game game) {
-    return ElevatedButton(
-      child: Tooltip(
-        message: 'Share',
-        child: Icon(
-          Icons.share,
-          color: Theme.of(context).selectedRowColor,
-        ),
-      ),
-      onPressed: () async {
-        final baseUri = Uri.base.removeFragment();
-        final uri = baseUri.replace(
-            fragment: '/game/${game.name.replaceAll(' ', '+')}/${game.id}');
-        final url = uri.toString();
-        try {
-          await SharePlus.instance.share(
-            ShareParams(
-              title: AppCommon.randomGameMessage(game.name),
-              uri: uri,
-            ),
-          );
-        } catch (_) {
-          _showCopyLinkDialog(context, url);
-        }
-      },
-      style: ButtonStyle(
-          backgroundColor: WidgetStateProperty.all<Color>(
-              Theme.of(context).colorScheme.secondary),
-          shape: WidgetStateProperty.all<OutlinedBorder>(RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(30.0)))),
-    );
-  }
-
-  void _showCopyLinkDialog(BuildContext context, String url) {
-    showDialog(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: const Text('Share Link'),
-        content: SelectableText(url),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(),
-            child: const Text('Close'),
-          ),
-          FilledButton.icon(
-            onPressed: () {
-              Clipboard.setData(ClipboardData(text: url));
-              Navigator.of(dialogContext).pop();
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Link copied to clipboard')),
-              );
-            },
-            icon: const Icon(Icons.copy),
-            label: const Text('Copy Link'),
-          ),
-        ],
-      ),
-    );
-  }
 
   Widget pageDrawer(BuildContext context) {
     var staticDataComponentLength = 6;

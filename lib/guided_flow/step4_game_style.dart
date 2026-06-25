@@ -73,7 +73,7 @@ class _Step4GameStyleState extends State<Step4GameStyle> {
         return Card(
           elevation: 2,
           child: Padding(
-            padding: const EdgeInsets.all(20.0),
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [

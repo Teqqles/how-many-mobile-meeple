@@ -49,7 +49,7 @@ class _Step3TimeAvailableState extends State<Step3TimeAvailable> {
         return Card(
           elevation: 2,
           child: Padding(
-            padding: const EdgeInsets.all(20.0),
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [

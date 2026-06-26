@@ -11,6 +11,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     steps:
       - name: Checkout code
@@ -34,5 +36,43 @@ jobs:
       - name: Analyze code
         run: flutter analyze
 
-      - name: Run tests
-        run: flutter test
+      - name: Run tests with coverage
+        run: flutter test --coverage
+
+      - name: Update coverage badge
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        run: |
+          LCOV="coverage/lcov.info"
+          if [ ! -f "$LCOV" ]; then
+            echo "No coverage file"
+            exit 0
+          fi
+
+          LINES_FOUND=$(grep -c "^DA:" "$LCOV" || true)
+          LINES_HIT=$(grep "^DA:" "$LCOV" | cut -d, -f2 | grep -vc "^0$" || true)
+
+          if [ "$LINES_FOUND" -gt 0 ]; then
+            PCT=$(( LINES_HIT * 100 / LINES_FOUND ))
+          else
+            PCT=0
+          fi
+
+          if [ "$PCT" -ge 80 ]; then
+            COLOR="brightgreen"
+          elif [ "$PCT" -ge 60 ]; then
+            COLOR="yellow"
+          elif [ "$PCT" -ge 40 ]; then
+            COLOR="orange"
+          else
+            COLOR="red"
+          fi
+
+          mkdir -p .badges
+          printf '{"schemaVersion":1,"label":"coverage","message":"%s%%","color":"%s"}\n' "$PCT" "$COLOR" > .badges/coverage.json
+
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add .badges/coverage.json
+          git diff --cached --quiet && exit 0
+          git commit -m "chore: update coverage badge [skip ci]"
+          git push

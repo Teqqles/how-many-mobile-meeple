@@ -89,13 +89,15 @@ Each endpoint returns an array of game objects:
 
 ## 🔧 Configure Flutter App to Use Mock API
 
-Update `lib/app_common.dart`:
+Create a local config override (no code changes needed):
 
-```dart
-static const String boardGameGeekProxyUrl =
-    "http://localhost:3000";  // For local testing
-    // "https://api.howmanymeeple.com";  // Production
+```bash
+cp web/config.json web/config.local.json
 ```
+
+The app automatically loads `config.local.json` when present, which points to `http://localhost:3000`.
+
+See [web/CONFIG.md](../web/CONFIG.md) for full configuration details.
 
 ## 🎮 Testing with the App
 
@@ -105,7 +107,7 @@ static const String boardGameGeekProxyUrl =
    npm start
    ```
 
-2. Update the API URL in the Flutter app (see above)
+2. Create `web/config.local.json` (see above)
 
 3. Run the Flutter app:
    ```bash
@@ -113,8 +115,8 @@ static const String boardGameGeekProxyUrl =
    ```
 
 4. In the app, enter one of these:
-   - Username: `testuser1` or `testuser2` (select "collection" type)
-   - Geeklist ID: `12345` (select "geeklist" type)
+   - Username: `testuser1` or `testuser2`
+   - Geeklist ID: `12345`
 
 ## 📝 Mock Data Included
 

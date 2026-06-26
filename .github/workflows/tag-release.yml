@@ -17,6 +17,15 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.44.x'
+          channel: 'stable'
+
+      - name: Install dependencies
+        run: flutter pub get
+
       - name: Determine version bump
         id: bump
         run: |
@@ -114,6 +123,42 @@ jobs:
         if: steps.bump.outputs.type != 'skip'
         run: python3 scripts/generate_about_data.py --issues-file /tmp/github_issues.json
 
+      - name: Generate changelog
+        if: steps.bump.outputs.type != 'skip'
+        run: python3 scripts/generate_changelog.py
+
+      - name: Generate coverage data
+        if: steps.bump.outputs.type != 'skip'
+        run: |
+          flutter test --coverage
+          LCOV="coverage/lcov.info"
+          if [ ! -f "$LCOV" ]; then
+            echo "No coverage file"
+            exit 0
+          fi
+
+          LINES_FOUND=$(grep -c "^DA:" "$LCOV" || true)
+          LINES_HIT=$(grep "^DA:" "$LCOV" | cut -d, -f2 | grep -vc "^0$" || true)
+
+          if [ "$LINES_FOUND" -gt 0 ]; then
+            PCT=$(( LINES_HIT * 100 / LINES_FOUND ))
+          else
+            PCT=0
+          fi
+
+          if [ "$PCT" -ge 80 ]; then
+            COLOR="brightgreen"
+          elif [ "$PCT" -ge 60 ]; then
+            COLOR="yellow"
+          elif [ "$PCT" -ge 40 ]; then
+            COLOR="orange"
+          else
+            COLOR="red"
+          fi
+
+          mkdir -p .badges
+          printf '{"schemaVersion":1,"label":"coverage","message":"%s%%","color":"%s"}\n' "$PCT" "$COLOR" > .badges/coverage.json
+
       - name: Commit, tag, and push
         if: steps.bump.outputs.type != 'skip'
         run: |
@@ -122,7 +167,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          git add pubspec.yaml lib/assets/about_data.json
+          git add pubspec.yaml lib/assets/about_data.json CHANGELOG.md .badges/coverage.json
           git commit -m "chore: bump version to ${TAG} [skip ci]"
           git tag "$TAG"
           git push origin main "$TAG"

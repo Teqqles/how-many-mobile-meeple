@@ -1,4 +1,4 @@
-enum SortableGameField { name, maxPlaytime, rating, weight }
+enum SortableGameField { name, maxPlaytime, rating, weight, plays }
 
 class Game {
   final int id;

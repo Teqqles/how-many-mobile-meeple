@@ -10,6 +10,7 @@ import 'package:how_many_mobile_meeple/components/complexity_filter_widget.dart'
 import 'package:how_many_mobile_meeple/components/mechanic_filter_widget.dart';
 import 'package:how_many_mobile_meeple/components/player_filter_widget.dart';
 import 'package:how_many_mobile_meeple/components/rating_filter_widget.dart';
+import 'package:how_many_mobile_meeple/components/shelf_of_shame_filter_widget.dart';
 import 'package:how_many_mobile_meeple/components/time_filter_widget.dart';
 
 class AdvancedModeWidget extends StatelessWidget {
@@ -35,6 +36,8 @@ class AdvancedModeWidget extends StatelessWidget {
         const RatingFilterWidget(),
         const SizedBox(height: 8),
         const MechanicFilterWidget(),
+        const SizedBox(height: 8),
+        const ShelfOfShameFilterWidget(),
       ],
     );
   }

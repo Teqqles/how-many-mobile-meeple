@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:how_many_mobile_meeple/components/game_image_with_stats.dart';
 import 'package:how_many_mobile_meeple/model/game.dart';
+import 'package:how_many_mobile_meeple/model/model.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 Game _gameWithRating(double rating) => Game(
       id: 1,
@@ -36,13 +39,20 @@ Game _gameWithPartialData() => Game(
       averageWeight: 0,
     );
 
-Widget _wrapWidget(Widget child) => MaterialApp(
-      home: Scaffold(
-        body: SizedBox(width: 400, height: 600, child: child),
+Widget _wrapWidget(Widget child) => ChangeNotifierProvider<AppModel>.value(
+      value: AppModel(),
+      child: MaterialApp(
+        home: Scaffold(
+          body: SizedBox(width: 400, height: 600, child: child),
+        ),
       ),
     );
 
 void main() {
+  setUp(() {
+    SharedPreferences.setMockInitialValues({});
+  });
+
   group('GameImageWithStats rating badge', () {
     setUp(() {
       FlutterError.onError = (details) {
@@ -70,10 +80,7 @@ void main() {
       );
 
       expect(find.text('7.5'), findsOneWidget);
-      final sizedBoxes = find.byWidgetPredicate(
-        (w) => w is SizedBox && w.width == 72 && w.height == 72,
-      );
-      expect(sizedBoxes, findsOneWidget);
+      expect(find.byIcon(Icons.star), findsOneWidget);
     });
 
     testWidgets('silver star for rating >= 6.5', (tester) async {
@@ -82,10 +89,7 @@ void main() {
       );
 
       expect(find.text('6.8'), findsOneWidget);
-      final sizedBoxes = find.byWidgetPredicate(
-        (w) => w is SizedBox && w.width == 72 && w.height == 72,
-      );
-      expect(sizedBoxes, findsOneWidget);
+      expect(find.byIcon(Icons.star), findsOneWidget);
     });
 
     testWidgets('bronze star for rating >= 5.5', (tester) async {
@@ -94,10 +98,7 @@ void main() {
       );
 
       expect(find.text('5.9'), findsOneWidget);
-      final sizedBoxes = find.byWidgetPredicate(
-        (w) => w is SizedBox && w.width == 72 && w.height == 72,
-      );
-      expect(sizedBoxes, findsOneWidget);
+      expect(find.byIcon(Icons.star), findsOneWidget);
     });
 
     testWidgets('orange circle for rating >= 4.5', (tester) async {
@@ -106,13 +107,7 @@ void main() {
       );
 
       expect(find.text('4.7'), findsOneWidget);
-      final containers = find.byWidgetPredicate(
-        (w) =>
-            w is Container &&
-            w.constraints?.maxWidth == 56 &&
-            w.constraints?.maxHeight == 56,
-      );
-      expect(containers, findsOneWidget);
+      expect(find.byIcon(Icons.star), findsOneWidget);
     });
 
     testWidgets('red circle for rating < 4.5', (tester) async {
@@ -121,13 +116,7 @@ void main() {
       );
 
       expect(find.text('3.2'), findsOneWidget);
-      final containers = find.byWidgetPredicate(
-        (w) =>
-            w is Container &&
-            w.constraints?.maxWidth == 56 &&
-            w.constraints?.maxHeight == 56,
-      );
-      expect(containers, findsOneWidget);
+      expect(find.byIcon(Icons.star), findsOneWidget);
     });
 
     testWidgets('boundary: 7.4 gets silver not gold', (tester) async {
@@ -197,7 +186,7 @@ void main() {
         _wrapWidget(GameImageWithStats(game: _gameWithNoData())),
       );
 
-      expect(find.text('BoardGameGeek'), findsOneWidget);
+      expect(find.byIcon(Icons.open_in_new), findsOneWidget);
     });
 
     testWidgets('shows only stats that have data', (tester) async {
@@ -208,7 +197,7 @@ void main() {
       expect(find.byIcon(Icons.people), findsOneWidget);
       expect(find.byIcon(Icons.timer), findsNothing);
       expect(find.byIcon(Icons.fitness_center), findsNothing);
-      expect(find.text('BoardGameGeek'), findsOneWidget);
+      expect(find.byIcon(Icons.open_in_new), findsOneWidget);
     });
   });
 }

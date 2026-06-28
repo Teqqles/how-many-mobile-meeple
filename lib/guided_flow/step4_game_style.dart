@@ -5,6 +5,7 @@ import 'package:how_many_mobile_meeple/model/settings.dart';
 import 'package:how_many_mobile_meeple/components/app_choice_chip.dart';
 import 'package:how_many_mobile_meeple/components/step_header_card.dart';
 import 'package:how_many_mobile_meeple/components/info_message_box.dart';
+import 'package:how_many_mobile_meeple/components/unplayed_only_toggle.dart';
 import 'package:how_many_mobile_meeple/tour_tips/tour_tip_keys.dart';
 
 /// Step 4: Game Style
@@ -258,6 +259,12 @@ class _Step4GameStyleState extends State<Step4GameStyle> {
                       ? 'Skip mechanics to see all game types'
                       : '${selectedMechanics.length} mechanic(s) selected',
                 ),
+
+                const SizedBox(height: 32),
+                const Divider(),
+                const SizedBox(height: 24),
+
+                const UnplayedOnlyToggle(),
               ],
             ),
           ),

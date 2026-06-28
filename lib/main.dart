@@ -49,6 +49,21 @@ class MyApp extends StatelessWidget {
               onPrimary: Colors.white, // White text on primary color buttons
             ),
             highlightColor: _swatch.shade50,
+            switchTheme: SwitchThemeData(
+              thumbColor: WidgetStateProperty.resolveWith(
+                (states) => states.contains(WidgetState.selected)
+                    ? Colors.white
+                    : _swatch.shade600,
+              ),
+              trackColor: WidgetStateProperty.resolveWith(
+                (states) => states.contains(WidgetState.selected)
+                    ? _swatch.shade600
+                    : Colors.white,
+              ),
+              trackOutlineColor: WidgetStateProperty.resolveWith(
+                (states) => _swatch.shade600,
+              ),
+            ),
             filledButtonTheme: FilledButtonThemeData(
               style: FilledButton.styleFrom(
                 foregroundColor: Colors.white, // White text/icons

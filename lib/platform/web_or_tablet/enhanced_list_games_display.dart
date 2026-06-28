@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:how_many_mobile_meeple/components/app_default_padding.dart';
+import 'package:how_many_mobile_meeple/components/feature_drawer.dart';
 import 'package:how_many_mobile_meeple/favourites/favourite_game.dart';
 import 'package:how_many_mobile_meeple/favourites/favourites_service.dart';
 import 'package:how_many_mobile_meeple/favourites/ignored_games_service.dart';
@@ -15,6 +16,8 @@ import '../../network_content_widget.dart';
 import '../../screen_tools.dart';
 import 'package:how_many_mobile_meeple/components/platform_independent_image.dart';
 import 'package:how_many_mobile_meeple/components/rating_badge.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:how_many_mobile_meeple/model/settings.dart';
 
 class EnhancedListGamesDisplayPage extends NetworkWidget with AppPage {
   @override
@@ -22,6 +25,7 @@ class EnhancedListGamesDisplayPage extends NetworkWidget with AppPage {
     return Scaffold(
         appBar:
             HowManyMeepleAppBar(AppCommon.listGamesPageTitle, context: context),
+        drawer: const FeatureDrawer(),
         endDrawer: pageDrawer(context),
         persistentFooterButtons: [iconButtonGroup(context)],
         body: Container(child: loadNetworkContent(displayGame)));
@@ -85,14 +89,34 @@ class _GameListBodyState extends State<_GameListBody> with ScreenTools {
     if (mounted) setState(() {});
   }
 
+  List<Game> _sortByPlays(AppModel model) {
+    final games = model.bggCache.games.getGamesByName(SortOrder.Asc);
+    games.sort((a, b) {
+      final aPlays = model.getPlayCount(a.id);
+      final bPlays = model.getPlayCount(b.id);
+      return model.sortDirection == SortOrder.Asc
+          ? aPlays.compareTo(bPlays)
+          : bPlays.compareTo(aPlays);
+    });
+    return games;
+  }
+
   @override
   Widget build(BuildContext context) {
     final model = widget.model;
-    var allGames = model.bggCache.games
-        .getGamesBy(field: model.sortGameField, order: model.sortDirection);
-    final games = _showIgnored
+    var allGames = model.sortGameField == SortableGameField.plays
+        ? _sortByPlays(model)
+        : model.bggCache.games
+            .getGamesBy(field: model.sortGameField, order: model.sortDirection);
+    var games = _showIgnored
         ? allGames
         : allGames.where((g) => !widget.ignoredService.contains(g.id)).toList();
+
+    final sosSetting =
+        model.settings.setting(Settings.filterShelfOfShameOnly.name);
+    if (sosSetting.enabled && sosSetting.getBool() && model.playsLoaded) {
+      games = games.where((g) => model.isUnplayed(g.id)).toList();
+    }
 
     if (games.isEmpty) {
       return _buildExhaustedState(context);
@@ -150,6 +174,7 @@ class _GameListBodyState extends State<_GameListBody> with ScreenTools {
   }
 
   Widget _buildHeader(BuildContext context, AppModel model) {
+    final isWide = isWideScreen(context);
     return Container(
       decoration: BoxDecoration(
         border:
@@ -157,28 +182,37 @@ class _GameListBodyState extends State<_GameListBody> with ScreenTools {
       ),
       child: Row(
         children: [
-          const SizedBox(width: 56),
+          const SizedBox(width: 52),
           Expanded(
-            flex: 4,
             child: _sortButton(context, model, 'Name', SortableGameField.name,
                 alignment: Alignment.centerLeft),
           ),
+          if (isWide) ...[
+            SizedBox(
+              width: 80,
+              child: _sortButton(
+                  context, model, null, SortableGameField.maxPlaytime,
+                  icon: Icons.timer),
+            ),
+            SizedBox(
+              width: 60,
+              child: _sortButton(context, model, null, SortableGameField.weight,
+                  icon: Icons.fitness_center),
+            ),
+            if (model.playsLoaded)
+              SizedBox(
+                width: 60,
+                child: _sortButton(
+                    context, model, null, SortableGameField.plays,
+                    icon: Icons.sports_esports),
+              ),
+          ],
           SizedBox(
-            width: 80,
-            child: _sortButton(
-                context, model, null, SortableGameField.maxPlaytime,
-                icon: Icons.timer),
-          ),
-          SizedBox(
-            width: 60,
-            child: _sortButton(context, model, null, SortableGameField.weight,
-                icon: Icons.fitness_center),
-          ),
-          SizedBox(
-            width: 60,
+            width: isWide ? 60 : 50,
             child: _sortButton(context, model, null, SortableGameField.rating,
                 icon: Icons.star),
           ),
+          if (isWide) const SizedBox(width: 80),
         ],
       ),
     );
@@ -310,7 +344,6 @@ class _GameListBodyState extends State<_GameListBody> with ScreenTools {
             ),
           ),
           Expanded(
-            flex: 4,
             child: AppDefaultPadding(
               child: InkWell(
                 onTap: () => Navigator.of(context).pushNamed(
@@ -319,38 +352,58 @@ class _GameListBodyState extends State<_GameListBody> with ScreenTools {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Row(
-                      children: [
-                        if (isFav)
-                          Padding(
-                            padding: const EdgeInsets.only(right: 4),
-                            child: Icon(Icons.favorite,
-                                size: 14, color: Colors.amber.shade700),
-                          ),
-                        Flexible(
-                          child: Text(game.name,
-                              style: const TextStyle(
-                                decoration: TextDecoration.underline,
-                              )),
-                        ),
-                      ],
-                    ),
+                    Text(game.name,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          decoration: TextDecoration.underline,
+                        )),
                     const SizedBox(height: 2),
                     Row(
-                      mainAxisSize: MainAxisSize.min,
                       children: [
+                        if (isFav) ...[
+                          Icon(Icons.favorite,
+                              size: 12, color: Colors.amber.shade700),
+                          const SizedBox(width: 6),
+                        ],
                         Icon(Icons.people,
                             size: 12,
                             color: Theme.of(context).colorScheme.secondary),
                         const SizedBox(width: 3),
                         Text(
                           game.minPlayers == game.maxPlayers
-                              ? '${game.minPlayers} players'
-                              : '${game.minPlayers}-${game.maxPlayers} players',
+                              ? '${game.minPlayers}p'
+                              : '${game.minPlayers}-${game.maxPlayers}p',
                           style: TextStyle(
                               fontSize: 11,
                               color: Theme.of(context).colorScheme.secondary),
                         ),
+                        if (widget.model.primaryPlayer != null &&
+                            widget.model.isInCollection(game.id)) ...[
+                          const SizedBox(width: 6),
+                          FaIcon(FontAwesomeIcons.crown,
+                              size: 10,
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .secondary
+                                  .withAlpha(150)),
+                        ],
+                        if (widget.model.playsLoaded) ...[
+                          const SizedBox(width: 6),
+                          Text(
+                            widget.model.getPlayCount(game.id) > 0
+                                ? '${widget.model.getPlayCount(game.id)} plays'
+                                : 'Unplayed',
+                            style: TextStyle(
+                              fontSize: 10,
+                              color: widget.model.getPlayCount(game.id) > 0
+                                  ? Theme.of(context).colorScheme.secondary
+                                  : Theme.of(context)
+                                      .colorScheme
+                                      .error
+                                      .withAlpha(180),
+                            ),
+                          ),
+                        ],
                       ],
                     ),
                   ],
@@ -358,28 +411,48 @@ class _GameListBodyState extends State<_GameListBody> with ScreenTools {
               ),
             ),
           ),
-          SizedBox(
-            width: 80,
-            child: AppDefaultPadding(
-              child: Container(
-                alignment: Alignment.centerRight,
-                child: Text(AppCommon.minutesToTime(game.maxPlaytime)),
+          if (isWide) ...[
+            SizedBox(
+              width: 80,
+              child: AppDefaultPadding(
+                child: Container(
+                  alignment: Alignment.centerRight,
+                  child: Text(AppCommon.minutesToTime(game.maxPlaytime)),
+                ),
               ),
             ),
-          ),
-          SizedBox(
-            width: 60,
-            child: AppDefaultPadding(
-              child: Container(
-                alignment: Alignment.centerRight,
-                child: Text(game.averageWeight.toStringAsFixed(2)),
+            SizedBox(
+              width: 60,
+              child: AppDefaultPadding(
+                child: Container(
+                  alignment: Alignment.centerRight,
+                  child: Text(game.averageWeight.toStringAsFixed(2)),
+                ),
               ),
             ),
-          ),
+            if (widget.model.playsLoaded)
+              SizedBox(
+                width: 60,
+                child: AppDefaultPadding(
+                  child: Container(
+                    alignment: Alignment.centerRight,
+                    child: Text(
+                      '${widget.model.getPlayCount(game.id)}',
+                      style: TextStyle(
+                        color: widget.model.getPlayCount(game.id) == 0
+                            ? Theme.of(context).colorScheme.error.withAlpha(180)
+                            : null,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+          ],
           SizedBox(
-            width: 60,
+            width: isWide ? 60 : 50,
             child: Center(
-              child: MiniRatingBadge(rating: game.averageRating, size: 38),
+              child: MiniRatingBadge(
+                  rating: game.averageRating, size: isWide ? 38 : 34),
             ),
           ),
           if (isWide) ...[

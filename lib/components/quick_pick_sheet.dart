@@ -27,6 +27,7 @@ class _QuickPickSheetState extends State<QuickPickSheet> {
   int? _selectedPlayers;
   int? _selectedMaxTime;
   double? _selectedWeight;
+  bool _shelfOfShameOnly = false;
 
   @override
   void didChangeDependencies() {
@@ -57,6 +58,10 @@ class _QuickPickSheetState extends State<QuickPickSheet> {
         _weightOptions.containsValue(complexitySetting.value)) {
       _selectedWeight = complexitySetting.value as double;
     }
+
+    final sosSetting =
+        model.settings.setting(Settings.filterShelfOfShameOnly.name);
+    _shelfOfShameOnly = sosSetting.enabled && sosSetting.getBool();
   }
 
   static const Map<String, int> _playerOptions = {
@@ -80,86 +85,90 @@ class _QuickPickSheetState extends State<QuickPickSheet> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.only(
-        left: 24,
-        right: 24,
-        top: 24,
-        bottom: MediaQuery.of(context).viewInsets.bottom + 24,
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Center(
-            child: Container(
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
-                borderRadius: BorderRadius.circular(2),
+    return SingleChildScrollView(
+      child: Padding(
+        padding: EdgeInsets.only(
+          left: 24,
+          right: 24,
+          top: 24,
+          bottom: MediaQuery.of(context).viewInsets.bottom + 24,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Center(
+              child: Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  borderRadius: BorderRadius.circular(2),
+                ),
               ),
             ),
-          ),
-          const SizedBox(height: 20),
-          Text(
-            'Quick Pick',
-            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 4),
-          Text(
-            'Pick what matters, skip what doesn\'t',
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
-                ),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 28),
-          _buildChipRow(
-            icon: Icons.people,
-            label: 'Players',
-            options: _playerOptions,
-            selected: _selectedPlayers,
-            onChanged: (value) => setState(() => _selectedPlayers = value),
-          ),
-          const SizedBox(height: 16),
-          _buildChipRow(
-            icon: Icons.schedule,
-            label: 'Time',
-            options: _timeOptions,
-            selected: _selectedMaxTime,
-            onChanged: (value) => setState(() => _selectedMaxTime = value),
-          ),
-          const SizedBox(height: 16),
-          _buildChipRow(
-            icon: Icons.fitness_center,
-            label: 'Weight',
-            options: _weightOptions,
-            selected: _selectedWeight,
-            onChanged: (value) => setState(() => _selectedWeight = value),
-          ),
-          const SizedBox(height: 28),
-          Consumer<AppModel>(
-            builder: (context, model, child) {
-              final hasSource = model.items.itemList.isNotEmpty;
-              return FilledButton.icon(
-                onPressed: hasSource ? () => _applyAndGo(context) : null,
-                icon: const Icon(Icons.casino, size: 24),
-                label: Text(
-                  hasSource ? 'Go!' : 'Add a source first',
-                  style: const TextStyle(
-                      fontSize: 16, fontWeight: FontWeight.bold),
-                ),
-                style: FilledButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                ),
-              );
-            },
-          ),
-        ],
+            const SizedBox(height: 20),
+            Text(
+              'Quick Pick',
+              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 4),
+            Text(
+              'Pick what matters, skip what doesn\'t',
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 28),
+            _buildChipRow(
+              icon: Icons.people,
+              label: 'Players',
+              options: _playerOptions,
+              selected: _selectedPlayers,
+              onChanged: (value) => setState(() => _selectedPlayers = value),
+            ),
+            const SizedBox(height: 16),
+            _buildChipRow(
+              icon: Icons.schedule,
+              label: 'Time',
+              options: _timeOptions,
+              selected: _selectedMaxTime,
+              onChanged: (value) => setState(() => _selectedMaxTime = value),
+            ),
+            const SizedBox(height: 16),
+            _buildChipRow(
+              icon: Icons.fitness_center,
+              label: 'Weight',
+              options: _weightOptions,
+              selected: _selectedWeight,
+              onChanged: (value) => setState(() => _selectedWeight = value),
+            ),
+            const SizedBox(height: 16),
+            _buildShelfOfShameToggle(context),
+            const SizedBox(height: 28),
+            Consumer<AppModel>(
+              builder: (context, model, child) {
+                final hasSource = model.items.itemList.isNotEmpty;
+                return FilledButton.icon(
+                  onPressed: hasSource ? () => _applyAndGo(context) : null,
+                  icon: const Icon(Icons.casino, size: 24),
+                  label: Text(
+                    hasSource ? 'Go!' : 'Add a source first',
+                    style: const TextStyle(
+                        fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                  style: FilledButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                  ),
+                );
+              },
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -203,6 +212,61 @@ class _QuickPickSheetState extends State<QuickPickSheet> {
     );
   }
 
+  Widget _buildShelfOfShameToggle(BuildContext context) {
+    return Consumer<AppModel>(
+      builder: (context, model, child) {
+        final hasPrimaryPlayer = model.primaryPlayer != null;
+        return InkWell(
+          onTap: hasPrimaryPlayer
+              ? () => setState(() => _shelfOfShameOnly = !_shelfOfShameOnly)
+              : null,
+          borderRadius: BorderRadius.circular(8),
+          child: Container(
+            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(
+                color: _shelfOfShameOnly
+                    ? Theme.of(context).colorScheme.primary
+                    : Theme.of(context).colorScheme.outline.withAlpha(80),
+              ),
+              color: _shelfOfShameOnly
+                  ? Theme.of(context).colorScheme.primaryContainer.withAlpha(80)
+                  : null,
+            ),
+            child: Row(
+              children: [
+                Icon(Icons.shelves,
+                    size: 20,
+                    color: hasPrimaryPlayer
+                        ? Theme.of(context).colorScheme.primary
+                        : Theme.of(context).colorScheme.onSurfaceVariant),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    'Unplayed only',
+                    style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: hasPrimaryPlayer
+                              ? null
+                              : Theme.of(context).colorScheme.onSurfaceVariant,
+                        ),
+                  ),
+                ),
+                Switch(
+                  value: _shelfOfShameOnly,
+                  onChanged: hasPrimaryPlayer
+                      ? (value) => setState(() => _shelfOfShameOnly = value)
+                      : null,
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   void _applyAndGo(BuildContext context) {
     final model = AppModel.of(context, listen: false);
 
@@ -234,6 +298,12 @@ class _QuickPickSheetState extends State<QuickPickSheet> {
       complexitySetting.enabled = true;
       model.settings.updateSetting(complexitySetting);
     }
+
+    final sosSetting =
+        model.settings.setting(Settings.filterShelfOfShameOnly.name);
+    sosSetting.value = _shelfOfShameOnly;
+    sosSetting.enabled = _shelfOfShameOnly;
+    model.settings.updateSetting(sosSetting);
 
     model.invalidateCache();
     model.updateStore();

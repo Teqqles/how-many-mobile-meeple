@@ -27,6 +27,7 @@ dependencies:
   path: ^1.9.0
   synchronized: ^3.3.0+3
   tutorial_coach_mark: ^1.3.3
+  font_awesome_flutter: ^11.0.0
 
 dev_dependencies:
   flutter_test:

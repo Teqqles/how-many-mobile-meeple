@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:how_many_mobile_meeple/model/model.dart';
@@ -417,6 +418,9 @@ class _Step1SelectSourceState extends State<Step1SelectSource> {
       label = item.name;
     }
 
+    final isPrimary = item.itemType == ItemType.collection &&
+        model.primaryPlayer == item.name;
+
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
       child: Container(
@@ -447,6 +451,18 @@ class _Step1SelectSourceState extends State<Step1SelectSource> {
                     ),
               ),
             ),
+            if (item.itemType == ItemType.collection)
+              IconButton(
+                icon: FaIcon(
+                  FontAwesomeIcons.crown,
+                  size: 16,
+                  color: isPrimary ? Colors.amber : Colors.grey,
+                ),
+                onPressed: () {
+                  model.primaryPlayer = item.name;
+                },
+                tooltip: isPrimary ? 'Primary player' : 'Set as primary player',
+              ),
             IconButton(
               icon: const Icon(Icons.close, size: 20),
               onPressed: () {

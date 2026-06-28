@@ -8,6 +8,7 @@ import 'package:how_many_mobile_meeple/platform/common/game_detail_page.dart';
 import 'package:how_many_mobile_meeple/platform/pages.dart';
 import 'package:how_many_mobile_meeple/platform/web/url_fragment_encoder.dart';
 import 'package:how_many_mobile_meeple/settings_summary_page.dart';
+import 'package:how_many_mobile_meeple/shelf_of_shame/shelf_of_shame_page.dart';
 
 class Router {
   static const String homeRoute = '/';
@@ -18,10 +19,12 @@ class Router {
   static const String favouritesRoute = '/favourites';
   static const String ignoredRoute = '/ignored';
   static const String aboutRoute = '/about';
+  static const String shelfOfShameRoute = '/shelf-of-shame';
 
   static List<String> routeList = [
     randomRoute,
     listRoute,
+    shelfOfShameRoute,
     settingsRoute,
     homeRoute
   ];
@@ -80,6 +83,15 @@ class Router {
                       'Swipe left on a game in the list to hide it from future results.',
                   serviceFactory: IgnoredGamesService.instance,
                 ),
+            settings: settings);
+      case Router.shelfOfShameRoute:
+        final sosSegments =
+            settings.name!.split('/').where((s) => s.isNotEmpty).toList();
+        final sosUsername = sosSegments.length > 1
+            ? Uri.decodeComponent(sosSegments.last)
+            : null;
+        return MaterialPageRoute(
+            builder: (_) => ShelfOfShamePage(username: sosUsername),
             settings: settings);
       case Router.aboutRoute:
         return MaterialPageRoute(

@@ -36,6 +36,9 @@ class Settings {
   static Setting filterMinRating =
       Setting("minimumRating", header: "Bgg-Filter-Min-Rating", value: 5.0);
 
+  static Setting filterShelfOfShameOnly =
+      Setting("shelfOfShameOnly", value: false, enabled: false);
+
   static Setting preferAdvancedMode =
       Setting("preferAdvancedMode", value: false, enabled: true);
 
@@ -57,6 +60,8 @@ class Settings {
             Settings.filterUseAllMechanics.clone(),
         Settings.filterComplexity.name: Settings.filterComplexity.clone(),
         Settings.filterMinRating.name: Settings.filterMinRating.clone(),
+        Settings.filterShelfOfShameOnly.name:
+            Settings.filterShelfOfShameOnly.clone(),
         Settings.preferAdvancedMode.name: Settings.preferAdvancedMode.clone(),
       }));
 

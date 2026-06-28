@@ -1,9 +1,11 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:how_many_mobile_meeple/components/platform_independent_image.dart';
 import 'package:how_many_mobile_meeple/components/rating_badge.dart';
 import 'package:how_many_mobile_meeple/model/game.dart';
+import 'package:how_many_mobile_meeple/model/model.dart';
 import 'package:how_many_mobile_meeple/screen_tools.dart';
 
 class GameImageWithStats extends StatelessWidget with ScreenTools {
@@ -85,77 +87,229 @@ class GameImageWithStats extends StatelessWidget with ScreenTools {
                   ),
                 ),
               ),
-            if (_hasRating)
-              Positioned(
-                right: 8,
-                top: 8,
-                child: _RatingBadge(rating: game.averageRating),
-              ),
-            Positioned(
-              right: 0,
-              bottom: 0,
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.primary.withAlpha(192),
-                  borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(12),
-                  ),
-                  border: Border.all(color: Colors.white, width: 1.5),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withAlpha(64),
-                      blurRadius: 8,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
-                ),
-                padding:
-                    const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    if (_hasPlayers) ...[
-                      _StatChip(
-                        icon: Icons.people,
-                        label: game.minPlayers == game.maxPlayers
-                            ? '${game.minPlayers} players'
-                            : '${game.minPlayers}-${game.maxPlayers} players',
-                      ),
-                      const SizedBox(height: 14),
-                    ],
-                    if (_hasPlaytime) ...[
-                      _StatChip(
-                        icon: Icons.timer,
-                        label: '${game.maxPlaytime} min',
-                      ),
-                      const SizedBox(height: 14),
-                    ],
-                    if (_hasWeight) ...[
-                      _StatChip(
-                        icon: Icons.fitness_center,
-                        label: '${game.averageWeight.toStringAsFixed(1)} / 5',
-                      ),
-                      const SizedBox(height: 14),
-                    ],
-                    MouseRegion(
-                      cursor: SystemMouseCursors.click,
-                      child: GestureDetector(
-                        onTap: () => launchUrl(Uri.parse(
-                            'https://www.boardgamegeek.com/boardgame/${game.id}')),
-                        child: const _StatChip(
-                          icon: Icons.open_in_new,
-                          label: 'BoardGameGeek',
+            Positioned.fill(
+              child: Consumer<AppModel>(
+                builder: (context, model, child) {
+                  final isNarrow = !isWideScreen(context);
+                  final hasCollection = model.playsLoaded;
+                  final isOwned = model.isInCollection(game.id);
+                  final playCount = model.getPlayCount(game.id);
+
+                  final panel = _StatsPanel(
+                    game: game,
+                    isNarrow: isNarrow,
+                    hasCollection: hasCollection,
+                    isOwned: isOwned,
+                    playCount: playCount,
+                    hasPlayers: _hasPlayers,
+                    hasPlaytime: _hasPlaytime,
+                    hasWeight: _hasWeight,
+                    hasRating: _hasRating,
+                    maxHeight: maxHeight,
+                  );
+
+                  return Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      if (_hasRating && !panel.ratingWouldOverlap)
+                        Positioned(
+                          right: 8,
+                          top: 8,
+                          child: _RatingBadge(rating: game.averageRating),
                         ),
+                      Positioned(
+                        right: 0,
+                        bottom: 0,
+                        child: panel,
                       ),
-                    ),
-                  ],
-                ),
+                    ],
+                  );
+                },
               ),
             ),
           ],
         ),
       ),
+    );
+  }
+}
+
+class _StatsPanel extends StatelessWidget {
+  final Game game;
+  final bool isNarrow;
+  final bool hasCollection;
+  final bool isOwned;
+  final int playCount;
+  final bool hasPlayers;
+  final bool hasPlaytime;
+  final bool hasWeight;
+  final bool hasRating;
+  final double maxHeight;
+
+  const _StatsPanel({
+    required this.game,
+    required this.isNarrow,
+    required this.hasCollection,
+    required this.isOwned,
+    required this.playCount,
+    required this.hasPlayers,
+    required this.hasPlaytime,
+    required this.hasWeight,
+    required this.hasRating,
+    required this.maxHeight,
+  });
+
+  int get _statCount {
+    int count = 1; // BGG link always present
+    if (hasPlayers) count++;
+    if (hasPlaytime) count++;
+    if (hasWeight) count++;
+    if (hasCollection) {
+      count++; // plays
+      if (isOwned) count++;
+    }
+    return count;
+  }
+
+  bool get ratingWouldOverlap {
+    if (!hasRating) return false;
+    final rowHeight = isNarrow ? 22.0 : 28.0;
+    final spacing = isNarrow ? 8.0 : 14.0;
+    final padding = isNarrow ? 20.0 : 32.0;
+    final panelHeight =
+        (_statCount * rowHeight) + ((_statCount - 1) * spacing) + padding;
+    final badgeSize = game.averageRating >= 5.5 ? 72.0 : 56.0;
+    final badgeBottom = maxHeight - 8.0 - badgeSize;
+    final panelTop = maxHeight - panelHeight;
+    return panelTop <= badgeBottom + 8;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final showRatingInPanel = ratingWouldOverlap;
+
+    return Container(
+      constraints: BoxConstraints(
+        maxWidth: isNarrow ? 160 : 220,
+      ),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.primary.withAlpha(192),
+        borderRadius: const BorderRadius.only(
+          topLeft: Radius.circular(12),
+        ),
+        border: Border.all(color: Colors.white, width: 1.5),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withAlpha(64),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      padding: EdgeInsets.symmetric(
+        vertical: isNarrow ? 10 : 16,
+        horizontal: isNarrow ? 12 : 20,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (showRatingInPanel) ...[
+            _InlineRatingChip(rating: game.averageRating, compact: isNarrow),
+            SizedBox(height: isNarrow ? 8 : 14),
+          ],
+          if (hasPlayers) ...[
+            _StatChip(
+              icon: Icons.people,
+              label: game.minPlayers == game.maxPlayers
+                  ? '${game.minPlayers}p'
+                  : '${game.minPlayers}-${game.maxPlayers}p',
+              compact: isNarrow,
+            ),
+            SizedBox(height: isNarrow ? 8 : 14),
+          ],
+          if (hasPlaytime) ...[
+            _StatChip(
+              icon: Icons.timer,
+              label: '${game.maxPlaytime} min',
+              compact: isNarrow,
+            ),
+            SizedBox(height: isNarrow ? 8 : 14),
+          ],
+          if (hasWeight) ...[
+            _StatChip(
+              icon: Icons.fitness_center,
+              label: '${game.averageWeight.toStringAsFixed(1)} / 5',
+              compact: isNarrow,
+            ),
+            SizedBox(height: isNarrow ? 8 : 14),
+          ],
+          if (hasCollection) ...[
+            _StatChip(
+              icon: Icons.play_arrow,
+              label: playCount > 0
+                  ? '$playCount play${playCount == 1 ? '' : 's'}'
+                  : 'Unplayed',
+              compact: isNarrow,
+            ),
+            SizedBox(height: isNarrow ? 8 : 14),
+            if (isOwned)
+              _StatChip(
+                icon: Icons.check_circle_outline,
+                label: 'Owned',
+                compact: isNarrow,
+              ),
+            if (isOwned) SizedBox(height: isNarrow ? 8 : 14),
+          ],
+          MouseRegion(
+            cursor: SystemMouseCursors.click,
+            child: GestureDetector(
+              onTap: () => launchUrl(Uri.parse(
+                  'https://www.boardgamegeek.com/boardgame/${game.id}')),
+              child: _StatChip(
+                icon: Icons.open_in_new,
+                label: isNarrow ? 'BGG' : 'BoardGameGeek',
+                compact: isNarrow,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _InlineRatingChip extends StatelessWidget {
+  final double rating;
+  final bool compact;
+
+  const _InlineRatingChip({required this.rating, this.compact = false});
+
+  @override
+  Widget build(BuildContext context) {
+    final (Color bgColor, _) = ratingColors(rating);
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: compact ? 14 : 18,
+          height: compact ? 14 : 18,
+          decoration: BoxDecoration(
+            color: bgColor,
+            shape: BoxShape.circle,
+          ),
+          child: Icon(Icons.star, size: compact ? 10 : 12, color: Colors.white),
+        ),
+        SizedBox(width: compact ? 3 : 4),
+        Text(
+          rating.toStringAsFixed(1),
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: compact ? 11 : 13,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ],
     );
   }
 }
@@ -275,22 +429,30 @@ class _StarPainter extends CustomPainter {
 class _StatChip extends StatelessWidget {
   final IconData icon;
   final String label;
+  final bool compact;
 
-  const _StatChip({required this.icon, required this.label});
+  const _StatChip({
+    required this.icon,
+    required this.label,
+    this.compact = false,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(icon, color: Colors.white, size: 18),
-        const SizedBox(width: 4),
-        Text(
-          label,
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 13,
-            fontWeight: FontWeight.w600,
+        Icon(icon, color: Colors.white, size: compact ? 14 : 18),
+        SizedBox(width: compact ? 3 : 4),
+        Flexible(
+          child: Text(
+            label,
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: compact ? 11 : 13,
+              fontWeight: FontWeight.w600,
+            ),
+            overflow: TextOverflow.ellipsis,
           ),
         ),
       ],

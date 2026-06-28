@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:how_many_mobile_meeple/components/feature_drawer.dart';
 import 'package:how_many_mobile_meeple/components/game_image_with_stats.dart';
 import 'package:how_many_mobile_meeple/components/recommendations_widget.dart';
 import 'package:how_many_mobile_meeple/favourites/game_action_buttons.dart';
 import 'package:how_many_mobile_meeple/favourites/ignored_games_service.dart';
 import 'package:how_many_mobile_meeple/platform/common/game_display_page.dart';
+import 'package:how_many_mobile_meeple/model/settings.dart';
 import 'package:how_many_mobile_meeple/platform/router.dart' as r;
 import 'package:how_many_mobile_meeple/screen_tools.dart';
 
@@ -19,6 +21,7 @@ class WebRandomGameDisplayPage extends GameDisplayPage {
     return Scaffold(
         appBar: HowManyMeepleAppBar(AppCommon.randomGamePageTitle,
             context: context),
+        drawer: const FeatureDrawer(),
         endDrawer: pageDrawer(context),
         persistentFooterButtons: [iconButtonGroup(context)],
         body: Container(child: loadNetworkContent(displayGame)));
@@ -28,6 +31,16 @@ class WebRandomGameDisplayPage extends GameDisplayPage {
     var cachedGames = model.bggCache;
     Game? game =
         hasPageRefreshed(model) ? cachedGames.random : cachedGames.lastRandom;
+
+    final sosSetting =
+        model.settings.setting(Settings.filterShelfOfShameOnly.name);
+    final shelfOnly =
+        sosSetting.enabled && sosSetting.getBool() && model.playsLoaded;
+
+    if (shelfOnly && game != null && !model.isUnplayed(game.id)) {
+      game = _nextUnplayed(model);
+    }
+
     if (game == null) {
       return _buildExhaustedState(context, model);
     }
@@ -55,6 +68,15 @@ class WebRandomGameDisplayPage extends GameDisplayPage {
         ),
       ),
     );
+  }
+
+  Game? _nextUnplayed(AppModel model) {
+    for (var i = 0; i < 100; i++) {
+      final candidate = model.bggCache.random;
+      if (candidate == null) return null;
+      if (model.isUnplayed(candidate.id)) return candidate;
+    }
+    return null;
   }
 
   Widget _buildExhaustedState(BuildContext context, AppModel model) {

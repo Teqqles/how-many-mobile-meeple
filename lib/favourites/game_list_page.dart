@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:how_many_mobile_meeple/app_page.dart';
+import 'package:how_many_mobile_meeple/components/feature_drawer.dart';
 import 'package:how_many_mobile_meeple/components/platform_independent_image.dart';
 import 'package:how_many_mobile_meeple/how_many_meeple_app_bar.dart';
 import 'package:how_many_mobile_meeple/platform/router.dart' as r;
@@ -55,6 +56,7 @@ class _GameListPageState extends State<GameListPage> with AppPage {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: HowManyMeepleAppBar(widget.title, context: context),
+      drawer: const FeatureDrawer(),
       endDrawer: pageDrawer(context),
       body: _service == null
           ? const Center(child: CircularProgressIndicator())

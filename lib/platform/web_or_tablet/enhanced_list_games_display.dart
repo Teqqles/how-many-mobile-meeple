@@ -74,12 +74,14 @@ class _GameListBodyState extends State<_GameListBody> with ScreenTools {
   @override
   void initState() {
     super.initState();
+    widget.model.addListener(_rebuild);
     widget.favouritesService.addListener(_rebuild);
     widget.ignoredService.addListener(_rebuild);
   }
 
   @override
   void dispose() {
+    widget.model.removeListener(_rebuild);
     widget.favouritesService.removeListener(_rebuild);
     widget.ignoredService.removeListener(_rebuild);
     super.dispose();

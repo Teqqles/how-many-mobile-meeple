@@ -1,6 +1,11 @@
 {
-  "version": "2.10.3",
+  "version": "2.11.1",
   "recent_changes": [
+    {
+      "type": "feat",
+      "scope": "",
+      "description": "add Shelf of Shame feature with play tracking and UX improvements"
+    },
     {
       "type": "fix",
       "scope": "",
@@ -203,6 +208,11 @@
     }
   ],
   "upcoming": [
+    {
+      "number": 86,
+      "title": "Display dateadded on Shelf of Shame, sort by longest owned",
+      "labels": []
+    },
     {
       "number": 80,
       "title": "Update to latest dependencies (breaking changes)",

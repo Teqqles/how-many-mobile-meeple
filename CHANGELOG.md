@@ -3,6 +3,11 @@
 All notable changes to this project are documented here.
 This file is auto-generated from conventional commits on each release.
 
+## [v2.11.3] - 2026-06-28
+
+### Fixed
+- **ci:** resolve race condition between Flutter CI and Tag Release workflows
+
 ## [v2.11.1] - 2026-06-28
 
 ### Added

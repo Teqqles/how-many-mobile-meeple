@@ -1,6 +1,11 @@
 {
-  "version": "2.11.3",
+  "version": "2.11.4",
   "recent_changes": [
+    {
+      "type": "fix",
+      "scope": "",
+      "description": "listing page now rebuilds when plays data loads asynchronously"
+    },
     {
       "type": "fix",
       "scope": "ci",

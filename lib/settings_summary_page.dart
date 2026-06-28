@@ -4,6 +4,7 @@ import 'package:how_many_mobile_meeple/model/settings.dart';
 import 'package:how_many_mobile_meeple/how_many_meeple_app_bar.dart';
 import 'package:how_many_mobile_meeple/app_common.dart';
 import 'package:how_many_mobile_meeple/app_page.dart';
+import 'package:how_many_mobile_meeple/components/feature_drawer.dart';
 import 'package:how_many_mobile_meeple/components/disclaimer_text.dart';
 import 'package:how_many_mobile_meeple/components/empty_widget.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -44,6 +45,7 @@ class SettingsSummaryPage extends StatelessWidget with AppPage {
         model: model,
         context: context,
       ),
+      drawer: const FeatureDrawer(),
       endDrawer: pageDrawer(context),
       body: SingleChildScrollView(
         child: Padding(

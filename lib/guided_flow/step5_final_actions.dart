@@ -127,6 +127,26 @@ class Step5FinalActions extends StatelessWidget {
 
                 const SizedBox(height: 12),
 
+                // Shelf of Shame
+                OutlinedButton.icon(
+                  onPressed: () {
+                    final username = model.primaryPlayer ?? '';
+                    Navigator.of(context).pushNamed(
+                        '${r.Router.shelfOfShameRoute}/${Uri.encodeComponent(username)}');
+                  },
+                  icon: const Icon(Icons.shelves, size: 24),
+                  label: const Text(
+                    'Shelf of Shame',
+                    style: TextStyle(fontSize: 16),
+                  ),
+                  style: OutlinedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 20, horizontal: 24),
+                  ),
+                ),
+
+                const SizedBox(height: 12),
+
                 // Tertiary action - Review Settings
                 OutlinedButton.icon(
                   onPressed: () {

@@ -36,9 +36,42 @@ void main() {
     });
 
     test('extracts base route from nested path', () {
-      // Route with nested path should extract the base route
       final route =
           r.Router.generateRoute(RouteSettings(name: '/random/extra/path'));
+      expect(route, isA<MaterialPageRoute>());
+    });
+
+    test('handles shelf-of-shame route', () {
+      final route =
+          r.Router.generateRoute(RouteSettings(name: '/shelf-of-shame'));
+      expect(route, isA<MaterialPageRoute>());
+    });
+
+    test('handles shelf-of-shame route with username', () {
+      final route = r.Router.generateRoute(
+          RouteSettings(name: '/shelf-of-shame/testuser'));
+      expect(route, isA<MaterialPageRoute>());
+    });
+
+    test('handles shelf-of-shame route with encoded username', () {
+      final route = r.Router.generateRoute(
+          RouteSettings(name: '/shelf-of-shame/user%20name'));
+      expect(route, isA<MaterialPageRoute>());
+    });
+
+    test('handles game detail route with id', () {
+      final route =
+          r.Router.generateRoute(RouteSettings(name: '/game/Wingspan/174430'));
+      expect(route, isA<MaterialPageRoute>());
+    });
+
+    test('handles favourites route', () {
+      final route = r.Router.generateRoute(RouteSettings(name: '/favourites'));
+      expect(route, isA<MaterialPageRoute>());
+    });
+
+    test('handles ignored route', () {
+      final route = r.Router.generateRoute(RouteSettings(name: '/ignored'));
       expect(route, isA<MaterialPageRoute>());
     });
   });

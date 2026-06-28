@@ -27,32 +27,32 @@ class _BoardGameItemInputWidgetState extends State<BoardGameItemInputWidget> {
 
   @override
   Widget build(BuildContext context) {
-    var textFieldWidth = MediaQuery.of(context).size.width * 0.65;
-
     return Align(
         alignment: Alignment.centerLeft,
         child: AppDefaultPadding(
           child: Row(
             children: <Widget>[
-              Container(
-                height: 35,
-                width: textFieldWidth,
-                child: Consumer<AppModel>(
-                  builder: (context, model, child) => TextFormField(
-                    enabled:
-                        model.items.itemList.length < AppCommon.maxItemsFromBgg,
-                    controller: controller,
-                    decoration: InputDecoration(
-                      hintText: model.items.itemList.length <
-                              AppCommon.maxItemsFromBgg
-                          ? AppCommon.itemHintTextMessage
-                          : AppCommon.maxItemsMessage,
+              Expanded(
+                child: SizedBox(
+                  height: 35,
+                  child: Consumer<AppModel>(
+                    builder: (context, model, child) => TextFormField(
+                      enabled: model.items.itemList.length <
+                          AppCommon.maxItemsFromBgg,
+                      controller: controller,
+                      decoration: InputDecoration(
+                        hintText: model.items.itemList.length <
+                                AppCommon.maxItemsFromBgg
+                            ? AppCommon.itemHintTextMessage
+                            : AppCommon.maxItemsMessage,
+                      ),
                     ),
                   ),
                 ),
               ),
               Consumer<AppModel>(
-                builder: (context, model, child) => AppDefaultPadding(
+                builder: (context, model, child) => Padding(
+                  padding: const EdgeInsets.only(left: 8),
                   child: ElevatedButton(
                     child: const Text('Add'),
                     onPressed: () {

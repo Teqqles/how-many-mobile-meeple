@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import 'app_common.dart';
-import 'components/quick_pick_sheet.dart';
 import 'model/model.dart';
 import 'platform/router.dart' as r;
 import 'save_dialog.dart';
@@ -17,19 +15,37 @@ class HowManyMeepleAppBar extends AppBar {
       : super(
           backgroundColor: Theme.of(context).colorScheme.primary,
           foregroundColor: Theme.of(context).colorScheme.onPrimary,
-          leading: isHomePage
-              ? null
-              : IconButton(
-                  icon: const Icon(Icons.arrow_back),
-                  tooltip: 'Back',
-                  onPressed: () {
-                    if (Navigator.of(context).canPop()) {
-                      Navigator.of(context).pop();
-                    } else {
-                      Navigator.of(context).pushNamedAndRemoveUntil(
-                          r.Router.homeRoute, (route) => false);
-                    }
-                  }),
+          leading: Builder(
+            builder: (ctx) => isHomePage
+                ? IconButton(
+                    icon: const Icon(Icons.menu),
+                    tooltip: 'Menu',
+                    onPressed: () => Scaffold.of(ctx).openDrawer(),
+                  )
+                : Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.menu),
+                        tooltip: 'Menu',
+                        onPressed: () => Scaffold.of(ctx).openDrawer(),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.arrow_back),
+                        tooltip: 'Back',
+                        onPressed: () {
+                          if (Navigator.of(ctx).canPop()) {
+                            Navigator.of(ctx).pop();
+                          } else {
+                            Navigator.of(ctx).pushNamedAndRemoveUntil(
+                                r.Router.homeRoute, (route) => false);
+                          }
+                        },
+                      ),
+                    ],
+                  ),
+          ),
+          leadingWidth: isHomePage ? null : 96,
           titleSpacing: isHomePage ? null : 0,
           title: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -52,23 +68,6 @@ class HowManyMeepleAppBar extends AppBar {
                   : null,
               mainAxisSize: MainAxisSize.min,
               children: [
-                IconButton(
-                  icon: const Icon(Icons.newspaper, size: 20),
-                  tooltip: 'Board Game News',
-                  visualDensity: VisualDensity.compact,
-                  onPressed: () => launchUrl(
-                    Uri.parse('https://www.boardgamenews.co.uk/'),
-                    mode: LaunchMode.externalApplication,
-                  ),
-                ),
-                Builder(
-                  builder: (ctx) => IconButton(
-                    icon: const Icon(Icons.bolt, size: 20),
-                    tooltip: 'Quick Pick',
-                    visualDensity: VisualDensity.compact,
-                    onPressed: () => QuickPickSheet.show(ctx),
-                  ),
-                ),
                 Builder(
                   builder: (ctx) => IconButton(
                     icon: const Icon(Icons.favorite, size: 20),

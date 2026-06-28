@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:how_many_mobile_meeple/app_common.dart';
 import 'package:how_many_mobile_meeple/components/app_default_padding.dart';
 import 'package:how_many_mobile_meeple/model/item.dart';
@@ -60,18 +61,41 @@ class BoardGameItemListWidget extends StatelessWidget {
         title: Text(item.itemType == ItemType.hotList
             ? 'Trending Games'
             : _limitTitleLength(item.name)),
-        trailing: IconButton(
-          padding: const EdgeInsets.all(4),
-          constraints: const BoxConstraints(),
-          tooltip: 'Remove',
-          icon: Icon(
-            Icons.delete,
-            size: AppCommon.standardIconSize,
-            color: Theme.of(context).colorScheme.error,
-          ),
-          onPressed: () {
-            model.deleteItem(item);
-          },
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (item.itemType == ItemType.collection)
+              IconButton(
+                padding: const EdgeInsets.all(4),
+                constraints: const BoxConstraints(),
+                tooltip: model.primaryPlayer == item.name
+                    ? 'Primary player'
+                    : 'Set as primary player',
+                icon: FaIcon(
+                  FontAwesomeIcons.crown,
+                  size: 18,
+                  color: model.primaryPlayer == item.name
+                      ? Colors.amber
+                      : Colors.grey,
+                ),
+                onPressed: () {
+                  model.primaryPlayer = item.name;
+                },
+              ),
+            IconButton(
+              padding: const EdgeInsets.all(4),
+              constraints: const BoxConstraints(),
+              tooltip: 'Remove',
+              icon: Icon(
+                Icons.delete,
+                size: AppCommon.standardIconSize,
+                color: Theme.of(context).colorScheme.error,
+              ),
+              onPressed: () {
+                model.deleteItem(item);
+              },
+            ),
+          ],
         ),
       ),
     );

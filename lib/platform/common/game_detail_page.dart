@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:how_many_mobile_meeple/api/game_detail_service.dart';
 import 'package:how_many_mobile_meeple/components/app_default_padding.dart';
+import 'package:how_many_mobile_meeple/components/feature_drawer.dart';
 import 'package:how_many_mobile_meeple/components/game_image_with_stats.dart';
 import 'package:how_many_mobile_meeple/components/recommendations_widget.dart';
 import 'package:how_many_mobile_meeple/favourites/game_action_buttons.dart';
@@ -34,6 +35,7 @@ class _GameDetailPageState extends State<GameDetailPage>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: HowManyMeepleAppBar('Game Details', context: context),
+      drawer: const FeatureDrawer(),
       endDrawer: pageDrawer(context),
       persistentFooterButtons: [iconButtonGroup(context)],
       body: FutureBuilder<Game>(

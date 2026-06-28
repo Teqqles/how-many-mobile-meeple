@@ -4,6 +4,7 @@ import 'package:how_many_mobile_meeple/model/model.dart';
 import 'package:how_many_mobile_meeple/how_many_meeple_app_bar.dart';
 import 'package:how_many_mobile_meeple/app_common.dart';
 import 'package:how_many_mobile_meeple/app_page.dart';
+import 'package:how_many_mobile_meeple/components/feature_drawer.dart';
 import 'package:how_many_mobile_meeple/components/quick_pick_sheet.dart';
 import 'package:how_many_mobile_meeple/guided_flow/step1_select_source.dart';
 import 'package:how_many_mobile_meeple/guided_flow/step2_whos_playing.dart';
@@ -90,6 +91,8 @@ class _GuidedFlowHomePageState extends State<GuidedFlowHomePage> {
             model: model,
             context: context,
           ),
+          drawer: const FeatureDrawer(),
+          drawerEdgeDragWidth: 60,
           endDrawer: widget.pageDrawer(context),
           body: Column(
             children: [
@@ -114,17 +117,17 @@ class _GuidedFlowHomePageState extends State<GuidedFlowHomePage> {
 
   /// Builds the guided flow with step progression
   Widget _buildGuidedFlow(BuildContext context) {
-    return GestureDetector(
-      onHorizontalDragEnd: (details) {
-        final velocity = details.primaryVelocity ?? 0;
+    return _DrawerAwareSwipeDetector(
+      onSwipeLeft: () {
         final model = AppModel.of(context, listen: false);
-        if (velocity < -300 && _currentStep < _totalSteps - 1) {
+        if (_currentStep < _totalSteps - 1) {
           final canProceed =
               _currentStep != 0 || model.items.itemList.isNotEmpty;
           if (canProceed) setState(() => _currentStep++);
-        } else if (velocity > 300 && _currentStep > 0) {
-          setState(() => _currentStep--);
         }
+      },
+      onSwipeRight: () {
+        if (_currentStep > 0) setState(() => _currentStep--);
       },
       child: SingleChildScrollView(
         child: Padding(
@@ -458,6 +461,49 @@ class _GuidedFlowHomePageState extends State<GuidedFlowHomePage> {
           ),
         );
       },
+    );
+  }
+}
+
+class _DrawerAwareSwipeDetector extends StatefulWidget {
+  final VoidCallback onSwipeLeft;
+  final VoidCallback onSwipeRight;
+  final Widget child;
+
+  const _DrawerAwareSwipeDetector({
+    required this.onSwipeLeft,
+    required this.onSwipeRight,
+    required this.child,
+  });
+
+  @override
+  State<_DrawerAwareSwipeDetector> createState() =>
+      _DrawerAwareSwipeDetectorState();
+}
+
+class _DrawerAwareSwipeDetectorState extends State<_DrawerAwareSwipeDetector> {
+  double? _startX;
+
+  @override
+  Widget build(BuildContext context) {
+    return Listener(
+      onPointerDown: (event) {
+        _startX = event.position.dx;
+      },
+      onPointerUp: (event) {
+        final startX = _startX;
+        _startX = null;
+        if (startX == null) return;
+        if (startX < 60) return;
+        final dx = event.position.dx - startX;
+        if (dx.abs() < 50) return;
+        if (dx < 0) {
+          widget.onSwipeLeft();
+        } else {
+          widget.onSwipeRight();
+        }
+      },
+      child: widget.child,
     );
   }
 }

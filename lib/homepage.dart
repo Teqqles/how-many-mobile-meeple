@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:how_many_mobile_meeple/components/board_game_item_input_widget.dart';
 import 'package:how_many_mobile_meeple/components/board_game_item_list_widget.dart';
 import 'package:how_many_mobile_meeple/components/complexity_filter_widget.dart';
+import 'package:how_many_mobile_meeple/components/feature_drawer.dart';
 import 'package:how_many_mobile_meeple/components/mechanic_filter_widget.dart';
 import 'package:how_many_mobile_meeple/components/player_filter_widget.dart';
 import 'package:how_many_mobile_meeple/components/rating_filter_widget.dart';
@@ -34,6 +35,8 @@ class HomePage extends StatelessWidget with AppPage {
             isHomePage: true,
             model: model,
             context: context),
+        drawer: const FeatureDrawer(),
+        drawerEdgeDragWidth: 60,
         endDrawer: pageDrawer(context),
         bottomNavigationBar: Container(
           color: Theme.of(context).highlightColor,

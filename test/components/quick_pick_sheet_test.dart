@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:http/http.dart' as http;
+import 'package:http/testing.dart' as http_testing;
+import 'package:how_many_mobile_meeple/api/http_retry_client.dart';
+import 'package:how_many_mobile_meeple/api/plays_service.dart';
 import 'package:how_many_mobile_meeple/components/quick_pick_sheet.dart';
 import 'package:how_many_mobile_meeple/model/item.dart';
 import 'package:how_many_mobile_meeple/model/model.dart';
@@ -40,6 +44,17 @@ void main() {
 
   setUp(() {
     SharedPreferences.setMockInitialValues({});
+    PlaysService.clearCache();
+    HttpRetryClient.setDelayFunction((_) async {});
+    HttpRetryClient.setTestClient(
+      http_testing.MockClient((request) async => http.Response('[]', 200)),
+    );
+  });
+
+  tearDown(() {
+    HttpRetryClient.resetTestClient();
+    HttpRetryClient.resetDelayFunction();
+    PlaysService.clearCache();
   });
 
   group('QuickPickSheet', () {
@@ -268,6 +283,65 @@ void main() {
           defaultMaxTime);
       expect(model.settings.setting(Settings.filterComplexity.name).value,
           defaultComplexity);
+    });
+
+    testWidgets('displays Unplayed only toggle', (tester) async {
+      final model = AppModel();
+      await model.addItem(Item('testuser'));
+      await tester.pumpWidget(_buildTestApp(model: model));
+      await tester.tap(find.text('Open'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Unplayed only'), findsOneWidget);
+      expect(find.byIcon(Icons.shelves), findsOneWidget);
+    });
+
+    testWidgets('Unplayed toggle disabled without primary player',
+        (tester) async {
+      final model = AppModel();
+      await model.addItem(Item('trending', itemType: ItemType.hotList));
+      await tester.pumpWidget(_buildTestApp(model: model));
+      await tester.tap(find.text('Open'));
+      await tester.pumpAndSettle();
+
+      final switches = tester.widgetList<Switch>(find.byType(Switch)).toList();
+      final sosSwitch = switches.last;
+      expect(sosSwitch.onChanged, isNull);
+    });
+
+    testWidgets('Unplayed toggle applies on Go', (tester) async {
+      final model = AppModel();
+      await model.addItem(Item('testuser'));
+      await tester.pumpWidget(_buildTestApp(model: model));
+      await tester.tap(find.text('Open'));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byType(Switch));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Go!'));
+      await tester.pumpAndSettle();
+
+      final setting =
+          model.settings.setting(Settings.filterShelfOfShameOnly.name);
+      expect(setting.enabled, isTrue);
+      expect(setting.getBool(), isTrue);
+    });
+
+    testWidgets('restores Unplayed toggle from model', (tester) async {
+      final model = AppModel();
+      await model.addItem(Item('testuser'));
+      final setting =
+          model.settings.setting(Settings.filterShelfOfShameOnly.name);
+      setting.value = true;
+      setting.enabled = true;
+      model.settings.updateSetting(setting);
+
+      await tester.pumpWidget(_buildTestApp(model: model));
+      await tester.tap(find.text('Open'));
+      await tester.pumpAndSettle();
+
+      final sw = tester.widget<Switch>(find.byType(Switch));
+      expect(sw.value, isTrue);
     });
   });
 }

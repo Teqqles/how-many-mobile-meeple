@@ -1,10 +1,15 @@
+import 'dart:convert';
 import 'package:flutter/cupertino.dart';
+import 'package:how_many_mobile_meeple/api/http_retry_client.dart';
+import 'package:how_many_mobile_meeple/api/plays_service.dart';
+import 'package:how_many_mobile_meeple/model/play_data.dart';
 import 'package:how_many_mobile_meeple/platform/web/url_fragment_extractor.dart';
 import 'package:how_many_mobile_meeple/storage/preferences_history_interface.dart';
 import 'package:how_many_mobile_meeple/storage/storage_factory.dart';
 import 'package:how_many_mobile_meeple/storage/stored_preferences.dart';
 import 'package:provider/provider.dart';
 import 'package:how_many_mobile_meeple/model/settings.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:how_many_mobile_meeple/model/app_preferences.dart';
 import 'package:how_many_mobile_meeple/model/bgg_cache.dart';
@@ -37,6 +42,11 @@ class AppModel extends ChangeNotifier {
   StoredPreferences? _store;
   List<AppPreferences>? _cachedPreferences;
 
+  String? _primaryPlayer;
+  Map<int, PlayData> _playsData = {};
+  bool _playsLoaded = false;
+  Set<int> _collectionGameIds = {};
+
   late Settings _settings;
   Orientation? screenOrientation;
 
@@ -45,6 +55,67 @@ class AppModel extends ChangeNotifier {
   BggCache get bggCache => _bggCache;
 
   Settings get settings => _settings;
+
+  String? get primaryPlayer => _primaryPlayer;
+
+  set primaryPlayer(String? value) {
+    if (_primaryPlayer == value) return;
+    _primaryPlayer = value;
+    _playsLoaded = false;
+    _playsData = {};
+    _collectionGameIds = {};
+    _persistPrimaryPlayer();
+    notifyListeners();
+    if (value != null) {
+      loadPlays();
+    }
+  }
+
+  Map<int, PlayData> get playsData => _playsData;
+
+  bool get playsLoaded => _playsLoaded;
+
+  int getPlayCount(int gameId) => _playsData[gameId]?.totalPlays ?? 0;
+
+  bool isUnplayed(int gameId) => getPlayCount(gameId) == 0;
+
+  bool isInCollection(int gameId) => _collectionGameIds.contains(gameId);
+
+  Future<void> loadPlays() async {
+    if (_primaryPlayer == null) return;
+    final results = await Future.wait([
+      PlaysService.fetchPlays(_primaryPlayer!),
+      _fetchCollectionIds(_primaryPlayer!),
+    ]);
+    _playsData = results[0] as Map<int, PlayData>;
+    _collectionGameIds = results[1] as Set<int>;
+    _playsLoaded = true;
+    notifyListeners();
+  }
+
+  Future<Set<int>> _fetchCollectionIds(String username) async {
+    final url = Uri.parse(
+        '${AppCommon.boardGameGeekProxyUrl}/collection/${Uri.encodeComponent(username)}');
+    final headers = {
+      Settings.fieldsToReturnFromApi.header!:
+          Settings.fieldsToReturnFromApi.value.toString(),
+    };
+    final response = await HttpRetryClient.getWithRetry(url, headers: headers);
+    if (response.statusCode == 200) {
+      final List<dynamic> jsonList = jsonDecode(response.body);
+      return jsonList.map<int>((g) => g['id'] as int).toSet();
+    }
+    return {};
+  }
+
+  Future<void> _persistPrimaryPlayer() async {
+    final prefs = await SharedPreferences.getInstance();
+    if (_primaryPlayer != null) {
+      await prefs.setString('primary_player', _primaryPlayer!);
+    } else {
+      await prefs.remove('primary_player');
+    }
+  }
 
   SortOrder sortDirection = SortOrder.Desc;
 
@@ -86,6 +157,10 @@ class AppModel extends ChangeNotifier {
 
   Future<void> addItem(Item item) async {
     _items.itemList.add(item);
+    if (item.itemType == ItemType.collection && _primaryPlayer == null) {
+      _primaryPlayer = item.name;
+      _persistPrimaryPlayer();
+    }
     invalidateCache();
     await updateStore();
   }
@@ -129,6 +204,14 @@ class AppModel extends ChangeNotifier {
 
   Future<void> deleteItem(Item item) async {
     _items.itemList.remove(item);
+    if (item.itemType == ItemType.collection && _primaryPlayer == item.name) {
+      final nextCollection = _items.itemList
+          .where((i) => i.itemType == ItemType.collection)
+          .toList();
+      _primaryPlayer =
+          nextCollection.isNotEmpty ? nextCollection.first.name : null;
+      _persistPrimaryPlayer();
+    }
     invalidateCache();
     await _storeItems(_items);
   }
@@ -162,13 +245,20 @@ class AppModel extends ChangeNotifier {
     if (_extractor.containsModel()) {
       hasLoadedPersistedData = true;
       _urlConsumed = true;
-      return;
+    } else {
+      final store = await _getStore();
+      _items = await store.loadItems(AppCommon.maxItemsFromBgg);
+      replaceSettings(await store.loadSettings(settings));
+      hasLoadedPersistedData = true;
     }
-    final store = await _getStore();
-    _items = await store.loadItems(AppCommon.maxItemsFromBgg);
-    replaceSettings(await store.loadSettings(settings));
-    hasLoadedPersistedData = true;
+
+    final prefs = await SharedPreferences.getInstance();
+    _primaryPlayer = prefs.getString('primary_player');
     notifyListeners();
+
+    if (_primaryPlayer != null) {
+      loadPlays();
+    }
     for (final item in _items.itemList) {
       if (item.itemType == ItemType.hotList) continue;
       PrefetchService.warmCache(item);

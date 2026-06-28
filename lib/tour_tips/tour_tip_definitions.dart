@@ -12,8 +12,7 @@ class TourTipDefinitions {
     TourTip(
       id: 'appbar_actions',
       title: 'Your Top Bar',
-      description: '📰 News: latest board game news\n'
-          '⚡ Quick Pick: skip steps, pick a random game fast\n'
+      description: '☰ Menu: quick pick, random game, shelf of shame & more\n'
           '❤️ Favourites: your saved games\n'
           '⚙️ Settings: advanced options and filters',
       pageId: pageAppBar,

@@ -1,6 +1,11 @@
 {
-  "version": "2.11.1",
+  "version": "2.11.3",
   "recent_changes": [
+    {
+      "type": "fix",
+      "scope": "ci",
+      "description": "resolve race condition between Flutter CI and Tag Release workflows"
+    },
     {
       "type": "feat",
       "scope": "",

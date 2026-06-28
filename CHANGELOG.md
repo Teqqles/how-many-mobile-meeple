@@ -3,6 +3,11 @@
 All notable changes to this project are documented here.
 This file is auto-generated from conventional commits on each release.
 
+## [v2.11.1] - 2026-06-28
+
+### Added
+- add Shelf of Shame feature with play tracking and UX improvements
+
 ## [v2.10.3] - 2026-06-25
 
 ### Fixed

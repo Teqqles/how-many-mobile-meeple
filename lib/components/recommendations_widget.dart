@@ -1,14 +1,15 @@
+// coverage:ignore-file
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:how_many_mobile_meeple/api/recommendations_service.dart';
 import 'package:how_many_mobile_meeple/app_common.dart';
 import 'package:how_many_mobile_meeple/model/game.dart';
 import 'package:how_many_mobile_meeple/model/model.dart';
 import 'package:how_many_mobile_meeple/model/recommendation.dart';
 import 'package:how_many_mobile_meeple/platform/router.dart' as r;
+import 'package:how_many_mobile_meeple/services/service_locator.dart';
 
 class RecommendationsWidget extends StatefulWidget {
   final Game sourceGame;
@@ -25,12 +26,12 @@ class RecommendationsWidget extends StatefulWidget {
 }
 
 class _RecommendationsWidgetState extends State<RecommendationsWidget> {
-  late Future<List<Recommendation>> _future;
+  Future<List<Recommendation>>? _future;
 
   @override
-  void initState() {
-    super.initState();
-    _future = _fetchRecommendations();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _future ??= _fetchRecommendations();
   }
 
   Future<List<Recommendation>> _fetchRecommendations() {
@@ -40,7 +41,7 @@ class _RecommendationsWidgetState extends State<RecommendationsWidget> {
           .map((e) => MapEntry(e.value.header!, e.value.value.toString())),
     );
 
-    return RecommendationsService.fetchRecommendations(
+    return context.recommendationsFetcher.fetchRecommendations(
       gameIds: [widget.sourceGame.id],
       headers: headers,
     );

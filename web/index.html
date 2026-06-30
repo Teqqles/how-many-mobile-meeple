@@ -54,5 +54,10 @@
 </head>
 <body>
   <script src="main.dart.js" type="application/javascript"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('image-cache-sw.js');
+    }
+  </script>
 </body>
 </html>

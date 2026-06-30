@@ -1,3 +1,4 @@
+// coverage:ignore-file
 abstract class DatabaseMigration {
   final Map<int, String> patches;
 

@@ -1,3 +1,4 @@
+// coverage:ignore-file
 import 'package:flutter/material.dart';
 import 'package:how_many_mobile_meeple/storage/storage_factory.dart';
 

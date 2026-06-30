@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:how_many_mobile_meeple/components/feature_drawer.dart';
+import 'package:how_many_mobile_meeple/components/plays_loading_indicator.dart';
 import 'package:how_many_mobile_meeple/components/game_image_with_stats.dart';
 import 'package:how_many_mobile_meeple/components/recommendations_widget.dart';
 import 'package:how_many_mobile_meeple/favourites/game_action_buttons.dart';
@@ -24,6 +25,7 @@ class WebRandomGameDisplayPage extends GameDisplayPage {
         drawer: const FeatureDrawer(),
         endDrawer: pageDrawer(context),
         persistentFooterButtons: [iconButtonGroup(context)],
+        bottomNavigationBar: const PlaysLoadingIndicator(),
         body: Container(child: loadNetworkContent(displayGame)));
   }
 

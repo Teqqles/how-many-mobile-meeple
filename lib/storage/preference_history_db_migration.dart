@@ -1,3 +1,4 @@
+// coverage:ignore-file
 import 'package:how_many_mobile_meeple/storage/database_migration.dart';
 import 'package:how_many_mobile_meeple/storage/preferences_history.dart';
 

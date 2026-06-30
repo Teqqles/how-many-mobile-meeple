@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:how_many_mobile_meeple/components/app_default_padding.dart';
 import 'package:how_many_mobile_meeple/components/feature_drawer.dart';
+import 'package:how_many_mobile_meeple/components/plays_loading_indicator.dart';
 import 'package:how_many_mobile_meeple/favourites/favourite_game.dart';
 import 'package:how_many_mobile_meeple/favourites/favourites_service.dart';
 import 'package:how_many_mobile_meeple/favourites/ignored_games_service.dart';
@@ -28,6 +29,7 @@ class EnhancedListGamesDisplayPage extends NetworkWidget with AppPage {
         drawer: const FeatureDrawer(),
         endDrawer: pageDrawer(context),
         persistentFooterButtons: [iconButtonGroup(context)],
+        bottomNavigationBar: const PlaysLoadingIndicator(),
         body: Container(child: loadNetworkContent(displayGame)));
   }
 

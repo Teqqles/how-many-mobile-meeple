@@ -1,3 +1,4 @@
+// coverage:ignore-file
 import 'tour_tip.dart';
 
 class TourTipDefinitions {

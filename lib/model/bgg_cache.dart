@@ -6,10 +6,13 @@ import 'package:how_many_mobile_meeple/favourites/ignored_games_service.dart';
 import 'game.dart';
 import 'games.dart';
 
+typedef ClockFunction = DateTime Function();
+
 class BggCache {
   Games _games;
   int _durationMinutes;
   late int _cacheTimestamp;
+  final ClockFunction _clock;
 
   Games get games => _games;
   late List<Game> _remainingPool;
@@ -55,7 +58,8 @@ class BggCache {
 
   Game? get lastRandom => _validatedSticky ?? random;
 
-  BggCache(this._games, this._durationMinutes) {
+  BggCache(this._games, this._durationMinutes, {ClockFunction? clock})
+      : _clock = clock ?? DateTime.now {
     refreshCacheTimestamp();
     _remainingPool = _buildWeightedPool();
   }
@@ -97,14 +101,12 @@ class BggCache {
   int epochToSeconds(int millisEpoch) => (millisEpoch / 1000).floor();
 
   bool isStale() =>
-      this._cacheTimestamp <
-      epochToSeconds(DateTime.now().millisecondsSinceEpoch);
+      this._cacheTimestamp < epochToSeconds(_clock().millisecondsSinceEpoch);
 
   void makeStale() => this._cacheTimestamp = 0;
 
   void refreshCacheTimestamp() {
-    this._cacheTimestamp =
-        epochToSeconds(DateTime.now().millisecondsSinceEpoch) +
-            (this.durationInMinutes * 60);
+    this._cacheTimestamp = epochToSeconds(_clock().millisecondsSinceEpoch) +
+        (this.durationInMinutes * 60);
   }
 }

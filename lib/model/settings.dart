@@ -103,6 +103,8 @@ class Settings {
     return Setting(name, value: null, enabled: false);
   }
 
+  static int inferMinTime(int maxTime) => (maxTime * 0.5).floor();
+
   void updateSetting(Setting setting) => _settings[setting.name] = setting;
 
   void updateAllSettings(Settings settings) {

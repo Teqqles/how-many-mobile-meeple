@@ -4,23 +4,27 @@ import 'package:how_many_mobile_meeple/model/model.dart';
 import 'package:how_many_mobile_meeple/how_many_meeple_app_bar.dart';
 import 'package:how_many_mobile_meeple/app_common.dart';
 import 'package:how_many_mobile_meeple/app_page.dart';
-import 'package:how_many_mobile_meeple/components/feature_drawer.dart';
-import 'package:how_many_mobile_meeple/components/quick_pick_sheet.dart';
 import 'package:how_many_mobile_meeple/guided_flow/step1_select_source.dart';
 import 'package:how_many_mobile_meeple/guided_flow/step2_whos_playing.dart';
 import 'package:how_many_mobile_meeple/guided_flow/step3_time_available.dart';
 import 'package:how_many_mobile_meeple/guided_flow/step4_game_style.dart';
 import 'package:how_many_mobile_meeple/guided_flow/step5_final_actions.dart';
-import 'package:how_many_mobile_meeple/guided_flow/advanced_mode_widget.dart';
 import 'package:how_many_mobile_meeple/components/pwa_install_banner.dart';
 import 'package:how_many_mobile_meeple/components/pwa_update_banner.dart';
 import 'package:how_many_mobile_meeple/components/disclaimer_text.dart';
 import 'package:how_many_mobile_meeple/components/empty_widget.dart';
-import 'package:how_many_mobile_meeple/tour_tips/tour_tip_service.dart';
-import 'package:how_many_mobile_meeple/tour_tips/tour_tip_definitions.dart';
 import 'package:how_many_mobile_meeple/tour_tips/tour_tip_keys.dart';
+import 'package:how_many_mobile_meeple/platform/router.dart' as r;
 import 'package:package_info_plus/package_info_plus.dart';
-import 'package:how_many_mobile_meeple/about_page.dart';
+
+import 'package:how_many_mobile_meeple/guided_flow/advanced_mode_widget.dart'
+    deferred as advanced_mode;
+import 'package:how_many_mobile_meeple/components/feature_drawer.dart'
+    deferred as feature_drawer;
+import 'package:how_many_mobile_meeple/components/quick_pick_sheet.dart'
+    deferred as quick_pick;
+import 'package:how_many_mobile_meeple/tour_tips/tour_tip_service.dart'
+    deferred as tour_tips;
 
 /// Main guided flow homepage supporting two modes:
 /// 1. Guided Flow Mode (default) - step-by-step onboarding
@@ -39,6 +43,24 @@ class _GuidedFlowHomePageState extends State<GuidedFlowHomePage> {
 
   final int _totalSteps = 5;
 
+  bool _advancedModeLoaded = false;
+  bool _featureDrawerLoaded = false;
+  bool _quickPickLoaded = false;
+
+  @override
+  void initState() {
+    super.initState();
+    feature_drawer.loadLibrary().then((_) {
+      if (mounted) setState(() => _featureDrawerLoaded = true);
+    });
+    advanced_mode.loadLibrary().then((_) {
+      if (mounted) setState(() => _advancedModeLoaded = true);
+    });
+    quick_pick.loadLibrary().then((_) {
+      if (mounted) _quickPickLoaded = true;
+    });
+  }
+
   void _syncAdvancedMode(AppModel model) {
     final value = model.settings.setting('preferAdvancedMode').getBool();
     if (value != _showAdvancedMode) {
@@ -51,16 +73,16 @@ class _GuidedFlowHomePageState extends State<GuidedFlowHomePage> {
     final isAdvanced = model.settings.setting('preferAdvancedMode').getBool();
     if (isAdvanced) return;
 
-    final pageId = _currentStep == 0
-        ? TourTipDefinitions.pageAppBar
-        : 'step${_currentStep + 1}';
+    final pageId =
+        _currentStep == 0 ? 'page_app_bar' : 'step${_currentStep + 1}';
 
     if (_tourTipTriggered.contains(pageId)) return;
     _tourTipTriggered.add(pageId);
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       if (!mounted) return;
-      final service = await TourTipService.instance();
+      await tour_tips.loadLibrary();
+      final service = await tour_tips.TourTipService.instance();
       if (!service.isEnabled) return;
 
       await service.showTipsForPage(
@@ -91,7 +113,7 @@ class _GuidedFlowHomePageState extends State<GuidedFlowHomePage> {
             model: model,
             context: context,
           ),
-          drawer: const FeatureDrawer(),
+          drawer: _buildFeatureDrawer(),
           drawerEdgeDragWidth: 60,
           endDrawer: widget.pageDrawer(context),
           body: Column(
@@ -112,6 +134,15 @@ class _GuidedFlowHomePageState extends State<GuidedFlowHomePage> {
                   : null,
         );
       },
+    );
+  }
+
+  Widget _buildFeatureDrawer() {
+    if (_featureDrawerLoaded) {
+      return feature_drawer.FeatureDrawer();
+    }
+    return const Drawer(
+      child: Center(child: CircularProgressIndicator()),
     );
   }
 
@@ -334,7 +365,7 @@ class _GuidedFlowHomePageState extends State<GuidedFlowHomePage> {
                   const SizedBox(width: 8),
                   FilledButton.tonalIcon(
                     onPressed: canProceedFromStep1
-                        ? () => QuickPickSheet.show(context)
+                        ? () => _showQuickPick(context)
                         : null,
                     icon: const Icon(Icons.bolt),
                     label: const Text('Quick Pick'),
@@ -358,6 +389,12 @@ class _GuidedFlowHomePageState extends State<GuidedFlowHomePage> {
         );
       },
     );
+  }
+
+  void _showQuickPick(BuildContext context) {
+    if (_quickPickLoaded) {
+      quick_pick.QuickPickSheet.show(context);
+    }
   }
 
   /// Builds the BGG attribution footer (required by BGG API usage guidelines)
@@ -395,9 +432,8 @@ class _GuidedFlowHomePageState extends State<GuidedFlowHomePage> {
               Tooltip(
                 message: 'About',
                 child: GestureDetector(
-                  onTap: () => Navigator.of(context).push(
-                    MaterialPageRoute(builder: (_) => const AboutPage()),
-                  ),
+                  onTap: () =>
+                      Navigator.of(context).pushNamed(r.Router.aboutRoute),
                   child: Icon(
                     Icons.info_outline,
                     size: 20,
@@ -419,15 +455,20 @@ class _GuidedFlowHomePageState extends State<GuidedFlowHomePage> {
 
   /// Advanced mode - shows the full existing UI
   Widget _buildAdvancedMode(BuildContext context) {
+    if (_advancedModeLoaded) {
+      return _buildAdvancedModeContent(context);
+    }
+    return const Center(child: CircularProgressIndicator());
+  }
+
+  Widget _buildAdvancedModeContent(BuildContext context) {
     return Consumer<AppModel>(
       builder: (context, model, child) {
-        // Only show "Back to Guided Flow" if user hasn't set "Always Use Advanced Mode"
         return SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.all(16.0),
             child: Column(
               children: [
-                // Back to guided flow button
                 SizedBox(
                   width: double.infinity,
                   child: OutlinedButton.icon(
@@ -446,15 +487,9 @@ class _GuidedFlowHomePageState extends State<GuidedFlowHomePage> {
                     ),
                   ),
                 ),
-
                 const SizedBox(height: 16),
-
-                // Advanced Mode UI
-                const AdvancedModeWidget(),
-
+                advanced_mode.AdvancedModeWidget(),
                 const SizedBox(height: 16),
-
-                // Action buttons at bottom
                 widget.iconButtonGroup(context),
               ],
             ),

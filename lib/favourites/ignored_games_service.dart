@@ -3,19 +3,28 @@ import 'game_list_service.dart';
 
 class IgnoredGamesService extends GameListService {
   static IgnoredGamesService? _instance;
+  static Future<IgnoredGamesService>? _instanceFuture;
 
   IgnoredGamesService._() : super('ignored_games');
 
-  static Future<IgnoredGamesService> instance() async {
-    if (_instance != null) return _instance!;
-    _instance = IgnoredGamesService._();
-    await _instance!.load();
+  static Future<IgnoredGamesService> instance() {
+    if (_instance != null) return Future.value(_instance!);
+    return _instanceFuture ??= _create();
+  }
+
+  static Future<IgnoredGamesService> _create() async {
+    final svc = IgnoredGamesService._();
+    await svc.load();
     final favs = FavouritesService.cached;
-    if (favs != null) _instance!.linkOpposite(favs);
-    return _instance!;
+    if (favs != null) svc.linkOpposite(favs);
+    _instance = svc;
+    return svc;
   }
 
   static IgnoredGamesService? get cached => _instance;
 
-  static void resetForTesting() => _instance = null;
+  static void resetForTesting() {
+    _instance = null;
+    _instanceFuture = null;
+  }
 }

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:how_many_mobile_meeple/api/http_retry_client.dart';
@@ -60,6 +61,7 @@ class AppModel extends ChangeNotifier {
 
   set primaryPlayer(String? value) {
     if (_primaryPlayer == value) return;
+    _playsRetryTimer?.cancel();
     _primaryPlayer = value;
     _playsLoaded = false;
     _playsData = {};
@@ -81,16 +83,41 @@ class AppModel extends ChangeNotifier {
 
   bool isInCollection(int gameId) => _collectionGameIds.contains(gameId);
 
-  Future<void> loadPlays() async {
-    if (_primaryPlayer == null) return;
-    final results = await Future.wait([
-      PlaysService.fetchPlays(_primaryPlayer!),
-      _fetchCollectionIds(_primaryPlayer!),
-    ]);
-    _playsData = results[0] as Map<int, PlayData>;
-    _collectionGameIds = results[1] as Set<int>;
-    _playsLoaded = true;
-    notifyListeners();
+  Future<void>? _loadPlaysInFlight;
+  Timer? _playsRetryTimer;
+
+  Future<void> loadPlays() {
+    if (_primaryPlayer == null) return Future.value();
+    return _loadPlaysInFlight ??= _doLoadPlays();
+  }
+
+  Future<void> _doLoadPlays() async {
+    try {
+      final results = await Future.wait([
+        PlaysService.fetchPlays(_primaryPlayer!),
+        _fetchCollectionIds(_primaryPlayer!),
+      ]);
+      final playsResult = results[0] as PlaysResult;
+      _playsData = playsResult.plays;
+      _collectionGameIds = results[1] as Set<int>;
+      _playsLoaded = true;
+      notifyListeners();
+
+      if (!playsResult.complete) {
+        _schedulePlaysRetry(playsResult.retryAfterSeconds);
+      }
+    } finally {
+      _loadPlaysInFlight = null;
+    }
+  }
+
+  void _schedulePlaysRetry(int delaySeconds) {
+    _playsRetryTimer?.cancel();
+    final seconds = delaySeconds > 0 ? delaySeconds : 30;
+    _playsRetryTimer = Timer(Duration(seconds: seconds), () {
+      PlaysService.clearCache();
+      loadPlays();
+    });
   }
 
   Future<Set<int>> _fetchCollectionIds(String username) async {

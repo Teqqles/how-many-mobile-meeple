@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:how_many_mobile_meeple/components/app_switch.dart';
 import 'package:how_many_mobile_meeple/model/model.dart';
 import 'package:how_many_mobile_meeple/model/settings.dart';
 
@@ -70,7 +71,7 @@ class UnplayedOnlyToggle extends StatelessWidget {
               ],
             ),
           ),
-          Switch(
+          AppSwitch(
             value: isActive,
             onChanged: hasPrimaryPlayer ? onToggle : null,
           ),
@@ -129,7 +130,7 @@ class UnplayedOnlyToggle extends StatelessWidget {
                 ],
               ),
             ),
-            Switch(
+            AppSwitch(
               value: isActive,
               onChanged: hasPrimaryPlayer ? onToggle : null,
             ),

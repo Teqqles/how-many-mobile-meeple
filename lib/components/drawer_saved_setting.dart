@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:how_many_mobile_meeple/model/app_preferences.dart';
 import 'package:how_many_mobile_meeple/model/model.dart';
+import 'package:how_many_mobile_meeple/storage/preferences_history_interface.dart';
 import 'package:how_many_mobile_meeple/storage/storage_factory.dart';
 import 'package:how_many_mobile_meeple/platform/router.dart' as r;
 
@@ -12,7 +13,7 @@ class DrawerSavedSetting extends Container {
 
   DrawerSavedSetting(
       this.preferencesTitle, this.preferences, BuildContext context,
-      {int index = 0})
+      {int index = 0, PreferencesHistoryInterface? storage})
       : super(
           padding:
               const EdgeInsets.only(top: 12, bottom: 12, left: 8, right: 8),
@@ -51,7 +52,7 @@ class DrawerSavedSetting extends Container {
                   Future.delayed(Duration(milliseconds: 300), () {
                     navigator.pushNamed(r.Router.settingsRoute);
                   });
-                }, // id},
+                },
               ),
               IconButton(
                 tooltip: 'Delete',
@@ -69,7 +70,7 @@ class DrawerSavedSetting extends Container {
                     return;
                   }
                   var model = AppModel.of(context, listen: false);
-                  var db = StorageFactory.getPreferencesHistory();
+                  var db = storage ?? StorageFactory.getPreferencesHistory();
                   db.deletePreference(preferences.id!);
                   model.invalidatePreferencesCache();
                 },

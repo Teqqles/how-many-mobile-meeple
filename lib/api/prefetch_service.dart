@@ -5,12 +5,20 @@ import 'package:how_many_mobile_meeple/model/item.dart';
 
 class PrefetchService {
   static final Set<String> _warmed = {};
+  static http.Client? _testClient;
+
+  static void setTestClient(http.Client client) => _testClient = client;
+  static void resetTestClient() {
+    _testClient = null;
+    _warmed.clear();
+  }
 
   static Future<void> warmCache(Item item) async {
     final key = '${item.itemType.name}:${item.name}';
     if (!_warmed.add(key)) return;
+    final client = _testClient ?? http.Client();
     try {
-      await http.post(
+      await client.post(
         Uri.parse('${AppCommon.boardGameGeekProxyUrl}/prefetch'),
         headers: {'Content-Type': 'application/json'},
         body: json.encode({
@@ -19,8 +27,9 @@ class PrefetchService {
         }),
       );
     } catch (_) {
-      // Fire-and-forget - failures are non-fatal
       _warmed.remove(key);
+    } finally {
+      if (_testClient == null) client.close();
     }
   }
 }

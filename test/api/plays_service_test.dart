@@ -100,6 +100,20 @@ void main() {
       expect(capturedUrl!.path, '/plays/teqqles');
     });
 
+    test('sends Bgg-Plays-Meta header', () async {
+      Map<String, String>? capturedHeaders;
+      HttpRetryClient.setTestClient(
+        SyncMockClient((request) {
+          capturedHeaders = request.headers;
+          return http.Response(_wrapResponse([]), 200);
+        }),
+      );
+
+      await PlaysService.fetchPlays('testuser');
+
+      expect(capturedHeaders!['Bgg-Plays-Meta'], 'true');
+    });
+
     test('uses cached result on subsequent calls when complete', () async {
       int callCount = 0;
       HttpRetryClient.setTestClient(

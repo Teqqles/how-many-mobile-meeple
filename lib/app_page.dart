@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:how_many_mobile_meeple/platform/router.dart' as r;
 import 'package:provider/provider.dart';
 import 'package:how_many_mobile_meeple/components/drawer_bgg_filter.dart';
-import 'package:how_many_mobile_meeple/components/drawer_switch.dart';
+import 'package:how_many_mobile_meeple/components/app_switch.dart';
 import 'package:how_many_mobile_meeple/components/app_default_padding.dart';
 import 'package:how_many_mobile_meeple/components/quick_pick_sheet.dart';
 import 'package:how_many_mobile_meeple/favourites/ignored_games_service.dart';
@@ -88,7 +88,7 @@ mixin AppPage {
               style: TextStyle(fontSize: 13),
             ),
           ),
-          DrawerSwitch(
+          AppSwitch(
             onChanged: (bool value) async {
               setting.value = value;
               setting.enabled = true;
@@ -122,7 +122,7 @@ mixin AppPage {
                   style: TextStyle(fontSize: 13),
                 ),
               ),
-              DrawerSwitch(
+              AppSwitch(
                 onChanged: (bool value) async {
                   final service = await TourTipService.instance();
                   await service.setEnabled(value);

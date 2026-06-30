@@ -1,3 +1,4 @@
+// coverage:ignore-file
 import 'package:how_many_mobile_meeple/model/model.dart';
 
 import '../../app_page.dart';

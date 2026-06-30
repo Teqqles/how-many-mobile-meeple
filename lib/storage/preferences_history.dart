@@ -1,3 +1,4 @@
+// coverage:ignore-file
 import 'dart:convert';
 
 import 'package:how_many_mobile_meeple/model/app_preferences.dart';

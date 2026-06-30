@@ -22,8 +22,7 @@ class _PlaysLoadingIndicatorState extends State<PlaysLoadingIndicator> {
   @override
   Widget build(BuildContext context) {
     return Selector<AppModel, bool>(
-      selector: (_, model) =>
-          !model.playsLoaded && model.primaryPlayer != null,
+      selector: (_, model) => !model.playsLoaded && model.primaryPlayer != null,
       builder: (context, showLoading, child) {
         if (!showLoading) return const SizedBox.shrink();
         return const LinearProgressIndicator();

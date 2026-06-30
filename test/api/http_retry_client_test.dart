@@ -86,6 +86,54 @@ void main() {
       expect(capturedHeader, 'test-value');
     });
 
+    test('sends Accept-Encoding gzip header on all requests', () async {
+      Map<String, String>? capturedHeaders;
+      HttpRetryClient.setTestClient(
+        SyncMockClient((request) {
+          capturedHeaders = request.headers;
+          return http.Response('ok', 200);
+        }),
+      );
+
+      await HttpRetryClient.getWithRetry(Uri.parse('http://test.com/api'));
+
+      expect(capturedHeaders!['Accept-Encoding'], 'gzip');
+    });
+
+    test('caller headers override Accept-Encoding if specified', () async {
+      Map<String, String>? capturedHeaders;
+      HttpRetryClient.setTestClient(
+        SyncMockClient((request) {
+          capturedHeaders = request.headers;
+          return http.Response('ok', 200);
+        }),
+      );
+
+      await HttpRetryClient.getWithRetry(
+        Uri.parse('http://test.com/api'),
+        headers: {'Accept-Encoding': 'br'},
+      );
+
+      expect(capturedHeaders!['Accept-Encoding'], 'br');
+    });
+
+    test('does not send Accept-Encoding gzip for cors-proxy requests',
+        () async {
+      Map<String, String>? capturedHeaders;
+      HttpRetryClient.setTestClient(
+        SyncMockClient((request) {
+          capturedHeaders = request.headers;
+          return http.Response('ok', 200);
+        }),
+      );
+
+      await HttpRetryClient.getWithRetry(
+        Uri.parse('http://test.com/cors-proxy/_abc123'),
+      );
+
+      expect(capturedHeaders!.containsKey('Accept-Encoding'), isFalse);
+    });
+
     test('returns non-retryable error status immediately', () async {
       int callCount = 0;
       HttpRetryClient.setTestClient(

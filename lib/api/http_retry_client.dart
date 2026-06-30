@@ -34,10 +34,16 @@ class HttpRetryClient {
     final deadline = DateTime.now().add(_retryTimeout);
     int backoff = _initialBackoffSeconds;
 
+    final isCorsProxy = url.path.contains('/cors-proxy/');
+    final mergedHeaders = {
+      if (!isCorsProxy) 'Accept-Encoding': 'gzip',
+      ...?headers,
+    };
+
     while (true) {
       final client = _testClient ?? http.Client();
       try {
-        final response = await client.get(url, headers: headers);
+        final response = await client.get(url, headers: mergedHeaders);
 
         if (!retryableStatuses.contains(response.statusCode) ||
             DateTime.now().isAfter(deadline)) {

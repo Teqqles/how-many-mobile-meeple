@@ -1,5 +1,5 @@
 const CACHE_NAME = 'bgg-images-v1';
-const MAX_ENTRIES = 500;
+const MAX_ENTRIES = 1000;
 const IMAGE_PATH = '/cors-proxy/_';
 
 self.addEventListener('install', (event) => {

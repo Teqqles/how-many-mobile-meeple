@@ -48,7 +48,10 @@ class PlaysService {
     try {
       final url =
           Uri.parse('${AppCommon.boardGameGeekProxyUrl}/plays/$username');
-      final response = await HttpRetryClient.getWithRetry(url);
+      final response = await HttpRetryClient.getWithRetry(
+        url,
+        headers: {'Bgg-Plays-Meta': 'true'},
+      );
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> json = jsonDecode(response.body);

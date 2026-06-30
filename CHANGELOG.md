@@ -3,6 +3,11 @@
 All notable changes to this project are documented here.
 This file is auto-generated from conventional commits on each release.
 
+## [v2.11.4] - 2026-06-28
+
+### Fixed
+- listing page now rebuilds when plays data loads asynchronously
+
 ## [v2.11.3] - 2026-06-28
 
 ### Fixed

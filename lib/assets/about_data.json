@@ -1,6 +1,41 @@
 {
-  "version": "2.11.4",
+  "version": "2.17.11",
   "recent_changes": [
+    {
+      "type": "feat",
+      "scope": "",
+      "description": "enable gzip encoding and add Bgg-Plays-Meta header for API calls"
+    },
+    {
+      "type": "feat",
+      "scope": "",
+      "description": "add service worker for PWA image caching"
+    },
+    {
+      "type": "fix",
+      "scope": "",
+      "description": "deduplicate shelf of shame API calls and load plays asynchronously"
+    },
+    {
+      "type": "feat",
+      "scope": "",
+      "description": "support partial plays loading with automatic background retry"
+    },
+    {
+      "type": "feat",
+      "scope": "",
+      "description": "add clock injection to BggCache and time inference to Settings"
+    },
+    {
+      "type": "feat",
+      "scope": "",
+      "description": "add service locator for dependency injection"
+    },
+    {
+      "type": "feat",
+      "scope": "",
+      "description": "add request deduplication and test injection to API services"
+    },
     {
       "type": "fix",
       "scope": "",
@@ -219,6 +254,26 @@
   ],
   "upcoming": [
     {
+      "number": 94,
+      "title": "Scope Consumer widgets to reduce unnecessary rebuilds",
+      "labels": []
+    },
+    {
+      "number": 91,
+      "title": "Debounce updateStore() on slider changes",
+      "labels": []
+    },
+    {
+      "number": 90,
+      "title": "Lazy load game thumbnails on listing page",
+      "labels": []
+    },
+    {
+      "number": 89,
+      "title": "Setting to hide Shelf of Shame and play stats",
+      "labels": []
+    },
+    {
       "number": 86,
       "title": "Display dateadded on Shelf of Shame, sort by longest owned",
       "labels": []
@@ -231,11 +286,6 @@
     {
       "number": 78,
       "title": "Dark mode with theme colour options",
-      "labels": []
-    },
-    {
-      "number": 77,
-      "title": "Shelf-of-shame",
       "labels": []
     },
     {

@@ -1,11 +1,16 @@
+// coverage:ignore-file
 import 'package:flutter/cupertino.dart';
 import 'package:how_many_mobile_meeple/guided_flow_homepage.dart';
-import 'package:how_many_mobile_meeple/platform/web_or_tablet/enhanced_list_games_display.dart';
-import 'package:how_many_mobile_meeple/platform/web_or_tablet/web_random_game_display.dart';
+import 'package:how_many_mobile_meeple/platform/web_or_tablet/enhanced_list_games_display.dart'
+    deferred as list_page;
+import 'package:how_many_mobile_meeple/platform/web_or_tablet/web_random_game_display.dart'
+    deferred as random_page;
 
 abstract class Pages {
   Widget homePage();
+  Future<void> Function() get randomGameLoader;
   Widget randomGamePage();
+  Future<void> Function() get listGamesLoader;
   Widget listGamesPage();
 
   static Pages platformPages() {
@@ -26,12 +31,18 @@ class WebPages extends Pages {
   }
 
   @override
+  Future<void> Function() get randomGameLoader => random_page.loadLibrary;
+
+  @override
   Widget randomGamePage() {
-    return WebRandomGameDisplayPage();
+    return random_page.WebRandomGameDisplayPage();
   }
 
   @override
+  Future<void> Function() get listGamesLoader => list_page.loadLibrary;
+
+  @override
   Widget listGamesPage() {
-    return EnhancedListGamesDisplayPage();
+    return list_page.EnhancedListGamesDisplayPage();
   }
 }

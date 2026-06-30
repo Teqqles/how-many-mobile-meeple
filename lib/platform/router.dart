@@ -1,14 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:how_many_mobile_meeple/about_page.dart';
 import 'package:how_many_mobile_meeple/favourites/favourites_service.dart';
-import 'package:how_many_mobile_meeple/favourites/game_list_page.dart';
 import 'package:how_many_mobile_meeple/favourites/ignored_games_service.dart';
 import 'package:how_many_mobile_meeple/model/model.dart';
-import 'package:how_many_mobile_meeple/platform/common/game_detail_page.dart';
 import 'package:how_many_mobile_meeple/platform/pages.dart';
 import 'package:how_many_mobile_meeple/platform/web/url_fragment_encoder.dart';
-import 'package:how_many_mobile_meeple/settings_summary_page.dart';
-import 'package:how_many_mobile_meeple/shelf_of_shame/shelf_of_shame_page.dart';
+
+import 'package:how_many_mobile_meeple/about_page.dart' deferred as about;
+import 'package:how_many_mobile_meeple/favourites/game_list_page.dart'
+    deferred as game_list;
+import 'package:how_many_mobile_meeple/platform/common/game_detail_page.dart'
+    deferred as game_detail;
+import 'package:how_many_mobile_meeple/settings_summary_page.dart'
+    deferred as settings_page;
+import 'package:how_many_mobile_meeple/shelf_of_shame/shelf_of_shame_page.dart'
+    deferred as shelf_of_shame;
 
 class Router {
   static const String homeRoute = '/';
@@ -42,7 +47,11 @@ class Router {
       final gameId = int.tryParse(idStr);
       if (gameId != null) {
         return MaterialPageRoute(
-            builder: (_) => GameDetailPage(gameId: gameId), settings: settings);
+            builder: (_) => _deferred(
+                  game_detail.loadLibrary,
+                  () => game_detail.GameDetailPage(gameId: gameId),
+                ),
+            settings: settings);
       }
     }
 
@@ -52,36 +61,54 @@ class Router {
             builder: (_) => Pages.platformPages().homePage(),
             settings: settings);
       case Router.listRoute:
+        final pages = Pages.platformPages();
         return MaterialPageRoute(
-            builder: (_) => Pages.platformPages().listGamesPage(),
+            builder: (_) => _deferred(
+                  pages.listGamesLoader,
+                  () => pages.listGamesPage(),
+                ),
             settings: settings);
       case Router.randomRoute:
+        final rPages = Pages.platformPages();
         return MaterialPageRoute(
-            builder: (_) => Pages.platformPages().randomGamePage(),
+            builder: (_) => _deferred(
+                  rPages.randomGameLoader,
+                  () => rPages.randomGamePage(),
+                ),
             settings: settings);
       case Router.settingsRoute:
         return MaterialPageRoute(
-            builder: (_) => SettingsSummaryPage(), settings: settings);
+            builder: (_) => _deferred(
+                  settings_page.loadLibrary,
+                  () => settings_page.SettingsSummaryPage(),
+                ),
+            settings: settings);
       case Router.favouritesRoute:
         return MaterialPageRoute(
-            builder: (_) => GameListPage(
-                  title: 'Favourites',
-                  emptyIcon: Icons.favorite_border,
-                  emptyTitle: 'No favourites yet',
-                  emptyDescription:
-                      'Swipe right on a game in the list or tap the heart on a game page to add favourites.',
-                  serviceFactory: FavouritesService.instance,
+            builder: (_) => _deferred(
+                  game_list.loadLibrary,
+                  () => game_list.GameListPage(
+                    title: 'Favourites',
+                    emptyIcon: Icons.favorite_border,
+                    emptyTitle: 'No favourites yet',
+                    emptyDescription:
+                        'Swipe right on a game in the list or tap the heart on a game page to add favourites.',
+                    serviceFactory: FavouritesService.instance,
+                  ),
                 ),
             settings: settings);
       case Router.ignoredRoute:
         return MaterialPageRoute(
-            builder: (_) => GameListPage(
-                  title: 'Ignored Games',
-                  emptyIcon: Icons.visibility_off_outlined,
-                  emptyTitle: 'No ignored games',
-                  emptyDescription:
-                      'Swipe left on a game in the list to hide it from future results.',
-                  serviceFactory: IgnoredGamesService.instance,
+            builder: (_) => _deferred(
+                  game_list.loadLibrary,
+                  () => game_list.GameListPage(
+                    title: 'Ignored Games',
+                    emptyIcon: Icons.visibility_off_outlined,
+                    emptyTitle: 'No ignored games',
+                    emptyDescription:
+                        'Swipe left on a game in the list to hide it from future results.',
+                    serviceFactory: IgnoredGamesService.instance,
+                  ),
                 ),
             settings: settings);
       case Router.shelfOfShameRoute:
@@ -91,11 +118,18 @@ class Router {
             ? Uri.decodeComponent(sosSegments.last)
             : null;
         return MaterialPageRoute(
-            builder: (_) => ShelfOfShamePage(username: sosUsername),
+            builder: (_) => _deferred(
+                  shelf_of_shame.loadLibrary,
+                  () => shelf_of_shame.ShelfOfShamePage(username: sosUsername),
+                ),
             settings: settings);
       case Router.aboutRoute:
         return MaterialPageRoute(
-            builder: (_) => const AboutPage(), settings: settings);
+            builder: (_) => _deferred(
+                  about.loadLibrary,
+                  () => about.AboutPage(),
+                ),
+            settings: settings);
       default:
         return MaterialPageRoute(
             builder: (_) => Pages.platformPages().homePage(),
@@ -110,4 +144,26 @@ class Router {
         UrlFragmentEncoder.encode(name, items: items, settings: settings);
     return RouteSettings(name: encodedName);
   }
+}
+
+Widget _deferred(
+  Future<void> Function() loadLibrary,
+  Widget Function() builder,
+) {
+  return FutureBuilder(
+    future: loadLibrary(),
+    builder: (context, snapshot) {
+      if (snapshot.connectionState == ConnectionState.done) {
+        if (snapshot.hasError) {
+          return const Scaffold(
+            body: Center(child: Text('Failed to load page')),
+          );
+        }
+        return builder();
+      }
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    },
+  );
 }

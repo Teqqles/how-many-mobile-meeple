@@ -8,6 +8,7 @@ import 'package:how_many_mobile_meeple/api/http_retry_client.dart';
 import 'package:how_many_mobile_meeple/app_common.dart';
 import 'package:how_many_mobile_meeple/app_page.dart';
 import 'package:how_many_mobile_meeple/components/feature_drawer.dart';
+import 'package:how_many_mobile_meeple/components/plays_loading_indicator.dart';
 import 'package:how_many_mobile_meeple/components/loading_fun_facts.dart';
 import 'package:how_many_mobile_meeple/components/platform_independent_image.dart';
 import 'package:how_many_mobile_meeple/how_many_meeple_app_bar.dart';
@@ -53,10 +54,9 @@ class _ShelfOfShamePageState extends State<ShelfOfShamePage>
       return;
     }
 
+    model.loadPlays();
+
     try {
-      if (!model.playsLoaded) {
-        await model.loadPlays();
-      }
       final games = await _fetchFullCollection(username);
       if (mounted) {
         setState(() {
@@ -74,18 +74,29 @@ class _ShelfOfShamePageState extends State<ShelfOfShamePage>
     }
   }
 
-  Future<Games> _fetchFullCollection(String username) async {
-    final url = Uri.parse(
-        '${AppCommon.boardGameGeekProxyUrl}/collection/${Uri.encodeComponent(username)}');
-    final headers = {
-      Settings.fieldsToReturnFromApi.header!:
-          Settings.fieldsToReturnFromApi.value.toString(),
-    };
-    final response = await HttpRetryClient.getWithRetry(url, headers: headers);
-    if (response.statusCode == 200) {
-      return Games.fromJson(jsonDecode(response.body));
+  Future<Games>? _fetchInFlight;
+
+  Future<Games> _fetchFullCollection(String username) {
+    return _fetchInFlight ??= _doFetchCollection(username);
+  }
+
+  Future<Games> _doFetchCollection(String username) async {
+    try {
+      final url = Uri.parse(
+          '${AppCommon.boardGameGeekProxyUrl}/collection/${Uri.encodeComponent(username)}');
+      final headers = {
+        Settings.fieldsToReturnFromApi.header!:
+            Settings.fieldsToReturnFromApi.value.toString(),
+      };
+      final response =
+          await HttpRetryClient.getWithRetry(url, headers: headers);
+      if (response.statusCode == 200) {
+        return Games.fromJson(jsonDecode(response.body));
+      }
+      throw Exception('Failed to load collection');
+    } finally {
+      _fetchInFlight = null;
     }
-    throw Exception('Failed to load collection');
   }
 
   @override
@@ -94,6 +105,7 @@ class _ShelfOfShamePageState extends State<ShelfOfShamePage>
       appBar: HowManyMeepleAppBar('Shelf of Shame', context: context),
       drawer: const FeatureDrawer(),
       endDrawer: pageDrawer(context),
+      bottomNavigationBar: const PlaysLoadingIndicator(),
       body: Consumer<AppModel>(
         builder: (context, model, child) {
           final hasCollection = model.items.itemList

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:how_many_mobile_meeple/api/game_detail_service.dart';
 import 'package:how_many_mobile_meeple/components/app_default_padding.dart';
 import 'package:how_many_mobile_meeple/components/feature_drawer.dart';
+import 'package:how_many_mobile_meeple/components/plays_loading_indicator.dart';
 import 'package:how_many_mobile_meeple/components/game_image_with_stats.dart';
 import 'package:how_many_mobile_meeple/components/recommendations_widget.dart';
 import 'package:how_many_mobile_meeple/favourites/game_action_buttons.dart';
@@ -11,6 +11,7 @@ import 'package:how_many_mobile_meeple/model/game.dart';
 import 'package:how_many_mobile_meeple/model/model.dart';
 import 'package:how_many_mobile_meeple/screen_tools.dart';
 import 'package:how_many_mobile_meeple/app_page.dart';
+import 'package:how_many_mobile_meeple/services/service_locator.dart';
 
 class GameDetailPage extends StatefulWidget {
   final int gameId;
@@ -23,12 +24,12 @@ class GameDetailPage extends StatefulWidget {
 
 class _GameDetailPageState extends State<GameDetailPage>
     with ScreenTools, AppPage {
-  late Future<Game> _future;
+  Future<Game>? _future;
 
   @override
-  void initState() {
-    super.initState();
-    _future = GameDetailService.fetchGame(widget.gameId);
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _future ??= context.gameDetailFetcher.fetchGame(widget.gameId);
   }
 
   @override
@@ -38,6 +39,7 @@ class _GameDetailPageState extends State<GameDetailPage>
       drawer: const FeatureDrawer(),
       endDrawer: pageDrawer(context),
       persistentFooterButtons: [iconButtonGroup(context)],
+      bottomNavigationBar: const PlaysLoadingIndicator(),
       body: FutureBuilder<Game>(
         future: _future,
         builder: (context, snapshot) {

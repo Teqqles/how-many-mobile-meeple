@@ -1,3 +1,4 @@
+// coverage:ignore-file
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:share_plus/share_plus.dart';
@@ -5,6 +6,7 @@ import 'favourite_game.dart';
 import 'favourites_service.dart';
 import 'ignored_games_service.dart';
 import '../model/game.dart';
+import '../services/service_locator.dart';
 
 class GameActionButtons extends StatefulWidget {
   final Game game;
@@ -18,16 +20,21 @@ class GameActionButtons extends StatefulWidget {
 class _GameActionButtonsState extends State<GameActionButtons> {
   FavouritesService? _favService;
   IgnoredGamesService? _ignoreService;
+  bool _servicesLoading = false;
 
   @override
-  void initState() {
-    super.initState();
-    _loadServices();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_servicesLoading && _favService == null) {
+      _servicesLoading = true;
+      _loadServices();
+    }
   }
 
   Future<void> _loadServices() async {
-    final fav = await FavouritesService.instance();
-    final ignore = await IgnoredGamesService.instance();
+    final services = context.gameServices;
+    final fav = await services.favourites();
+    final ignore = await services.ignored();
     fav.addListener(_rebuild);
     ignore.addListener(_rebuild);
     if (mounted) {

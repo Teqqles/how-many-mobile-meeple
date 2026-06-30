@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:how_many_mobile_meeple/app_common.dart';
 import 'package:how_many_mobile_meeple/components/app_default_padding.dart';
-import 'package:how_many_mobile_meeple/components/filter_switch.dart';
+import 'package:how_many_mobile_meeple/components/app_switch.dart';
 import 'package:how_many_mobile_meeple/components/filter_value_badge.dart';
 import 'package:how_many_mobile_meeple/model/model.dart';
 import 'package:how_many_mobile_meeple/model/settings.dart';
@@ -50,7 +50,8 @@ class TimeFilterWidget extends StatelessWidget {
                       ),
                     ),
                   ),
-                  FilterSwitch(
+                  AppSwitch(
+                      style: AppSwitchStyle.subtle,
                       onChanged: (bool value) {
                         model.settings
                             .setting(Settings.filterMinimumTimeToPlay.name)

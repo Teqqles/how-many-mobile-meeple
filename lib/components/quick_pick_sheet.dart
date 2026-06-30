@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:how_many_mobile_meeple/components/app_choice_chip.dart';
+import 'package:how_many_mobile_meeple/components/app_switch.dart';
 import 'package:how_many_mobile_meeple/model/model.dart';
 import 'package:how_many_mobile_meeple/model/settings.dart';
 import 'package:how_many_mobile_meeple/platform/router.dart' as r;
@@ -253,7 +254,7 @@ class _QuickPickSheetState extends State<QuickPickSheet> {
                         ),
                   ),
                 ),
-                Switch(
+                AppSwitch(
                   value: _shelfOfShameOnly,
                   onChanged: hasPrimaryPlayer
                       ? (value) => setState(() => _shelfOfShameOnly = value)
@@ -283,7 +284,7 @@ class _QuickPickSheetState extends State<QuickPickSheet> {
           model.settings.setting(Settings.filterMinimumTimeToPlay.name);
       final maxTimeSetting =
           model.settings.setting(Settings.filterMaximumTimeToPlay.name);
-      minTimeSetting.value = (_selectedMaxTime! * 0.5).floor();
+      minTimeSetting.value = Settings.inferMinTime(_selectedMaxTime!);
       maxTimeSetting.value = _selectedMaxTime;
       minTimeSetting.enabled = true;
       maxTimeSetting.enabled = true;

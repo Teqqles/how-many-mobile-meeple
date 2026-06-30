@@ -3,7 +3,7 @@ import 'package:how_many_mobile_meeple/model/model.dart';
 import 'package:how_many_mobile_meeple/model/setting.dart';
 
 import 'package:how_many_mobile_meeple/components/app_default_padding.dart';
-import 'package:how_many_mobile_meeple/components/drawer_switch.dart';
+import 'package:how_many_mobile_meeple/components/app_switch.dart';
 
 class DrawerBggFilter extends Container {
   DrawerBggFilter(
@@ -22,7 +22,7 @@ class DrawerBggFilter extends Container {
                   style: TextStyle(fontSize: 13),
                 ),
               ),
-              DrawerSwitch(
+              AppSwitch(
                   onChanged: (bool value) {
                     setting.value = value;
                     setting.enabled = true;

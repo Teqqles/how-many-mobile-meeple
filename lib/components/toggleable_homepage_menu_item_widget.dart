@@ -5,7 +5,7 @@ import 'package:provider/provider.dart';
 
 import 'app_default_padding.dart';
 import 'app_home_menu_padding.dart';
-import 'filter_switch.dart';
+import 'app_switch.dart';
 
 class ToggleableHomepageMenuItemWidget extends StatelessWidget {
   final String label;
@@ -46,7 +46,8 @@ class ToggleableHomepageMenuItemWidget extends StatelessWidget {
                     ),
                   ),
                 ),
-                FilterSwitch(
+                AppSwitch(
+                    style: AppSwitchStyle.subtle,
                     onChanged: (bool value) {
                       var setting = model.settings.setting(this.setting.name);
                       setting.enabled = value;

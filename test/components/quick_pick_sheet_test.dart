@@ -1,7 +1,9 @@
+@Tags(['widget'])
+library;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
-import 'package:http/testing.dart' as http_testing;
 import 'package:how_many_mobile_meeple/api/http_retry_client.dart';
 import 'package:how_many_mobile_meeple/api/plays_service.dart';
 import 'package:how_many_mobile_meeple/components/quick_pick_sheet.dart';
@@ -10,6 +12,7 @@ import 'package:how_many_mobile_meeple/model/model.dart';
 import 'package:how_many_mobile_meeple/model/settings.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../helpers/sync_mock_client.dart';
 
 Widget _buildTestApp({AppModel? model}) {
   final appModel = model ?? AppModel();
@@ -47,7 +50,7 @@ void main() {
     PlaysService.clearCache();
     HttpRetryClient.setDelayFunction((_) async {});
     HttpRetryClient.setTestClient(
-      http_testing.MockClient((request) async => http.Response('[]', 200)),
+      SyncMockClient((_) => http.Response('[]', 200)),
     );
   });
 

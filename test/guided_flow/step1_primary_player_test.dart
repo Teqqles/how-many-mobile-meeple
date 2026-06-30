@@ -1,10 +1,12 @@
+@Tags(['widget'])
+library;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:http/http.dart' as http;
-import 'package:http/testing.dart' as http_testing;
 import 'package:how_many_mobile_meeple/api/http_retry_client.dart';
 import 'package:how_many_mobile_meeple/api/plays_service.dart';
+import '../helpers/mock_api_client.dart';
 import 'package:how_many_mobile_meeple/guided_flow/step1_select_source.dart';
 import 'package:how_many_mobile_meeple/model/item.dart';
 import 'package:how_many_mobile_meeple/model/model.dart';
@@ -39,9 +41,7 @@ void main() {
     });
     PlaysService.clearCache();
     HttpRetryClient.setDelayFunction((_) async {});
-    HttpRetryClient.setTestClient(
-      http_testing.MockClient((request) async => http.Response('[]', 200)),
-    );
+    HttpRetryClient.setTestClient(mockApiClient());
   });
 
   tearDown(() {

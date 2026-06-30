@@ -1,3 +1,6 @@
+@Tags(['unit'])
+library;
+
 import 'dart:convert';
 
 import 'package:how_many_mobile_meeple/model/setting.dart';

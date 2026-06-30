@@ -1,14 +1,26 @@
+@Tags(['unit'])
+library;
+
 import 'dart:convert';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
-import 'package:http/testing.dart' as http_testing;
 import 'package:how_many_mobile_meeple/api/http_retry_client.dart';
 import 'package:how_many_mobile_meeple/api/plays_service.dart';
+import '../helpers/sync_mock_client.dart';
+
+String _wrapResponse(List<Map<String, dynamic>> plays,
+    {bool complete = true, int? retryAfterSeconds}) {
+  final meta = <String, dynamic>{'complete': complete};
+  if (retryAfterSeconds != null) {
+    meta['retry_after_seconds'] = retryAfterSeconds;
+  }
+  return jsonEncode({'plays': plays, 'meta': meta});
+}
 
 void main() {
   setUp(() {
     PlaysService.clearCache();
-    HttpRetryClient.setDelayFunction((_) async {});
+    HttpRetryClient.setDelayFunction((_) => Future.value());
   });
 
   tearDown(() {
@@ -19,60 +31,53 @@ void main() {
 
   group('PlaysService.fetchPlays', () {
     test('parses play data from API response', () async {
-      final responseBody = jsonEncode([
+      final responseBody = _wrapResponse([
         {'game_id': 1, 'game_name': 'Wingspan', 'total_plays': 5},
         {'game_id': 2, 'game_name': 'Catan', 'total_plays': 12},
       ]);
 
       HttpRetryClient.setTestClient(
-        http_testing.MockClient((request) async {
-          return http.Response(responseBody, 200);
-        }),
+        SyncMockClient((_) => http.Response(responseBody, 200)),
       );
 
-      final plays = await PlaysService.fetchPlays('testuser');
+      final result = await PlaysService.fetchPlays('testuser');
 
-      expect(plays.length, 2);
-      expect(plays[1]!.gameName, 'Wingspan');
-      expect(plays[1]!.totalPlays, 5);
-      expect(plays[2]!.gameName, 'Catan');
-      expect(plays[2]!.totalPlays, 12);
+      expect(result.plays.length, 2);
+      expect(result.plays[1]!.gameName, 'Wingspan');
+      expect(result.plays[1]!.totalPlays, 5);
+      expect(result.plays[2]!.gameName, 'Catan');
+      expect(result.plays[2]!.totalPlays, 12);
     });
 
     test('returns map keyed by game_id', () async {
-      final responseBody = jsonEncode([
+      final responseBody = _wrapResponse([
         {'game_id': 42, 'game_name': 'Azul', 'total_plays': 3},
       ]);
 
       HttpRetryClient.setTestClient(
-        http_testing.MockClient((request) async {
-          return http.Response(responseBody, 200);
-        }),
+        SyncMockClient((_) => http.Response(responseBody, 200)),
       );
 
-      final plays = await PlaysService.fetchPlays('testuser');
+      final result = await PlaysService.fetchPlays('testuser');
 
-      expect(plays.containsKey(42), isTrue);
-      expect(plays[42]!.gameName, 'Azul');
+      expect(result.plays.containsKey(42), isTrue);
+      expect(result.plays[42]!.gameName, 'Azul');
     });
 
     test('returns empty map on 404', () async {
       HttpRetryClient.setTestClient(
-        http_testing.MockClient((request) async {
-          return http.Response('not found', 404);
-        }),
+        SyncMockClient((_) => http.Response('not found', 404)),
       );
 
-      final plays = await PlaysService.fetchPlays('nonexistent');
+      final result = await PlaysService.fetchPlays('nonexistent');
 
-      expect(plays, isEmpty);
+      expect(result.plays, isEmpty);
+      expect(result.complete, isTrue);
     });
 
     test('throws exception on server error', () async {
       HttpRetryClient.setTestClient(
-        http_testing.MockClient((request) async {
-          return http.Response('error', 500);
-        }),
+        SyncMockClient((_) => http.Response('error', 500)),
       );
 
       expect(
@@ -84,9 +89,9 @@ void main() {
     test('calls correct URL with username', () async {
       Uri? capturedUrl;
       HttpRetryClient.setTestClient(
-        http_testing.MockClient((request) async {
+        SyncMockClient((request) {
           capturedUrl = request.url;
-          return http.Response('[]', 200);
+          return http.Response(_wrapResponse([]), 200);
         }),
       );
 
@@ -95,13 +100,13 @@ void main() {
       expect(capturedUrl!.path, '/plays/teqqles');
     });
 
-    test('uses cached result on subsequent calls', () async {
+    test('uses cached result on subsequent calls when complete', () async {
       int callCount = 0;
       HttpRetryClient.setTestClient(
-        http_testing.MockClient((request) async {
+        SyncMockClient((_) {
           callCount++;
           return http.Response(
-            jsonEncode([
+            _wrapResponse([
               {'game_id': 1, 'game_name': 'Wingspan', 'total_plays': 5}
             ]),
             200,
@@ -115,12 +120,36 @@ void main() {
       expect(callCount, 1);
     });
 
+    test('does not cache incomplete results', () async {
+      int callCount = 0;
+      HttpRetryClient.setTestClient(
+        SyncMockClient((_) {
+          callCount++;
+          return http.Response(
+            _wrapResponse(
+              [
+                {'game_id': 1, 'game_name': 'Wingspan', 'total_plays': 5}
+              ],
+              complete: false,
+              retryAfterSeconds: 30,
+            ),
+            200,
+          );
+        }),
+      );
+
+      await PlaysService.fetchPlays('testuser');
+      await PlaysService.fetchPlays('testuser');
+
+      expect(callCount, 2);
+    });
+
     test('caches per username separately', () async {
       int callCount = 0;
       HttpRetryClient.setTestClient(
-        http_testing.MockClient((request) async {
+        SyncMockClient((_) {
           callCount++;
-          return http.Response('[]', 200);
+          return http.Response(_wrapResponse([]), 200);
         }),
       );
 
@@ -133,13 +162,13 @@ void main() {
     test('retries on 202 before succeeding', () async {
       int callCount = 0;
       HttpRetryClient.setTestClient(
-        http_testing.MockClient((request) async {
+        SyncMockClient((_) {
           callCount++;
           if (callCount < 2) {
             return http.Response('processing', 202);
           }
           return http.Response(
-            jsonEncode([
+            _wrapResponse([
               {'game_id': 1, 'game_name': 'Wingspan', 'total_plays': 5}
             ]),
             200,
@@ -147,30 +176,29 @@ void main() {
         }),
       );
 
-      final plays = await PlaysService.fetchPlays('testuser');
+      final result = await PlaysService.fetchPlays('testuser');
 
-      expect(plays.length, 1);
+      expect(result.plays.length, 1);
       expect(callCount, 2);
     });
 
     test('handles empty plays array', () async {
       HttpRetryClient.setTestClient(
-        http_testing.MockClient((request) async {
-          return http.Response('[]', 200);
-        }),
+        SyncMockClient((_) => http.Response(_wrapResponse([]), 200)),
       );
 
-      final plays = await PlaysService.fetchPlays('newuser');
+      final result = await PlaysService.fetchPlays('newuser');
 
-      expect(plays, isEmpty);
+      expect(result.plays, isEmpty);
+      expect(result.complete, isTrue);
     });
 
     test('clearCache forces re-fetch', () async {
       int callCount = 0;
       HttpRetryClient.setTestClient(
-        http_testing.MockClient((request) async {
+        SyncMockClient((_) {
           callCount++;
-          return http.Response('[]', 200);
+          return http.Response(_wrapResponse([]), 200);
         }),
       );
 
@@ -179,6 +207,42 @@ void main() {
       await PlaysService.fetchPlays('testuser');
 
       expect(callCount, 2);
+    });
+
+    test('returns complete true when meta indicates complete', () async {
+      HttpRetryClient.setTestClient(
+        SyncMockClient((_) => http.Response(
+            _wrapResponse([
+              {'game_id': 1, 'game_name': 'Azul', 'total_plays': 3}
+            ]),
+            200)),
+      );
+
+      final result = await PlaysService.fetchPlays('testuser');
+
+      expect(result.complete, isTrue);
+      expect(result.retryAfterSeconds, 0);
+    });
+
+    test('returns incomplete with retry delay when meta indicates more data',
+        () async {
+      HttpRetryClient.setTestClient(
+        SyncMockClient((_) => http.Response(
+            _wrapResponse(
+              [
+                {'game_id': 1, 'game_name': 'Azul', 'total_plays': 3}
+              ],
+              complete: false,
+              retryAfterSeconds: 30,
+            ),
+            200)),
+      );
+
+      final result = await PlaysService.fetchPlays('testuser');
+
+      expect(result.complete, isFalse);
+      expect(result.retryAfterSeconds, 30);
+      expect(result.plays.length, 1);
     });
   });
 }

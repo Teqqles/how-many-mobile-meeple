@@ -1,3 +1,6 @@
+@Tags(['unit'])
+library;
+
 import 'package:flutter/material.dart';
 import 'package:how_many_mobile_meeple/platform/router.dart' as r;
 import 'package:test/test.dart';

@@ -1,3 +1,6 @@
+@Tags(['unit'])
+library;
+
 import 'package:how_many_mobile_meeple/model/bgg_cache.dart';
 import 'package:how_many_mobile_meeple/model/game.dart';
 import 'package:how_many_mobile_meeple/model/games.dart';
@@ -41,6 +44,74 @@ main() {
     });
     test('returns true when the given duration is in the past', () {
       var cache = BggCache(games, -duration);
+      expect(cache.isStale(), true);
+    });
+  });
+  group('isStale with injectable clock', () {
+    test('not stale when clock is before expiry', () {
+      final baseTime = DateTime(2024, 1, 1, 12, 0, 0);
+      var currentTime = baseTime;
+      final cache = BggCache(games, 5, clock: () => currentTime);
+
+      expect(cache.isStale(), false);
+
+      // 4 minutes later — still fresh
+      currentTime = baseTime.add(Duration(minutes: 4));
+      expect(cache.isStale(), false);
+    });
+
+    test('stale exactly at expiry boundary', () {
+      final baseTime = DateTime(2024, 1, 1, 12, 0, 0);
+      var currentTime = baseTime;
+      final cache = BggCache(games, 5, clock: () => currentTime);
+
+      // 5 minutes later — at boundary
+      currentTime = baseTime.add(Duration(minutes: 5));
+      expect(cache.isStale(), false);
+
+      // 5 minutes + 1 second — past boundary
+      currentTime = baseTime.add(Duration(minutes: 5, seconds: 1));
+      expect(cache.isStale(), true);
+    });
+
+    test('stale well after expiry', () {
+      final baseTime = DateTime(2024, 1, 1, 12, 0, 0);
+      var currentTime = baseTime;
+      final cache = BggCache(games, 5, clock: () => currentTime);
+
+      currentTime = baseTime.add(Duration(hours: 1));
+      expect(cache.isStale(), true);
+    });
+
+    test('refreshCacheTimestamp resets expiry from current clock time', () {
+      final baseTime = DateTime(2024, 1, 1, 12, 0, 0);
+      var currentTime = baseTime;
+      final cache = BggCache(games, 5, clock: () => currentTime);
+
+      // Advance past expiry
+      currentTime = baseTime.add(Duration(minutes: 10));
+      expect(cache.isStale(), true);
+
+      // Refresh resets the countdown from "now"
+      cache.refreshCacheTimestamp();
+      expect(cache.isStale(), false);
+
+      // Still fresh 4 minutes after refresh
+      currentTime = baseTime.add(Duration(minutes: 14));
+      expect(cache.isStale(), false);
+
+      // Stale 6 minutes after refresh
+      currentTime = baseTime.add(Duration(minutes: 16));
+      expect(cache.isStale(), true);
+    });
+
+    test('zero duration cache is immediately stale', () {
+      final baseTime = DateTime(2024, 1, 1, 12, 0, 0);
+      var currentTime = baseTime;
+      final cache = BggCache(games, 0, clock: () => currentTime);
+
+      // Even 1 second later it's stale
+      currentTime = baseTime.add(Duration(seconds: 1));
       expect(cache.isStale(), true);
     });
   });

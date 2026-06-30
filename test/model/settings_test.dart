@@ -1,3 +1,6 @@
+@Tags(['unit'])
+library;
+
 import 'package:how_many_mobile_meeple/model/settings.dart';
 import 'package:test/test.dart';
 
@@ -22,6 +25,30 @@ main() {
       customPlayerSetting.value = 1;
       mySettings.updateSetting(customPlayerSetting);
       expect(mySettings.changedSettings, {});
+    });
+  });
+
+  group('inferMinTime', () {
+    test('returns half of the given max time', () {
+      expect(Settings.inferMinTime(60), 30);
+      expect(Settings.inferMinTime(90), 45);
+    });
+
+    test('floors odd values', () {
+      expect(Settings.inferMinTime(45), 22);
+      expect(Settings.inferMinTime(31), 15);
+    });
+
+    test('returns zero for zero input', () {
+      expect(Settings.inferMinTime(0), 0);
+    });
+
+    test('returns zero for input of 1', () {
+      expect(Settings.inferMinTime(1), 0);
+    });
+
+    test('handles large values', () {
+      expect(Settings.inferMinTime(600), 300);
     });
   });
 

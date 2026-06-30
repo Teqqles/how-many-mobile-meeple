@@ -1,12 +1,13 @@
-import 'dart:convert';
+@Tags(['unit'])
+library;
+
 import 'package:flutter_test/flutter_test.dart';
-import 'package:http/http.dart' as http;
-import 'package:http/testing.dart' as http_testing;
 import 'package:how_many_mobile_meeple/api/http_retry_client.dart';
 import 'package:how_many_mobile_meeple/api/plays_service.dart';
 import 'package:how_many_mobile_meeple/model/item.dart';
 import 'package:how_many_mobile_meeple/model/model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../helpers/mock_api_client.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -14,7 +15,7 @@ void main() {
   setUp(() {
     SharedPreferences.setMockInitialValues({});
     PlaysService.clearCache();
-    HttpRetryClient.setDelayFunction((_) async {});
+    HttpRetryClient.setDelayFunction((_) => Future.value());
   });
 
   tearDown(() {
@@ -35,20 +36,10 @@ void main() {
     });
 
     test('loadPlays fetches and stores play data', () async {
-      HttpRetryClient.setTestClient(
-        http_testing.MockClient((request) async {
-          if (request.url.path.startsWith('/plays/')) {
-            return http.Response(
-              jsonEncode([
-                {'game_id': 1, 'game_name': 'Wingspan', 'total_plays': 5},
-                {'game_id': 2, 'game_name': 'Catan', 'total_plays': 0},
-              ]),
-              200,
-            );
-          }
-          return http.Response('[]', 200);
-        }),
-      );
+      HttpRetryClient.setTestClient(mockApiClient(plays: [
+        {'game_id': 1, 'game_name': 'Wingspan', 'total_plays': 5},
+        {'game_id': 2, 'game_name': 'Catan', 'total_plays': 0},
+      ]));
 
       final model = AppModel();
       await model.addItem(Item('testuser'));
@@ -59,19 +50,9 @@ void main() {
     });
 
     test('getPlayCount returns correct count after loading', () async {
-      HttpRetryClient.setTestClient(
-        http_testing.MockClient((request) async {
-          if (request.url.path.startsWith('/plays/')) {
-            return http.Response(
-              jsonEncode([
-                {'game_id': 42, 'game_name': 'Azul', 'total_plays': 7},
-              ]),
-              200,
-            );
-          }
-          return http.Response('[]', 200);
-        }),
-      );
+      HttpRetryClient.setTestClient(mockApiClient(plays: [
+        {'game_id': 42, 'game_name': 'Azul', 'total_plays': 7},
+      ]));
 
       final model = AppModel();
       await model.addItem(Item('testuser'));
@@ -81,19 +62,9 @@ void main() {
     });
 
     test('getPlayCount returns 0 for games not in plays data', () async {
-      HttpRetryClient.setTestClient(
-        http_testing.MockClient((request) async {
-          if (request.url.path.startsWith('/plays/')) {
-            return http.Response(
-              jsonEncode([
-                {'game_id': 1, 'game_name': 'Wingspan', 'total_plays': 5},
-              ]),
-              200,
-            );
-          }
-          return http.Response('[]', 200);
-        }),
-      );
+      HttpRetryClient.setTestClient(mockApiClient(plays: [
+        {'game_id': 1, 'game_name': 'Wingspan', 'total_plays': 5},
+      ]));
 
       final model = AppModel();
       await model.addItem(Item('testuser'));
@@ -103,20 +74,10 @@ void main() {
     });
 
     test('isUnplayed returns true for games with 0 plays', () async {
-      HttpRetryClient.setTestClient(
-        http_testing.MockClient((request) async {
-          if (request.url.path.startsWith('/plays/')) {
-            return http.Response(
-              jsonEncode([
-                {'game_id': 1, 'game_name': 'Wingspan', 'total_plays': 5},
-                {'game_id': 2, 'game_name': 'Catan', 'total_plays': 0},
-              ]),
-              200,
-            );
-          }
-          return http.Response('[]', 200);
-        }),
-      );
+      HttpRetryClient.setTestClient(mockApiClient(plays: [
+        {'game_id': 1, 'game_name': 'Wingspan', 'total_plays': 5},
+        {'game_id': 2, 'game_name': 'Catan', 'total_plays': 0},
+      ]));
 
       final model = AppModel();
       await model.addItem(Item('testuser'));
@@ -126,19 +87,9 @@ void main() {
     });
 
     test('isUnplayed returns true for games not in plays data', () async {
-      HttpRetryClient.setTestClient(
-        http_testing.MockClient((request) async {
-          if (request.url.path.startsWith('/plays/')) {
-            return http.Response(
-              jsonEncode([
-                {'game_id': 1, 'game_name': 'Wingspan', 'total_plays': 5},
-              ]),
-              200,
-            );
-          }
-          return http.Response('[]', 200);
-        }),
-      );
+      HttpRetryClient.setTestClient(mockApiClient(plays: [
+        {'game_id': 1, 'game_name': 'Wingspan', 'total_plays': 5},
+      ]));
 
       final model = AppModel();
       await model.addItem(Item('testuser'));
@@ -148,19 +99,9 @@ void main() {
     });
 
     test('isUnplayed returns false for games with plays', () async {
-      HttpRetryClient.setTestClient(
-        http_testing.MockClient((request) async {
-          if (request.url.path.startsWith('/plays/')) {
-            return http.Response(
-              jsonEncode([
-                {'game_id': 1, 'game_name': 'Wingspan', 'total_plays': 5},
-              ]),
-              200,
-            );
-          }
-          return http.Response('[]', 200);
-        }),
-      );
+      HttpRetryClient.setTestClient(mockApiClient(plays: [
+        {'game_id': 1, 'game_name': 'Wingspan', 'total_plays': 5},
+      ]));
 
       final model = AppModel();
       await model.addItem(Item('testuser'));
@@ -172,11 +113,7 @@ void main() {
     test('loadPlays does nothing when no primary player set', () async {
       int callCount = 0;
       HttpRetryClient.setTestClient(
-        http_testing.MockClient((request) async {
-          callCount++;
-          return http.Response('[]', 200);
-        }),
-      );
+          mockApiClient(onRequest: (_) => callCount++));
 
       final model = AppModel();
       await model.addItem(Item('trending', itemType: ItemType.hotList));
@@ -188,11 +125,7 @@ void main() {
     test('loadPlays uses primary player username', () async {
       final capturedPaths = <String>[];
       HttpRetryClient.setTestClient(
-        http_testing.MockClient((request) async {
-          capturedPaths.add(request.url.path);
-          return http.Response('[]', 200);
-        }),
-      );
+          mockApiClient(onRequest: (r) => capturedPaths.add(r.url.path)));
 
       final model = AppModel();
       await model.addItem(Item('teqqles'));
@@ -203,31 +136,18 @@ void main() {
     });
 
     test('isInCollection returns true for games in collection', () async {
-      HttpRetryClient.setTestClient(
-        http_testing.MockClient((request) async {
-          if (request.url.path.startsWith('/plays/')) {
-            return http.Response('[]', 200);
-          }
-          if (request.url.path.startsWith('/collection/')) {
-            return http.Response(
-              jsonEncode([
-                {
-                  'id': 1,
-                  'name': 'Wingspan',
-                  'minplayers': 1,
-                  'maxplayers': 5,
-                  'maxplaytime': 70,
-                  'image': null,
-                  'thumbnail': null,
-                  'stats': {'average': 8.0, 'averageweight': 2.5},
-                },
-              ]),
-              200,
-            );
-          }
-          return http.Response('[]', 200);
-        }),
-      );
+      HttpRetryClient.setTestClient(mockApiClient(collection: [
+        {
+          'id': 1,
+          'name': 'Wingspan',
+          'minplayers': 1,
+          'maxplayers': 5,
+          'maxplaytime': 70,
+          'image': null,
+          'thumbnail': null,
+          'stats': {'average': 8.0, 'averageweight': 2.5},
+        },
+      ]));
 
       final model = AppModel();
       await model.addItem(Item('testuser'));
@@ -243,11 +163,7 @@ void main() {
     });
 
     test('playsLoaded is true after successful load', () async {
-      HttpRetryClient.setTestClient(
-        http_testing.MockClient((request) async {
-          return http.Response('[]', 200);
-        }),
-      );
+      HttpRetryClient.setTestClient(mockApiClient());
 
       final model = AppModel();
       await model.addItem(Item('testuser'));
@@ -257,11 +173,7 @@ void main() {
     });
 
     test('notifies listeners when plays load completes', () async {
-      HttpRetryClient.setTestClient(
-        http_testing.MockClient((request) async {
-          return http.Response('[]', 200);
-        }),
-      );
+      HttpRetryClient.setTestClient(mockApiClient());
 
       final model = AppModel();
       await model.addItem(Item('testuser'));
@@ -278,11 +190,7 @@ void main() {
         () async {
       final capturedPaths = <String>[];
       HttpRetryClient.setTestClient(
-        http_testing.MockClient((request) async {
-          capturedPaths.add(request.url.path);
-          return http.Response('[]', 200);
-        }),
-      );
+          mockApiClient(onRequest: (r) => capturedPaths.add(r.url.path)));
 
       SharedPreferences.setMockInitialValues({
         'primary_player': 'storeduser',
@@ -300,11 +208,7 @@ void main() {
     test('primaryPlayer setter triggers loadPlays', () async {
       final capturedPaths = <String>[];
       HttpRetryClient.setTestClient(
-        http_testing.MockClient((request) async {
-          capturedPaths.add(request.url.path);
-          return http.Response('[]', 200);
-        }),
-      );
+          mockApiClient(onRequest: (r) => capturedPaths.add(r.url.path)));
 
       final model = AppModel();
       await model.addItem(Item('user1'));
@@ -319,19 +223,9 @@ void main() {
     });
 
     test('primaryPlayer setter resets plays state', () async {
-      HttpRetryClient.setTestClient(
-        http_testing.MockClient((request) async {
-          if (request.url.path.startsWith('/plays/')) {
-            return http.Response(
-              jsonEncode([
-                {'game_id': 1, 'game_name': 'Wingspan', 'total_plays': 5},
-              ]),
-              200,
-            );
-          }
-          return http.Response('[]', 200);
-        }),
-      );
+      HttpRetryClient.setTestClient(mockApiClient(plays: [
+        {'game_id': 1, 'game_name': 'Wingspan', 'total_plays': 5},
+      ]));
 
       final model = AppModel();
       await model.addItem(Item('user1'));
@@ -340,13 +234,13 @@ void main() {
       expect(model.playsLoaded, isTrue);
       expect(model.getPlayCount(1), 5);
 
-      HttpRetryClient.setTestClient(
-        http_testing.MockClient((request) async => http.Response('[]', 200)),
-      );
+      HttpRetryClient.setTestClient(mockApiClient());
       model.primaryPlayer = 'user2';
 
       expect(model.playsLoaded, isFalse);
       expect(model.getPlayCount(1), 0);
+
+      await model.loadPlays();
     });
   });
 }

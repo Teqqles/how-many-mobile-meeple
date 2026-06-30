@@ -1,3 +1,6 @@
+@Tags(['unit'])
+library;
+
 import 'package:how_many_mobile_meeple/load_games.dart';
 import 'package:how_many_mobile_meeple/model/game_request.dart';
 import 'package:how_many_mobile_meeple/model/item.dart';

@@ -1,11 +1,13 @@
+@Tags(['unit'])
+library;
+
 import 'package:flutter_test/flutter_test.dart';
-import 'package:http/http.dart' as http;
-import 'package:http/testing.dart' as http_testing;
 import 'package:how_many_mobile_meeple/api/http_retry_client.dart';
 import 'package:how_many_mobile_meeple/api/plays_service.dart';
 import 'package:how_many_mobile_meeple/model/item.dart';
 import 'package:how_many_mobile_meeple/model/model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../helpers/mock_api_client.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -14,9 +16,7 @@ void main() {
     SharedPreferences.setMockInitialValues({});
     PlaysService.clearCache();
     HttpRetryClient.setDelayFunction((_) async {});
-    HttpRetryClient.setTestClient(
-      http_testing.MockClient((request) async => http.Response('[]', 200)),
-    );
+    HttpRetryClient.setTestClient(mockApiClient());
   });
 
   tearDown(() {

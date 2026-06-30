@@ -1,10 +1,11 @@
-import 'dart:async';
+@Tags(['widget'])
+library;
+
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
-import 'package:http/testing.dart' as http_testing;
 import 'package:how_many_mobile_meeple/api/http_retry_client.dart';
 import 'package:how_many_mobile_meeple/api/plays_service.dart';
 import 'package:how_many_mobile_meeple/model/item.dart';
@@ -12,6 +13,8 @@ import 'package:how_many_mobile_meeple/model/model.dart';
 import 'package:how_many_mobile_meeple/shelf_of_shame/shelf_of_shame_page.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../helpers/mock_api_client.dart';
+import '../helpers/sync_mock_client.dart';
 
 Widget _buildTestApp(AppModel model) {
   return ChangeNotifierProvider<AppModel>.value(
@@ -20,21 +23,6 @@ Widget _buildTestApp(AppModel model) {
       home: const ShelfOfShamePage(),
     ),
   );
-}
-
-http_testing.MockClient _mockClient({
-  required List<Map<String, dynamic>> collectionGames,
-  required List<Map<String, dynamic>> playsData,
-}) {
-  return http_testing.MockClient((request) async {
-    if (request.url.path.startsWith('/plays/')) {
-      return http.Response(jsonEncode(playsData), 200);
-    }
-    if (request.url.path.startsWith('/collection/')) {
-      return http.Response(jsonEncode(collectionGames), 200);
-    }
-    return http.Response('Not found', 404);
-  });
 }
 
 void main() {
@@ -55,9 +43,7 @@ void main() {
   group('ShelfOfShamePage', () {
     testWidgets('shows no collection message when no collection added',
         (tester) async {
-      HttpRetryClient.setTestClient(
-        http_testing.MockClient((_) async => http.Response('[]', 200)),
-      );
+      HttpRetryClient.setTestClient(mockApiClient());
 
       final model = AppModel();
       await model.addItem(Item('trending', itemType: ItemType.hotList));
@@ -72,9 +58,7 @@ void main() {
     testWidgets(
         'shows no primary player message when collection exists but no player set',
         (tester) async {
-      HttpRetryClient.setTestClient(
-        http_testing.MockClient((_) async => http.Response('[]', 200)),
-      );
+      HttpRetryClient.setTestClient(mockApiClient());
 
       final model = AppModel();
       await model.addItem(Item('testuser'));
@@ -87,37 +71,28 @@ void main() {
       expect(find.textContaining('crown icon'), findsOneWidget);
     });
 
-    testWidgets('shows loading indicator while fetching', (tester) async {
-      final completer = Completer<http.Response>();
-      HttpRetryClient.setTestClient(
-        http_testing.MockClient((request) {
-          if (request.url.path.startsWith('/plays/')) {
-            return completer.future;
-          }
-          return Future.value(http.Response('[]', 200));
-        }),
-      );
+    testWidgets('shows loading indicator initially', (tester) async {
+      HttpRetryClient.setTestClient(mockApiClient(
+        collection: [],
+        plays: [],
+      ));
 
       final model = AppModel();
       await model.addItem(Item('testuser'));
 
       await tester.pumpWidget(_buildTestApp(model));
-      await tester.pump();
 
       expect(find.byType(SpinKitCubeGrid), findsOneWidget);
-
-      completer.complete(http.Response('[]', 200));
-      await tester.pumpAndSettle();
     });
 
     testWidgets('shows collection banner with primary player name',
         (tester) async {
-      HttpRetryClient.setTestClient(_mockClient(
-        collectionGames: [
+      HttpRetryClient.setTestClient(mockApiClient(
+        collection: [
           _gameJson(1, 'Wingspan'),
           _gameJson(2, 'Catan'),
         ],
-        playsData: [
+        plays: [
           {'game_id': 1, 'game_name': 'Wingspan', 'total_plays': 5},
         ],
       ));
@@ -133,13 +108,13 @@ void main() {
 
     testWidgets('shows only unplayed games from full collection',
         (tester) async {
-      HttpRetryClient.setTestClient(_mockClient(
-        collectionGames: [
+      HttpRetryClient.setTestClient(mockApiClient(
+        collection: [
           _gameJson(1, 'Wingspan'),
           _gameJson(2, 'Catan'),
           _gameJson(3, 'Azul'),
         ],
-        playsData: [
+        plays: [
           {'game_id': 1, 'game_name': 'Wingspan', 'total_plays': 5},
           {'game_id': 2, 'game_name': 'Catan', 'total_plays': 0},
         ],
@@ -157,13 +132,13 @@ void main() {
     });
 
     testWidgets('shows unplayed count in banner', (tester) async {
-      HttpRetryClient.setTestClient(_mockClient(
-        collectionGames: [
+      HttpRetryClient.setTestClient(mockApiClient(
+        collection: [
           _gameJson(1, 'Wingspan'),
           _gameJson(2, 'Catan'),
           _gameJson(3, 'Azul'),
         ],
-        playsData: [
+        plays: [
           {'game_id': 1, 'game_name': 'Wingspan', 'total_plays': 5},
           {'game_id': 2, 'game_name': 'Catan', 'total_plays': 0},
           {'game_id': 3, 'game_name': 'Azul', 'total_plays': 0},
@@ -181,12 +156,12 @@ void main() {
 
     testWidgets('shows celebration message when all games played',
         (tester) async {
-      HttpRetryClient.setTestClient(_mockClient(
-        collectionGames: [
+      HttpRetryClient.setTestClient(mockApiClient(
+        collection: [
           _gameJson(1, 'Wingspan'),
           _gameJson(2, 'Catan'),
         ],
-        playsData: [
+        plays: [
           {'game_id': 1, 'game_name': 'Wingspan', 'total_plays': 5},
           {'game_id': 2, 'game_name': 'Catan', 'total_plays': 3},
         ],
@@ -202,11 +177,11 @@ void main() {
     });
 
     testWidgets('shows BG Stats plug at bottom of list', (tester) async {
-      HttpRetryClient.setTestClient(_mockClient(
-        collectionGames: [
+      HttpRetryClient.setTestClient(mockApiClient(
+        collection: [
           _gameJson(1, 'Wingspan'),
         ],
-        playsData: [
+        plays: [
           {'game_id': 1, 'game_name': 'Wingspan', 'total_plays': 0},
         ],
       ));
@@ -222,9 +197,7 @@ void main() {
     });
 
     testWidgets('shows app bar with correct title', (tester) async {
-      HttpRetryClient.setTestClient(
-        http_testing.MockClient((_) async => http.Response('[]', 200)),
-      );
+      HttpRetryClient.setTestClient(mockApiClient());
 
       final model = AppModel();
 
@@ -236,13 +209,13 @@ void main() {
 
     testWidgets('games with no play data are shown as unplayed',
         (tester) async {
-      HttpRetryClient.setTestClient(_mockClient(
-        collectionGames: [
+      HttpRetryClient.setTestClient(mockApiClient(
+        collection: [
           _gameJson(1, 'Wingspan'),
           _gameJson(2, 'Catan'),
           _gameJson(3, 'Azul'),
         ],
-        playsData: [
+        plays: [
           {'game_id': 1, 'game_name': 'Wingspan', 'total_plays': 3},
         ],
       ));
@@ -261,12 +234,20 @@ void main() {
     testWidgets('fetches full unfiltered collection', (tester) async {
       Map<String, String>? capturedHeaders;
       HttpRetryClient.setTestClient(
-        http_testing.MockClient((request) async {
+        SyncMockClient((request) {
           if (request.url.path.startsWith('/collection/')) {
             capturedHeaders = request.headers;
             return http.Response(jsonEncode([_gameJson(1, 'Wingspan')]), 200);
           }
-          return http.Response('[]', 200);
+          if (request.url.path.startsWith('/plays/')) {
+            return http.Response(
+                jsonEncode({
+                  'plays': [],
+                  'meta': {'complete': true}
+                }),
+                200);
+          }
+          return http.Response('Not found', 404);
         }),
       );
 

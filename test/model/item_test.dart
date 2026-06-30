@@ -1,3 +1,6 @@
+@Tags(['unit'])
+library;
+
 import 'package:how_many_mobile_meeple/model/item.dart';
 import 'package:test/test.dart';
 

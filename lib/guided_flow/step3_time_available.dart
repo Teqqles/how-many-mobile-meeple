@@ -175,7 +175,8 @@ class _Step3TimeAvailableState extends State<Step3TimeAvailable> {
                       onSelected: (selected) {
                         if (selected) {
                           setState(() {
-                            minTimeSetting.value = (targetTime * 0.5).floor();
+                            minTimeSetting.value =
+                                Settings.inferMinTime(targetTime);
                             maxTimeSetting.value = targetTime;
                             minTimeSetting.enabled = true;
                             maxTimeSetting.enabled = true;

@@ -1,6 +1,11 @@
 {
-  "version": "2.17.11",
+  "version": "2.18.1",
   "recent_changes": [
+    {
+      "type": "feat",
+      "scope": "",
+      "description": "add play log with local tracking and BGG history"
+    },
     {
       "type": "feat",
       "scope": "",
@@ -254,6 +259,21 @@
   ],
   "upcoming": [
     {
+      "number": 99,
+      "title": "Play log - Connect BGG account and sync plays (Phase 2)",
+      "labels": []
+    },
+    {
+      "number": 98,
+      "title": "Play log - Server-side backup and cross-device sync",
+      "labels": []
+    },
+    {
+      "number": 97,
+      "title": "Play log - Export and import play history as JSON",
+      "labels": []
+    },
+    {
       "number": 94,
       "title": "Scope Consumer widgets to reduce unnecessary rebuilds",
       "labels": []
@@ -286,11 +306,6 @@
     {
       "number": 78,
       "title": "Dark mode with theme colour options",
-      "labels": []
-    },
-    {
-      "number": 75,
-      "title": "Play log - Track games played with BGG integration",
       "labels": []
     },
     {

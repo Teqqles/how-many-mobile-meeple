@@ -3,6 +3,19 @@
 All notable changes to this project are documented here.
 This file is auto-generated from conventional commits on each release.
 
+## [v2.17.11] - 2026-06-30
+
+### Added
+- enable gzip encoding and add Bgg-Plays-Meta header for API calls
+- add service worker for PWA image caching
+- support partial plays loading with automatic background retry
+- add clock injection to BggCache and time inference to Settings
+- add service locator for dependency injection
+- add request deduplication and test injection to API services
+
+### Fixed
+- deduplicate shelf of shame API calls and load plays asynchronously
+
 ## [v2.11.4] - 2026-06-28
 
 ### Fixed

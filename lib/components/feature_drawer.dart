@@ -95,6 +95,15 @@ class FeatureDrawer extends StatelessWidget {
                 ),
                 _buildItem(
                   context,
+                  icon: Icons.history,
+                  label: 'Play History',
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    Navigator.of(context).pushNamed(r.Router.playLogRoute);
+                  },
+                ),
+                _buildItem(
+                  context,
                   icon: Icons.visibility_off,
                   label: 'Ignored Games',
                   onTap: () {

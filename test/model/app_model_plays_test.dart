@@ -6,6 +6,8 @@ import 'package:how_many_mobile_meeple/api/http_retry_client.dart';
 import 'package:how_many_mobile_meeple/api/plays_service.dart';
 import 'package:how_many_mobile_meeple/model/item.dart';
 import 'package:how_many_mobile_meeple/model/model.dart';
+import 'package:how_many_mobile_meeple/play_log/play_log_entry.dart';
+import 'package:how_many_mobile_meeple/play_log/play_log_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../helpers/mock_api_client.dart';
 
@@ -15,6 +17,7 @@ void main() {
   setUp(() {
     SharedPreferences.setMockInitialValues({});
     PlaysService.clearCache();
+    PlayLogService.resetForTesting();
     HttpRetryClient.setDelayFunction((_) => Future.value());
   });
 
@@ -22,6 +25,7 @@ void main() {
     HttpRetryClient.resetTestClient();
     HttpRetryClient.resetDelayFunction();
     PlaysService.clearCache();
+    PlayLogService.resetForTesting();
   });
 
   group('AppModel plays integration', () {
@@ -220,6 +224,200 @@ void main() {
 
       expect(capturedPaths, contains('/plays/user2'));
       expect(capturedPaths, contains('/collection/user2'));
+    });
+
+    test('local plays count toward getPlayCount without a BGG player',
+        () async {
+      final playLog = await PlayLogService.instance();
+      final model = AppModel();
+      model.attachPlayLog(playLog);
+
+      playLog.logPlay(PlayLogEntry(
+        id: 'a',
+        gameId: 55,
+        name: 'Azul',
+        playedAt: DateTime(2026, 1, 1),
+      ));
+
+      expect(model.getPlayCount(55), 1);
+      expect(model.isUnplayed(55), isFalse);
+    });
+
+    test('attachPlayLog is a no-op after dispose', () async {
+      final playLog = await PlayLogService.instance();
+      final model = AppModel();
+      model.dispose();
+
+      // Must not throw "used after being disposed".
+      model.attachPlayLog(playLog);
+    });
+
+    test('disposed model ignores later play-log changes', () async {
+      final playLog = await PlayLogService.instance();
+      final model = AppModel();
+      model.attachPlayLog(playLog);
+      model.dispose();
+
+      // The still-live play log notifying must not touch the disposed model.
+      playLog.logPlay(PlayLogEntry(
+        id: 'a',
+        gameId: 1,
+        name: 'Azul',
+        playedAt: DateTime(2026, 1, 1),
+      ));
+    });
+
+    test('local plays are added on top of BGG plays', () async {
+      HttpRetryClient.setTestClient(mockApiClient(plays: [
+        {'game_id': 1, 'game_name': 'Wingspan', 'total_plays': 5},
+      ]));
+
+      final playLog = await PlayLogService.instance();
+      final model = AppModel();
+      model.attachPlayLog(playLog);
+      await model.addItem(Item('testuser'));
+      await model.loadPlays();
+
+      playLog.logPlay(PlayLogEntry(
+        id: 'a',
+        gameId: 1,
+        name: 'Wingspan',
+        playedAt: DateTime(2026, 1, 1),
+      ));
+
+      expect(model.getPlayCount(1), 6);
+    });
+
+    test('attachPlayLog change notifies listeners', () async {
+      final playLog = await PlayLogService.instance();
+      final model = AppModel();
+      model.attachPlayLog(playLog);
+
+      int notifyCount = 0;
+      model.addListener(() => notifyCount++);
+
+      playLog.logPlay(PlayLogEntry(
+        id: 'a',
+        gameId: 1,
+        name: 'Catan',
+        playedAt: DateTime(2026, 1, 1),
+      ));
+
+      expect(notifyCount, greaterThan(0));
+    });
+
+    test('bggPlays flattens individual plays across games', () async {
+      HttpRetryClient.setTestClient(mockApiClient(plays: [
+        {
+          'game_id': 1,
+          'game_name': 'Wingspan',
+          'total_plays': 2,
+          'plays': [
+            {'play_id': 10, 'date': '2026-01-01', 'players': []},
+            {'play_id': 11, 'date': '2026-02-01', 'players': []},
+          ],
+        },
+        {
+          'game_id': 2,
+          'game_name': 'Catan',
+          'total_plays': 1,
+          'plays': [
+            {'play_id': 20, 'date': '2026-03-01', 'players': []},
+          ],
+        },
+      ]));
+
+      final model = AppModel();
+      await model.addItem(Item('testuser'));
+      await model.loadPlays();
+
+      expect(model.bggPlays.length, 3);
+      expect(
+          model.bggPlays.map((r) => r.play.playId), containsAll([10, 11, 20]));
+      expect(model.bggPlays.firstWhere((r) => r.play.playId == 20).gameName,
+          'Catan');
+    });
+
+    test('primaryPlayerName resolves the real name from a matching play',
+        () async {
+      HttpRetryClient.setTestClient(mockApiClient(plays: [
+        {
+          'game_id': 1,
+          'game_name': 'Wingspan',
+          'total_plays': 1,
+          'plays': [
+            {
+              'play_id': 10,
+              'date': '2026-01-01',
+              'players': [
+                {'username': 'Teqqles', 'name': 'David Long', 'win': false},
+                {'username': '', 'name': 'Thomas', 'win': true},
+              ],
+            },
+          ],
+        },
+      ]));
+
+      final model = AppModel();
+      await model.addItem(Item('Teqqles'));
+      await model.loadPlays();
+
+      expect(model.primaryPlayerName, 'David Long');
+    });
+
+    test('primaryPlayerName matches the username case-insensitively', () async {
+      HttpRetryClient.setTestClient(mockApiClient(plays: [
+        {
+          'game_id': 1,
+          'game_name': 'Wingspan',
+          'total_plays': 1,
+          'plays': [
+            {
+              'play_id': 10,
+              'date': '2026-01-01',
+              'players': [
+                {'username': 'Teqqles', 'name': 'David Long', 'win': false},
+              ],
+            },
+          ],
+        },
+      ]));
+
+      final model = AppModel();
+      await model.addItem(Item('teqqles'));
+      await model.loadPlays();
+
+      expect(model.primaryPlayerName, 'David Long');
+    });
+
+    test('primaryPlayerName falls back to the username with no matching play',
+        () async {
+      HttpRetryClient.setTestClient(mockApiClient(plays: [
+        {'game_id': 1, 'game_name': 'Wingspan', 'total_plays': 5},
+      ]));
+
+      final model = AppModel();
+      await model.addItem(Item('teqqles'));
+      await model.loadPlays();
+
+      expect(model.primaryPlayerName, 'teqqles');
+    });
+
+    test('primaryPlayerName is null when no primary player is set', () {
+      final model = AppModel();
+      expect(model.primaryPlayerName, isNull);
+    });
+
+    test('bggPlays is empty for aggregated-only data', () async {
+      HttpRetryClient.setTestClient(mockApiClient(plays: [
+        {'game_id': 1, 'game_name': 'Wingspan', 'total_plays': 5},
+      ]));
+
+      final model = AppModel();
+      await model.addItem(Item('testuser'));
+      await model.loadPlays();
+
+      expect(model.bggPlays, isEmpty);
     });
 
     test('primaryPlayer setter resets plays state', () async {

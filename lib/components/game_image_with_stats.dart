@@ -91,9 +91,11 @@ class GameImageWithStats extends StatelessWidget with ScreenTools {
               child: Consumer<AppModel>(
                 builder: (context, model, child) {
                   final isNarrow = !isWideScreen(context);
-                  final hasCollection = model.playsLoaded;
-                  final isOwned = model.isInCollection(game.id);
                   final playCount = model.getPlayCount(game.id);
+                  // Show the plays row when BGG data has loaded or the user has
+                  // logged plays locally, so local-only plays are still visible.
+                  final hasCollection = model.playsLoaded || playCount > 0;
+                  final isOwned = model.isInCollection(game.id);
 
                   final panel = _StatsPanel(
                     game: game,

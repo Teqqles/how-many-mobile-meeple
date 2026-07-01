@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:how_many_mobile_meeple/app_page.dart';
 import 'package:how_many_mobile_meeple/components/feature_drawer.dart';
-import 'package:how_many_mobile_meeple/components/platform_independent_image.dart';
+import 'package:how_many_mobile_meeple/components/game_thumbnail.dart';
+import 'package:how_many_mobile_meeple/components/list_empty_state.dart';
 import 'package:how_many_mobile_meeple/how_many_meeple_app_bar.dart';
 import 'package:how_many_mobile_meeple/platform/router.dart' as r;
 import 'favourite_game.dart';
@@ -67,30 +68,10 @@ class _GameListPageState extends State<GameListPage> with AppPage {
   Widget _buildBody(BuildContext context) {
     final games = _service!.games;
     if (games.isEmpty) {
-      return Center(
-        child: Padding(
-          padding: const EdgeInsets.all(32),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(widget.emptyIcon,
-                  size: 64, color: Theme.of(context).colorScheme.secondary),
-              const SizedBox(height: 16),
-              Text(
-                widget.emptyTitle,
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
-              const SizedBox(height: 8),
-              Text(
-                widget.emptyDescription,
-                textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
-                    ),
-              ),
-            ],
-          ),
-        ),
+      return ListEmptyState(
+        icon: widget.emptyIcon,
+        title: widget.emptyTitle,
+        description: widget.emptyDescription,
       );
     }
 
@@ -121,25 +102,7 @@ class _GameListPageState extends State<GameListPage> with AppPage {
           ? Colors.transparent
           : Theme.of(context).colorScheme.primary.withAlpha(8),
       child: ListTile(
-        leading: ClipRRect(
-          borderRadius: BorderRadius.circular(4),
-          child: SizedBox(
-            width: 44,
-            height: 44,
-            child: game.thumbnail != null
-                ? PlatformIndependentImage(
-                    imageUrl: game.thumbnail!,
-                    fit: BoxFit.cover,
-                  )
-                : Container(
-                    color: Theme.of(context).colorScheme.primaryContainer,
-                    child: Icon(Icons.casino,
-                        size: 22,
-                        color:
-                            Theme.of(context).colorScheme.onPrimaryContainer),
-                  ),
-          ),
-        ),
+        leading: GameThumbnail(thumbnail: game.thumbnail),
         title: Text(game.name),
         trailing: IconButton(
           icon: Icon(Icons.remove_circle_outline,

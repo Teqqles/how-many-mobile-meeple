@@ -8,6 +8,7 @@ import 'package:provider/provider.dart';
 
 import 'package:how_many_mobile_meeple/model/model.dart';
 import 'package:how_many_mobile_meeple/app_config.dart';
+import 'package:how_many_mobile_meeple/play_log/play_log_service.dart';
 import 'package:how_many_mobile_meeple/pwa/pwa_update_service.dart';
 
 import 'meeple_theme.dart';
@@ -37,7 +38,11 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-        create: (_) => AppModel(),
+        create: (_) {
+          final model = AppModel();
+          PlayLogService.instance().then(model.attachPlayLog);
+          return model;
+        },
         child: MaterialApp(
           title: 'How Many Meeple?',
           theme: ThemeData(

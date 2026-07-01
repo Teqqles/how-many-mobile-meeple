@@ -6,6 +6,9 @@ import 'favourite_game.dart';
 import 'favourites_service.dart';
 import 'ignored_games_service.dart';
 import '../model/game.dart';
+import '../model/model.dart';
+import '../play_log/log_play_dialog.dart';
+import '../play_log/play_log_service.dart';
 import '../services/service_locator.dart';
 
 class GameActionButtons extends StatefulWidget {
@@ -20,6 +23,7 @@ class GameActionButtons extends StatefulWidget {
 class _GameActionButtonsState extends State<GameActionButtons> {
   FavouritesService? _favService;
   IgnoredGamesService? _ignoreService;
+  PlayLogService? _playLogService;
   bool _servicesLoading = false;
 
   @override
@@ -35,12 +39,14 @@ class _GameActionButtonsState extends State<GameActionButtons> {
     final services = context.gameServices;
     final fav = await services.favourites();
     final ignore = await services.ignored();
+    final playLog = await services.playLog();
     fav.addListener(_rebuild);
     ignore.addListener(_rebuild);
     if (mounted) {
       setState(() {
         _favService = fav;
         _ignoreService = ignore;
+        _playLogService = playLog;
       });
     }
   }
@@ -58,7 +64,9 @@ class _GameActionButtonsState extends State<GameActionButtons> {
 
   @override
   Widget build(BuildContext context) {
-    if (_favService == null || _ignoreService == null) {
+    if (_favService == null ||
+        _ignoreService == null ||
+        _playLogService == null) {
       return const SizedBox.shrink();
     }
 
@@ -71,9 +79,19 @@ class _GameActionButtonsState extends State<GameActionButtons> {
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
+      child: Wrap(
+        alignment: WrapAlignment.center,
+        spacing: 12,
+        runSpacing: 8,
         children: [
+          _actionButton(
+            context,
+            onPressed: () => _logPlay(context, game),
+            icon: const Icon(Icons.check_circle_outline),
+            label: 'Played it',
+            compact: compact,
+            backgroundColor: Colors.green.shade700,
+          ),
           _actionButton(
             context,
             onPressed: () => _favService!.toggle(favGame),
@@ -84,7 +102,6 @@ class _GameActionButtonsState extends State<GameActionButtons> {
                 ? Colors.amber.shade700
                 : Theme.of(context).colorScheme.secondary,
           ),
-          const SizedBox(width: 12),
           _actionButton(
             context,
             onPressed: () {
@@ -100,7 +117,6 @@ class _GameActionButtonsState extends State<GameActionButtons> {
                 ? Theme.of(context).colorScheme.secondary
                 : Theme.of(context).colorScheme.error,
           ),
-          const SizedBox(width: 12),
           _actionButton(
             context,
             onPressed: () => _share(context, game),
@@ -146,6 +162,24 @@ class _GameActionButtonsState extends State<GameActionButtons> {
       label: Text(label),
       style: style,
     );
+  }
+
+  void _logPlay(BuildContext context, Game game) async {
+    final service = _playLogService;
+    if (service == null) return;
+    final entry = await LogPlayDialog.show(
+      context,
+      game: game,
+      suggestedPlayers: service.frequentPlayers(),
+      primaryPlayer: AppModel.of(context, listen: false).primaryPlayerName,
+    );
+    if (entry == null) return;
+    service.logPlay(entry);
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Logged a play of ${game.name}')),
+      );
+    }
   }
 
   void _share(BuildContext context, Game game) async {

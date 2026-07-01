@@ -10,6 +10,8 @@ import 'package:how_many_mobile_meeple/favourites/game_list_page.dart'
     deferred as game_list;
 import 'package:how_many_mobile_meeple/platform/common/game_detail_page.dart'
     deferred as game_detail;
+import 'package:how_many_mobile_meeple/play_log/play_log_page.dart'
+    deferred as play_log;
 import 'package:how_many_mobile_meeple/settings_summary_page.dart'
     deferred as settings_page;
 import 'package:how_many_mobile_meeple/shelf_of_shame/shelf_of_shame_page.dart'
@@ -23,6 +25,7 @@ class Router {
   static const String gameDetailRoute = '/game';
   static const String favouritesRoute = '/favourites';
   static const String ignoredRoute = '/ignored';
+  static const String playLogRoute = '/play-log';
   static const String aboutRoute = '/about';
   static const String shelfOfShameRoute = '/shelf-of-shame';
 
@@ -109,6 +112,13 @@ class Router {
                         'Swipe left on a game in the list to hide it from future results.',
                     serviceFactory: IgnoredGamesService.instance,
                   ),
+                ),
+            settings: settings);
+      case Router.playLogRoute:
+        return MaterialPageRoute(
+            builder: (_) => _deferred(
+                  play_log.loadLibrary,
+                  () => play_log.PlayLogPage(),
                 ),
             settings: settings);
       case Router.shelfOfShameRoute:

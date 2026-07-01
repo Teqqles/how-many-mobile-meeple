@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:how_many_mobile_meeple/api/http_retry_client.dart';
 import 'package:how_many_mobile_meeple/api/plays_service.dart';
 import 'package:how_many_mobile_meeple/model/play_data.dart';
+import 'package:how_many_mobile_meeple/play_log/play_log_service.dart';
 import 'package:how_many_mobile_meeple/platform/web/url_fragment_extractor.dart';
 import 'package:how_many_mobile_meeple/storage/preferences_history_interface.dart';
 import 'package:how_many_mobile_meeple/storage/storage_factory.dart';
@@ -47,6 +48,9 @@ class AppModel extends ChangeNotifier {
   Map<int, PlayData> _playsData = {};
   bool _playsLoaded = false;
   Set<int> _collectionGameIds = {};
+  Map<int, String> _collectionThumbnails = {};
+  PlayLogService? _playLog;
+  bool _disposed = false;
 
   late Settings _settings;
   Orientation? screenOrientation;
@@ -66,6 +70,7 @@ class AppModel extends ChangeNotifier {
     _playsLoaded = false;
     _playsData = {};
     _collectionGameIds = {};
+    _collectionThumbnails = {};
     _persistPrimaryPlayer();
     notifyListeners();
     if (value != null) {
@@ -77,7 +82,66 @@ class AppModel extends ChangeNotifier {
 
   bool get playsLoaded => _playsLoaded;
 
-  int getPlayCount(int gameId) => _playsData[gameId]?.totalPlays ?? 0;
+  /// The primary player's real name as recorded on their BGG plays, if any
+  /// play lists them by [_primaryPlayer] as its username. Falls back to the
+  /// username so callers always have something to show.
+  String? get primaryPlayerName {
+    final username = _primaryPlayer;
+    if (username == null) return null;
+    final lower = username.toLowerCase();
+    for (final data in _playsData.values) {
+      for (final play in data.plays) {
+        for (final player in play.players) {
+          if (player.username.toLowerCase() == lower &&
+              player.name.isNotEmpty) {
+            return player.name;
+          }
+        }
+      }
+    }
+    return username;
+  }
+
+  /// Thumbnail URL for a game if we have it (from the collection), else null.
+  String? thumbnailFor(int gameId) => _collectionThumbnails[gameId];
+
+  /// Every individual play loaded from BGG, flattened across games and paired
+  /// with the game it belongs to. Aggregated-only games contribute nothing.
+  List<BggPlayRecord> get bggPlays => [
+        for (final data in _playsData.values)
+          for (final play in data.plays)
+            BggPlayRecord(
+              gameId: data.gameId,
+              gameName: data.gameName,
+              thumbnail: _collectionThumbnails[data.gameId],
+              play: play,
+            ),
+      ];
+
+  /// Attaches the local play log so locally logged plays are counted alongside
+  /// the plays fetched from BGG. Listens for changes so counts update live.
+  ///
+  /// Safe to call after disposal: the play log loads asynchronously, so the
+  /// model may already be torn down (hot restart, fast rebuild) when it lands.
+  void attachPlayLog(PlayLogService playLog) {
+    if (_disposed || identical(_playLog, playLog)) return;
+    _playLog?.removeListener(_onPlayLogChanged);
+    _playLog = playLog;
+    _playLog!.addListener(_onPlayLogChanged);
+    notifyListeners();
+  }
+
+  void _onPlayLogChanged() {
+    if (_disposed) return;
+    notifyListeners();
+  }
+
+  /// Total plays for a game: BGG-reported plays plus any logged locally.
+  int getPlayCount(int gameId) {
+    final remote = _playsData[gameId]?.totalPlays ?? 0;
+    final local = _playLog?.playCount(gameId) ?? 0;
+    return remote + local;
+  }
 
   bool isUnplayed(int gameId) => getPlayCount(gameId) == 0;
 
@@ -95,11 +159,16 @@ class AppModel extends ChangeNotifier {
     try {
       final results = await Future.wait([
         PlaysService.fetchPlays(_primaryPlayer!),
-        _fetchCollectionIds(_primaryPlayer!),
+        _fetchCollection(_primaryPlayer!),
       ]);
       final playsResult = results[0] as PlaysResult;
+      final collection = results[1] as List<dynamic>;
       _playsData = playsResult.plays;
-      _collectionGameIds = results[1] as Set<int>;
+      _collectionGameIds = collection.map<int>((g) => g['id'] as int).toSet();
+      _collectionThumbnails = {
+        for (final g in collection)
+          if (g['thumbnail'] != null) g['id'] as int: g['thumbnail'] as String,
+      };
       _playsLoaded = true;
       notifyListeners();
 
@@ -111,6 +180,14 @@ class AppModel extends ChangeNotifier {
     }
   }
 
+  @override
+  void dispose() {
+    _disposed = true;
+    _playsRetryTimer?.cancel();
+    _playLog?.removeListener(_onPlayLogChanged);
+    super.dispose();
+  }
+
   void _schedulePlaysRetry(int delaySeconds) {
     _playsRetryTimer?.cancel();
     final seconds = delaySeconds > 0 ? delaySeconds : 30;
@@ -120,7 +197,7 @@ class AppModel extends ChangeNotifier {
     });
   }
 
-  Future<Set<int>> _fetchCollectionIds(String username) async {
+  Future<List<dynamic>> _fetchCollection(String username) async {
     final url = Uri.parse(
         '${AppCommon.boardGameGeekProxyUrl}/collection/${Uri.encodeComponent(username)}');
     final headers = {
@@ -129,10 +206,9 @@ class AppModel extends ChangeNotifier {
     };
     final response = await HttpRetryClient.getWithRetry(url, headers: headers);
     if (response.statusCode == 200) {
-      final List<dynamic> jsonList = jsonDecode(response.body);
-      return jsonList.map<int>((g) => g['id'] as int).toSet();
+      return jsonDecode(response.body) as List<dynamic>;
     }
-    return {};
+    return const [];
   }
 
   Future<void> _persistPrimaryPlayer() async {

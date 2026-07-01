@@ -11,6 +11,7 @@ import 'package:how_many_mobile_meeple/platform/common/game_detail_page.dart';
 import 'package:how_many_mobile_meeple/services/service_locator.dart';
 import 'package:how_many_mobile_meeple/favourites/favourites_service.dart';
 import 'package:how_many_mobile_meeple/favourites/ignored_games_service.dart';
+import 'package:how_many_mobile_meeple/play_log/play_log_service.dart';
 import 'package:network_image_mock/network_image_mock.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -57,13 +58,16 @@ class _FakeRecommendationsFetcher implements RecommendationsFetcher {
 class _FakeGameServices implements GameServices {
   final FavouritesService _favs;
   final IgnoredGamesService _ignored;
+  final PlayLogService _playLog;
 
-  _FakeGameServices(this._favs, this._ignored);
+  _FakeGameServices(this._favs, this._ignored, this._playLog);
 
   @override
   Future<FavouritesService> favourites() => Future.value(_favs);
   @override
   Future<IgnoredGamesService> ignored() => Future.value(_ignored);
+  @override
+  Future<PlayLogService> playLog() => Future.value(_playLog);
 }
 
 Widget _buildTestApp(
@@ -95,19 +99,23 @@ void main() {
   late AppModel model;
   late FavouritesService favs;
   late IgnoredGamesService ignored;
+  late PlayLogService playLog;
 
   setUp(() async {
     SharedPreferences.setMockInitialValues({});
     FavouritesService.resetForTesting();
     IgnoredGamesService.resetForTesting();
+    PlayLogService.resetForTesting();
     favs = await FavouritesService.instance();
     ignored = await IgnoredGamesService.instance();
+    playLog = await PlayLogService.instance();
     model = AppModel();
   });
 
   tearDown(() {
     FavouritesService.resetForTesting();
     IgnoredGamesService.resetForTesting();
+    PlayLogService.resetForTesting();
   });
 
   group('GameDetailPage', () {
@@ -117,7 +125,7 @@ void main() {
         await tester.pumpWidget(_buildTestApp(
           model,
           fetcher: fetcher,
-          services: _FakeGameServices(favs, ignored),
+          services: _FakeGameServices(favs, ignored, playLog),
         ));
         await tester.pump();
       });
@@ -139,7 +147,7 @@ void main() {
         await tester.pumpWidget(_buildTestApp(
           model,
           fetcher: fetcher,
-          services: _FakeGameServices(favs, ignored),
+          services: _FakeGameServices(favs, ignored, playLog),
         ));
         await tester.pump();
       });
@@ -161,7 +169,7 @@ void main() {
         await tester.pumpWidget(_buildTestApp(
           model,
           fetcher: fetcher,
-          services: _FakeGameServices(favs, ignored),
+          services: _FakeGameServices(favs, ignored, playLog),
           gameId: 99,
         ));
         await tester.pump();
@@ -176,7 +184,7 @@ void main() {
         await tester.pumpWidget(_buildTestApp(
           model,
           fetcher: fetcher,
-          services: _FakeGameServices(favs, ignored),
+          services: _FakeGameServices(favs, ignored, playLog),
         ));
         await tester.pump();
         await tester.pump();
@@ -193,7 +201,7 @@ void main() {
         await tester.pumpWidget(_buildTestApp(
           model,
           fetcher: fetcher,
-          services: _FakeGameServices(favs, ignored),
+          services: _FakeGameServices(favs, ignored, playLog),
         ));
         await tester.pump();
         await tester.pump();

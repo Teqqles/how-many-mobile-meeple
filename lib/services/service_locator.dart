@@ -4,6 +4,7 @@ import 'package:how_many_mobile_meeple/api/game_detail_service.dart';
 import 'package:how_many_mobile_meeple/api/recommendations_service.dart';
 import 'package:how_many_mobile_meeple/favourites/favourites_service.dart';
 import 'package:how_many_mobile_meeple/favourites/ignored_games_service.dart';
+import 'package:how_many_mobile_meeple/play_log/play_log_service.dart';
 import 'package:how_many_mobile_meeple/model/game.dart';
 import 'package:how_many_mobile_meeple/model/recommendation.dart';
 
@@ -23,6 +24,7 @@ abstract class RecommendationsFetcher {
 abstract class GameServices {
   Future<FavouritesService> favourites();
   Future<IgnoredGamesService> ignored();
+  Future<PlayLogService> playLog();
 }
 
 class DefaultGameDetailFetcher implements GameDetailFetcher {
@@ -51,6 +53,8 @@ class DefaultGameServices implements GameServices {
   Future<FavouritesService> favourites() => FavouritesService.instance();
   @override
   Future<IgnoredGamesService> ignored() => IgnoredGamesService.instance();
+  @override
+  Future<PlayLogService> playLog() => PlayLogService.instance();
 }
 
 extension ServiceLocator on BuildContext {

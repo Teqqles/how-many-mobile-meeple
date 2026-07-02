@@ -28,6 +28,14 @@ class BggCache {
     }
     _removeIgnoredFromPool();
     if (_remainingPool.isEmpty) {
+      // Drawing without replacement has emptied the pool. Rebuild it from the
+      // full collection so the roll never exhausts the list - the collection
+      // stays stable and we keep selecting from it however many times the user
+      // rolls.
+      _replenishPool();
+    }
+    if (_remainingPool.isEmpty) {
+      // Nothing left even after rebuilding (e.g. every game is ignored).
       return _validatedSticky;
     }
     _stickyRandom = _nextRandom();
@@ -39,6 +47,17 @@ class BggCache {
     var selectedGame = _remainingPool[randomIndex];
     _remainingPool.removeWhere((g) => g.id == selectedGame.id);
     return selectedGame;
+  }
+
+  /// Rebuilds the draw pool from the full collection. When more than one game
+  /// is available, the just-shown game is held back so replenishing at the end
+  /// of a cycle doesn't immediately repeat it.
+  void _replenishPool() {
+    _remainingPool = _buildWeightedPool();
+    final sticky = _stickyRandom;
+    if (sticky != null && _remainingPool.any((g) => g.id != sticky.id)) {
+      _remainingPool.removeWhere((g) => g.id == sticky.id);
+    }
   }
 
   void _removeIgnoredFromPool() {

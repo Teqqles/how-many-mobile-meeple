@@ -226,7 +226,8 @@ class _ShelfOfShamePageState extends State<ShelfOfShamePage>
     final allGames = _fullCollection!;
     final unplayedGames = allGames.gamesByName.values
         .where((game) => model.isUnplayed(game.id))
-        .toList();
+        .toList()
+      ..sort(_worstOffenderFirst);
 
     if (unplayedGames.isEmpty) {
       return Center(
@@ -327,16 +328,99 @@ class _ShelfOfShamePageState extends State<ShelfOfShamePage>
           ),
         ),
         title: Text(game.name),
-        subtitle: Text(
-          '${game.minPlayers}-${game.maxPlayers} players',
-          style: TextStyle(
-              fontSize: 12, color: Theme.of(context).colorScheme.secondary),
-        ),
+        subtitle: _buildTileSubtitle(context, game),
         onTap: () => Navigator.of(context).pushNamed(
             '${r.Router.gameDetailRoute}/${game.name.replaceAll(' ', '+')}/${game.id}'),
       ),
     );
   }
+
+  /// Games owned longest without a play surface first; those missing an
+  /// ownership date sink to the bottom, ordered by name for stability.
+  int _worstOffenderFirst(Game a, Game b) {
+    final da = a.lastModified;
+    final db = b.lastModified;
+    if (da == null && db == null) return a.name.compareTo(b.name);
+    if (da == null) return 1;
+    if (db == null) return -1;
+    return da.compareTo(db);
+  }
+
+  /// Whole years between [date] and today, floored (0 if less than a year).
+  int _yearsSince(DateTime date) {
+    final now = DateTime.now();
+    var years = now.year - date.year;
+    if (now.month < date.month ||
+        (now.month == date.month && now.day < date.day)) {
+      years--;
+    }
+    return years < 0 ? 0 : years;
+  }
+
+  /// A game is a "worst offender" once it has sat unplayed for three-plus years.
+  static const int _worstOffenderYears = 3;
+
+  Widget _buildTileSubtitle(BuildContext context, Game game) {
+    final owned = game.lastModified;
+    final playerLine = _buildPlayerCountLine(context, game);
+
+    if (owned == null) {
+      return playerLine;
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        playerLine,
+        const SizedBox(height: 2),
+        _buildOwnershipLine(context, owned),
+      ],
+    );
+  }
+
+  Widget _buildPlayerCountLine(BuildContext context, Game game) {
+    return Text(
+      '${game.minPlayers}-${game.maxPlayers} players',
+      style: TextStyle(
+          fontSize: 12, color: Theme.of(context).colorScheme.secondary),
+    );
+  }
+
+  Widget _buildOwnershipLine(BuildContext context, DateTime owned) {
+    final years = _yearsSince(owned);
+
+    if (years >= _worstOffenderYears) {
+      return Text(
+        "Dude - $years years owned, still unplayed!",
+        style: TextStyle(
+          fontSize: 12,
+          fontWeight: FontWeight.w600,
+          color: Theme.of(context).colorScheme.error,
+        ),
+      );
+    }
+
+    return Text(
+      _ownershipLabel(owned, years),
+      style: TextStyle(
+          fontSize: 12, color: Theme.of(context).colorScheme.onSurfaceVariant),
+    );
+  }
+
+  String _ownershipLabel(DateTime owned, int years) {
+    final ownedSince = 'Owned since ${_monthYear(owned)}';
+    if (years < 1) return ownedSince;
+    final duration = years == 1 ? '1 year' : '$years years';
+    return '$ownedSince • $duration unplayed';
+  }
+
+  static const List<String> _monthAbbreviations = [
+    'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', //
+    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+  ];
+
+  String _monthYear(DateTime date) =>
+      '${_monthAbbreviations[date.month - 1]} ${date.year}';
 
   Widget _buildBgStatsPlug(BuildContext context) {
     return Padding(

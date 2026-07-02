@@ -13,6 +13,7 @@ const mockGames = {
       minplayers: 1,
       maxplaytime: 120,
       image: 'https://cf.geekdo-images.com/sZYp_3BTDGjh2unaZfZmuA__original/img/pKft1d38Zr88VoM_vk5SbZjtQsk=/0x0/filters:format(jpeg)/pic2437871.jpg',
+      lastmodified: '2018-11-02',
       stats: {
         average: 8.7,
         averageweight: 3.86
@@ -25,6 +26,7 @@ const mockGames = {
       minplayers: 1,
       maxplaytime: 120,
       image: 'https://cf.geekdo-images.com/wg9oOLcsKvDesSUdZQ4rxw__original/img/FS1RE8Ue6nk1pNbPI3l-OSapQGc=/0x0/filters:format(jpeg)/pic3536616.jpg',
+      lastmodified: null,
       stats: {
         average: 8.4,
         averageweight: 3.25
@@ -37,6 +39,7 @@ const mockGames = {
       minplayers: 2,
       maxplaytime: 150,
       image: 'https://cf.geekdo-images.com/bre12PlN4lHLHlh952hQxA__original/img/OsoO8BEgAV0EbiT93wWSIGWfIbY=/0x0/filters:format(jpeg)/pic5375624.jpg',
+      lastmodified: '2024-06-20',
       stats: {
         average: 8.2,
         averageweight: 3.96
@@ -199,6 +202,17 @@ const server = http.createServer((req, res) => {
     return filtered;
   };
 
+  // Mirror the backend's whitelist behaviour for `lastmodified`: emitted by
+  // default, kept when the header lists it, dropped when a header is present
+  // but omits it. Other fields are left untouched by this mock.
+  const applyLastModifiedWhitelist = (games, headers) => {
+    const whitelist = headers['bgg-field-whitelist'];
+    if (whitelist === undefined) return games;
+    const fields = whitelist.split(',').map(f => f.trim());
+    if (fields.includes('lastmodified')) return games;
+    return games.map(({ lastmodified, ...rest }) => rest);
+  };
+
   // Handle collection endpoint: /collection/username
   const collectionMatch = path.match(/^\/collection\/(.+)$/);
   if (collectionMatch) {
@@ -207,6 +221,7 @@ const server = http.createServer((req, res) => {
 
     // Apply filters
     games = filterGames(games, req.headers);
+    games = applyLastModifiedWhitelist(games, req.headers);
 
     console.log(`  → Returning ${games.length} games after filtering`);
 

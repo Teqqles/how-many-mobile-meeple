@@ -11,6 +11,10 @@ class Game {
   final double averageRating;
   final double averageWeight;
 
+  /// The date this game entered the owner's collection. Null when the backend
+  /// reported no date or a whitelist omitted the field.
+  final DateTime? lastModified;
+
   Game({
     required this.id,
     required this.name,
@@ -21,6 +25,7 @@ class Game {
     this.thumbnail,
     required this.averageRating,
     required this.averageWeight,
+    this.lastModified,
   });
 
   factory Game.fromJson(Map<String, dynamic> json) {
@@ -34,7 +39,13 @@ class Game {
       thumbnail: json['thumbnail'],
       averageRating: (json['stats']['average'] ?? 0).toDouble(),
       averageWeight: (json['stats']['averageweight'] ?? 0).toDouble(),
+      lastModified: _parseLastModified(json['lastmodified']),
     );
+  }
+
+  static DateTime? _parseLastModified(Object? value) {
+    if (value is! String || value.isEmpty) return null;
+    return DateTime.tryParse(value);
   }
 
   @override

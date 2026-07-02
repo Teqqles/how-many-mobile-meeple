@@ -3,7 +3,8 @@ import 'package:how_many_mobile_meeple/model/setting.dart';
 class Settings {
   static Setting fieldsToReturnFromApi = Setting("fieldsToUse",
       header: "Bgg-Field-Whitelist",
-      value: "id,name,maxplayers,minplayers,maxplaytime,image,thumbnail,stats",
+      value:
+          "id,name,maxplayers,minplayers,maxplaytime,image,thumbnail,stats,lastmodified",
       enabled: true);
 
   static Setting filterNumberOfPlayers =

@@ -90,6 +90,61 @@ void main() {
     });
   });
 
+  group('Item URL token round-trip', () {
+    test('collection encodes as its plain name', () {
+      var item = Item('testuser', itemType: ItemType.collection);
+      expect(item.toUrlToken(), 'testuser');
+    });
+
+    test('geekList encodes as its plain name', () {
+      var item = Item('12345', itemType: ItemType.geekList);
+      expect(item.toUrlToken(), '12345');
+    });
+
+    test('hotList encodes wrapped in square brackets', () {
+      var item = Item('trending', itemType: ItemType.hotList);
+      expect(item.toUrlToken(), '[trending]');
+    });
+
+    test('bracketed token restores as a hotList item', () {
+      var item = Item.fromUrlToken('[trending]');
+      expect(item.name, 'trending');
+      expect(item.itemType, ItemType.hotList);
+    });
+
+    test('hotList survives a full round-trip', () {
+      var original = Item('trending', itemType: ItemType.hotList);
+      var restored = Item.fromUrlToken(original.toUrlToken());
+      expect(restored, original);
+      expect(restored.itemType, ItemType.hotList);
+    });
+
+    test('plain username token restores as a collection', () {
+      var item = Item.fromUrlToken('trending');
+      expect(item.name, 'trending');
+      expect(item.itemType, ItemType.collection);
+    });
+
+    test('numeric token restores as a geekList', () {
+      var item = Item.fromUrlToken('12345');
+      expect(item.itemType, ItemType.geekList);
+    });
+
+    test('percent-encoded bracketed token restores as a hotList item', () {
+      // Browsers encode the brackets in the URL fragment, so the token arrives
+      // as %5Btrending%5D rather than a literal [trending].
+      var item = Item.fromUrlToken('%5Btrending%5D');
+      expect(item.name, 'trending');
+      expect(item.itemType, ItemType.hotList);
+    });
+
+    test('malformed percent-encoding falls back to the raw token', () {
+      var item = Item.fromUrlToken('%ZZnotvalid');
+      expect(item.name, '%ZZnotvalid');
+      expect(item.itemType, ItemType.collection);
+    });
+  });
+
   group('Item equality', () {
     test('items with same name and type are equal', () {
       var item1 = Item('test', itemType: ItemType.collection);

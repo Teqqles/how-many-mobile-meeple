@@ -38,6 +38,24 @@ main() {
       var extractor = UrlFragmentExtractor(mockUri);
       expect(extractor.containsModel(), false);
     });
+
+    test('returns false for a game detail deep link', () {
+      // The trailing segment is a game id, not a source, so this fragment
+      // encodes no model - stored parameters should load instead.
+      final mockUri = MockUri();
+      when(mockUri.hasFragment).thenReturn(true);
+      when(mockUri.fragment).thenReturn('/game/Gloomhaven/174430');
+      var extractor = UrlFragmentExtractor(mockUri);
+      expect(extractor.containsModel(), false);
+    });
+
+    test('returns false for the bare game route', () {
+      final mockUri = MockUri();
+      when(mockUri.hasFragment).thenReturn(true);
+      when(mockUri.fragment).thenReturn('/game');
+      var extractor = UrlFragmentExtractor(mockUri);
+      expect(extractor.containsModel(), false);
+    });
   });
 
   var expectedItems =
@@ -62,6 +80,49 @@ main() {
 
       var extractor = UrlFragmentExtractor(mockUri);
       expect(extractor.extractItems(), expectedItems);
+    });
+
+    test('restores a bracketed hotList token as a hotList source', () {
+      final mockUri = MockUri();
+
+      when(mockUri.hasFragment).thenReturn(true);
+      when(mockUri.fragment).thenReturn("/random/[trending]");
+
+      var extractor = UrlFragmentExtractor(mockUri);
+      final items = extractor.extractItems();
+      expect(items.itemList.length, 1);
+      expect(items.itemList.first.name, 'trending');
+      expect(items.itemList.first.itemType, ItemType.hotList);
+    });
+
+    test('restores a percent-encoded hotList token as a hotList source', () {
+      // The browser encodes the brackets, so the real fragment looks like this.
+      final mockUri = MockUri();
+
+      when(mockUri.hasFragment).thenReturn(true);
+      when(mockUri.fragment).thenReturn("/random/%5Btrending%5D");
+
+      var extractor = UrlFragmentExtractor(mockUri);
+      final items = extractor.extractItems();
+      expect(items.itemList.length, 1);
+      expect(items.itemList.first.name, 'trending');
+      expect(items.itemList.first.itemType, ItemType.hotList);
+    });
+
+    test('restores a mix of hotList and collection tokens', () {
+      final mockUri = MockUri();
+
+      when(mockUri.hasFragment).thenReturn(true);
+      when(mockUri.fragment).thenReturn("/list/[trending]+teqqles");
+
+      var extractor = UrlFragmentExtractor(mockUri);
+      expect(
+        extractor.extractItems(),
+        Items([
+          Item('trending', itemType: ItemType.hotList),
+          Item('teqqles'),
+        ]),
+      );
     });
 
     test('ignores query parameters', () {

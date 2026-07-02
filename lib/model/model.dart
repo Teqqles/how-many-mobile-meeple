@@ -224,27 +224,43 @@ class AppModel extends ChangeNotifier {
 
   SortableGameField sortGameField = SortableGameField.rating;
 
-  UrlFragmentExtractor _extractor = UrlFragmentExtractor(Uri.base);
+  final UrlFragmentExtractor _extractor;
 
-  AppModel({PreferencesHistoryInterface? preferencesHistory})
-      : _preferencesHistory =
-            preferencesHistory ?? StorageFactory.getPreferencesHistory() {
+  AppModel({
+    PreferencesHistoryInterface? preferencesHistory,
+    UrlFragmentExtractor? urlExtractor,
+  })  : _preferencesHistory =
+            preferencesHistory ?? StorageFactory.getPreferencesHistory(),
+        _extractor = urlExtractor ?? UrlFragmentExtractor(Uri.base) {
     _settings = Settings.defaultSettings();
   }
 
   Future<void> refreshFromUrl() async {
+    await _consumeUrlModel();
+  }
+
+  /// Applies items and settings encoded in the URL fragment, if any, exactly
+  /// once. Safe to call from any entry point (home pages or a deep-linked
+  /// list/random/detail page) and idempotent thereafter.
+  Future<void> _consumeUrlModel() async {
     if (_urlConsumed) return;
-    if (_extractor.containsModel()) {
-      _urlConsumed = true;
-      await replaceItems(_extractor.extractItems());
-      var extractedSettings = _extractor.extractSettings();
-      extractedSettings = _rebuildUrlMechanics(extractedSettings);
-      if (_settings != extractedSettings) {
-        _settings.updateAllSettings(extractedSettings);
-        invalidateCache();
-      }
+    if (!_extractor.containsModel()) return;
+    _urlConsumed = true;
+    await _deferPastCurrentBuild();
+    await replaceItems(_extractor.extractItems());
+    var extractedSettings = _extractor.extractSettings();
+    extractedSettings = _rebuildUrlMechanics(extractedSettings);
+    if (_settings != extractedSettings) {
+      _settings.updateAllSettings(extractedSettings);
+      invalidateCache();
     }
   }
+
+  /// The bootstrap methods run inside a widget build (the home pages call them
+  /// from a Consumer builder), so the notifyListeners() that follows would
+  /// otherwise fire during that build. Yielding to a microtask lets the current
+  /// build complete first.
+  Future<void> _deferPastCurrentBuild() => Future<void>.microtask(() {});
 
   Settings _rebuildUrlMechanics(Settings extractedSettings) {
     final mechanicsSetting =
@@ -273,8 +289,25 @@ class AppModel extends ChangeNotifier {
       return;
     }
     _items = items;
+    _reconcilePrimaryPlayer();
     invalidateCache();
     await updateStore();
+  }
+
+  /// Keeps [primaryPlayer] consistent with the current collection items after
+  /// the item list is swapped wholesale (e.g. following a shared permalink or
+  /// searching a different collection). If the existing primary player is no
+  /// longer among the collections, it falls back to the first collection in
+  /// the new list, or null when none remain. Going through the setter clears
+  /// the stale plays/collection data and reloads for the new player.
+  void _reconcilePrimaryPlayer() {
+    final collections = _items.itemList
+        .where((i) => i.itemType == ItemType.collection)
+        .toList();
+    final stillPresent = _primaryPlayer != null &&
+        collections.any((i) => i.name == _primaryPlayer);
+    if (stillPresent) return;
+    primaryPlayer = collections.isNotEmpty ? collections.first.name : null;
   }
 
   Future<void> replaceSettings(Settings settings) async {
@@ -346,17 +379,28 @@ class AppModel extends ChangeNotifier {
 
   Future<void> loadStoredData() async {
     if (_extractor.containsModel()) {
+      // A shared/deep link encodes the model in the URL fragment. Apply it here
+      // so the parameters survive a hard refresh onto any page, not just the
+      // home pages that separately call refreshFromUrl(). The primary player is
+      // derived from the permalink's collections by replaceItems - the stored
+      // one belongs to a previous session and must not clobber it.
+      await _consumeUrlModel();
       hasLoadedPersistedData = true;
-      _urlConsumed = true;
     } else {
       final store = await _getStore();
       _items = await store.loadItems(AppCommon.maxItemsFromBgg);
       replaceSettings(await store.loadSettings(settings));
       hasLoadedPersistedData = true;
+
+      final prefs = await SharedPreferences.getInstance();
+      _primaryPlayer = prefs.getString('primary_player');
+      // Enforce the invariant that a set collection always has a primary
+      // player: on refresh the stored value may be missing or stale (a
+      // collection removed in a prior session), which would leave no crown
+      // icon. Fall back to the first collection in the list.
+      _reconcilePrimaryPlayer();
     }
 
-    final prefs = await SharedPreferences.getInstance();
-    _primaryPlayer = prefs.getString('primary_player');
     notifyListeners();
 
     if (_primaryPlayer != null) {

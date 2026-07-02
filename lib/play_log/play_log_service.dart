@@ -6,7 +6,7 @@ import 'play_log_entry.dart';
 /// Stores a chronological history of games the user has played.
 ///
 /// Unlike favourites/ignored (which are sets keyed by game id), the play log
-/// allows the same game to appear many times — one entry per play. Entries are
+/// allows the same game to appear many times - one entry per play. Entries are
 /// persisted to [SharedPreferences] as JSON and always exposed newest-first.
 class PlayLogService extends ChangeNotifier {
   static const String storageKey = 'play_log';

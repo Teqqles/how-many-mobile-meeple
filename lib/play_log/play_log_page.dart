@@ -190,7 +190,7 @@ class _PlayLogPageState extends State<PlayLogPage> with AppPage {
           const SizedBox(width: 12),
           Expanded(
             child: Text(
-              "You haven't played $name in $months months — "
+              "You haven't played $name in $months months - "
               'time to bring it back to the table?',
               style: TextStyle(
                 color: Theme.of(context).colorScheme.onTertiaryContainer,

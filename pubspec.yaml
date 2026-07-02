@@ -1,6 +1,6 @@
 name: how_many_mobile_meeple
 description:  A flutter/dart project for picking board games
-version: 2.18.1+30
+version: 2.19.4+31
 
 environment:
   sdk: '>=3.0.0 <4.0.0'

@@ -1,6 +1,21 @@
 {
-  "version": "2.18.1",
+  "version": "2.19.4",
   "recent_changes": [
+    {
+      "type": "fix",
+      "scope": "",
+      "description": "restore parameters and primary player correctly from permalinks"
+    },
+    {
+      "type": "fix",
+      "scope": "",
+      "description": "stop random roll from exhausting the collection"
+    },
+    {
+      "type": "feat",
+      "scope": "",
+      "description": "surface collection ownership date on shelf of shame"
+    },
     {
       "type": "feat",
       "scope": "",
@@ -294,11 +309,6 @@
       "labels": []
     },
     {
-      "number": 86,
-      "title": "Display dateadded on Shelf of Shame, sort by longest owned",
-      "labels": []
-    },
-    {
       "number": 80,
       "title": "Update to latest dependencies (breaking changes)",
       "labels": []
@@ -332,13 +342,6 @@
       "number": 68,
       "title": "Game detail page shows a synopsis",
       "labels": []
-    },
-    {
-      "number": 62,
-      "title": "Losing filter details if hitting refresh on detail pages",
-      "labels": [
-        "bug"
-      ]
     },
     {
       "number": 61,

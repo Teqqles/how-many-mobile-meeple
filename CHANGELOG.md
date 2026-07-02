@@ -3,6 +3,11 @@
 All notable changes to this project are documented here.
 This file is auto-generated from conventional commits on each release.
 
+## [v2.18.1] - 2026-07-01
+
+### Added
+- add play log with local tracking and BGG history
+
 ## [v2.17.11] - 2026-06-30
 
 ### Added

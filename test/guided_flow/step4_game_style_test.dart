@@ -113,7 +113,7 @@ void main() {
 
       await tester.pumpWidget(_buildTestWidget(model));
 
-      // Hand Management is in 'Core Gameplay' — visible above fold
+      // Hand Management is in 'Core Gameplay' - visible above fold
       await tester.tap(find.text('Hand Management'));
       await tester.pump();
 

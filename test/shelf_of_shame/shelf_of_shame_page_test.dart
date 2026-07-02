@@ -262,10 +262,77 @@ void main() {
       expect(capturedHeaders!.containsKey('Bgg-Filter-Player-Count'), isFalse);
       expect(capturedHeaders!.containsKey('Bgg-Filter-Min-Duration'), isFalse);
     });
+
+    testWidgets('shows ownership date when lastmodified is recent',
+        (tester) async {
+      // Recent enough (under the 3-year threshold) to show the date line
+      // rather than the worst-offender call-out. Pick a fixed month/day well
+      // clear of "today" so the "Mar" label is stable regardless of run date.
+      final recentYear = DateTime.now().year - 1;
+      HttpRetryClient.setTestClient(mockApiClient(
+        collection: [
+          _gameJson(1, 'Catan', lastmodified: '$recentYear-03-15'),
+        ],
+        plays: [
+          {'game_id': 1, 'game_name': 'Catan', 'total_plays': 0},
+        ],
+      ));
+
+      final model = AppModel();
+      await model.addItem(Item('testuser'));
+
+      await tester.pumpWidget(_buildTestApp(model));
+      await tester.pumpAndSettle();
+
+      expect(
+          find.textContaining('Owned since Mar $recentYear'), findsOneWidget);
+    });
+
+    testWidgets('shows worst-offender call-out for long-owned unplayed games',
+        (tester) async {
+      HttpRetryClient.setTestClient(mockApiClient(
+        collection: [
+          _gameJson(1, 'Gloomhaven', lastmodified: '2015-01-01'),
+        ],
+        plays: [
+          {'game_id': 1, 'game_name': 'Gloomhaven', 'total_plays': 0},
+        ],
+      ));
+
+      final model = AppModel();
+      await model.addItem(Item('testuser'));
+
+      await tester.pumpWidget(_buildTestApp(model));
+      await tester.pumpAndSettle();
+
+      expect(
+          find.textContaining('years owned, still unplayed'), findsOneWidget);
+    });
+
+    testWidgets('shows no date line when lastmodified is null', (tester) async {
+      HttpRetryClient.setTestClient(mockApiClient(
+        collection: [
+          _gameJson(1, 'Azul', lastmodified: null),
+        ],
+        plays: [
+          {'game_id': 1, 'game_name': 'Azul', 'total_plays': 0},
+        ],
+      ));
+
+      final model = AppModel();
+      await model.addItem(Item('testuser'));
+
+      await tester.pumpWidget(_buildTestApp(model));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Azul'), findsOneWidget);
+      expect(find.textContaining('Owned since'), findsNothing);
+      expect(find.textContaining('unplayed!'), findsNothing);
+    });
   });
 }
 
-Map<String, dynamic> _gameJson(int id, String name) => {
+Map<String, dynamic> _gameJson(int id, String name, {String? lastmodified}) => {
       'id': id,
       'name': name,
       'minplayers': 2,
@@ -274,4 +341,5 @@ Map<String, dynamic> _gameJson(int id, String name) => {
       'image': 'http://example.com/$id.jpg',
       'thumbnail': null,
       'stats': {'average': 7.5, 'averageweight': 2.5},
+      'lastmodified': lastmodified,
     };

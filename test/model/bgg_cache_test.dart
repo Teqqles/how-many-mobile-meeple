@@ -55,7 +55,7 @@ main() {
 
       expect(cache.isStale(), false);
 
-      // 4 minutes later — still fresh
+      // 4 minutes later - still fresh
       currentTime = baseTime.add(Duration(minutes: 4));
       expect(cache.isStale(), false);
     });
@@ -65,11 +65,11 @@ main() {
       var currentTime = baseTime;
       final cache = BggCache(games, 5, clock: () => currentTime);
 
-      // 5 minutes later — at boundary
+      // 5 minutes later - at boundary
       currentTime = baseTime.add(Duration(minutes: 5));
       expect(cache.isStale(), false);
 
-      // 5 minutes + 1 second — past boundary
+      // 5 minutes + 1 second - past boundary
       currentTime = baseTime.add(Duration(minutes: 5, seconds: 1));
       expect(cache.isStale(), true);
     });
@@ -164,6 +164,39 @@ main() {
       var cache = BggCache(games, duration);
       var first = cache.lastRandom;
       expect(cache.lastRandom, first);
+    });
+  });
+  group('random does not exhaust the collection', () {
+    test('keeps returning games when rolled far more times than the pool size',
+        () {
+      var cache = BggCache(games, duration);
+
+      // Two games in the pool; roll many times over. The pool must replenish
+      // rather than run dry and start returning null.
+      for (var i = 0; i < 50; i++) {
+        expect(cache.random, TypeMatcher<Game>(),
+            reason: 'roll $i should still yield a game');
+      }
+    });
+
+    test('replenished pool still only ever selects games from the collection',
+        () {
+      var cache = BggCache(games, duration);
+      final validIds = {game1.id, game2.id};
+
+      for (var i = 0; i < 50; i++) {
+        final game = cache.random!;
+        expect(validIds.contains(game.id), true);
+      }
+    });
+
+    test('single-game collection keeps returning that game on repeated rolls',
+        () {
+      var cache = BggCache(Games(gamesByName: {game1.name: game1}), duration);
+
+      for (var i = 0; i < 10; i++) {
+        expect(cache.random, game1);
+      }
     });
   });
 }

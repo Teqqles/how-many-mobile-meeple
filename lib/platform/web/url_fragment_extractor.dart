@@ -10,8 +10,18 @@ class UrlFragmentExtractor {
 
   UrlFragmentExtractor(Uri uri) {
     this.uri = uri;
-    hasModelData = uri.hasFragment && !Router.routeList.contains(uri.fragment);
+    hasModelData = uri.hasFragment &&
+        !Router.routeList.contains(uri.fragment) &&
+        !_isGameDetailFragment(uri.fragment);
   }
+
+  /// A game detail deep link (e.g. `/game/Gloomhaven/174430`) encodes no
+  /// sources or settings - the trailing segment is a game id, not a collection.
+  /// Treating it as a model would wire that id in as a source, so we exclude it
+  /// and let stored parameters load instead.
+  bool _isGameDetailFragment(String fragment) =>
+      fragment == Router.gameDetailRoute ||
+      fragment.startsWith('${Router.gameDetailRoute}/');
 
   bool containsModel() {
     return hasModelData;
@@ -24,7 +34,7 @@ class UrlFragmentExtractor {
     var potentialEncodedItems = _removePageTypeFromFragment(uri.fragment);
     var itemsFromString = potentialEncodedItems
         .split("+")
-        .map((strItem) => Item(strItem))
+        .map((strItem) => Item.fromUrlToken(strItem))
         .toList();
     return Items(itemsFromString);
   }

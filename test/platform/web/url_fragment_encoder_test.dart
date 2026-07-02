@@ -124,5 +124,18 @@ main() {
           items: mockItems, settings: mockSettings);
       expect(encodedName, expectedEncodedName);
     });
+
+    test('encodes a hotList item wrapped in square brackets', () {
+      final mockItems = MockItems();
+      final mockSettings = MockSettings();
+
+      when(mockItems.itemList)
+          .thenReturn([Item('trending', itemType: ItemType.hotList)]);
+      when(mockSettings.changedSettings).thenReturn({});
+      var expectedEncodedName = expectedName + '/[trending]';
+      var encodedName = UrlFragmentEncoder.encode(expectedName,
+          items: mockItems, settings: mockSettings);
+      expect(encodedName, expectedEncodedName);
+    });
   });
 }

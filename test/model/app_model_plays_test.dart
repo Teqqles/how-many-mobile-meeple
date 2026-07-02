@@ -198,7 +198,7 @@ void main() {
 
       SharedPreferences.setMockInitialValues({
         'primary_player': 'storeduser',
-        'item_0': '{"name":"storeduser","item_type":{"name":"collection"}}',
+        'bgg-item-0': '{"name":"storeduser","item_type":{"name":"collection"}}',
       });
 
       final model = AppModel();

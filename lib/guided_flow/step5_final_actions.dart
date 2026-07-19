@@ -4,7 +4,6 @@ import 'package:how_many_mobile_meeple/components/quick_pick_sheet.dart';
 import 'package:how_many_mobile_meeple/model/model.dart';
 import 'package:how_many_mobile_meeple/platform/router.dart' as r;
 import 'package:how_many_mobile_meeple/save_dialog.dart';
-import 'package:how_many_mobile_meeple/tour_tips/tour_tip_keys.dart';
 
 /// Step 5: Final Actions
 /// Shows main actions and mode toggle
@@ -91,10 +90,9 @@ class Step5FinalActions extends StatelessWidget {
                     _navigateToPage(context, randomPageSettings);
                   },
                   icon: const Icon(Icons.casino, size: 24),
-                  label: Text(
+                  label: const Text(
                     'Random Game',
-                    key: TourTipKeys.randomButton,
-                    style: const TextStyle(fontSize: 16),
+                    style: TextStyle(fontSize: 16),
                   ),
                   style: OutlinedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(
@@ -114,10 +112,9 @@ class Step5FinalActions extends StatelessWidget {
                     _navigateToPage(context, listPageSettings);
                   },
                   icon: const Icon(Icons.list, size: 24),
-                  label: Text(
+                  label: const Text(
                     'View List',
-                    key: TourTipKeys.listButton,
-                    style: const TextStyle(fontSize: 16),
+                    style: TextStyle(fontSize: 16),
                   ),
                   style: OutlinedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(
@@ -174,10 +171,7 @@ class Step5FinalActions extends StatelessWidget {
                     );
                   },
                   icon: const Icon(Icons.save_outlined),
-                  label: Text(
-                    'Save These Settings',
-                    key: TourTipKeys.saveButton,
-                  ),
+                  label: const Text('Save These Settings'),
                   style: TextButton.styleFrom(
                     padding: const EdgeInsets.all(16),
                   ),

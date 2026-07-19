@@ -33,12 +33,7 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   setUp(() {
-    SharedPreferences.setMockInitialValues({
-      'tour_tip_seen_step1_tab_selector': true,
-      'tour_tip_seen_step1_trending': true,
-      'tour_tip_seen_step1_collection': true,
-      'tour_tip_seen_step1_geeklist': true,
-    });
+    SharedPreferences.setMockInitialValues({});
     PlaysService.clearCache();
     HttpRetryClient.setDelayFunction((_) async {});
     HttpRetryClient.setTestClient(mockApiClient());

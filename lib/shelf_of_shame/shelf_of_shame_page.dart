@@ -102,7 +102,8 @@ class _ShelfOfShamePageState extends State<ShelfOfShamePage>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: HowManyMeepleAppBar('Shelf of Shame', context: context),
+      appBar: HowManyMeepleAppBar('Shelf of Shame',
+          context: context, helpSection: 'shelf-of-shame'),
       drawer: const FeatureDrawer(),
       endDrawer: pageDrawer(context),
       bottomNavigationBar: const PlaysLoadingIndicator(),

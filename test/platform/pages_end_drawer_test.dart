@@ -7,7 +7,6 @@ import 'package:how_many_mobile_meeple/favourites/favourites_service.dart';
 import 'package:how_many_mobile_meeple/favourites/game_list_page.dart';
 import 'package:how_many_mobile_meeple/favourites/ignored_games_service.dart';
 import 'package:how_many_mobile_meeple/model/model.dart';
-import 'package:how_many_mobile_meeple/tour_tips/tour_tip_service.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -24,10 +23,7 @@ void main() {
   setUp(() {
     FavouritesService.resetForTesting();
     IgnoredGamesService.resetForTesting();
-    TourTipService.resetForTesting();
-    SharedPreferences.setMockInitialValues({
-      'tour_tips_disabled': true,
-    });
+    SharedPreferences.setMockInitialValues({});
   });
 
   group('All pages have an endDrawer', () {

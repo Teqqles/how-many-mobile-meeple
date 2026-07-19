@@ -6,7 +6,6 @@ import 'package:how_many_mobile_meeple/components/app_choice_chip.dart';
 import 'package:how_many_mobile_meeple/components/step_header_card.dart';
 import 'package:how_many_mobile_meeple/components/info_message_box.dart';
 import 'package:how_many_mobile_meeple/components/unplayed_only_toggle.dart';
-import 'package:how_many_mobile_meeple/tour_tips/tour_tip_keys.dart';
 
 /// Step 4: Game Style
 /// Allows users to select difficulty and mechanics
@@ -90,7 +89,6 @@ class _Step4GameStyleState extends State<Step4GameStyle> {
                 // Difficulty section
                 Text(
                   'Difficulty',
-                  key: TourTipKeys.complexitySlider,
                   style: Theme.of(context).textTheme.titleLarge?.copyWith(
                         fontWeight: FontWeight.bold,
                       ),
@@ -179,7 +177,6 @@ class _Step4GameStyleState extends State<Step4GameStyle> {
                 // Mechanics section
                 Text(
                   'Mechanics (Optional)',
-                  key: TourTipKeys.mechanicsSection,
                   style: Theme.of(context).textTheme.titleLarge?.copyWith(
                         fontWeight: FontWeight.bold,
                       ),

@@ -21,7 +21,7 @@ class WebRandomGameDisplayPage extends GameDisplayPage {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: HowManyMeepleAppBar(AppCommon.randomGamePageTitle,
-            context: context),
+            context: context, helpSection: 'random'),
         drawer: const FeatureDrawer(),
         endDrawer: pageDrawer(context),
         persistentFooterButtons: [iconButtonGroup(context)],

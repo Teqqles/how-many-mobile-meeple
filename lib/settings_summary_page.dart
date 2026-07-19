@@ -42,6 +42,7 @@ class SettingsSummaryPage extends StatelessWidget with AppPage {
         'My Settings',
         hasSaveDialog: false,
         isHomePage: false,
+        helpSection: 'settings',
         model: model,
         context: context,
       ),

@@ -3,6 +3,15 @@
 All notable changes to this project are documented here.
 This file is auto-generated from conventional commits on each release.
 
+## [v2.19.4] - 2026-07-02
+
+### Added
+- surface collection ownership date on shelf of shame
+
+### Fixed
+- restore parameters and primary player correctly from permalinks
+- stop random roll from exhausting the collection
+
 ## [v2.18.1] - 2026-07-01
 
 ### Added

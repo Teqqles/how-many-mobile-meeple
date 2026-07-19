@@ -1,6 +1,11 @@
 {
-  "version": "2.19.4",
+  "version": "2.20.1",
   "recent_changes": [
+    {
+      "type": "feat",
+      "scope": "",
+      "description": "replace tour tips with context-sensitive help page"
+    },
     {
       "type": "fix",
       "scope": "",
@@ -150,126 +155,6 @@
       "type": "fix",
       "scope": "",
       "description": "center loading screen on mobile viewports"
-    },
-    {
-      "type": "feat",
-      "scope": "",
-      "description": "add tour tips, trending games, fun facts, and remove legacy mobile"
-    },
-    {
-      "type": "feat",
-      "scope": "",
-      "description": "redesign list pages with thumbnails, stats, rating badges, and sort indicators"
-    },
-    {
-      "type": "feat",
-      "scope": "",
-      "description": "add rating badge to game image overlay"
-    },
-    {
-      "type": "feat",
-      "scope": "",
-      "description": "add game detail page with cached API, share permalink, and image alignment"
-    },
-    {
-      "type": "fix",
-      "scope": "",
-      "description": "stale cache served after removing a collection/geeklist"
-    },
-    {
-      "type": "fix",
-      "scope": "",
-      "description": "cache invalidation & url reload stopping user changes"
-    },
-    {
-      "type": "feat",
-      "scope": "",
-      "description": "prefetch cache warming for collections and geeklists"
-    },
-    {
-      "type": "feat",
-      "scope": "",
-      "description": "replace max complexity filter with around-complexity filter"
-    },
-    {
-      "type": "feat",
-      "scope": "",
-      "description": "add Board Game News link to app bar"
-    },
-    {
-      "type": "feat",
-      "scope": "",
-      "description": "swipe gestures, larger step hit targets, full-width advanced mode"
-    },
-    {
-      "type": "feat",
-      "scope": "",
-      "description": "PWA install banner and home screen prompt"
-    },
-    {
-      "type": "feat",
-      "scope": "",
-      "description": "add Finish button to guided flow for direct navigation to results"
-    },
-    {
-      "type": "feat",
-      "scope": "",
-      "description": "UI consistency improvements"
-    },
-    {
-      "type": "fix",
-      "scope": "",
-      "description": "update code to correct analysis warnings from flutter upgrade"
-    },
-    {
-      "type": "fix",
-      "scope": "",
-      "description": "upgrade Flutter version in CI to 3.44.x for Dart 3.12 compatibility"
-    },
-    {
-      "type": "fix",
-      "scope": "",
-      "description": "update GitHub Actions workflow for Flutter 3.0"
-    },
-    {
-      "type": "fix",
-      "scope": "",
-      "description": "enable Add Source button when text is entered"
-    },
-    {
-      "type": "fix",
-      "scope": "",
-      "description": "restore automatic ItemType detection for numeric IDs"
-    },
-    {
-      "type": "fix",
-      "scope": "",
-      "description": "add missing null assertion in router path extraction"
-    },
-    {
-      "type": "feat",
-      "scope": "",
-      "description": "add mock BGG API server for development"
-    },
-    {
-      "type": "feat",
-      "scope": "",
-      "description": "add BGG attribution and theme extensions"
-    },
-    {
-      "type": "feat",
-      "scope": "",
-      "description": "add guided flow UI for game selection"
-    },
-    {
-      "type": "fix",
-      "scope": "",
-      "description": "handle unknown setting keys gracefully"
-    },
-    {
-      "type": "fix",
-      "scope": "",
-      "description": "prevent race conditions in async data operations"
     }
   ],
   "upcoming": [

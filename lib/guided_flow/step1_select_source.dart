@@ -8,8 +8,6 @@ import 'package:how_many_mobile_meeple/app_common.dart';
 import 'package:how_many_mobile_meeple/components/step_header_card.dart';
 import 'package:how_many_mobile_meeple/components/info_message_box.dart';
 import 'package:how_many_mobile_meeple/api/prefetch_service.dart';
-import 'package:how_many_mobile_meeple/tour_tips/tour_tip_service.dart';
-import 'package:how_many_mobile_meeple/tour_tips/tour_tip_storage.dart';
 
 /// Step 1: Select Source of Games
 /// Tabbed UI: Trending (hot list) vs My Collection (BGG username/geeklist)
@@ -25,13 +23,6 @@ class _Step1SelectSourceState extends State<Step1SelectSource> {
 
   final TextEditingController _controller = TextEditingController();
   int _tabIndex = 0;
-  bool _tourTriggered = false;
-
-  final GlobalKey _tabSelectorKey = GlobalKey(debugLabel: 'step1_tab_selector');
-  final GlobalKey _trendingContentKey = GlobalKey(debugLabel: 'step1_trending');
-  final GlobalKey _collectionInputKey =
-      GlobalKey(debugLabel: 'step1_collection');
-  final GlobalKey _geeklistInputKey = GlobalKey(debugLabel: 'step1_geeklist');
 
   @override
   void initState() {
@@ -52,117 +43,6 @@ class _Step1SelectSourceState extends State<Step1SelectSource> {
     await prefs.setInt(_tabKey, index);
   }
 
-  void _triggerStep1Tour() {
-    if (_tourTriggered) return;
-    _tourTriggered = true;
-
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      if (!mounted) return;
-      final service = await TourTipService.instance();
-      if (!service.isEnabled) return;
-
-      final storage = await TourTipStorage.create();
-      final tipIds = [
-        'step1_tab_selector',
-        'step1_trending',
-        'step1_collection',
-        'step1_geeklist',
-      ];
-      final unseen = tipIds.where((id) => !storage.isSeen(id)).toList();
-      if (unseen.isEmpty) return;
-
-      if (_tabSelectorKey.currentContext == null) return;
-
-      while (service.isShowing) {
-        await Future.delayed(const Duration(milliseconds: 200));
-        if (!mounted) return;
-      }
-
-      await Future.delayed(const Duration(milliseconds: 500));
-      if (!mounted) return;
-      if (!service.isEnabled) return;
-
-      final steps = <_Step1TipStep>[
-        if (unseen.contains('step1_tab_selector'))
-          _Step1TipStep(
-            key: _tabSelectorKey,
-            id: 'step1_tab_selector',
-            title: 'Choose Your Source',
-            description:
-                'Switch between Trending games, your BGG Collection, or a Geeklist. You can add multiple sources.',
-          ),
-        if (unseen.contains('step1_trending'))
-          _Step1TipStep(
-            key: _trendingContentKey,
-            id: 'step1_trending',
-            title: 'Trending Games',
-            description:
-                'Browse the hottest games on BoardGameGeek right now - no account needed. Just tap to add them as a source.',
-            tabIndex: 0,
-          ),
-        if (unseen.contains('step1_collection'))
-          _Step1TipStep(
-            key: _collectionInputKey,
-            id: 'step1_collection',
-            title: 'My Collection',
-            description:
-                'Enter your BoardGameGeek username to search within your own game collection.',
-            tabIndex: 1,
-          ),
-        if (unseen.contains('step1_geeklist'))
-          _Step1TipStep(
-            key: _geeklistInputKey,
-            id: 'step1_geeklist',
-            title: 'Geeklist',
-            description:
-                'Enter a BGG Geeklist ID to search games from a community-curated list.',
-            tabIndex: 2,
-          ),
-      ];
-
-      if (steps.isEmpty) return;
-
-      _dismissed = false;
-      for (final step in steps) {
-        if (!mounted || _dismissed || !service.isEnabled) break;
-
-        if (step.tabIndex != null) {
-          _switchToTab(step.tabIndex!);
-          await Future.delayed(const Duration(milliseconds: 300));
-          if (!mounted || _dismissed) break;
-        }
-
-        if (step.key.currentContext == null) continue;
-
-        final shown = await service.showSingleTip(
-          context: context,
-          key: step.key,
-          id: step.id,
-          title: step.title,
-          description: step.description,
-        );
-        if (!shown) _dismissed = true;
-      }
-
-      if (mounted) _switchToTab(0);
-
-      for (final id in tipIds) {
-        await storage.markSeen(id);
-      }
-    });
-  }
-
-  bool _dismissed = false;
-
-  void _switchToTab(int index) {
-    if (mounted) {
-      setState(() {
-        _tabIndex = index;
-        _controller.clear();
-      });
-    }
-  }
-
   @override
   void dispose() {
     _controller.dispose();
@@ -176,7 +56,6 @@ class _Step1SelectSourceState extends State<Step1SelectSource> {
 
   @override
   Widget build(BuildContext context) {
-    _triggerStep1Tour();
     return Consumer<AppModel>(
       builder: (context, model, child) => Card(
         elevation: 2,
@@ -196,11 +75,11 @@ class _Step1SelectSourceState extends State<Step1SelectSource> {
               if (_tabIndex == 0)
                 _buildTrendingContent(context, model)
               else if (_tabIndex == 1)
-                _buildInputContent(context, model, ItemType.collection,
-                    'Collection', _collectionInputKey)
+                _buildInputContent(
+                    context, model, ItemType.collection, 'Collection')
               else
-                _buildInputContent(context, model, ItemType.geekList,
-                    'Geeklist', _geeklistInputKey),
+                _buildInputContent(
+                    context, model, ItemType.geekList, 'Geeklist'),
               // Show added sources (shared across both tabs)
               if (model.items.itemList.isNotEmpty) ...[
                 const SizedBox(height: 24),
@@ -247,13 +126,10 @@ class _Step1SelectSourceState extends State<Step1SelectSource> {
         ),
       ),
       segments: [
-        ButtonSegment(
+        const ButtonSegment(
           value: 0,
-          label: Text('Trending',
-              key: _tabSelectorKey,
-              overflow: TextOverflow.ellipsis,
-              maxLines: 1),
-          icon: const Icon(Icons.local_fire_department, size: 16),
+          label: Text('Trending', overflow: TextOverflow.ellipsis, maxLines: 1),
+          icon: Icon(Icons.local_fire_department, size: 16),
         ),
         const ButtonSegment(
           value: 1,
@@ -296,10 +172,7 @@ class _Step1SelectSourceState extends State<Step1SelectSource> {
               ? OutlinedButton.icon(
                   onPressed: null,
                   icon: const Icon(Icons.check_circle),
-                  label: Text(
-                    'Trending Games Added',
-                    key: _trendingContentKey,
-                  ),
+                  label: const Text('Trending Games Added'),
                   style: OutlinedButton.styleFrom(
                     padding: const EdgeInsets.all(16),
                   ),
@@ -310,10 +183,7 @@ class _Step1SelectSourceState extends State<Step1SelectSource> {
                           ? null
                           : () => _addHotList(model),
                   icon: const Icon(Icons.local_fire_department),
-                  label: Text(
-                    'Use Trending Games',
-                    key: _trendingContentKey,
-                  ),
+                  label: const Text('Use Trending Games'),
                   style: FilledButton.styleFrom(
                     padding: const EdgeInsets.all(16),
                   ),
@@ -323,8 +193,8 @@ class _Step1SelectSourceState extends State<Step1SelectSource> {
     );
   }
 
-  Widget _buildInputContent(BuildContext context, AppModel model,
-      ItemType itemType, String label, GlobalKey fieldKey) {
+  Widget _buildInputContent(
+      BuildContext context, AppModel model, ItemType itemType, String label) {
     final isCollection = itemType == ItemType.collection;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -336,7 +206,6 @@ class _Step1SelectSourceState extends State<Step1SelectSource> {
             labelText: isCollection ? 'BoardGameGeek Username' : 'Geeklist ID',
             hintText: isCollection ? 'e.g., testuser1' : 'e.g., 12345',
             prefixIcon: Icon(
-              key: fieldKey,
               isCollection ? Icons.person_outline : Icons.format_list_numbered,
             ),
             border: const OutlineInputBorder(),
@@ -475,20 +344,4 @@ class _Step1SelectSourceState extends State<Step1SelectSource> {
       ),
     );
   }
-}
-
-class _Step1TipStep {
-  final GlobalKey key;
-  final String id;
-  final String title;
-  final String description;
-  final int? tabIndex;
-
-  const _Step1TipStep({
-    required this.key,
-    required this.id,
-    required this.title,
-    required this.description,
-    this.tabIndex,
-  });
 }

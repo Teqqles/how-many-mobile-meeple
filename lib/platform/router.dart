@@ -8,6 +8,7 @@ import 'package:how_many_mobile_meeple/platform/web/url_fragment_encoder.dart';
 import 'package:how_many_mobile_meeple/about_page.dart' deferred as about;
 import 'package:how_many_mobile_meeple/favourites/game_list_page.dart'
     deferred as game_list;
+import 'package:how_many_mobile_meeple/help/help_page.dart' deferred as help;
 import 'package:how_many_mobile_meeple/platform/common/game_detail_page.dart'
     deferred as game_detail;
 import 'package:how_many_mobile_meeple/play_log/play_log_page.dart'
@@ -27,6 +28,7 @@ class Router {
   static const String ignoredRoute = '/ignored';
   static const String playLogRoute = '/play-log';
   static const String aboutRoute = '/about';
+  static const String helpRoute = '/help';
   static const String shelfOfShameRoute = '/shelf-of-shame';
 
   static List<String> routeList = [
@@ -138,6 +140,16 @@ class Router {
             builder: (_) => _deferred(
                   about.loadLibrary,
                   () => about.AboutPage(),
+                ),
+            settings: settings);
+      case Router.helpRoute:
+        final helpSegments =
+            settings.name!.split('/').where((s) => s.isNotEmpty).toList();
+        final sectionId = helpSegments.length > 1 ? helpSegments.last : null;
+        return MaterialPageRoute(
+            builder: (_) => _deferred(
+                  help.loadLibrary,
+                  () => help.HelpPage(initialSectionId: sectionId),
                 ),
             settings: settings);
       default:

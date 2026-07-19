@@ -24,8 +24,8 @@ class EnhancedListGamesDisplayPage extends NetworkWidget with AppPage {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar:
-            HowManyMeepleAppBar(AppCommon.listGamesPageTitle, context: context),
+        appBar: HowManyMeepleAppBar(AppCommon.listGamesPageTitle,
+            context: context, helpSection: 'list'),
         drawer: const FeatureDrawer(),
         endDrawer: pageDrawer(context),
         persistentFooterButtons: [iconButtonGroup(context)],

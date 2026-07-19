@@ -56,7 +56,8 @@ class _GameListPageState extends State<GameListPage> with AppPage {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: HowManyMeepleAppBar(widget.title, context: context),
+      appBar: HowManyMeepleAppBar(widget.title,
+          context: context, helpSection: 'favourites'),
       drawer: const FeatureDrawer(),
       endDrawer: pageDrawer(context),
       body: _service == null

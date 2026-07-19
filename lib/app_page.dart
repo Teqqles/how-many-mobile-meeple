@@ -12,7 +12,6 @@ import 'model/model.dart';
 import 'model/settings.dart';
 import 'pwa/pwa_install_service.dart';
 import 'theme_extensions.dart';
-import 'tour_tips/tour_tip_service.dart';
 
 mixin AppPage {
   static const String randomGameLabel = "Random Game";
@@ -67,7 +66,7 @@ mixin AppPage {
             context,
             index: 2),
         _buildAdvancedModeToggle(model, context, index: 3),
-        _buildTourTipsToggle(context, index: 4),
+        _buildHelpLink(context, index: 4),
         _buildIgnoredGamesLink(context, index: 5),
       ];
 
@@ -104,36 +103,22 @@ mixin AppPage {
     );
   }
 
-  Widget _buildTourTipsToggle(BuildContext context, {int index = 0}) {
-    return FutureBuilder<TourTipService>(
-      future: TourTipService.instance(),
-      builder: (context, snapshot) {
-        final isEnabled = snapshot.hasData ? snapshot.data!.isEnabled : true;
-        return Container(
-          color:
-              index % 2 == 0 ? Theme.of(context).highlightColor : Colors.white,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              AppDefaultPadding(
-                child: Text(
-                  "Show Tour Tips",
-                  textAlign: TextAlign.left,
-                  style: TextStyle(fontSize: 13),
-                ),
-              ),
-              AppSwitch(
-                onChanged: (bool value) async {
-                  final service = await TourTipService.instance();
-                  await service.setEnabled(value);
-                  Navigator.of(context).pop();
-                },
-                value: isEnabled,
-              ),
-            ],
-          ),
-        );
-      },
+  Widget _buildHelpLink(BuildContext context, {int index = 0}) {
+    return Material(
+      color: index % 2 == 0 ? Theme.of(context).highlightColor : Colors.white,
+      child: ListTile(
+        dense: true,
+        leading: Icon(Icons.help_outline,
+            size: 20, color: Theme.of(context).colorScheme.secondary),
+        title: const Text(
+          'Help',
+          style: TextStyle(fontSize: 13),
+        ),
+        onTap: () {
+          Navigator.of(context).pop();
+          Navigator.of(context).pushNamed(r.Router.helpRoute);
+        },
+      ),
     );
   }
 

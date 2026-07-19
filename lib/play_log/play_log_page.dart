@@ -84,7 +84,8 @@ class _PlayLogPageState extends State<PlayLogPage> with AppPage {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: HowManyMeepleAppBar('Play History', context: context),
+      appBar: HowManyMeepleAppBar('Play History',
+          context: context, helpSection: 'play-log'),
       drawer: const FeatureDrawer(),
       endDrawer: pageDrawer(context),
       body: _service == null

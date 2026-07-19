@@ -13,7 +13,6 @@ import 'package:how_many_mobile_meeple/components/pwa_install_banner.dart';
 import 'package:how_many_mobile_meeple/components/pwa_update_banner.dart';
 import 'package:how_many_mobile_meeple/components/disclaimer_text.dart';
 import 'package:how_many_mobile_meeple/components/empty_widget.dart';
-import 'package:how_many_mobile_meeple/tour_tips/tour_tip_keys.dart';
 import 'package:how_many_mobile_meeple/platform/router.dart' as r;
 import 'package:package_info_plus/package_info_plus.dart';
 
@@ -23,8 +22,6 @@ import 'package:how_many_mobile_meeple/components/feature_drawer.dart'
     deferred as feature_drawer;
 import 'package:how_many_mobile_meeple/components/quick_pick_sheet.dart'
     deferred as quick_pick;
-import 'package:how_many_mobile_meeple/tour_tips/tour_tip_service.dart'
-    deferred as tour_tips;
 
 /// Main guided flow homepage supporting two modes:
 /// 1. Guided Flow Mode (default) - step-by-step onboarding
@@ -39,7 +36,6 @@ class GuidedFlowHomePage extends StatefulWidget with AppPage {
 class _GuidedFlowHomePageState extends State<GuidedFlowHomePage> {
   int _currentStep = 0;
   bool _showAdvancedMode = false;
-  final Set<String> _tourTipTriggered = {};
 
   final int _totalSteps = 5;
 
@@ -69,30 +65,6 @@ class _GuidedFlowHomePageState extends State<GuidedFlowHomePage> {
     }
   }
 
-  void _triggerTourTips(AppModel model) {
-    final isAdvanced = model.settings.setting('preferAdvancedMode').getBool();
-    if (isAdvanced) return;
-
-    final pageId =
-        _currentStep == 0 ? 'page_app_bar' : 'step${_currentStep + 1}';
-
-    if (_tourTipTriggered.contains(pageId)) return;
-    _tourTipTriggered.add(pageId);
-
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      if (!mounted) return;
-      await tour_tips.loadLibrary();
-      final service = await tour_tips.TourTipService.instance();
-      if (!service.isEnabled) return;
-
-      await service.showTipsForPage(
-        context: context,
-        pageId: pageId,
-        targets: TourTipKeys.forPage(pageId),
-      );
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return Consumer<AppModel>(
@@ -103,13 +75,13 @@ class _GuidedFlowHomePageState extends State<GuidedFlowHomePage> {
         }
 
         _syncAdvancedMode(model);
-        _triggerTourTips(model);
 
         return Scaffold(
           appBar: HowManyMeepleAppBar(
             AppCommon.optionsPageTitle,
             hasSaveDialog: _showAdvancedMode,
             isHomePage: true,
+            helpSection: 'home',
             model: model,
             context: context,
           ),

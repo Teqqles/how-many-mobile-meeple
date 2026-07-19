@@ -35,7 +35,8 @@ class _GameDetailPageState extends State<GameDetailPage>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: HowManyMeepleAppBar('Game Details', context: context),
+      appBar: HowManyMeepleAppBar('Game Details',
+          context: context, helpSection: 'game-detail'),
       drawer: const FeatureDrawer(),
       endDrawer: pageDrawer(context),
       persistentFooterButtons: [iconButtonGroup(context)],

@@ -11,12 +11,15 @@ import 'package:shared_preferences/shared_preferences.dart';
 Widget _buildTestApp({
   bool isHomePage = true,
   bool hasSaveDialog = false,
+  String? helpSection,
   AppModel? model,
+  Map<String, WidgetBuilder>? routes,
 }) {
   final appModel = model ?? AppModel();
   return ChangeNotifierProvider<AppModel>.value(
     value: appModel,
     child: MaterialApp(
+      routes: routes ?? const {},
       home: Builder(
         builder: (context) => Scaffold(
           appBar: HowManyMeepleAppBar(
@@ -24,6 +27,7 @@ Widget _buildTestApp({
             context: context,
             isHomePage: isHomePage,
             hasSaveDialog: hasSaveDialog,
+            helpSection: helpSection,
             model: appModel,
           ),
           endDrawer: const Drawer(child: Text('Settings Drawer')),
@@ -65,6 +69,44 @@ void main() {
       await tester.pumpWidget(_buildTestApp());
 
       expect(find.byTooltip('Settings'), findsOneWidget);
+    });
+
+    testWidgets('shows Help button', (tester) async {
+      await tester.pumpWidget(_buildTestApp());
+
+      expect(find.byTooltip('Help'), findsOneWidget);
+    });
+
+    testWidgets('Help button navigates to /help without a section',
+        (tester) async {
+      var pushedRoute = '';
+      await tester.pumpWidget(_buildTestApp(routes: {
+        '/help': (_) {
+          pushedRoute = '/help';
+          return const Scaffold(body: Text('Help Page'));
+        },
+      }));
+
+      await tester.tap(find.byTooltip('Help'));
+      await tester.pumpAndSettle();
+
+      expect(pushedRoute, '/help');
+    });
+
+    testWidgets('Help button navigates to page section when set',
+        (tester) async {
+      var pushedRoute = '';
+      await tester.pumpWidget(_buildTestApp(helpSection: 'list', routes: {
+        '/help/list': (_) {
+          pushedRoute = '/help/list';
+          return const Scaffold(body: Text('Help Page'));
+        },
+      }));
+
+      await tester.tap(find.byTooltip('Help'));
+      await tester.pumpAndSettle();
+
+      expect(pushedRoute, '/help/list');
     });
 
     testWidgets('shows Save button when hasSaveDialog is true', (tester) async {

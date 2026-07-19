@@ -4,13 +4,13 @@ import 'app_common.dart';
 import 'model/model.dart';
 import 'platform/router.dart' as r;
 import 'save_dialog.dart';
-import 'tour_tips/tour_tip_keys.dart';
 
 class HowManyMeepleAppBar extends AppBar {
   HowManyMeepleAppBar(String subtitle,
       {required BuildContext context,
       bool hasSaveDialog = false,
       bool isHomePage = false,
+      String? helpSection,
       AppModel? model})
       : super(
           backgroundColor: Theme.of(context).colorScheme.primary,
@@ -63,11 +63,20 @@ class HowManyMeepleAppBar extends AppBar {
           ),
           actions: [
             Row(
-              key: isHomePage && (ModalRoute.of(context)?.isCurrent ?? true)
-                  ? TourTipKeys.appBarActions
-                  : null,
               mainAxisSize: MainAxisSize.min,
               children: [
+                Builder(
+                  builder: (ctx) => IconButton(
+                    icon: const Icon(Icons.help_outline, size: 20),
+                    tooltip: 'Help',
+                    visualDensity: VisualDensity.compact,
+                    onPressed: () => Navigator.of(ctx).pushNamed(
+                      helpSection == null
+                          ? r.Router.helpRoute
+                          : '${r.Router.helpRoute}/$helpSection',
+                    ),
+                  ),
+                ),
                 Builder(
                   builder: (ctx) => IconButton(
                     icon: const Icon(Icons.favorite, size: 20),

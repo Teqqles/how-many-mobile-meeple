@@ -12,6 +12,7 @@ import 'package:how_many_mobile_meeple/services/service_locator.dart';
 import 'package:how_many_mobile_meeple/favourites/favourites_service.dart';
 import 'package:how_many_mobile_meeple/favourites/ignored_games_service.dart';
 import 'package:how_many_mobile_meeple/play_log/play_log_service.dart';
+import 'package:how_many_mobile_meeple/recently_viewed/recently_viewed_service.dart';
 import 'package:network_image_mock/network_image_mock.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -106,6 +107,7 @@ void main() {
     FavouritesService.resetForTesting();
     IgnoredGamesService.resetForTesting();
     PlayLogService.resetForTesting();
+    RecentlyViewedService.resetForTesting();
     favs = await FavouritesService.instance();
     ignored = await IgnoredGamesService.instance();
     playLog = await PlayLogService.instance();
@@ -116,6 +118,7 @@ void main() {
     FavouritesService.resetForTesting();
     IgnoredGamesService.resetForTesting();
     PlayLogService.resetForTesting();
+    RecentlyViewedService.resetForTesting();
   });
 
   group('GameDetailPage', () {
@@ -208,6 +211,23 @@ void main() {
       });
 
       expect(find.text('Favourite'), findsOneWidget);
+    });
+
+    testWidgets('records the game as recently viewed once it loads',
+        (tester) async {
+      final fetcher = _FakeGameDetailFetcher(game: _testGame);
+      await mockNetworkImagesFor(() async {
+        await tester.pumpWidget(_buildTestApp(
+          model,
+          fetcher: fetcher,
+          services: _FakeGameServices(favs, ignored, playLog),
+        ));
+        await tester.pumpAndSettle();
+      });
+
+      final recentlyViewed = await RecentlyViewedService.instance();
+      expect(recentlyViewed.games.map((g) => g.id), [42]);
+      expect(recentlyViewed.games.first.name, 'Wingspan');
     });
   });
 }

@@ -1,160 +1,15 @@
 {
-  "version": "2.20.1",
+  "version": "2.21.0",
   "recent_changes": [
     {
       "type": "feat",
       "scope": "",
+      "description": "debounce slider persistence to reduce redundant writes"
+    },
+    {
+      "type": "feat",
+      "scope": "",
       "description": "replace tour tips with context-sensitive help page"
-    },
-    {
-      "type": "fix",
-      "scope": "",
-      "description": "restore parameters and primary player correctly from permalinks"
-    },
-    {
-      "type": "fix",
-      "scope": "",
-      "description": "stop random roll from exhausting the collection"
-    },
-    {
-      "type": "feat",
-      "scope": "",
-      "description": "surface collection ownership date on shelf of shame"
-    },
-    {
-      "type": "feat",
-      "scope": "",
-      "description": "add play log with local tracking and BGG history"
-    },
-    {
-      "type": "feat",
-      "scope": "",
-      "description": "enable gzip encoding and add Bgg-Plays-Meta header for API calls"
-    },
-    {
-      "type": "feat",
-      "scope": "",
-      "description": "add service worker for PWA image caching"
-    },
-    {
-      "type": "fix",
-      "scope": "",
-      "description": "deduplicate shelf of shame API calls and load plays asynchronously"
-    },
-    {
-      "type": "feat",
-      "scope": "",
-      "description": "support partial plays loading with automatic background retry"
-    },
-    {
-      "type": "feat",
-      "scope": "",
-      "description": "add clock injection to BggCache and time inference to Settings"
-    },
-    {
-      "type": "feat",
-      "scope": "",
-      "description": "add service locator for dependency injection"
-    },
-    {
-      "type": "feat",
-      "scope": "",
-      "description": "add request deduplication and test injection to API services"
-    },
-    {
-      "type": "fix",
-      "scope": "",
-      "description": "listing page now rebuilds when plays data loads asynchronously"
-    },
-    {
-      "type": "fix",
-      "scope": "ci",
-      "description": "resolve race condition between Flutter CI and Tag Release workflows"
-    },
-    {
-      "type": "feat",
-      "scope": "",
-      "description": "add Shelf of Shame feature with play tracking and UX improvements"
-    },
-    {
-      "type": "fix",
-      "scope": "",
-      "description": "prevent app title truncation and compact detail buttons on mobile"
-    },
-    {
-      "type": "fix",
-      "scope": "",
-      "description": "tour tips scroll into view, consolidate app bar tip, reduce padding"
-    },
-    {
-      "type": "feat",
-      "scope": "",
-      "description": "add favourites and ignored games with swipe gestures"
-    },
-    {
-      "type": "feat",
-      "scope": "",
-      "description": "add Quick Pick for fast random game selection"
-    },
-    {
-      "type": "feat",
-      "scope": "",
-      "description": "cache drawer preferences and hide empty game stats"
-    },
-    {
-      "type": "fix",
-      "scope": "",
-      "description": "handle null fields in hot games API response"
-    },
-    {
-      "type": "fix",
-      "scope": "",
-      "description": "guard null preference delete and cache StoredPreferences instance"
-    },
-    {
-      "type": "fix",
-      "scope": "",
-      "description": "use GitHub Actions API for issues instead of HTTP request"
-    },
-    {
-      "type": "fix",
-      "scope": "",
-      "description": "handle GitHub API timeout in about data generation"
-    },
-    {
-      "type": "fix",
-      "scope": "",
-      "description": "load saved sources on refresh and show friendly empty state"
-    },
-    {
-      "type": "fix",
-      "scope": "",
-      "description": "share button on random game page and remove false fallback dialog"
-    },
-    {
-      "type": "feat",
-      "scope": "",
-      "description": "auto-generate about page data in CI on tag release"
-    },
-    {
-      "type": "feat",
-      "scope": "",
-      "description": "add about page with version info, upcoming features, and contributors"
-    },
-    {
-      "type": "feat",
-      "scope": "",
-      "description": "replace collection/geeklist toggle with auto-detected leading icon"
-    },
-    {
-      "type": "fix",
-      "scope": "",
-      "description": "compact step 1 tabs to prevent text wrapping on mobile"
-    },
-    {
-      "type": "fix",
-      "scope": "",
-      "description": "center loading screen on mobile viewports"
     }
   ],
   "upcoming": [
@@ -176,11 +31,6 @@
     {
       "number": 94,
       "title": "Scope Consumer widgets to reduce unnecessary rebuilds",
-      "labels": []
-    },
-    {
-      "number": 91,
-      "title": "Debounce updateStore() on slider changes",
       "labels": []
     },
     {

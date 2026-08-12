@@ -3,6 +3,11 @@
 All notable changes to this project are documented here.
 This file is auto-generated from conventional commits on each release.
 
+## [v2.20.1] - 2026-07-19
+
+### Added
+- replace tour tips with context-sensitive help page
+
 ## [v2.19.4] - 2026-07-02
 
 ### Added

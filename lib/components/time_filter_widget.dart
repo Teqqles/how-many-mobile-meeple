@@ -87,7 +87,7 @@ class TimeFilterWidget extends StatelessWidget {
                             model.settings
                                 .setting(Settings.filterMaximumTimeToPlay.name)
                                 .value = time.end.floor();
-                            model.updateStore();
+                            model.updateStoreDebounced();
                             model.invalidateCache();
                           },
                     values: RangeValues(

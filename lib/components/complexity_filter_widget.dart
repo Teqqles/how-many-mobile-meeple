@@ -38,7 +38,7 @@ class ComplexityFilterWidget extends StatelessWidget {
                               model.settings
                                   .setting(Settings.filterComplexity.name)
                                   .value = complexity;
-                              model.updateStore();
+                              model.updateStoreDebounced();
                               model.invalidateCache();
                             },
                       value: model.settings

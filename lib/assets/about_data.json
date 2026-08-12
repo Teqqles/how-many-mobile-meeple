@@ -1,6 +1,11 @@
 {
-  "version": "2.21.0",
+  "version": "2.22.0",
   "recent_changes": [
+    {
+      "type": "feat",
+      "scope": "",
+      "description": "recently viewed games history in drawer"
+    },
     {
       "type": "feat",
       "scope": "",
@@ -66,11 +71,6 @@
     {
       "number": 71,
       "title": "Share a filtered search link",
-      "labels": []
-    },
-    {
-      "number": 70,
-      "title": "Recently viewed games history",
       "labels": []
     },
     {

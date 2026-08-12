@@ -3,6 +3,11 @@
 All notable changes to this project are documented here.
 This file is auto-generated from conventional commits on each release.
 
+## [v2.21.0] - 2026-08-12
+
+### Added
+- debounce slider persistence to reduce redundant writes
+
 ## [v2.20.1] - 2026-07-19
 
 ### Added

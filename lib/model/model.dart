@@ -184,6 +184,11 @@ class AppModel extends ChangeNotifier {
   void dispose() {
     _disposed = true;
     _playsRetryTimer?.cancel();
+    // Flush any pending debounced write so a change made just before the user
+    // navigates away is not lost.
+    if (_storeDebounceTimer?.isActive ?? false) {
+      _flushStore();
+    }
     _playLog?.removeListener(_onPlayLogChanged);
     super.dispose();
   }
@@ -352,12 +357,44 @@ class AppModel extends ChangeNotifier {
     await _storeItems(_items);
   }
 
+  Timer? _storeDebounceTimer;
+
+  /// Delay before a debounced [updateStoreDebounced] actually persists.
+  /// Dragging a slider fires many calls in quick succession; only the value the
+  /// user settles on is written, once the drag pauses for this long.
+  @visibleForTesting
+  static Duration storeDebounceDelay = const Duration(milliseconds: 300);
+
+  /// Number of times settings/items were actually persisted. A test hook to
+  /// assert debouncing collapses a burst of calls into a single write.
+  @visibleForTesting
+  int storeWriteCount = 0;
+
   Future<void> updateStore() async {
+    _storeDebounceTimer?.cancel();
+    _storeDebounceTimer = null;
+    await _flushStore();
+    notifyListeners();
+  }
+
+  /// Like [updateStore] but for high-frequency callers such as slider drags:
+  /// updates the UI immediately while collapsing the burst of writes into a
+  /// single persistence after the user settles ([storeDebounceDelay]). A
+  /// pending write is flushed on [dispose] so nothing is lost.
+  void updateStoreDebounced() {
+    notifyListeners();
+    _storeDebounceTimer?.cancel();
+    _storeDebounceTimer = Timer(storeDebounceDelay, _flushStore);
+  }
+
+  Future<void> _flushStore() async {
+    _storeDebounceTimer?.cancel();
+    _storeDebounceTimer = null;
+    storeWriteCount++;
     await Future.wait([
       _storeSettings(settings),
       _storeItems(_items),
     ]);
-    notifyListeners();
   }
 
   Future<List<AppPreferences>> getSavedPreferences() async {

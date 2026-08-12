@@ -38,7 +38,7 @@ class RatingFilterWidget extends StatelessWidget {
                               model.settings
                                   .setting(Settings.filterMinRating.name)
                                   .value = rating;
-                              model.updateStore();
+                              model.updateStoreDebounced();
                               model.invalidateCache();
                             },
                       value: model.settings

@@ -110,7 +110,7 @@ class _Step3TimeAvailableState extends State<Step3TimeAvailable> {
                       maxTimeSetting.enabled = true;
                       model.settings.updateSetting(minTimeSetting);
                       model.settings.updateSetting(maxTimeSetting);
-                      model.updateStore();
+                      model.updateStoreDebounced();
                       model.invalidateCache();
                     });
                   },

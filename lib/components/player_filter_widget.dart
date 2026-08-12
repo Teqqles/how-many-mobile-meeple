@@ -38,7 +38,7 @@ class PlayerFilterWidget extends StatelessWidget {
                               model.settings
                                   .setting(Settings.filterNumberOfPlayers.name)
                                   .value = players.floor();
-                              model.updateStore();
+                              model.updateStoreDebounced();
                               model.invalidateCache();
                             },
                       value: model.settings

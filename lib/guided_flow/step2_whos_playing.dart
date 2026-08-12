@@ -89,7 +89,7 @@ class _Step2WhosPlayingState extends State<Step2WhosPlaying> {
                       playerSetting.value = value.floor();
                       playerSetting.enabled = true;
                       model.settings.updateSetting(playerSetting);
-                      model.updateStore();
+                      model.updateStoreDebounced();
                       model.invalidateCache();
                     });
                   },

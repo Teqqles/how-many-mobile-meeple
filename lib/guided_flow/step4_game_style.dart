@@ -157,7 +157,7 @@ class _Step4GameStyleState extends State<Step4GameStyle> {
                       difficultySetting.value = value;
                       difficultySetting.enabled = true;
                       model.settings.updateSetting(difficultySetting);
-                      model.updateStore();
+                      model.updateStoreDebounced();
                       model.invalidateCache();
                     });
                   },

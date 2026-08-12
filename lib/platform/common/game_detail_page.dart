@@ -9,6 +9,8 @@ import 'package:how_many_mobile_meeple/favourites/game_action_buttons.dart';
 import 'package:how_many_mobile_meeple/how_many_meeple_app_bar.dart';
 import 'package:how_many_mobile_meeple/model/game.dart';
 import 'package:how_many_mobile_meeple/model/model.dart';
+import 'package:how_many_mobile_meeple/recently_viewed/recently_viewed_game.dart';
+import 'package:how_many_mobile_meeple/recently_viewed/recently_viewed_service.dart';
 import 'package:how_many_mobile_meeple/screen_tools.dart';
 import 'package:how_many_mobile_meeple/app_page.dart';
 import 'package:how_many_mobile_meeple/services/service_locator.dart';
@@ -29,7 +31,22 @@ class _GameDetailPageState extends State<GameDetailPage>
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _future ??= context.gameDetailFetcher.fetchGame(widget.gameId);
+    if (_future == null) {
+      final future = context.gameDetailFetcher.fetchGame(widget.gameId);
+      _future = future;
+      // Record the visit once the game loads, off the build path so it never
+      // notifies listeners mid-frame.
+      future.then(_recordRecentlyViewed).catchError((_) {});
+    }
+  }
+
+  void _recordRecentlyViewed(Game game) async {
+    final service = await RecentlyViewedService.instance();
+    service.add(RecentlyViewedGame(
+      id: game.id,
+      name: game.name,
+      thumbnail: game.thumbnail,
+    ));
   }
 
   @override

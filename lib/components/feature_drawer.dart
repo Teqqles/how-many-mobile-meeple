@@ -5,6 +5,8 @@ import 'package:how_many_mobile_meeple/components/quick_pick_sheet.dart';
 import 'package:how_many_mobile_meeple/model/item.dart';
 import 'package:how_many_mobile_meeple/model/model.dart';
 import 'package:how_many_mobile_meeple/platform/router.dart' as r;
+import 'package:how_many_mobile_meeple/recently_viewed/recently_viewed_game.dart';
+import 'package:how_many_mobile_meeple/recently_viewed/recently_viewed_service.dart';
 import 'package:how_many_mobile_meeple/app_common.dart';
 
 class FeatureDrawer extends StatelessWidget {
@@ -123,10 +125,70 @@ class FeatureDrawer extends StatelessWidget {
                     );
                   },
                 ),
+                _buildRecentlyViewed(context),
               ],
             ),
           ),
         );
+      },
+    );
+  }
+
+  /// Inline list of the last few games the user opened. Hidden entirely until
+  /// there is at least one, and kept in sync with the service so a game viewed
+  /// in this session appears without reopening the drawer.
+  Widget _buildRecentlyViewed(BuildContext context) {
+    return FutureBuilder<RecentlyViewedService>(
+      future: RecentlyViewedService.instance(),
+      builder: (context, snapshot) {
+        final service = snapshot.data;
+        if (service == null) return const SizedBox.shrink();
+        return ListenableBuilder(
+          listenable: service,
+          builder: (context, _) {
+            final games = service.games;
+            if (games.isEmpty) return const SizedBox.shrink();
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const Divider(),
+                _buildSectionTitle(context, 'Recently Viewed'),
+                ...games.map((game) => _buildRecentlyViewedTile(context, game)),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Widget _buildRecentlyViewedTile(
+      BuildContext context, RecentlyViewedGame game) {
+    final thumbnail = game.thumbnail;
+    return ListTile(
+      dense: true,
+      leading: (thumbnail != null && thumbnail.isNotEmpty)
+          ? SizedBox(
+              width: 32,
+              height: 32,
+              child: Image.network(
+                thumbnail,
+                fit: BoxFit.cover,
+                errorBuilder: (context, _, __) =>
+                    const Icon(Icons.casino, size: 20),
+              ),
+            )
+          : const Icon(Icons.casino, size: 20),
+      title: Text(
+        game.name,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        style: const TextStyle(fontSize: 14),
+      ),
+      onTap: () {
+        Navigator.of(context).pop();
+        Navigator.of(context)
+            .pushNamed('${r.Router.gameDetailRoute}/${game.id}');
       },
     );
   }

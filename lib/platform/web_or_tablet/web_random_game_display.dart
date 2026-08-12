@@ -8,6 +8,8 @@ import 'package:how_many_mobile_meeple/favourites/ignored_games_service.dart';
 import 'package:how_many_mobile_meeple/platform/common/game_display_page.dart';
 import 'package:how_many_mobile_meeple/model/settings.dart';
 import 'package:how_many_mobile_meeple/platform/router.dart' as r;
+import 'package:how_many_mobile_meeple/recently_viewed/recently_viewed_game.dart';
+import 'package:how_many_mobile_meeple/recently_viewed/recently_viewed_service.dart';
 import 'package:how_many_mobile_meeple/screen_tools.dart';
 
 import 'package:how_many_mobile_meeple/components/app_default_padding.dart';
@@ -47,6 +49,7 @@ class WebRandomGameDisplayPage extends GameDisplayPage {
       return _buildExhaustedState(context, model);
     }
     updatePageRefreshedStatus(model);
+    _recordRecentlyViewed(game);
     return SingleChildScrollView(
       child: Center(
         child: Container(
@@ -70,6 +73,26 @@ class WebRandomGameDisplayPage extends GameDisplayPage {
         ),
       ),
     );
+  }
+
+  /// Records the shown game as recently viewed, off the build path via a
+  /// post-frame callback. Skipped when it is already the most recent entry so
+  /// rebuilds of the same random game do not schedule redundant work.
+  void _recordRecentlyViewed(Game game) {
+    final cached = RecentlyViewedService.cached;
+    if (cached != null &&
+        cached.games.isNotEmpty &&
+        cached.games.first.id == game.id) {
+      return;
+    }
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final service = await RecentlyViewedService.instance();
+      service.add(RecentlyViewedGame(
+        id: game.id,
+        name: game.name,
+        thumbnail: game.thumbnail,
+      ));
+    });
   }
 
   Game? _nextUnplayed(AppModel model) {

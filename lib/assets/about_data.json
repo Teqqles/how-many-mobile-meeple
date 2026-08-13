@@ -1,6 +1,11 @@
 {
-  "version": "2.22.0",
+  "version": "2.23.0",
   "recent_changes": [
+    {
+      "type": "feat",
+      "scope": "",
+      "description": "add dark mode with curated theme palettes"
+    },
     {
       "type": "feat",
       "scope": "",
@@ -51,11 +56,6 @@
     {
       "number": 80,
       "title": "Update to latest dependencies (breaking changes)",
-      "labels": []
-    },
-    {
-      "number": 78,
-      "title": "Dark mode with theme colour options",
       "labels": []
     },
     {

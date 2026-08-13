@@ -3,6 +3,11 @@
 All notable changes to this project are documented here.
 This file is auto-generated from conventional commits on each release.
 
+## [v2.22.0] - 2026-08-12
+
+### Added
+- recently viewed games history in drawer
+
 ## [v2.21.0] - 2026-08-12
 
 ### Added

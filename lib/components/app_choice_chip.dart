@@ -89,23 +89,30 @@ class AppMechanicChip extends StatelessWidget {
       selected: selected,
       onSelected: enabled ? onSelected : null,
       selectedColor: Theme.of(context).colorScheme.secondary,
-      disabledColor: Colors.grey[100],
-      backgroundColor: enabled ? Colors.grey[200] : Colors.grey[100],
+      // Disabled chips fall back to the flat surface tone so they read as
+      // muted, distinct from the raised surfaceContainerHighest of an enabled
+      // but unselected chip.
+      disabledColor: Theme.of(context).colorScheme.surface,
+      backgroundColor: enabled
+          ? Theme.of(context).colorScheme.surfaceContainerHighest
+          : Theme.of(context).colorScheme.surface,
       elevation: enabled ? 2 : 0,
       side: BorderSide(
         color: enabled
             ? (selected
                 ? Theme.of(context).colorScheme.secondary
-                : Colors.grey[400]!)
-            : Colors.grey[300]!,
+                : Theme.of(context).colorScheme.outline)
+            : Theme.of(context).colorScheme.outlineVariant,
         width: 1.5,
       ),
       labelStyle: TextStyle(
         fontSize: 12,
         fontWeight: FontWeight.bold,
         color: selected && enabled
-            ? Colors.white
-            : (enabled ? Colors.black87 : Theme.of(context).disabledColor),
+            ? Theme.of(context).colorScheme.onSecondary
+            : (enabled
+                ? Theme.of(context).colorScheme.onSurface
+                : Theme.of(context).disabledColor),
       ),
     );
   }

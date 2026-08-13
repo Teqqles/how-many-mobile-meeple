@@ -10,8 +10,9 @@ class DrawerBggFilter extends Container {
       String filterTitle, Setting setting, AppModel model, BuildContext context,
       {int index = 0})
       : super(
-          color:
-              index % 2 == 0 ? Theme.of(context).highlightColor : Colors.white,
+          color: index % 2 == 0
+              ? Theme.of(context).highlightColor
+              : Theme.of(context).colorScheme.surface,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[

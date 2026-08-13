@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:how_many_mobile_meeple/components/drawer_bgg_filter.dart';
 import 'package:how_many_mobile_meeple/components/app_switch.dart';
 import 'package:how_many_mobile_meeple/components/app_default_padding.dart';
+import 'package:how_many_mobile_meeple/components/theme_mode_control.dart';
 import 'package:how_many_mobile_meeple/components/quick_pick_sheet.dart';
 import 'package:how_many_mobile_meeple/favourites/ignored_games_service.dart';
 import 'app_common.dart';
@@ -68,6 +69,7 @@ mixin AppPage {
         _buildAdvancedModeToggle(model, context, index: 3),
         _buildHelpLink(context, index: 4),
         _buildIgnoredGamesLink(context, index: 5),
+        ThemeModeControl(model),
       ];
 
   Widget _buildAdvancedModeToggle(AppModel model, BuildContext context,
@@ -76,7 +78,9 @@ mixin AppPage {
     final currentValue = setting.getBool();
 
     return Container(
-      color: index % 2 == 0 ? Theme.of(context).highlightColor : Colors.white,
+      color: index % 2 == 0
+          ? Theme.of(context).highlightColor
+          : Theme.of(context).colorScheme.surface,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: <Widget>[
@@ -105,7 +109,9 @@ mixin AppPage {
 
   Widget _buildHelpLink(BuildContext context, {int index = 0}) {
     return Material(
-      color: index % 2 == 0 ? Theme.of(context).highlightColor : Colors.white,
+      color: index % 2 == 0
+          ? Theme.of(context).highlightColor
+          : Theme.of(context).colorScheme.surface,
       child: ListTile(
         dense: true,
         leading: Icon(Icons.help_outline,
@@ -128,8 +134,9 @@ mixin AppPage {
       builder: (context, snapshot) {
         final count = snapshot.hasData ? snapshot.data!.games.length : 0;
         return Material(
-          color:
-              index % 2 == 0 ? Theme.of(context).highlightColor : Colors.white,
+          color: index % 2 == 0
+              ? Theme.of(context).highlightColor
+              : Theme.of(context).colorScheme.surface,
           child: ListTile(
             dense: true,
             leading: Icon(Icons.visibility_off,
@@ -164,8 +171,9 @@ mixin AppPage {
   }
 
   Widget _buildInstallDrawerItem(BuildContext context, int index) {
-    final bgColor =
-        index % 2 == 0 ? Theme.of(context).highlightColor : Colors.white;
+    final bgColor = index % 2 == 0
+        ? Theme.of(context).highlightColor
+        : Theme.of(context).colorScheme.surface;
     return Material(
       color: bgColor,
       child: ListTile(

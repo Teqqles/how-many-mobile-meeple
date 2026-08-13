@@ -43,6 +43,9 @@ class Settings {
   static Setting preferAdvancedMode =
       Setting("preferAdvancedMode", value: false, enabled: true);
 
+  static Setting themeMode =
+      Setting("themeMode", value: "system", enabled: true);
+
   static Settings defaultSettings() => Settings(Map.from({
         Settings.fieldsToReturnFromApi.name:
             Settings.fieldsToReturnFromApi.clone(),
@@ -64,6 +67,7 @@ class Settings {
         Settings.filterShelfOfShameOnly.name:
             Settings.filterShelfOfShameOnly.clone(),
         Settings.preferAdvancedMode.name: Settings.preferAdvancedMode.clone(),
+        Settings.themeMode.name: Settings.themeMode.clone(),
       }));
 
   Map<String, Setting> _settings = Map<String, Setting>();

@@ -69,6 +69,10 @@ class Setting {
     return (value as num?)?.toDouble() ?? 0.0;
   }
 
+  /// Type-safe getter for string values
+  /// Falls back to an empty string when the value is null
+  String getString() => value?.toString() ?? '';
+
   /// Type-safe getter for list values
   /// Returns empty list if value is not a list
   List<dynamic> getList() {

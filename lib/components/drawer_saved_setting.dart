@@ -20,13 +20,13 @@ class DrawerSavedSetting extends Container {
           decoration: BoxDecoration(
               color: index % 2 == 0
                   ? Theme.of(context).highlightColor
-                  : Colors.white,
+                  : Theme.of(context).colorScheme.surface,
               border: Border(
                   bottom: BorderSide(
                       width: 1,
                       color: index % 2 == 0
                           ? Theme.of(context).highlightColor
-                          : Colors.white))),
+                          : Theme.of(context).colorScheme.surface))),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[

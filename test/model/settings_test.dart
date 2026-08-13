@@ -28,6 +28,25 @@ main() {
     });
   });
 
+  group('themeMode', () {
+    test('defaults to "system" and is enabled', () {
+      var mySettings = Settings.defaultSettings();
+      var themeMode = mySettings.setting('themeMode');
+      expect(themeMode.getString(), 'system');
+      expect(themeMode.enabled, true);
+    });
+
+    test('is present in default settings', () {
+      var mySettings = Settings.defaultSettings();
+      expect(mySettings.allSettings.containsKey('themeMode'), true);
+    });
+
+    test('survives clone', () {
+      var cloned = Settings.defaultSettings().clone();
+      expect(cloned.setting('themeMode').getString(), 'system');
+    });
+  });
+
   group('inferMinTime', () {
     test('returns half of the given max time', () {
       expect(Settings.inferMinTime(60), 30);

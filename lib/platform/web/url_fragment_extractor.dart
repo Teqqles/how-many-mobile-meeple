@@ -12,7 +12,8 @@ class UrlFragmentExtractor {
     this.uri = uri;
     hasModelData = uri.hasFragment &&
         !Router.routeList.contains(uri.fragment) &&
-        !_isGameDetailFragment(uri.fragment);
+        !_isGameDetailFragment(uri.fragment) &&
+        !_isShelfOfShameFragment(uri.fragment);
   }
 
   /// A game detail deep link (e.g. `/game/Gloomhaven/174430`) encodes no
@@ -22,6 +23,15 @@ class UrlFragmentExtractor {
   bool _isGameDetailFragment(String fragment) =>
       fragment == Router.gameDetailRoute ||
       fragment.startsWith('${Router.gameDetailRoute}/');
+
+  /// A shelf of shame deep link (e.g. `/shelf-of-shame/teqqles`) carries the
+  /// collection owner's username as a route parameter, which the page consumes
+  /// directly - it is not an encoded model. Treating it as one seeds the
+  /// username as a bogus source and churns model state, spinning the page in a
+  /// reload loop that hammers the collection API, so we exclude it here.
+  bool _isShelfOfShameFragment(String fragment) =>
+      fragment == Router.shelfOfShameRoute ||
+      fragment.startsWith('${Router.shelfOfShameRoute}/');
 
   bool containsModel() {
     return hasModelData;

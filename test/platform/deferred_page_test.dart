@@ -43,11 +43,8 @@ void main() {
   testWidgets(
       'a deferred route mounts once and does not reload when the model notifies',
       (tester) async {
-    // A deferred page that fetches on mount (shelf of shame) once drove an
-    // infinite reload loop: _deferred rebuilt its load future on every build,
-    // so each model notify tore the page down and remounted it, refetching the
-    // collection and hammering the API. Guard against a regression by counting
-    // collection fetches while the model notifies repeatedly.
+    // Regression: a deferred page that fetches on mount once remounted on every
+    // model notify, looping its collection fetch. Count fetches across notifies.
     var collectionCount = 0;
     HttpRetryClient.setTestClient(SyncMockClient((req) {
       final p = req.url.path;

@@ -39,8 +39,7 @@ class _ShelfOfShamePageState extends State<ShelfOfShamePage>
   bool _loading = true;
   String? _error;
 
-  /// The linked user's plays when viewing someone else's shelf; null on an own
-  /// shelf, which reads plays from the model instead.
+  /// Linked user's plays when viewing another shelf; null on an own shelf.
   Map<int, PlayData>? _targetPlays;
   Timer? _targetPlaysRetry;
 
@@ -68,8 +67,7 @@ class _ShelfOfShamePageState extends State<ShelfOfShamePage>
       return;
     }
 
-    // A linked shelf must reflect the linked user's plays, so fetch theirs and
-    // leave the model untouched; an own shelf uses the model's plays.
+    // Linked shelf uses the linked user's plays; own shelf uses the model's.
     if (_isViewingOtherPlayer(model)) {
       unawaited(_loadTargetPlays(username));
     } else {
@@ -119,8 +117,7 @@ class _ShelfOfShamePageState extends State<ShelfOfShamePage>
     }
   }
 
-  /// Loads the linked user's plays and rebuilds, retrying incomplete results
-  /// the way the model does. Every game reads as unplayed until the first load.
+  /// Fetches the linked user's plays, retrying while results are incomplete.
   Future<void> _loadTargetPlays(String username) async {
     try {
       final result = await PlaysService.fetchPlays(username);
@@ -136,8 +133,7 @@ class _ShelfOfShamePageState extends State<ShelfOfShamePage>
         });
       }
     } catch (_) {
-      // Leave _targetPlays null so every game shows as unplayed rather than
-      // hiding games we could not confirm as played.
+      // Leave _targetPlays null so unconfirmed games show as unplayed.
     }
   }
 
@@ -327,9 +323,8 @@ class _ShelfOfShamePageState extends State<ShelfOfShamePage>
     );
   }
 
-  /// True when the shelf belongs to someone other than the stored primary
-  /// player - i.e. we followed a shared permalink for a different collection,
-  /// so the banner should read as "viewing" rather than "your" shelf.
+  /// True when viewing a permalinked shelf for someone other than the primary
+  /// player.
   bool _isViewingOtherPlayer(AppModel model) =>
       widget.username != null && widget.username != model.primaryPlayer;
 

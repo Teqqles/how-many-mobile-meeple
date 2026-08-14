@@ -463,7 +463,7 @@ class _ShelfOfShamePageState extends State<ShelfOfShamePage>
 
     if (years >= _worstOffenderYears) {
       return Text(
-        "Dude - $years years owned, still unplayed!",
+        "$years years owned, still unplayed!",
         style: TextStyle(
           fontSize: 12,
           fontWeight: FontWeight.w600,

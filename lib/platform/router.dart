@@ -172,20 +172,47 @@ Widget _deferred(
   Future<void> Function() loadLibrary,
   Widget Function() builder,
 ) {
-  return FutureBuilder(
-    future: loadLibrary(),
-    builder: (context, snapshot) {
-      if (snapshot.connectionState == ConnectionState.done) {
-        if (snapshot.hasError) {
-          return const Scaffold(
-            body: Center(child: Text('Failed to load page')),
-          );
+  return _DeferredPage(loadLibrary: loadLibrary, builder: builder);
+}
+
+/// Loads a deferred library, then shows the page it gates.
+///
+/// The load future is created once in [State.initState], not inline in
+/// `build`. Calling `loadLibrary()` on every build hands FutureBuilder a fresh
+/// future each time, resetting it to [ConnectionState.waiting] and tearing the
+/// page down; any ancestor rebuild (the app rebuilds on every model change)
+/// then remounts the page. A page that fetches or notifies the model on mount
+/// re-triggers that rebuild, spinning an infinite reload loop.
+class _DeferredPage extends StatefulWidget {
+  final Future<void> Function() loadLibrary;
+  final Widget Function() builder;
+
+  const _DeferredPage({required this.loadLibrary, required this.builder});
+
+  @override
+  State<_DeferredPage> createState() => _DeferredPageState();
+}
+
+class _DeferredPageState extends State<_DeferredPage> {
+  late final Future<void> _future = widget.loadLibrary();
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder(
+      future: _future,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.done) {
+          if (snapshot.hasError) {
+            return const Scaffold(
+              body: Center(child: Text('Failed to load page')),
+            );
+          }
+          return widget.builder();
         }
-        return builder();
-      }
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      );
-    },
-  );
+        return const Scaffold(
+          body: Center(child: CircularProgressIndicator()),
+        );
+      },
+    );
+  }
 }

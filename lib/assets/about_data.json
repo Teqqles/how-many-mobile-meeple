@@ -1,6 +1,11 @@
 {
-  "version": "2.23.0",
+  "version": "2.23.1",
   "recent_changes": [
+    {
+      "type": "fix",
+      "scope": "",
+      "description": "stop shelf of shame deep link reload loop and show linked user's shelf"
+    },
     {
       "type": "feat",
       "scope": "",
@@ -23,6 +28,39 @@
     }
   ],
   "upcoming": [
+    {
+      "number": 110,
+      "title": "How Many Meeple is findable with a search engine",
+      "labels": []
+    },
+    {
+      "number": 109,
+      "title": "Surface top mechanics as quick-filter chips",
+      "labels": [
+        "enhancement"
+      ]
+    },
+    {
+      "number": 108,
+      "title": "Seed filter defaults from the collection's sweet spot",
+      "labels": [
+        "enhancement"
+      ]
+    },
+    {
+      "number": 107,
+      "title": "Add a Collection Insights page",
+      "labels": [
+        "enhancement"
+      ]
+    },
+    {
+      "number": 106,
+      "title": "Show live match counts on the guided-flow filter steps",
+      "labels": [
+        "enhancement"
+      ]
+    },
     {
       "number": 99,
       "title": "Play log - Connect BGG account and sync plays (Phase 2)",

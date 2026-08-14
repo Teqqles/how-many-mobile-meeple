@@ -3,6 +3,11 @@
 All notable changes to this project are documented here.
 This file is auto-generated from conventional commits on each release.
 
+## [v2.23.0] - 2026-08-13
+
+### Added
+- add dark mode with curated theme palettes
+
 ## [v2.22.0] - 2026-08-12
 
 ### Added

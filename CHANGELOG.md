@@ -3,6 +3,11 @@
 All notable changes to this project are documented here.
 This file is auto-generated from conventional commits on each release.
 
+## [v2.23.1] - 2026-08-14
+
+### Fixed
+- stop shelf of shame deep link reload loop and show linked user's shelf
+
 ## [v2.23.0] - 2026-08-13
 
 ### Added

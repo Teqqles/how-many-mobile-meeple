@@ -1,6 +1,11 @@
 {
-  "version": "2.23.1",
+  "version": "2.23.3",
   "recent_changes": [
+    {
+      "type": "fix",
+      "scope": "",
+      "description": "stop shelf-of-shame infinite reload loop"
+    },
     {
       "type": "fix",
       "scope": "",

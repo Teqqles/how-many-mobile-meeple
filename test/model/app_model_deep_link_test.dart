@@ -88,23 +88,30 @@ void main() {
           reason: 'stored parameters should load when no URL model is present');
     });
 
-    test(
-        'permalink to a different collection sets the primary player from the '
-        'link, not the stored one', () async {
-      // A previous session left a stored primary player behind.
+    test('shelf of shame permalink is view-only and leaves stored data intact',
+        () async {
+      // A previous session left a stored primary player and collection behind.
       SharedPreferences.setMockInitialValues({
         'primary_player': 'storeduser',
         'bgg-item-0': '{"name":"storeduser","item_type":{"name":"collection"}}',
       });
 
-      // Following a shared permalink for a different collection.
+      // Following a shared shelf of shame permalink for a different collection.
+      // The trailing username is a route parameter the page consumes directly,
+      // not an encoded model - treating it as one seeded a bogus source and
+      // spun the page in a reload loop that spammed the collection API, so
+      // bootstrapping must leave the stored model untouched.
       final model = _modelForFragment('/shelf-of-shame/linkeduser');
 
       await model.loadStoredData();
 
-      expect(model.primaryPlayer, 'linkeduser',
-          reason: 'the permalink collection must drive the primary player so '
-              'shelf of shame / play history do not stick to the old one');
+      expect(model.primaryPlayer, 'storeduser',
+          reason: 'a shelf of shame permalink must not swap the stored player');
+      expect(model.items.itemList.map((i) => i.name), contains('storeduser'),
+          reason: 'the stored collection must survive the permalink');
+      expect(model.items.itemList.map((i) => i.name),
+          isNot(contains('linkeduser')),
+          reason: 'the permalink username must not become a source');
     });
   });
 }

@@ -56,6 +56,26 @@ main() {
       var extractor = UrlFragmentExtractor(mockUri);
       expect(extractor.containsModel(), false);
     });
+
+    test('returns false for a shelf of shame deep link', () {
+      // The trailing segment is the collection owner's username, consumed by
+      // the page's route parameter - not an encoded model. Treating it as one
+      // seeds a bogus source and churns state, spinning the page in a reload
+      // loop that spams the collection API.
+      final mockUri = MockUri();
+      when(mockUri.hasFragment).thenReturn(true);
+      when(mockUri.fragment).thenReturn('/shelf-of-shame/teqqles');
+      var extractor = UrlFragmentExtractor(mockUri);
+      expect(extractor.containsModel(), false);
+    });
+
+    test('returns false for the bare shelf of shame route', () {
+      final mockUri = MockUri();
+      when(mockUri.hasFragment).thenReturn(true);
+      when(mockUri.fragment).thenReturn('/shelf-of-shame');
+      var extractor = UrlFragmentExtractor(mockUri);
+      expect(extractor.containsModel(), false);
+    });
   });
 
   var expectedItems =

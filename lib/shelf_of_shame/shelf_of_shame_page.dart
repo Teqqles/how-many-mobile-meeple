@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -5,6 +6,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:how_many_mobile_meeple/api/http_retry_client.dart';
+import 'package:how_many_mobile_meeple/api/plays_service.dart';
 import 'package:how_many_mobile_meeple/app_common.dart';
 import 'package:how_many_mobile_meeple/app_page.dart';
 import 'package:how_many_mobile_meeple/components/feature_drawer.dart';
@@ -16,6 +18,7 @@ import 'package:how_many_mobile_meeple/model/game.dart';
 import 'package:how_many_mobile_meeple/model/games.dart';
 import 'package:how_many_mobile_meeple/model/item.dart';
 import 'package:how_many_mobile_meeple/model/model.dart';
+import 'package:how_many_mobile_meeple/model/play_data.dart';
 import 'package:how_many_mobile_meeple/model/settings.dart';
 import 'package:how_many_mobile_meeple/network_content_widget.dart';
 import 'package:how_many_mobile_meeple/platform/router.dart' as r;
@@ -36,10 +39,21 @@ class _ShelfOfShamePageState extends State<ShelfOfShamePage>
   bool _loading = true;
   String? _error;
 
+  /// The linked user's plays when viewing someone else's shelf; null on an own
+  /// shelf, which reads plays from the model instead.
+  Map<int, PlayData>? _targetPlays;
+  Timer? _targetPlaysRetry;
+
   @override
   void initState() {
     super.initState();
     _loadData();
+  }
+
+  @override
+  void dispose() {
+    _targetPlaysRetry?.cancel();
+    super.dispose();
   }
 
   String? get _targetUsername {
@@ -54,7 +68,13 @@ class _ShelfOfShamePageState extends State<ShelfOfShamePage>
       return;
     }
 
-    model.loadPlays();
+    // A linked shelf must reflect the linked user's plays, so fetch theirs and
+    // leave the model untouched; an own shelf uses the model's plays.
+    if (_isViewingOtherPlayer(model)) {
+      unawaited(_loadTargetPlays(username));
+    } else {
+      model.loadPlays();
+    }
 
     try {
       final games = await _fetchFullCollection(username);
@@ -97,6 +117,37 @@ class _ShelfOfShamePageState extends State<ShelfOfShamePage>
     } finally {
       _fetchInFlight = null;
     }
+  }
+
+  /// Loads the linked user's plays and rebuilds, retrying incomplete results
+  /// the way the model does. Every game reads as unplayed until the first load.
+  Future<void> _loadTargetPlays(String username) async {
+    try {
+      final result = await PlaysService.fetchPlays(username);
+      if (!mounted) return;
+      setState(() => _targetPlays = result.plays);
+      if (!result.complete) {
+        _targetPlaysRetry?.cancel();
+        final seconds =
+            result.retryAfterSeconds > 0 ? result.retryAfterSeconds : 30;
+        _targetPlaysRetry = Timer(Duration(seconds: seconds), () {
+          PlaysService.clearCache();
+          _loadTargetPlays(username);
+        });
+      }
+    } catch (_) {
+      // Leave _targetPlays null so every game shows as unplayed rather than
+      // hiding games we could not confirm as played.
+    }
+  }
+
+  bool _isUnplayed(AppModel model, int gameId) {
+    if (_isViewingOtherPlayer(model)) {
+      final plays = _targetPlays;
+      if (plays == null) return true;
+      return (plays[gameId]?.totalPlays ?? 0) == 0;
+    }
+    return model.isUnplayed(gameId);
   }
 
   @override
@@ -226,7 +277,7 @@ class _ShelfOfShamePageState extends State<ShelfOfShamePage>
   Widget _buildBody(BuildContext context, AppModel model) {
     final allGames = _fullCollection!;
     final unplayedGames = allGames.gamesByName.values
-        .where((game) => model.isUnplayed(game.id))
+        .where((game) => _isUnplayed(model, game.id))
         .toList()
       ..sort(_worstOffenderFirst);
 
@@ -276,24 +327,44 @@ class _ShelfOfShamePageState extends State<ShelfOfShamePage>
     );
   }
 
+  /// True when the shelf belongs to someone other than the stored primary
+  /// player - i.e. we followed a shared permalink for a different collection,
+  /// so the banner should read as "viewing" rather than "your" shelf.
+  bool _isViewingOtherPlayer(AppModel model) =>
+      widget.username != null && widget.username != model.primaryPlayer;
+
   Widget _buildCollectionBanner(
       BuildContext context, AppModel model, int count) {
+    final scheme = Theme.of(context).colorScheme;
     final displayName = _targetUsername ?? model.primaryPlayer ?? '';
+    final viewingOther = _isViewingOtherPlayer(model);
+
+    final background =
+        (viewingOther ? scheme.tertiaryContainer : scheme.primaryContainer)
+            .withAlpha(120);
+    final foreground =
+        viewingOther ? scheme.onTertiaryContainer : scheme.onPrimaryContainer;
+    final label = viewingOther
+        ? 'Viewing $displayName\'s shelf • $count unplayed'
+        : '$displayName\'s collection • $count unplayed';
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      color: Theme.of(context).colorScheme.primaryContainer.withAlpha(120),
+      color: background,
       child: Row(
         children: [
-          FaIcon(FontAwesomeIcons.crown,
-              size: 14, color: Theme.of(context).colorScheme.primary),
+          if (viewingOther)
+            Icon(Icons.visibility, size: 16, color: scheme.tertiary)
+          else
+            FaIcon(FontAwesomeIcons.crown, size: 14, color: scheme.primary),
           const SizedBox(width: 8),
           Expanded(
             child: Text(
-              '$displayName\'s collection • $count unplayed',
+              label,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     fontWeight: FontWeight.w500,
-                    color: Theme.of(context).colorScheme.onPrimaryContainer,
+                    color: foreground,
                   ),
             ),
           ),

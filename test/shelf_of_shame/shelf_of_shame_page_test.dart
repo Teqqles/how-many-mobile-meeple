@@ -16,11 +16,11 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../helpers/mock_api_client.dart';
 import '../helpers/sync_mock_client.dart';
 
-Widget _buildTestApp(AppModel model) {
+Widget _buildTestApp(AppModel model, {Widget page = const ShelfOfShamePage()}) {
   return ChangeNotifierProvider<AppModel>.value(
     value: model,
     child: MaterialApp(
-      home: const ShelfOfShamePage(),
+      home: page,
     ),
   );
 }
@@ -104,6 +104,82 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.textContaining("teqqles's collection"), findsOneWidget);
+    });
+
+    testWidgets(
+        'banner reads as "viewing" when the shelf is for another player',
+        (tester) async {
+      HttpRetryClient.setTestClient(mockApiClient(
+        collection: [
+          _gameJson(1, 'Wingspan'),
+        ],
+        plays: [],
+      ));
+
+      // Stored primary player is teqqles, but we followed a permalink for a
+      // different collection.
+      final model = AppModel();
+      await model.addItem(Item('teqqles'));
+
+      await tester.pumpWidget(_buildTestApp(model,
+          page: const ShelfOfShamePage(username: 'linkeduser')));
+      await tester.pumpAndSettle();
+
+      expect(find.textContaining("Viewing linkeduser's shelf"), findsOneWidget);
+      expect(find.textContaining("teqqles's collection"), findsNothing);
+    });
+
+    testWidgets(
+        "linked shelf shows the linked user's unplayed games, not the primary "
+        'player\'s', (tester) async {
+      // linkeduser left Wingspan unplayed; teqqles (primary) played both. If the
+      // page used the primary player's plays it would show "No shame here!".
+      HttpRetryClient.setTestClient(SyncMockClient((request) {
+        final path = request.url.path;
+        if (path.startsWith('/collection/')) {
+          return http.Response(
+              jsonEncode([_gameJson(1, 'Wingspan'), _gameJson(2, 'Catan')]),
+              200);
+        }
+        if (path.contains('/plays/linkeduser')) {
+          return http.Response(
+              jsonEncode({
+                'plays': [
+                  {'game_id': 2, 'game_name': 'Catan', 'total_plays': 3},
+                ],
+                'meta': {'complete': true},
+              }),
+              200);
+        }
+        if (path.startsWith('/plays/')) {
+          // teqqles (primary player) has played both games.
+          return http.Response(
+              jsonEncode({
+                'plays': [
+                  {'game_id': 1, 'game_name': 'Wingspan', 'total_plays': 5},
+                  {'game_id': 2, 'game_name': 'Catan', 'total_plays': 3},
+                ],
+                'meta': {'complete': true},
+              }),
+              200);
+        }
+        return http.Response('Not found', 404);
+      }));
+
+      final model = AppModel();
+      await model.addItem(Item('teqqles'));
+
+      await tester.pumpWidget(_buildTestApp(model,
+          page: const ShelfOfShamePage(username: 'linkeduser')));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Wingspan'), findsOneWidget,
+          reason: "unplayed for linkeduser, so it belongs on their shelf");
+      expect(find.text('Catan'), findsNothing,
+          reason: 'linkeduser has played Catan');
+      expect(find.text('No shame here!'), findsNothing,
+          reason:
+              "must not fall back to the primary player's all-played plays");
     });
 
     testWidgets('shows only unplayed games from full collection',

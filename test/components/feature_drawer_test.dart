@@ -3,14 +3,18 @@ library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:http/http.dart' as http;
+import 'package:how_many_mobile_meeple/api/http_retry_client.dart';
 import 'package:how_many_mobile_meeple/components/feature_drawer.dart';
 import 'package:how_many_mobile_meeple/model/item.dart';
 import 'package:how_many_mobile_meeple/model/model.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../helpers/sync_mock_client.dart';
 
 Widget _buildTestApp({AppModel? model}) {
   final appModel = model ?? AppModel();
+  addTearDown(appModel.dispose);
   return ChangeNotifierProvider<AppModel>.value(
     value: appModel,
     child: MaterialApp(
@@ -32,7 +36,12 @@ void main() {
 
   setUp(() {
     SharedPreferences.setMockInitialValues({});
+    // Adding a collection seeds filter defaults from analytics; a 404 resolves
+    // that fetch synchronously to a final result, so no retry timer is armed.
+    HttpRetryClient.setTestClient(
+        SyncMockClient((_) => http.Response('', 404)));
   });
+  tearDown(HttpRetryClient.resetTestClient);
 
   group('FeatureDrawer', () {
     testWidgets('displays Play section header', (tester) async {

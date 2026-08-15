@@ -149,6 +149,33 @@ void main() {
     });
   });
 
+  group('CollectionAnalytics.hasData', () {
+    test('true when any field is usable', () {
+      expect(CollectionAnalytics.fromJson(_fullBody()).hasData, isTrue);
+      expect(
+          CollectionAnalytics.fromJson({
+            'player_count_coverage': [
+              {'player_count': 4, 'best_or_recommended': 99}
+            ]
+          }).hasData,
+          isTrue);
+    });
+
+    test('false when all sections are empty (not-ready response)', () {
+      final a = CollectionAnalytics.fromJson({
+        'summary': {},
+        'complexity_distribution': [],
+        'playtime_distribution': [],
+        'player_count_coverage': [],
+      });
+      expect(a.hasData, isFalse);
+    });
+
+    test('false for an empty body', () {
+      expect(CollectionAnalytics.fromJson({}).hasData, isFalse);
+    });
+  });
+
   group('CollectionAnalytics.fromJson — Performance', () {
     test('parses a large distribution in linear time', () {
       final big = List.generate(

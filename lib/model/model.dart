@@ -11,6 +11,7 @@ import 'package:how_many_mobile_meeple/platform/web/url_fragment_extractor.dart'
 import 'package:how_many_mobile_meeple/storage/preferences_history_interface.dart';
 import 'package:how_many_mobile_meeple/storage/storage_factory.dart';
 import 'package:how_many_mobile_meeple/storage/stored_preferences.dart';
+import 'package:how_many_mobile_meeple/util/retry_scheduler.dart';
 import 'package:provider/provider.dart';
 import 'package:how_many_mobile_meeple/model/settings.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -67,7 +68,7 @@ class AppModel extends ChangeNotifier {
 
   set primaryPlayer(String? value) {
     if (_primaryPlayer == value) return;
-    _playsRetryTimer?.cancel();
+    _playsRetry.cancel();
     _primaryPlayer = value;
     _playsLoaded = false;
     _playsData = {};
@@ -150,11 +151,22 @@ class AppModel extends ChangeNotifier {
   bool isInCollection(int gameId) => _collectionGameIds.contains(gameId);
 
   Future<void>? _loadPlaysInFlight;
-  Timer? _playsRetryTimer;
+  final RetryScheduler _playsRetry = RetryScheduler();
 
   String? _analyticsSeededFor;
+  String? _analyticsSeedTarget;
+  bool _analyticsSeedInFlight = false;
+  int _analyticsSeedAttempts = 0;
+  final RetryScheduler _analyticsRetry = RetryScheduler();
 
-  /// Completes when the most recent seed attempt finishes. Test seam only.
+  static const int _maxAnalyticsSeedAttempts = 5;
+
+  /// Base retry delay (seconds), scaled by attempt for linear backoff.
+  /// Overridable so tests drive retries without real waits.
+  @visibleForTesting
+  static int analyticsRetryDelaySeconds = 3;
+
+  /// Completes when the latest seed attempt finishes. Test seam.
   @visibleForTesting
   Future<void>? analyticsSeedFuture;
 
@@ -164,16 +176,44 @@ class AppModel extends ChangeNotifier {
     return _loadPlaysInFlight ??= _doLoadPlays();
   }
 
-  /// Fire-and-forget: seed untouched filter defaults from the primary player's
-  /// collection analytics. Degrades silently and never triggers a refetch.
+  // Analytics compute async; early requests can be not-ready (non-200, or an
+  // empty 200). Retry (bounded), marking seeded only once usable data arrives.
   Future<void> _seedFiltersFromAnalytics(String username) async {
     if (_analyticsSeededFor == username) return;
-    _analyticsSeededFor = username;
-    final analytics = await CollectionAnalyticsService.fetch(username);
-    if (analytics == null || _disposed) return;
-    if (FilterSeeder.seed(analytics, _settings)) {
-      notifyListeners();
+    if (username != _analyticsSeedTarget) {
+      _analyticsSeedTarget = username;
+      _analyticsSeedAttempts = 0;
+      _analyticsRetry.cancel();
+    } else if (_analyticsSeedInFlight || _analyticsRetry.isActive) {
+      return;
     }
+    _analyticsSeedInFlight = true;
+    try {
+      final result = await CollectionAnalyticsService.fetch(username);
+      if (_disposed) return;
+      final analytics = result.analytics;
+      if (analytics != null && analytics.hasData) {
+        _analyticsSeededFor = username;
+        _analyticsRetry.cancel();
+        if (FilterSeeder.seed(analytics, _settings)) notifyListeners();
+        return;
+      }
+      if (result.retryable) _scheduleAnalyticsSeedRetry(username);
+    } finally {
+      _analyticsSeedInFlight = false;
+    }
+  }
+
+  void _scheduleAnalyticsSeedRetry(String username) {
+    if (_analyticsSeedAttempts >= _maxAnalyticsSeedAttempts) return;
+    _analyticsSeedAttempts++;
+    _analyticsRetry.schedule(
+      Duration(seconds: analyticsRetryDelaySeconds * _analyticsSeedAttempts),
+      () {
+        if (_disposed || _analyticsSeededFor == username) return;
+        analyticsSeedFuture = _seedFiltersFromAnalytics(username);
+      },
+    );
   }
 
   Future<void> _doLoadPlays() async {
@@ -204,7 +244,8 @@ class AppModel extends ChangeNotifier {
   @override
   void dispose() {
     _disposed = true;
-    _playsRetryTimer?.cancel();
+    _playsRetry.cancel();
+    _analyticsRetry.cancel();
     // Flush any pending debounced write so a change made just before the user
     // navigates away is not lost.
     if (_storeDebounceTimer?.isActive ?? false) {
@@ -215,9 +256,8 @@ class AppModel extends ChangeNotifier {
   }
 
   void _schedulePlaysRetry(int delaySeconds) {
-    _playsRetryTimer?.cancel();
     final seconds = delaySeconds > 0 ? delaySeconds : 30;
-    _playsRetryTimer = Timer(Duration(seconds: seconds), () {
+    _playsRetry.schedule(Duration(seconds: seconds), () {
       PlaysService.clearCache();
       loadPlays();
     });
@@ -302,12 +342,19 @@ class AppModel extends ChangeNotifier {
 
   Future<void> addItem(Item item) async {
     _items.itemList.add(item);
-    if (item.itemType == ItemType.collection && _primaryPlayer == null) {
+    final establishedPrimary =
+        item.itemType == ItemType.collection && _primaryPlayer == null;
+    if (establishedPrimary) {
       _primaryPlayer = item.name;
       _persistPrimaryPlayer();
     }
     invalidateCache();
     await updateStore();
+    // New primary player: seed filter defaults now, not on the next refresh.
+    // Plays load separately via PlaysLoadingIndicator.
+    if (establishedPrimary) {
+      analyticsSeedFuture = _seedFiltersFromAnalytics(item.name);
+    }
   }
 
   Future<void> replaceItems(Items items) async {

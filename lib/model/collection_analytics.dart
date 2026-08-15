@@ -91,10 +91,17 @@ class CollectionAnalytics {
   static (int, int?)? _parseIntRange(String label) {
     final closed = RegExp(r'\[(\d+),\s*(\d+)\)').firstMatch(label);
     if (closed != null) {
-      return (int.parse(closed.group(1)!), int.parse(closed.group(2)!));
+      final lo = int.tryParse(closed.group(1)!);
+      final hi = int.tryParse(closed.group(2)!);
+      if (lo == null || hi == null) return null;
+      return (lo, hi);
     }
     final open = RegExp(r'\[(\d+)\+\)').firstMatch(label);
-    if (open != null) return (int.parse(open.group(1)!), null);
+    if (open != null) {
+      final lo = int.tryParse(open.group(1)!);
+      if (lo == null) return null;
+      return (lo, null);
+    }
     return null;
   }
 
@@ -102,10 +109,17 @@ class CollectionAnalytics {
   static (double, double?)? _parseFloatRange(String label) {
     final closed = RegExp(r'\[([\d.]+),\s*([\d.]+)\)').firstMatch(label);
     if (closed != null) {
-      return (double.parse(closed.group(1)!), double.parse(closed.group(2)!));
+      final lo = double.tryParse(closed.group(1)!);
+      final hi = double.tryParse(closed.group(2)!);
+      if (lo == null || hi == null) return null;
+      return (lo, hi);
     }
     final open = RegExp(r'\[([\d.]+)\+\)').firstMatch(label);
-    if (open != null) return (double.parse(open.group(1)!), null);
+    if (open != null) {
+      final lo = double.tryParse(open.group(1)!);
+      if (lo == null) return null;
+      return (lo, null);
+    }
     return null;
   }
 }

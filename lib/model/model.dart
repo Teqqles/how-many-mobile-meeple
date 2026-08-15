@@ -1,8 +1,10 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/cupertino.dart';
+import 'package:how_many_mobile_meeple/api/collection_analytics_service.dart';
 import 'package:how_many_mobile_meeple/api/http_retry_client.dart';
 import 'package:how_many_mobile_meeple/api/plays_service.dart';
+import 'package:how_many_mobile_meeple/model/filter_seeder.dart';
 import 'package:how_many_mobile_meeple/model/play_data.dart';
 import 'package:how_many_mobile_meeple/play_log/play_log_service.dart';
 import 'package:how_many_mobile_meeple/platform/web/url_fragment_extractor.dart';
@@ -150,9 +152,28 @@ class AppModel extends ChangeNotifier {
   Future<void>? _loadPlaysInFlight;
   Timer? _playsRetryTimer;
 
+  String? _analyticsSeededFor;
+
+  /// Completes when the most recent seed attempt finishes. Test seam only.
+  @visibleForTesting
+  Future<void>? analyticsSeedFuture;
+
   Future<void> loadPlays() {
     if (_primaryPlayer == null) return Future.value();
+    analyticsSeedFuture = _seedFiltersFromAnalytics(_primaryPlayer!);
     return _loadPlaysInFlight ??= _doLoadPlays();
+  }
+
+  /// Fire-and-forget: seed untouched filter defaults from the primary player's
+  /// collection analytics. Degrades silently and never triggers a refetch.
+  Future<void> _seedFiltersFromAnalytics(String username) async {
+    if (_analyticsSeededFor == username) return;
+    _analyticsSeededFor = username;
+    final analytics = await CollectionAnalyticsService.fetch(username);
+    if (analytics == null || _disposed) return;
+    if (FilterSeeder.seed(analytics, _settings)) {
+      notifyListeners();
+    }
   }
 
   Future<void> _doLoadPlays() async {

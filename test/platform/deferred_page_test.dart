@@ -48,7 +48,7 @@ void main() {
     var collectionCount = 0;
     HttpRetryClient.setTestClient(SyncMockClient((req) {
       final p = req.url.path;
-      if (p.startsWith('/collection/')) {
+      if (p.startsWith('/collection/') && !p.endsWith('/analytics')) {
         collectionCount++;
         return http.Response(
             jsonEncode([_gameJson(1, 'Wingspan'), _gameJson(2, 'Catan')]), 200);

@@ -10,7 +10,7 @@ class FilterSeeder {
   static const int _maxPlayers = 10;
   static const int _minTime = 15;
   static const int _maxTime = 300;
-  static const double _minWeight = 0.0;
+  static const double _minWeight = 0.5;
   static const double _maxWeight = 5.0;
 
   static bool seed(CollectionAnalytics analytics, Settings settings) {
@@ -25,18 +25,7 @@ class FilterSeeder {
 
     final time = analytics.dominantPlaytime;
     if (time != null) {
-      changed |= _seedInt(
-        settings.setting(Settings.filterMinimumTimeToPlay.name),
-        time.min,
-        _minTime,
-        _maxTime,
-      );
-      changed |= _seedInt(
-        settings.setting(Settings.filterMaximumTimeToPlay.name),
-        time.max,
-        _minTime,
-        _maxTime,
-      );
+      changed |= _seedTimeRange(settings, time);
     }
 
     changed |= _seedDouble(
@@ -45,6 +34,41 @@ class FilterSeeder {
       _minWeight,
       _maxWeight,
     );
+
+    return changed;
+  }
+
+  /// Seeds the time range as one operation: fix the effective max first, then
+  /// clamp min below it, so the two sliders can never invert.
+  static bool _seedTimeRange(Settings settings, PlaytimeRange time) {
+    var changed = false;
+    final minSetting = settings.setting(Settings.filterMinimumTimeToPlay.name);
+    final maxSetting = settings.setting(Settings.filterMaximumTimeToPlay.name);
+
+    // Determine effective max: seed from bucket if untouched, else use current.
+    int effectiveMax;
+    if (!maxSetting.enabled) {
+      // Untouched: seed from bucket (use slider max for open-ended).
+      final bucketMax = time.max ?? _maxTime;
+      final clampedMax = bucketMax.clamp(_minTime, _maxTime).toInt();
+      if (maxSetting.value != clampedMax) {
+        maxSetting.value = clampedMax;
+        changed = true;
+      }
+      effectiveMax = clampedMax;
+    } else {
+      // User-set: leave it, use as constraint.
+      effectiveMax = maxSetting.value as int;
+    }
+
+    // Seed min, clamped to never exceed effective max.
+    if (!minSetting.enabled) {
+      final clampedMin = time.min.clamp(_minTime, effectiveMax).toInt();
+      if (minSetting.value != clampedMin) {
+        minSetting.value = clampedMin;
+        changed = true;
+      }
+    }
 
     return changed;
   }

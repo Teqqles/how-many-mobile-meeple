@@ -41,12 +41,48 @@ void main() {
       expect(s.setting(Settings.filterNumberOfPlayers.name).value, 10);
     });
 
-    test('null max leaves max time untouched', () {
+    test('open-ended bucket with both time settings untouched seeds max to 300',
+        () {
       final s = Settings.defaultSettings();
-      final before = s.setting(Settings.filterMaximumTimeToPlay.name).value;
       FilterSeeder.seed(_analytics(time: const PlaytimeRange(120, null)), s);
-      expect(s.setting(Settings.filterMinimumTimeToPlay.name).value, 120);
-      expect(s.setting(Settings.filterMaximumTimeToPlay.name).value, before);
+      final min = s.setting(Settings.filterMinimumTimeToPlay.name).value;
+      final max = s.setting(Settings.filterMaximumTimeToPlay.name).value;
+      expect(min, 120);
+      expect(max, 300); // open-ended → slider max
+      expect(min <= max, isTrue, reason: 'min must not exceed max');
+    });
+
+    test('open-ended bucket with max user-set clamps seeded min to that max',
+        () {
+      final s = Settings.defaultSettings();
+      final maxSetting = s.setting(Settings.filterMaximumTimeToPlay.name);
+      maxSetting.value = 90;
+      maxSetting.enabled = true; // user-set
+      FilterSeeder.seed(_analytics(time: const PlaytimeRange(120, null)), s);
+      final min = s.setting(Settings.filterMinimumTimeToPlay.name).value;
+      final max = maxSetting.value;
+      expect(max, 90); // user-set, unchanged
+      expect(min, 90); // clamped to max
+      expect(min <= max, isTrue, reason: 'min must not exceed max');
+    });
+
+    test('closed bucket min exceeding user-set max is clamped', () {
+      final s = Settings.defaultSettings();
+      final maxSetting = s.setting(Settings.filterMaximumTimeToPlay.name);
+      maxSetting.value = 60;
+      maxSetting.enabled = true; // user-set
+      FilterSeeder.seed(_analytics(time: const PlaytimeRange(90, 120)), s);
+      final min = s.setting(Settings.filterMinimumTimeToPlay.name).value;
+      final max = maxSetting.value;
+      expect(max, 60); // user-set, unchanged
+      expect(min, 60); // clamped to max
+      expect(min <= max, isTrue, reason: 'min must not exceed max');
+    });
+
+    test('complexity seeds to slider floor when analytics is below it', () {
+      final s = Settings.defaultSettings();
+      FilterSeeder.seed(_analytics(weight: 0.3), s);
+      expect(s.setting(Settings.filterComplexity.name).value, 0.5);
     });
   });
 

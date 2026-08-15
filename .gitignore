@@ -191,7 +191,7 @@ coverage/
 coverage.html/
 
 # Local configuration overrides
-web/config.local.json
+web/config.local.json*
 
 # Flutter auto-generated files
 .flutter-plugins-dependencies

@@ -8,6 +8,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:how_many_mobile_meeple/api/http_retry_client.dart';
 import 'package:how_many_mobile_meeple/api/plays_service.dart';
 import 'package:how_many_mobile_meeple/app_common.dart';
+import 'package:how_many_mobile_meeple/util/retry_scheduler.dart';
 import 'package:how_many_mobile_meeple/app_page.dart';
 import 'package:how_many_mobile_meeple/components/feature_drawer.dart';
 import 'package:how_many_mobile_meeple/components/plays_loading_indicator.dart';
@@ -41,7 +42,7 @@ class _ShelfOfShamePageState extends State<ShelfOfShamePage>
 
   /// Linked user's plays when viewing another shelf; null on an own shelf.
   Map<int, PlayData>? _targetPlays;
-  Timer? _targetPlaysRetry;
+  final RetryScheduler _targetPlaysRetry = RetryScheduler();
 
   @override
   void initState() {
@@ -51,7 +52,7 @@ class _ShelfOfShamePageState extends State<ShelfOfShamePage>
 
   @override
   void dispose() {
-    _targetPlaysRetry?.cancel();
+    _targetPlaysRetry.cancel();
     super.dispose();
   }
 
@@ -124,10 +125,9 @@ class _ShelfOfShamePageState extends State<ShelfOfShamePage>
       if (!mounted) return;
       setState(() => _targetPlays = result.plays);
       if (!result.complete) {
-        _targetPlaysRetry?.cancel();
         final seconds =
             result.retryAfterSeconds > 0 ? result.retryAfterSeconds : 30;
-        _targetPlaysRetry = Timer(Duration(seconds: seconds), () {
+        _targetPlaysRetry.schedule(Duration(seconds: seconds), () {
           PlaysService.clearCache();
           _loadTargetPlays(username);
         });

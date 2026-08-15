@@ -26,14 +26,16 @@ void main() {
   });
 
   group('CollectionAnalyticsService.fetch — Right', () {
-    test('200 with valid body returns a populated model', () async {
+    test('200 with valid body returns a populated model, not retryable',
+        () async {
       HttpRetryClient.setTestClient(
           SyncMockClient((_) => http.Response(_body(), 200)));
-      final a = await CollectionAnalyticsService.fetch('teqqles');
-      expect(a, isNotNull);
-      expect(a!.mostCoveredPlayerCount, 4);
-      expect(a.averageWeight, 2.3);
-      expect(a.dominantPlaytime!.min, 30);
+      final r = await CollectionAnalyticsService.fetch('teqqles');
+      expect(r.analytics, isNotNull);
+      expect(r.analytics!.mostCoveredPlayerCount, 4);
+      expect(r.analytics!.averageWeight, 2.3);
+      expect(r.analytics!.dominantPlaytime!.min, 30);
+      expect(r.retryable, isFalse);
     });
   });
 
@@ -50,39 +52,58 @@ void main() {
   });
 
   group('CollectionAnalyticsService.fetch — Boundary', () {
-    test('200 with empty sections returns model with null fields', () async {
+    test('200 with empty sections returns null fields and is retryable',
+        () async {
       HttpRetryClient.setTestClient(SyncMockClient(
           (_) => http.Response(jsonEncode({'summary': {}}), 200)));
-      final a = await CollectionAnalyticsService.fetch('teqqles');
-      expect(a, isNotNull);
-      expect(a!.mostCoveredPlayerCount, isNull);
+      final r = await CollectionAnalyticsService.fetch('teqqles');
+      expect(r.analytics, isNotNull);
+      expect(r.analytics!.mostCoveredPlayerCount, isNull);
+      // Empty 200 means analytics are still being computed.
+      expect(r.retryable, isTrue);
     });
   });
 
   group('CollectionAnalyticsService.fetch — Error', () {
-    test('non-200 returns null', () async {
+    test('404 (no such user) gives up, not retryable', () async {
       HttpRetryClient.setTestClient(
           SyncMockClient((_) => http.Response('nope', 404)));
-      expect(await CollectionAnalyticsService.fetch('teqqles'), isNull);
+      final r = await CollectionAnalyticsService.fetch('teqqles');
+      expect(r.analytics, isNull);
+      expect(r.retryable, isFalse);
     });
 
-    test('invalid JSON returns null', () async {
+    test('5xx (still computing) is retryable', () async {
+      HttpRetryClient.setTestClient(
+          SyncMockClient((_) => http.Response('boom', 503)));
+      final r = await CollectionAnalyticsService.fetch('teqqles');
+      expect(r.analytics, isNull);
+      expect(r.retryable, isTrue);
+    });
+
+    test('invalid JSON on 200 gives up, not retryable', () async {
       HttpRetryClient.setTestClient(
           SyncMockClient((_) => http.Response('not json', 200)));
-      expect(await CollectionAnalyticsService.fetch('teqqles'), isNull);
+      final r = await CollectionAnalyticsService.fetch('teqqles');
+      expect(r.analytics, isNull);
+      expect(r.retryable, isFalse);
     });
 
-    test('non-map JSON returns null', () async {
+    test('non-map JSON on 200 gives up, not retryable', () async {
       HttpRetryClient.setTestClient(
           SyncMockClient((_) => http.Response('[1,2,3]', 200)));
-      expect(await CollectionAnalyticsService.fetch('teqqles'), isNull);
+      final r = await CollectionAnalyticsService.fetch('teqqles');
+      expect(r.analytics, isNull);
+      expect(r.retryable, isFalse);
     });
 
-    test('thrown client error returns null', () async {
+    test('thrown client error is retryable (network/timeout)', () async {
       HttpRetryClient.setTestClient(SyncMockClient((_) {
         throw Exception('network down');
       }));
-      expect(await CollectionAnalyticsService.fetch('teqqles'), isNull);
+      final r = await CollectionAnalyticsService.fetch('teqqles');
+      expect(r.analytics, isNull);
+      expect(r.retryable, isTrue);
     });
   });
 }

@@ -15,6 +15,12 @@ class CollectionAnalytics {
     this.dominantPlaytime,
   });
 
+  /// True when any field parsed; false for an empty/not-ready response.
+  bool get hasData =>
+      mostCoveredPlayerCount != null ||
+      averageWeight != null ||
+      dominantPlaytime != null;
+
   factory CollectionAnalytics.fromJson(Map<String, dynamic> json) {
     return CollectionAnalytics(
       mostCoveredPlayerCount:

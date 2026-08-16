@@ -41,6 +41,7 @@ class HelpContent {
   static const String favourites = 'favourites';
   static const String playLog = 'play-log';
   static const String shelfOfShame = 'shelf-of-shame';
+  static const String collectionInsights = 'collection-insights';
   static const String settings = 'settings';
   static const String gameDetail = 'game-detail';
 
@@ -186,6 +187,35 @@ class HelpContent {
           title: 'Whose Shelf?',
           body: 'The shelf uses your primary player\'s BGG collection. Set the '
               'primary player with the crown icon on Step 1.',
+        ),
+      ],
+    ),
+    HelpSection(
+      id: collectionInsights,
+      icon: Icons.insights,
+      title: 'Collection Insights',
+      summary:
+          'A dashboard summarising your collection: headline totals, complexity '
+          'and play-time spreads, player-count coverage, and your most common '
+          'mechanics. Needs a BGG collection added as a source.',
+      items: [
+        HelpItem(
+          icon: Icons.grid_view,
+          title: 'Overview',
+          body: 'Totals for base games and expansions, plus average and median '
+              'ratings and average weight across the collection.',
+        ),
+        HelpItem(
+          icon: Icons.bar_chart,
+          title: 'Distributions',
+          body: 'Complexity and play-time bars show how your games spread '
+              'across light-to-heavy and quick-to-epic bands.',
+        ),
+        HelpItem(
+          icon: Icons.people_outline,
+          title: 'Player Counts',
+          body: 'For each player count, the solid bar is how many games play '
+              'best there; the faint bar is how many support it.',
         ),
       ],
     ),

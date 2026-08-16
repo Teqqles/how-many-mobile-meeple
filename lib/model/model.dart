@@ -166,6 +166,8 @@ class AppModel extends ChangeNotifier {
   /// Drives quick-filter enhancements that degrade gracefully when absent.
   CollectionAnalytics? get collectionAnalytics => _collectionAnalytics;
 
+  CollectionSummary? get collectionSummary => _collectionAnalytics?.summary;
+
   List<MechanicCount> get topMechanics =>
       _collectionAnalytics?.topMechanics ?? const [];
 

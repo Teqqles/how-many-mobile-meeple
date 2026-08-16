@@ -100,6 +100,31 @@ void main() {
       expect(find.text('Shelf of Shame'), findsOneWidget);
     });
 
+    testWidgets('displays Collection Insights in Discover section',
+        (tester) async {
+      await tester.pumpWidget(_buildTestApp());
+      await tester.tap(find.text('Open Drawer'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Collection Insights'), findsOneWidget);
+    });
+
+    testWidgets(
+        'shows collection-specific snackbar when tapping Collection Insights without collection',
+        (tester) async {
+      final model = AppModel();
+      await model.addItem(Item('trending', itemType: ItemType.hotList));
+
+      await tester.pumpWidget(_buildTestApp(model: model));
+      await tester.tap(find.text('Open Drawer'));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Collection Insights'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Add a BGG collection first'), findsOneWidget);
+    });
+
     testWidgets('displays Favourites in My Games section', (tester) async {
       await tester.pumpWidget(_buildTestApp());
       await tester.tap(find.text('Open Drawer'));
@@ -121,6 +146,8 @@ void main() {
       await tester.tap(find.text('Open Drawer'));
       await tester.pumpAndSettle();
 
+      await tester.scrollUntilVisible(find.text('Board Game News'), 100,
+          scrollable: find.byType(Scrollable).first);
       expect(find.text('Board Game News'), findsOneWidget);
     });
 

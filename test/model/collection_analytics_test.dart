@@ -85,6 +85,56 @@ void main() {
     });
   });
 
+  group('CollectionAnalytics.summary', () {
+    test('parses the summary block', () {
+      final s = CollectionAnalytics.fromJson(_fullBody()).summary!;
+      expect(s.totalGames, 113);
+      expect(s.medianRating, 7.42);
+      expect(s.averageWeight, 2.3);
+    });
+
+    test('parses all numeric summary fields', () {
+      final s = CollectionAnalytics.fromJson({
+        'summary': {
+          'total_games': 113,
+          'base_games': 85,
+          'expansions': 28,
+          'average_rating': 7.39,
+          'median_rating': 7.42,
+          'average_weight': 2.3,
+        }
+      }).summary!;
+      expect(s.totalGames, 113);
+      expect(s.baseGames, 85);
+      expect(s.expansions, 28);
+      expect(s.averageRating, 7.39);
+      expect(s.medianRating, 7.42);
+      expect(s.averageWeight, 2.3);
+    });
+
+    test('coerces int rating/weight to double', () {
+      final s = CollectionAnalytics.fromJson({
+        'summary': {'average_rating': 7, 'average_weight': 2}
+      }).summary!;
+      expect(s.averageRating, 7.0);
+      expect(s.averageWeight, 2.0);
+    });
+
+    test('summary is null when the block is empty or missing', () {
+      expect(CollectionAnalytics.fromJson({'summary': {}}).summary, isNull);
+      expect(CollectionAnalytics.fromJson({}).summary, isNull);
+      expect(CollectionAnalytics.fromJson({'summary': 'nope'}).summary, isNull);
+    });
+
+    test('summary presence keeps hasData true', () {
+      final a = CollectionAnalytics.fromJson({
+        'summary': {'total_games': 5}
+      });
+      expect(a.summary, isNotNull);
+      expect(a.hasData, isTrue);
+    });
+  });
+
   group('CollectionAnalytics raw distributions', () {
     test('parses player_count_coverage sorted ascending by player count', () {
       final a = CollectionAnalytics.fromJson(_fullBody());

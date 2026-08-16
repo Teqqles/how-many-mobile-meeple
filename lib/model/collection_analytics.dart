@@ -4,22 +4,31 @@ class PlaytimeRange {
   const PlaytimeRange(this.min, this.max);
 }
 
+class MechanicCount {
+  final String name;
+  final int count;
+  const MechanicCount(this.name, this.count);
+}
+
 class CollectionAnalytics {
   final int? mostCoveredPlayerCount;
   final double? averageWeight;
   final PlaytimeRange? dominantPlaytime;
+  final List<MechanicCount> topMechanics;
 
   const CollectionAnalytics({
     this.mostCoveredPlayerCount,
     this.averageWeight,
     this.dominantPlaytime,
+    this.topMechanics = const [],
   });
 
   /// True when any field parsed; false for an empty/not-ready response.
   bool get hasData =>
       mostCoveredPlayerCount != null ||
       averageWeight != null ||
-      dominantPlaytime != null;
+      dominantPlaytime != null ||
+      topMechanics.isNotEmpty;
 
   factory CollectionAnalytics.fromJson(Map<String, dynamic> json) {
     return CollectionAnalytics(
@@ -27,7 +36,24 @@ class CollectionAnalytics {
           _mostCoveredPlayerCount(json['player_count_coverage']),
       averageWeight: _averageWeight(json),
       dominantPlaytime: _dominantPlaytime(json['playtime_distribution']),
+      topMechanics: _topMechanics(json['top_mechanics']),
     );
+  }
+
+  /// Parses `[{name, count}, ...]` into count-descending order, dropping
+  /// malformed entries. Empty when the field is missing or not a list.
+  static List<MechanicCount> _topMechanics(dynamic list) {
+    if (list is! List) return const [];
+    final result = <MechanicCount>[];
+    for (final entry in list) {
+      if (entry is! Map) continue;
+      final name = entry['name'];
+      final count = entry['count'];
+      if (name is! String || count is! int) continue;
+      result.add(MechanicCount(name, count));
+    }
+    result.sort((a, b) => b.count.compareTo(a.count));
+    return result;
   }
 
   static int? _mostCoveredPlayerCount(dynamic coverage) {

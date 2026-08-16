@@ -7,6 +7,7 @@ import 'package:http/http.dart' as http;
 import 'package:how_many_mobile_meeple/api/http_retry_client.dart';
 import '../helpers/sync_mock_client.dart';
 import 'package:how_many_mobile_meeple/guided_flow/step4_game_style.dart';
+import 'package:how_many_mobile_meeple/model/collection_analytics.dart';
 import 'package:how_many_mobile_meeple/model/model.dart';
 import 'package:how_many_mobile_meeple/model/settings.dart';
 import 'package:provider/provider.dart';
@@ -46,6 +47,30 @@ void main() {
 
       expect(find.text('Game Style'), findsOneWidget);
       expect(find.text('Choose difficulty and mechanics'), findsOneWidget);
+    });
+
+    testWidgets('shows popular-in-collection chips when analytics are present',
+        (WidgetTester tester) async {
+      final model = AppModel();
+      model.setCollectionAnalyticsForTest(CollectionAnalytics.fromJson({
+        'top_mechanics': [
+          {'name': 'Hand Management', 'count': 43}
+        ]
+      }));
+
+      await tester.pumpWidget(_buildTestWidget(model));
+
+      expect(find.text('Popular in your collection'), findsOneWidget);
+      expect(find.text('Hand Management'), findsWidgets);
+    });
+
+    testWidgets('hides popular chips when analytics are absent',
+        (WidgetTester tester) async {
+      final model = AppModel();
+
+      await tester.pumpWidget(_buildTestWidget(model));
+
+      expect(find.text('Popular in your collection'), findsNothing);
     });
 
     testWidgets('displays difficulty section', (WidgetTester tester) async {

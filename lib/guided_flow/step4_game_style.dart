@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:how_many_mobile_meeple/model/model.dart';
 import 'package:how_many_mobile_meeple/model/settings.dart';
 import 'package:how_many_mobile_meeple/components/app_choice_chip.dart';
+import 'package:how_many_mobile_meeple/components/top_mechanic_chips_widget.dart';
 import 'package:how_many_mobile_meeple/components/step_header_card.dart';
 import 'package:how_many_mobile_meeple/components/info_message_box.dart';
 import 'package:how_many_mobile_meeple/components/unplayed_only_toggle.dart';
@@ -189,6 +190,9 @@ class _Step4GameStyleState extends State<Step4GameStyle> {
                       ),
                 ),
                 const SizedBox(height: 16),
+
+                // Quick chips for the mechanics this collection owns most.
+                const TopMechanicChipsWidget(alignment: WrapAlignment.start),
 
                 // Mechanics by category
                 ..._mechanicsCategories.entries.map((category) {

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:how_many_mobile_meeple/components/app_choice_chip.dart';
 import 'package:how_many_mobile_meeple/components/app_switch.dart';
+import 'package:how_many_mobile_meeple/components/top_mechanic_chips_widget.dart';
 import 'package:how_many_mobile_meeple/model/model.dart';
 import 'package:how_many_mobile_meeple/model/settings.dart';
 import 'package:how_many_mobile_meeple/platform/router.dart' as r;
@@ -29,6 +30,7 @@ class _QuickPickSheetState extends State<QuickPickSheet> {
   int? _selectedMaxTime;
   double? _selectedWeight;
   bool _shelfOfShameOnly = false;
+  final Set<String> _selectedMechanics = {};
 
   @override
   void didChangeDependencies() {
@@ -63,6 +65,14 @@ class _QuickPickSheetState extends State<QuickPickSheet> {
     final sosSetting =
         model.settings.setting(Settings.filterShelfOfShameOnly.name);
     _shelfOfShameOnly = sosSetting.enabled && sosSetting.getBool();
+
+    final mechanicsSetting =
+        model.settings.setting(Settings.filterMechanics.name);
+    if (mechanicsSetting.enabled) {
+      _selectedMechanics
+        ..clear()
+        ..addAll((mechanicsSetting.value as List).cast<String>());
+    }
   }
 
   static const Map<String, int> _playerOptions = {
@@ -149,6 +159,7 @@ class _QuickPickSheetState extends State<QuickPickSheet> {
               onChanged: (value) => setState(() => _selectedWeight = value),
             ),
             const SizedBox(height: 16),
+            _buildMechanicsRow(),
             _buildShelfOfShameToggle(context),
             const SizedBox(height: 28),
             Consumer<AppModel>(
@@ -210,6 +221,56 @@ class _QuickPickSheetState extends State<QuickPickSheet> {
           }).toList(),
         ),
       ],
+    );
+  }
+
+  /// One-tap chips for the collection's most-owned mechanics. Staged locally
+  /// and applied on Go, like the other rows. Renders nothing (and adds no
+  /// spacing) until analytics arrive, so it degrades gracefully.
+  Widget _buildMechanicsRow() {
+    return Consumer<AppModel>(
+      builder: (context, model, child) {
+        final mechanics =
+            model.topMechanics.take(TopMechanicChipsWidget.maxChips).toList();
+        if (mechanics.isEmpty) return const SizedBox.shrink();
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(Icons.category,
+                    size: 20, color: Theme.of(context).colorScheme.primary),
+                const SizedBox(width: 8),
+                Text(
+                  'Mechanics',
+                  style: Theme.of(context)
+                      .textTheme
+                      .titleSmall
+                      ?.copyWith(fontWeight: FontWeight.bold),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: mechanics.map((mechanic) {
+                return AppMechanicChip(
+                  label: mechanic.name,
+                  selected: _selectedMechanics.contains(mechanic.name),
+                  onSelected: (selected) => setState(() {
+                    selected
+                        ? _selectedMechanics.add(mechanic.name)
+                        : _selectedMechanics.remove(mechanic.name);
+                  }),
+                );
+              }).toList(),
+            ),
+            const SizedBox(height: 16),
+          ],
+        );
+      },
     );
   }
 
@@ -305,6 +366,12 @@ class _QuickPickSheetState extends State<QuickPickSheet> {
     sosSetting.value = _shelfOfShameOnly;
     sosSetting.enabled = _shelfOfShameOnly;
     model.settings.updateSetting(sosSetting);
+
+    final mechanicsSetting =
+        model.settings.setting(Settings.filterMechanics.name);
+    mechanicsSetting.value = _selectedMechanics.toList();
+    mechanicsSetting.enabled = _selectedMechanics.isNotEmpty;
+    model.settings.updateSetting(mechanicsSetting);
 
     model.invalidateCache();
     model.updateStore();

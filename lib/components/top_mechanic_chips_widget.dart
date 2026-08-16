@@ -8,7 +8,12 @@ import 'package:provider/provider.dart';
 /// sourced from analytics. Renders nothing until analytics arrive, so it
 /// degrades gracefully while the endpoint is not-ready or unavailable.
 class TopMechanicChipsWidget extends StatelessWidget {
-  const TopMechanicChipsWidget({super.key});
+  const TopMechanicChipsWidget(
+      {super.key, this.alignment = WrapAlignment.center});
+
+  /// Horizontal alignment of the label and chip row. Centered for the filter
+  /// list; [WrapAlignment.start] for the left-aligned guided-flow card.
+  final WrapAlignment alignment;
 
   static const int maxChips = 10;
 
@@ -20,10 +25,12 @@ class TopMechanicChipsWidget extends StatelessWidget {
         if (mechanics.isEmpty) return const SizedBox.shrink();
 
         final setting = model.settings.setting(Settings.filterMechanics.name);
+        final start = alignment == WrapAlignment.start;
         return Padding(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
+            crossAxisAlignment:
+                start ? CrossAxisAlignment.start : CrossAxisAlignment.center,
             children: <Widget>[
               Text(
                 'Popular in your collection',
@@ -31,7 +38,7 @@ class TopMechanicChipsWidget extends StatelessWidget {
               ),
               const SizedBox(height: 4),
               Wrap(
-                alignment: WrapAlignment.center,
+                alignment: alignment,
                 spacing: 5,
                 runSpacing: 5,
                 children: mechanics.map((mechanic) {
@@ -41,11 +48,12 @@ class TopMechanicChipsWidget extends StatelessWidget {
                     onSelected: (bool selected) {
                       if (selected) {
                         setting.value.add(mechanic.name);
-                        // One-tap filtering: make the mechanics filter live.
-                        setting.enabled = true;
                       } else {
                         setting.value.remove(mechanic.name);
                       }
+                      // One-tap filtering: keep the mechanics filter live only
+                      // while at least one mechanic is chosen.
+                      setting.enabled = setting.value.isNotEmpty;
                       model.invalidateCache();
                       model.updateStore();
                     },

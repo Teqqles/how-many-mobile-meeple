@@ -101,6 +101,7 @@ class PlayerCoverageChart extends StatelessWidget {
   final List<PlayerCountCoverage> coverage;
 
   static const double _labelWidth = 24;
+  static const double _valueWidth = 32;
   static const double _barHeight = 20;
 
   @override
@@ -133,8 +134,8 @@ class PlayerCoverageChart extends StatelessWidget {
                     height: _barHeight,
                     child: Stack(
                       children: [
-                        // Supported region: chevron fill with the count
-                        // sitting at the end of its own segment.
+                        // Supported region: chevron fill only. Its count sits
+                        // at the far end of the track (see trailing column).
                         FractionallySizedBox(
                           key: const ValueKey('coverage-supported'),
                           alignment: Alignment.centerLeft,
@@ -144,10 +145,7 @@ class PlayerCoverageChart extends StatelessWidget {
                             painter: _ChevronPainter(
                               theme.colorScheme.primary.withValues(alpha: 0.75),
                             ),
-                            child: _EndLabel(
-                              text: '${c.supported}',
-                              color: theme.colorScheme.primary,
-                            ),
+                            child: const SizedBox(height: _barHeight),
                           ),
                         ),
                         // Best/recommended region: solid fill with its count at
@@ -170,6 +168,14 @@ class PlayerCoverageChart extends StatelessWidget {
                         ),
                       ],
                     ),
+                  ),
+                ),
+                SizedBox(
+                  width: _valueWidth,
+                  child: Text(
+                    '${c.supported}',
+                    textAlign: TextAlign.right,
+                    style: theme.textTheme.bodySmall,
                   ),
                 ),
               ],

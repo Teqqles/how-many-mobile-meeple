@@ -24,6 +24,11 @@ Map<String, dynamic> _fullBody() => {
         {'player_count': 4, 'best_or_recommended': 99, 'supported': 109},
         {'player_count': 3, 'best_or_recommended': 95, 'supported': 108},
       ],
+      'top_mechanics': [
+        {'name': 'Hand Management', 'count': 43},
+        {'name': 'Set Collection', 'count': 39},
+        {'name': 'Dice Rolling', 'count': 38},
+      ],
     };
 
 void main() {
@@ -34,6 +39,49 @@ void main() {
       expect(a.averageWeight, 2.3);
       expect(a.dominantPlaytime!.min, 30);
       expect(a.dominantPlaytime!.max, 60);
+    });
+  });
+
+  group('CollectionAnalytics.topMechanics', () {
+    test('parses top_mechanics as name/count pairs in order', () {
+      final a = CollectionAnalytics.fromJson(_fullBody());
+      expect(a.topMechanics.map((m) => m.name).toList(),
+          ['Hand Management', 'Set Collection', 'Dice Rolling']);
+      expect(a.topMechanics.first.count, 43);
+    });
+
+    test('sorts descending by count when the source is unsorted', () {
+      final a = CollectionAnalytics.fromJson({
+        'top_mechanics': [
+          {'name': 'Low', 'count': 5},
+          {'name': 'High', 'count': 50},
+          {'name': 'Mid', 'count': 20},
+        ],
+      });
+      expect(
+          a.topMechanics.map((m) => m.name).toList(), ['High', 'Mid', 'Low']);
+    });
+
+    test('drops malformed entries without throwing', () {
+      final a = CollectionAnalytics.fromJson({
+        'top_mechanics': [
+          {'name': 'Good', 'count': 10},
+          {'name': 'NoCount'},
+          {'count': 3},
+          {'name': 42, 'count': 3},
+          {'name': 'BadCount', 'count': 'oops'},
+          'not a map',
+        ],
+      });
+      expect(a.topMechanics.length, 1);
+      expect(a.topMechanics.single.name, 'Good');
+    });
+
+    test('missing or non-list top_mechanics yields an empty list', () {
+      expect(CollectionAnalytics.fromJson({}).topMechanics, isEmpty);
+      expect(
+          CollectionAnalytics.fromJson({'top_mechanics': 'nope'}).topMechanics,
+          isEmpty);
     });
   });
 
@@ -159,6 +207,15 @@ void main() {
             ]
           }).hasData,
           isTrue);
+    });
+
+    test('true when only top_mechanics is present', () {
+      final a = CollectionAnalytics.fromJson({
+        'top_mechanics': [
+          {'name': 'Hand Management', 'count': 43}
+        ]
+      });
+      expect(a.hasData, isTrue);
     });
 
     test('false when all sections are empty (not-ready response)', () {

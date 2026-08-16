@@ -6,6 +6,7 @@ import 'package:how_many_mobile_meeple/app_common.dart';
 import 'package:how_many_mobile_meeple/components/app_choice_chip.dart';
 import 'package:how_many_mobile_meeple/components/step_header_card.dart';
 import 'package:how_many_mobile_meeple/components/info_message_box.dart';
+import 'package:how_many_mobile_meeple/components/distribution_count_row.dart';
 
 /// Step 3: Time Available
 /// Allows users to select game duration with quick presets
@@ -140,6 +141,17 @@ class _Step3TimeAvailableState extends State<Step3TimeAvailable> {
                     ),
                   ],
                 ),
+
+                // Live count of games per playtime bucket, from analytics.
+                // Highlights buckets overlapping the selected range; renders
+                // nothing until analytics arrive.
+                if (model.playtimeDistribution.isNotEmpty) ...[
+                  const SizedBox(height: 16),
+                  DistributionCountRow(
+                    buckets: model.playtimeDistribution,
+                    isActive: (b) => b.overlaps(minTime, maxTime),
+                  ),
+                ],
 
                 const SizedBox(height: 32),
 

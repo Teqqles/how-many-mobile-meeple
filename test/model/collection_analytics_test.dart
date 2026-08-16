@@ -85,6 +85,107 @@ void main() {
     });
   });
 
+  group('CollectionAnalytics raw distributions', () {
+    test('parses player_count_coverage sorted ascending by player count', () {
+      final a = CollectionAnalytics.fromJson(_fullBody());
+      expect(
+          a.playerCountCoverage.map((c) => c.playerCount).toList(), [2, 3, 4]);
+      final three = a.playerCountCoverage.firstWhere((c) => c.playerCount == 3);
+      expect(three.supported, 108);
+      expect(three.bestOrRecommended, 95);
+    });
+
+    test('drops player coverage entries missing any field', () {
+      final a = CollectionAnalytics.fromJson({
+        'player_count_coverage': [
+          {'player_count': 2, 'best_or_recommended': 82, 'supported': 103},
+          {'player_count': 3, 'best_or_recommended': 95},
+          {'best_or_recommended': 1, 'supported': 1},
+          'nope',
+        ],
+      });
+      expect(a.playerCountCoverage.length, 1);
+      expect(a.playerCountCoverage.single.playerCount, 2);
+    });
+
+    test('parses complexity buckets with name and float range', () {
+      final a = CollectionAnalytics.fromJson(_fullBody());
+      expect(a.complexityDistribution.map((b) => b.name).toList(),
+          ['light', 'medium']);
+      final light = a.complexityDistribution.first;
+      expect(light.min, 0);
+      expect(light.max, 2.0);
+      expect(light.count, 40);
+    });
+
+    test('parses playtime buckets with name and int range', () {
+      final a = CollectionAnalytics.fromJson(_fullBody());
+      expect(a.playtimeDistribution.map((b) => b.name).toList(),
+          ['filler', 'short', 'medium']);
+      final short = a.playtimeDistribution[1];
+      expect(short.min, 30);
+      expect(short.max, 60);
+      expect(short.count, 32);
+    });
+
+    test('open-ended bucket has null max', () {
+      final a = CollectionAnalytics.fromJson({
+        'complexity_distribution': [
+          {'label': 'heavy [4.0+)', 'count': 2},
+        ],
+        'playtime_distribution': [
+          {'label': 'epic [120+)', 'count': 20},
+        ],
+      });
+      expect(a.complexityDistribution.single.max, isNull);
+      expect(a.playtimeDistribution.single.max, isNull);
+    });
+
+    test('drops buckets with malformed labels', () {
+      final a = CollectionAnalytics.fromJson({
+        'complexity_distribution': [
+          {'label': 'light [0, 2.0)', 'count': 40},
+          {'label': 'weird', 'count': 5},
+          {'count': 3},
+          {'label': 'nocount [0, 1.0)'},
+        ],
+      });
+      expect(a.complexityDistribution.length, 1);
+      expect(a.complexityDistribution.single.name, 'light');
+    });
+
+    test('missing or non-list sections yield empty distributions', () {
+      final a = CollectionAnalytics.fromJson({});
+      expect(a.playerCountCoverage, isEmpty);
+      expect(a.complexityDistribution, isEmpty);
+      expect(a.playtimeDistribution, isEmpty);
+    });
+
+    test('DistributionBucket.contains respects half-open range', () {
+      const b = DistributionBucket(name: 'x', min: 2.0, max: 2.5, count: 1);
+      expect(b.contains(2.0), isTrue);
+      expect(b.contains(2.49), isTrue);
+      expect(b.contains(2.5), isFalse);
+      expect(b.contains(1.99), isFalse);
+    });
+
+    test('DistributionBucket.contains treats null max as open-ended', () {
+      const b = DistributionBucket(name: 'x', min: 120, max: null, count: 1);
+      expect(b.contains(120), isTrue);
+      expect(b.contains(9999), isTrue);
+      expect(b.contains(119), isFalse);
+    });
+
+    test('DistributionBucket.overlaps a selected range', () {
+      const b = DistributionBucket(name: 'x', min: 30, max: 60, count: 1);
+      expect(b.overlaps(0, 45), isTrue); // partial low overlap
+      expect(b.overlaps(45, 90), isTrue); // partial high overlap
+      expect(b.overlaps(30, 59), isTrue); // fully inside
+      expect(b.overlaps(0, 29), isFalse); // ends before bucket
+      expect(b.overlaps(60, 90), isFalse); // starts at exclusive top
+    });
+  });
+
   group('CollectionAnalytics.fromJson — Boundary', () {
     test('empty sections yield all-null fields', () {
       final a = CollectionAnalytics.fromJson({

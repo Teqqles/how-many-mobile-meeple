@@ -4,6 +4,7 @@ library;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:how_many_mobile_meeple/guided_flow/step3_time_available.dart';
+import 'package:how_many_mobile_meeple/model/collection_analytics.dart';
 import 'package:how_many_mobile_meeple/model/model.dart';
 import 'package:how_many_mobile_meeple/model/settings.dart';
 import 'package:provider/provider.dart';
@@ -150,6 +151,65 @@ void main() {
       expect(slider.min, 15.0);
       expect(slider.max, 300.0);
       expect(slider.divisions, 19);
+    });
+  });
+
+  group('Step3TimeAvailable playtime distribution', () {
+    CollectionAnalytics _dist() => CollectionAnalytics.fromJson({
+          'playtime_distribution': [
+            {'label': 'filler [0, 30)', 'count': 14},
+            {'label': 'short [30, 60)', 'count': 32},
+            {'label': 'medium [60, 90)', 'count': 26},
+            {'label': 'epic [120+)', 'count': 20},
+          ],
+        });
+
+    void _setRange(AppModel model, int min, int max) {
+      final minSetting =
+          model.settings.setting(Settings.filterMinimumTimeToPlay.name);
+      final maxSetting =
+          model.settings.setting(Settings.filterMaximumTimeToPlay.name);
+      minSetting.value = min;
+      maxSetting.value = max;
+      minSetting.enabled = true;
+      maxSetting.enabled = true;
+      model.settings.updateSetting(minSetting);
+      model.settings.updateSetting(maxSetting);
+    }
+
+    testWidgets('shows a labelled count per playtime bucket',
+        (WidgetTester tester) async {
+      final model = AppModel();
+      model.setCollectionAnalyticsForTest(_dist());
+
+      await tester.pumpWidget(_buildTestWidget(model));
+
+      expect(find.text('filler 14'), findsOneWidget);
+      expect(find.text('short 32'), findsOneWidget);
+      expect(find.text('epic 20'), findsOneWidget);
+    });
+
+    testWidgets('emphasises the bucket overlapping the selected range',
+        (WidgetTester tester) async {
+      final model = AppModel();
+      _setRange(model, 35, 55);
+      model.setCollectionAnalyticsForTest(_dist());
+
+      await tester.pumpWidget(_buildTestWidget(model));
+
+      final short = tester.widget<Text>(find.text('short 32'));
+      final filler = tester.widget<Text>(find.text('filler 14'));
+      expect(short.style?.fontWeight, FontWeight.bold);
+      expect(filler.style?.fontWeight, isNot(FontWeight.bold));
+    });
+
+    testWidgets('shows nothing when analytics are absent',
+        (WidgetTester tester) async {
+      final model = AppModel();
+
+      await tester.pumpWidget(_buildTestWidget(model));
+
+      expect(find.textContaining('filler'), findsNothing);
     });
   });
 }

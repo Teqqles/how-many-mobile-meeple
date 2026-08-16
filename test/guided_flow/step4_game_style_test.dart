@@ -129,6 +129,55 @@ void main() {
 
       expect(find.text('Unplayed only'), findsOneWidget);
     });
+
+    testWidgets('shows complexity distribution counts when analytics present',
+        (WidgetTester tester) async {
+      final model = AppModel();
+      model.setCollectionAnalyticsForTest(CollectionAnalytics.fromJson({
+        'complexity_distribution': [
+          {'label': 'light [0, 2.0)', 'count': 40},
+          {'label': 'medium-light [2.0, 2.5)', 'count': 28},
+          {'label': 'heavy [4.0+)', 'count': 2},
+        ],
+      }));
+
+      await tester.pumpWidget(_buildTestWidget(model));
+
+      expect(find.text('light 40'), findsOneWidget);
+      expect(find.text('medium-light 28'), findsOneWidget);
+      expect(find.text('heavy 2'), findsOneWidget);
+    });
+
+    testWidgets('emphasises the complexity bucket for the selected weight',
+        (WidgetTester tester) async {
+      final model = AppModel();
+      final setting = model.settings.setting(Settings.filterComplexity.name);
+      setting.value = 2.2;
+      setting.enabled = true;
+      model.settings.updateSetting(setting);
+      model.setCollectionAnalyticsForTest(CollectionAnalytics.fromJson({
+        'complexity_distribution': [
+          {'label': 'light [0, 2.0)', 'count': 40},
+          {'label': 'medium-light [2.0, 2.5)', 'count': 28},
+        ],
+      }));
+
+      await tester.pumpWidget(_buildTestWidget(model));
+
+      final active = tester.widget<Text>(find.text('medium-light 28'));
+      final inactive = tester.widget<Text>(find.text('light 40'));
+      expect(active.style?.fontWeight, FontWeight.bold);
+      expect(inactive.style?.fontWeight, isNot(FontWeight.bold));
+    });
+
+    testWidgets('hides complexity distribution when analytics are absent',
+        (WidgetTester tester) async {
+      final model = AppModel();
+
+      await tester.pumpWidget(_buildTestWidget(model));
+
+      expect(find.textContaining('light '), findsNothing);
+    });
   });
 
   group('Step4GameStyle mechanics interaction', () {

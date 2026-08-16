@@ -169,6 +169,15 @@ class AppModel extends ChangeNotifier {
   List<MechanicCount> get topMechanics =>
       _collectionAnalytics?.topMechanics ?? const [];
 
+  List<PlayerCountCoverage> get playerCountCoverage =>
+      _collectionAnalytics?.playerCountCoverage ?? const [];
+
+  List<DistributionBucket> get complexityDistribution =>
+      _collectionAnalytics?.complexityDistribution ?? const [];
+
+  List<DistributionBucket> get playtimeDistribution =>
+      _collectionAnalytics?.playtimeDistribution ?? const [];
+
   @visibleForTesting
   void setCollectionAnalyticsForTest(CollectionAnalytics? analytics) {
     _collectionAnalytics = analytics;

@@ -65,7 +65,7 @@ class HorizontalBarChart extends StatelessWidget {
                           color: datum.highlighted
                               ? theme.colorScheme.primary
                               : theme.colorScheme.primary
-                                  .withValues(alpha: 0.55),
+                                  .withValues(alpha: 0.82),
                           borderRadius: BorderRadius.circular(4),
                         ),
                       ),
@@ -101,7 +101,7 @@ class PlayerCoverageChart extends StatelessWidget {
   final List<PlayerCountCoverage> coverage;
 
   static const double _labelWidth = 24;
-  static const double _valueWidth = 40;
+  static const double _barHeight = 20;
 
   @override
   Widget build(BuildContext context) {
@@ -130,29 +130,41 @@ class PlayerCoverageChart extends StatelessWidget {
                 ),
                 Expanded(
                   child: _Track(
+                    height: _barHeight,
                     child: Stack(
                       children: [
+                        // Supported region: chevron fill with the count
+                        // sitting at the end of its own segment.
                         FractionallySizedBox(
                           key: const ValueKey('coverage-supported'),
                           alignment: Alignment.centerLeft,
                           widthFactor: factor(c.supported),
                           child: CustomPaint(
-                            size: const Size.fromHeight(14),
+                            size: const Size.fromHeight(_barHeight),
                             painter: _ChevronPainter(
-                              theme.colorScheme.primary.withValues(alpha: 0.45),
+                              theme.colorScheme.primary.withValues(alpha: 0.75),
                             ),
-                            child: const SizedBox(height: 14),
+                            child: _EndLabel(
+                              text: '${c.supported}',
+                              color: theme.colorScheme.primary,
+                            ),
                           ),
                         ),
+                        // Best/recommended region: solid fill with its count at
+                        // the end of the solid segment.
                         FractionallySizedBox(
                           key: const ValueKey('coverage-best'),
                           alignment: Alignment.centerLeft,
                           widthFactor: factor(c.bestOrRecommended),
                           child: Container(
-                            height: 14,
+                            height: _barHeight,
                             decoration: BoxDecoration(
                               color: theme.colorScheme.primary,
                               borderRadius: BorderRadius.circular(4),
+                            ),
+                            child: _EndLabel(
+                              text: '${c.bestOrRecommended}',
+                              color: theme.colorScheme.onPrimary,
                             ),
                           ),
                         ),
@@ -160,18 +172,39 @@ class PlayerCoverageChart extends StatelessWidget {
                     ),
                   ),
                 ),
-                SizedBox(
-                  width: _valueWidth,
-                  child: Text(
-                    '${c.bestOrRecommended}/${c.supported}',
-                    textAlign: TextAlign.right,
-                    style: theme.textTheme.bodySmall,
-                  ),
-                ),
               ],
             ),
           ),
       ],
+    );
+  }
+}
+
+/// A small count label pinned to the trailing edge of a bar segment, so each
+/// figure reads next to the end of its own line rather than in a shared column.
+class _EndLabel extends StatelessWidget {
+  const _EndLabel({required this.text, required this.color});
+
+  final String text;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return Align(
+      alignment: Alignment.centerRight,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 4),
+        child: Text(
+          text,
+          maxLines: 1,
+          overflow: TextOverflow.visible,
+          softWrap: false,
+          style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                color: color,
+                fontWeight: FontWeight.bold,
+              ),
+        ),
+      ),
     );
   }
 }
@@ -286,20 +319,26 @@ class _ChevronPainter extends CustomPainter {
   bool shouldRepaint(covariant _ChevronPainter old) => old.color != color;
 }
 
-/// The faint rounded track a bar sits in.
+/// The rounded track a bar sits in. A tinted fill and hairline border keep it
+/// distinct from the card background so the bars read clearly.
 class _Track extends StatelessWidget {
-  const _Track({required this.child});
+  const _Track({required this.child, this.height = 14});
 
   final Widget child;
+  final double height;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Container(
-      height: 14,
+      height: height,
       decoration: BoxDecoration(
         color: theme.colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(4),
+        border: Border.all(
+          color: theme.colorScheme.outlineVariant,
+          width: 1,
+        ),
       ),
       clipBehavior: Clip.antiAlias,
       child: child,

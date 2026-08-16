@@ -38,6 +38,7 @@ class _CollectionInsightsPageState extends State<CollectionInsightsPage>
           context: context, helpSection: 'collection-insights'),
       drawer: const FeatureDrawer(),
       endDrawer: pageDrawer(context),
+      bottomNavigationBar: const AppFooter(),
       body: Consumer<AppModel>(
         builder: (context, model, child) {
           final analytics = model.collectionAnalytics;
@@ -129,11 +130,7 @@ class _CollectionInsightsPageState extends State<CollectionInsightsPage>
 
     return ListView(
       padding: const EdgeInsets.all(16),
-      children: [
-        ...sections,
-        const SizedBox(height: 8),
-        const Center(child: BGGAttribution()),
-      ],
+      children: sections,
     );
   }
 

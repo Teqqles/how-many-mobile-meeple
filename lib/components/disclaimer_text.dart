@@ -1,7 +1,9 @@
 // coverage:ignore-file
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:how_many_mobile_meeple/platform/router.dart' as r;
 
 class DisclaimerText extends StatelessWidget {
   final String data;
@@ -12,6 +14,61 @@ class DisclaimerText extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Text(data, style: TextStyle(color: Theme.of(context).disabledColor));
+  }
+}
+
+/// The shared page footer: BGG attribution on the left, app version and an
+/// About link on the right, matching the home page. Required by the BGG API
+/// usage guidelines.
+class AppFooter extends StatelessWidget {
+  const AppFooter({Key? key}) : super(key: key);
+
+  Future<String> _appVersion() async {
+    final info = await PackageInfo.fromPlatform();
+    return info.version;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 60,
+      color: Theme.of(context).highlightColor,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: <Widget>[
+          const SizedBox(height: double.infinity, child: BGGAttribution()),
+          Padding(
+            padding: const EdgeInsets.only(right: 8.0),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                FutureBuilder<String>(
+                  future: _appVersion(),
+                  builder: (context, snapshot) => DisclaimerText(
+                    snapshot.hasData ? '(v:${snapshot.data})' : '',
+                    context,
+                  ),
+                ),
+                const SizedBox(width: 4),
+                Tooltip(
+                  message: 'About',
+                  child: GestureDetector(
+                    onTap: () =>
+                        Navigator.of(context).pushNamed(r.Router.aboutRoute),
+                    child: Icon(
+                      Icons.info_outline,
+                      size: 20,
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
 

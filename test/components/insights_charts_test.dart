@@ -110,6 +110,20 @@ void main() {
       expect(best.first.widthFactor, closeTo(82 / 109, 0.001));
     });
 
+    testWidgets('labels each segment with its own count at the bar end',
+        (tester) async {
+      await tester
+          .pumpWidget(_wrap(PlayerCoverageChart(coverage: _coverage())));
+
+      // Best count sits inside its solid segment; supported at the chevron end.
+      expect(find.text('82'), findsOneWidget);
+      expect(find.text('103'), findsOneWidget);
+      expect(find.text('99'), findsOneWidget);
+      expect(find.text('109'), findsOneWidget);
+      // No combined "best/supported" label remains.
+      expect(find.text('82/103'), findsNothing);
+    });
+
     testWidgets('fills the supported region with a chevron pattern',
         (tester) async {
       await tester

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:how_many_mobile_meeple/api/collection_analytics_service.dart';
+import 'package:how_many_mobile_meeple/model/collection_analytics.dart';
 import 'package:how_many_mobile_meeple/api/http_retry_client.dart';
 import 'package:how_many_mobile_meeple/api/plays_service.dart';
 import 'package:how_many_mobile_meeple/model/filter_seeder.dart';
@@ -159,6 +160,15 @@ class AppModel extends ChangeNotifier {
   int _analyticsSeedAttempts = 0;
   final RetryScheduler _analyticsRetry = RetryScheduler();
 
+  CollectionAnalytics? _collectionAnalytics;
+
+  /// Latest collection analytics once fetched, or null while not-ready/failed.
+  /// Drives quick-filter enhancements that degrade gracefully when absent.
+  CollectionAnalytics? get collectionAnalytics => _collectionAnalytics;
+
+  List<MechanicCount> get topMechanics =>
+      _collectionAnalytics?.topMechanics ?? const [];
+
   static const int _maxAnalyticsSeedAttempts = 5;
 
   /// Base retry delay (seconds), scaled by attempt for linear backoff.
@@ -194,8 +204,10 @@ class AppModel extends ChangeNotifier {
       final analytics = result.analytics;
       if (analytics != null && analytics.hasData) {
         _analyticsSeededFor = username;
+        _collectionAnalytics = analytics;
         _analyticsRetry.cancel();
-        if (FilterSeeder.seed(analytics, _settings)) notifyListeners();
+        FilterSeeder.seed(analytics, _settings);
+        notifyListeners();
         return;
       }
       if (result.retryable) _scheduleAnalyticsSeedRetry(username);

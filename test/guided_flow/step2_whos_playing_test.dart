@@ -4,6 +4,7 @@ library;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:how_many_mobile_meeple/guided_flow/step2_whos_playing.dart';
+import 'package:how_many_mobile_meeple/model/collection_analytics.dart';
 import 'package:how_many_mobile_meeple/model/model.dart';
 import 'package:how_many_mobile_meeple/model/settings.dart';
 import 'package:provider/provider.dart';
@@ -154,6 +155,50 @@ void main() {
 
       expect(find.text('10'), findsOneWidget);
       expect(find.text('players'), findsOneWidget);
+    });
+  });
+
+  group('Step2WhosPlaying match counts', () {
+    CollectionAnalytics _coverage() => CollectionAnalytics.fromJson({
+          'player_count_coverage': [
+            {'player_count': 3, 'best_or_recommended': 95, 'supported': 108},
+            {'player_count': 5, 'best_or_recommended': 45, 'supported': 55},
+          ],
+        });
+
+    testWidgets('shows best-at count for the selected player count',
+        (WidgetTester tester) async {
+      final model = AppModel();
+      model.setCollectionAnalyticsForTest(_coverage());
+
+      await tester.pumpWidget(_buildTestWidget(model));
+
+      // Default selection is 5 players.
+      expect(find.text('45 games play best at 5 players'), findsOneWidget);
+    });
+
+    testWidgets('hides the count when analytics are absent',
+        (WidgetTester tester) async {
+      final model = AppModel();
+
+      await tester.pumpWidget(_buildTestWidget(model));
+
+      expect(find.textContaining('play best at'), findsNothing);
+    });
+
+    testWidgets('hides the count when the selected count is not covered',
+        (WidgetTester tester) async {
+      final model = AppModel();
+      final setting =
+          model.settings.setting(Settings.filterNumberOfPlayers.name);
+      setting.value = 8;
+      setting.enabled = true;
+      model.settings.updateSetting(setting);
+      model.setCollectionAnalyticsForTest(_coverage());
+
+      await tester.pumpWidget(_buildTestWidget(model));
+
+      expect(find.textContaining('play best at'), findsNothing);
     });
   });
 }

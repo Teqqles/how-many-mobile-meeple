@@ -10,17 +10,54 @@ class MechanicCount {
   const MechanicCount(this.name, this.count);
 }
 
+/// Per-player-count coverage: how many games [supported] that count, and how
+/// many play [bestOrRecommended] at it.
+class PlayerCountCoverage {
+  final int playerCount;
+  final int supported;
+  final int bestOrRecommended;
+  const PlayerCountCoverage(
+      this.playerCount, this.supported, this.bestOrRecommended);
+}
+
+/// A labelled bucket of a distribution (complexity or playtime) with the count
+/// of games in it and the half-open numeric range `[min, max)` it covers.
+/// A null [max] means the bucket is open-ended (e.g. `heavy [4.0+)`).
+class DistributionBucket {
+  final String name;
+  final num min;
+  final num? max;
+  final int count;
+  const DistributionBucket(
+      {required this.name, required this.min, this.max, required this.count});
+
+  /// True when [value] falls in the half-open range `[min, max)`.
+  bool contains(num value) {
+    final upper = max;
+    return value >= min && (upper == null || value < upper);
+  }
+
+  /// True when the selected range `[lo, hi]` overlaps this bucket's `[min, max)`.
+  bool overlaps(num lo, num hi) => lo < (max ?? double.infinity) && hi >= min;
+}
+
 class CollectionAnalytics {
   final int? mostCoveredPlayerCount;
   final double? averageWeight;
   final PlaytimeRange? dominantPlaytime;
   final List<MechanicCount> topMechanics;
+  final List<PlayerCountCoverage> playerCountCoverage;
+  final List<DistributionBucket> complexityDistribution;
+  final List<DistributionBucket> playtimeDistribution;
 
   const CollectionAnalytics({
     this.mostCoveredPlayerCount,
     this.averageWeight,
     this.dominantPlaytime,
     this.topMechanics = const [],
+    this.playerCountCoverage = const [],
+    this.complexityDistribution = const [],
+    this.playtimeDistribution = const [],
   });
 
   /// True when any field parsed; false for an empty/not-ready response.
@@ -28,7 +65,10 @@ class CollectionAnalytics {
       mostCoveredPlayerCount != null ||
       averageWeight != null ||
       dominantPlaytime != null ||
-      topMechanics.isNotEmpty;
+      topMechanics.isNotEmpty ||
+      playerCountCoverage.isNotEmpty ||
+      complexityDistribution.isNotEmpty ||
+      playtimeDistribution.isNotEmpty;
 
   factory CollectionAnalytics.fromJson(Map<String, dynamic> json) {
     return CollectionAnalytics(
@@ -37,8 +77,57 @@ class CollectionAnalytics {
       averageWeight: _averageWeight(json),
       dominantPlaytime: _dominantPlaytime(json['playtime_distribution']),
       topMechanics: _topMechanics(json['top_mechanics']),
+      playerCountCoverage: _playerCountCoverage(json['player_count_coverage']),
+      complexityDistribution: _floatBuckets(json['complexity_distribution']),
+      playtimeDistribution: _intBuckets(json['playtime_distribution']),
     );
   }
+
+  /// Parses `[{player_count, supported, best_or_recommended}, ...]` ascending
+  /// by player count, dropping entries missing any field.
+  static List<PlayerCountCoverage> _playerCountCoverage(dynamic list) {
+    if (list is! List) return const [];
+    final result = <PlayerCountCoverage>[];
+    for (final entry in list) {
+      if (entry is! Map) continue;
+      final pc = entry['player_count'];
+      final supported = entry['supported'];
+      final best = entry['best_or_recommended'];
+      if (pc is! int || supported is! int || best is! int) continue;
+      result.add(PlayerCountCoverage(pc, supported, best));
+    }
+    result.sort((a, b) => a.playerCount.compareTo(b.playerCount));
+    return result;
+  }
+
+  /// Parses a distribution list into buckets, dropping malformed entries.
+  /// [parseRange] extracts the `[min, max)` numeric range from a label.
+  static List<DistributionBucket> _buckets(
+      dynamic dist, (num, num?)? Function(String) parseRange) {
+    if (dist is! List) return const [];
+    final result = <DistributionBucket>[];
+    for (final entry in dist) {
+      if (entry is! Map) continue;
+      final label = entry['label'];
+      final count = entry['count'];
+      if (label is! String || count is! int) continue;
+      final range = parseRange(label);
+      if (range == null) continue;
+      result.add(DistributionBucket(
+        name: label.split('[').first.trim(),
+        min: range.$1,
+        max: range.$2,
+        count: count,
+      ));
+    }
+    return result;
+  }
+
+  static List<DistributionBucket> _floatBuckets(dynamic dist) =>
+      _buckets(dist, _parseFloatRange);
+
+  static List<DistributionBucket> _intBuckets(dynamic dist) =>
+      _buckets(dist, _parseIntRange);
 
   /// Parses `[{name, count}, ...]` into count-descending order, dropping
   /// malformed entries. Empty when the field is missing or not a list.

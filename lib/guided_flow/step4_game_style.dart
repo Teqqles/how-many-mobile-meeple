@@ -4,6 +4,7 @@ import 'package:how_many_mobile_meeple/model/model.dart';
 import 'package:how_many_mobile_meeple/model/settings.dart';
 import 'package:how_many_mobile_meeple/components/app_choice_chip.dart';
 import 'package:how_many_mobile_meeple/components/top_mechanic_chips_widget.dart';
+import 'package:how_many_mobile_meeple/components/distribution_count_row.dart';
 import 'package:how_many_mobile_meeple/components/step_header_card.dart';
 import 'package:how_many_mobile_meeple/components/info_message_box.dart';
 import 'package:how_many_mobile_meeple/components/unplayed_only_toggle.dart';
@@ -170,6 +171,17 @@ class _Step4GameStyleState extends State<Step4GameStyle> {
                 InfoMessageBox(
                   message: _getDifficultyDescription(difficulty),
                 ),
+
+                // Live count of games per complexity bucket, from analytics.
+                // Highlights the bucket holding the selected weight (unless
+                // "Any" / 0); renders nothing until analytics arrive.
+                if (model.complexityDistribution.isNotEmpty) ...[
+                  const SizedBox(height: 12),
+                  DistributionCountRow(
+                    buckets: model.complexityDistribution,
+                    isActive: (b) => difficulty > 0 && b.contains(difficulty),
+                  ),
+                ],
 
                 const SizedBox(height: 32),
                 const Divider(),

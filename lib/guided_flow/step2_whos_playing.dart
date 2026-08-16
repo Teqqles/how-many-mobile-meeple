@@ -25,6 +25,28 @@ class _Step2WhosPlayingState extends State<Step2WhosPlaying> {
     'Party': 8,
   };
 
+  /// Caption showing how many games play best at [players], from analytics.
+  /// Renders nothing when analytics are unavailable or the count isn't covered,
+  /// so the step degrades gracefully.
+  Widget _buildMatchCount(BuildContext context, AppModel model, int players) {
+    final coverage = model.playerCountCoverage
+        .where((c) => c.playerCount == players)
+        .toList();
+    if (coverage.isEmpty) return const SizedBox.shrink();
+
+    final best = coverage.first.bestOrRecommended;
+    return Padding(
+      padding: const EdgeInsets.only(top: 8),
+      child: Text(
+        '$best games play best at $players ${players == 1 ? 'player' : 'players'}',
+        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              color: Theme.of(context).colorScheme.primary,
+              fontWeight: FontWeight.bold,
+            ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Consumer<AppModel>(
@@ -70,6 +92,7 @@ class _Step2WhosPlayingState extends State<Step2WhosPlaying> {
                                       .onSurfaceVariant,
                                 ),
                       ),
+                      _buildMatchCount(context, model, currentPlayers),
                     ],
                   ),
                 ),

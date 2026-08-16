@@ -110,6 +110,18 @@ void main() {
       expect(best.first.widthFactor, closeTo(82 / 109, 0.001));
     });
 
+    testWidgets('fills the supported region with a chevron pattern',
+        (tester) async {
+      await tester
+          .pumpWidget(_wrap(PlayerCoverageChart(coverage: _coverage())));
+
+      final supportedPaint = find.descendant(
+        of: find.byKey(const ValueKey('coverage-supported')),
+        matching: find.byType(CustomPaint),
+      );
+      expect(supportedPaint, findsWidgets);
+    });
+
     testWidgets('renders nothing when coverage is empty', (tester) async {
       await tester.pumpWidget(_wrap(const PlayerCoverageChart(coverage: [])));
       expect(find.byType(FractionallySizedBox), findsNothing);

@@ -136,13 +136,12 @@ class PlayerCoverageChart extends StatelessWidget {
                           key: const ValueKey('coverage-supported'),
                           alignment: Alignment.centerLeft,
                           widthFactor: factor(c.supported),
-                          child: Container(
-                            height: 14,
-                            decoration: BoxDecoration(
-                              color: theme.colorScheme.primary
-                                  .withValues(alpha: 0.25),
-                              borderRadius: BorderRadius.circular(4),
+                          child: CustomPaint(
+                            size: const Size.fromHeight(14),
+                            painter: _ChevronPainter(
+                              theme.colorScheme.primary.withValues(alpha: 0.45),
                             ),
+                            child: const SizedBox(height: 14),
                           ),
                         ),
                         FractionallySizedBox(
@@ -228,32 +227,63 @@ class _StatTile extends StatelessWidget {
       width: 104,
       padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
       decoration: BoxDecoration(
-        color: theme.colorScheme.surfaceContainerHighest,
+        color: theme.colorScheme.primaryContainer,
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: theme.colorScheme.outlineVariant),
+        border: Border.all(color: theme.colorScheme.primary, width: 1.5),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
             value,
-            style: theme.textTheme.titleLarge?.copyWith(
+            style: theme.textTheme.headlineSmall?.copyWith(
               fontWeight: FontWeight.bold,
-              color: theme.colorScheme.primary,
+              color: theme.colorScheme.onPrimaryContainer,
             ),
           ),
           const SizedBox(height: 4),
           Text(
             label,
             textAlign: TextAlign.center,
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: theme.colorScheme.onSurfaceVariant,
+            style: theme.textTheme.labelMedium?.copyWith(
+              color: theme.colorScheme.onPrimaryContainer,
+              fontWeight: FontWeight.w600,
             ),
           ),
         ],
       ),
     );
   }
+}
+
+/// Paints a repeating chevron pattern across the given size, used to fill the
+/// `supported` region so the gap beyond `best/recommended` reads at a glance.
+class _ChevronPainter extends CustomPainter {
+  const _ChevronPainter(this.color);
+
+  final Color color;
+
+  static const double _spacing = 7;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.5
+      ..strokeJoin = StrokeJoin.round;
+    final h = size.height;
+    for (double x = -h; x < size.width + h; x += _spacing) {
+      final path = Path()
+        ..moveTo(x, h)
+        ..lineTo(x + h / 2, 0)
+        ..lineTo(x + h, h);
+      canvas.drawPath(path, paint);
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _ChevronPainter old) => old.color != color;
 }
 
 /// The faint rounded track a bar sits in.

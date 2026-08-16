@@ -4,7 +4,6 @@ import 'package:how_many_mobile_meeple/components/board_game_item_list_widget.da
 import 'package:how_many_mobile_meeple/components/complexity_filter_widget.dart';
 import 'package:how_many_mobile_meeple/components/feature_drawer.dart';
 import 'package:how_many_mobile_meeple/components/mechanic_filter_widget.dart';
-import 'package:how_many_mobile_meeple/components/top_mechanic_chips_widget.dart';
 import 'package:how_many_mobile_meeple/components/player_filter_widget.dart';
 import 'package:how_many_mobile_meeple/components/rating_filter_widget.dart';
 import 'package:how_many_mobile_meeple/components/time_filter_widget.dart';
@@ -65,7 +64,6 @@ class HomePage extends StatelessWidget with AppPage {
                 PlayerFilterWidget(),
                 ComplexityFilterWidget(),
                 RatingFilterWidget(),
-                TopMechanicChipsWidget(),
                 MechanicFilterWidget(),
               ]),
             ),

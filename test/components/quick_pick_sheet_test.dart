@@ -7,6 +7,7 @@ import 'package:http/http.dart' as http;
 import 'package:how_many_mobile_meeple/api/http_retry_client.dart';
 import 'package:how_many_mobile_meeple/api/plays_service.dart';
 import 'package:how_many_mobile_meeple/components/quick_pick_sheet.dart';
+import 'package:how_many_mobile_meeple/model/collection_analytics.dart';
 import 'package:how_many_mobile_meeple/model/item.dart';
 import 'package:how_many_mobile_meeple/model/model.dart';
 import 'package:how_many_mobile_meeple/model/settings.dart';
@@ -286,6 +287,62 @@ void main() {
           defaultMaxTime);
       expect(model.settings.setting(Settings.filterComplexity.name).value,
           defaultComplexity);
+    });
+
+    Future<AppModel> _modelWithMechanics(WidgetTester tester) async {
+      final model = AppModel();
+      await model.addItem(Item('testuser'));
+      await model.analyticsSeedFuture;
+      model.setCollectionAnalyticsForTest(CollectionAnalytics.fromJson({
+        'top_mechanics': [
+          {'name': 'Hand Management', 'count': 43},
+          {'name': 'Set Collection', 'count': 39},
+        ]
+      }));
+      return model;
+    }
+
+    testWidgets('hides the mechanics row when analytics are absent',
+        (tester) async {
+      final model = AppModel();
+      await model.addItem(Item('testuser'));
+      await tester.pumpWidget(_buildTestApp(model: model));
+      await tester.tap(find.text('Open'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Mechanics'), findsNothing);
+    });
+
+    testWidgets('shows top-mechanic chips when analytics are present',
+        (tester) async {
+      final model = await _modelWithMechanics(tester);
+      await tester.pumpWidget(_buildTestApp(model: model));
+      await tester.tap(find.text('Open'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Mechanics'), findsOneWidget);
+      expect(find.text('Hand Management'), findsOneWidget);
+      expect(find.text('Set Collection'), findsOneWidget);
+    });
+
+    testWidgets('applies selected mechanics on Go', (tester) async {
+      final model = await _modelWithMechanics(tester);
+      await tester.pumpWidget(_buildTestApp(model: model));
+      await tester.tap(find.text('Open'));
+      await tester.pumpAndSettle();
+
+      await tester.ensureVisible(find.text('Hand Management'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Hand Management'));
+      await tester.pumpAndSettle();
+      await tester.ensureVisible(find.text('Go!'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Go!'));
+      await tester.pumpAndSettle();
+
+      final setting = model.settings.setting(Settings.filterMechanics.name);
+      expect((setting.value as List).cast<String>(), ['Hand Management']);
+      expect(setting.enabled, isTrue);
     });
 
     testWidgets('displays Unplayed only toggle', (tester) async {

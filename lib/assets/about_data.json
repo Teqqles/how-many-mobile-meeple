@@ -1,6 +1,11 @@
 {
-  "version": "2.32.1",
+  "version": "2.33.1",
   "recent_changes": [
+    {
+      "type": "feat",
+      "scope": "",
+      "description": "show live collection match counts on guided-flow steps"
+    },
     {
       "type": "feat",
       "scope": "",
@@ -106,13 +111,6 @@
     {
       "number": 107,
       "title": "Add a Collection Insights page",
-      "labels": [
-        "enhancement"
-      ]
-    },
-    {
-      "number": 106,
-      "title": "Show live match counts on the guided-flow filter steps",
       "labels": [
         "enhancement"
       ]

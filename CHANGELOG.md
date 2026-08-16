@@ -3,6 +3,18 @@
 All notable changes to this project are documented here.
 This file is auto-generated from conventional commits on each release.
 
+## [v2.32.1] - 2026-08-16
+
+### Added
+- surface top-mechanic chips in guided flow, quick picks, and mechanics section
+- show top-mechanics chips above the mechanics filter
+- add top-mechanics quick-filter chips
+- retain collection analytics on AppModel
+- parse top_mechanics from collection analytics
+
+### Fixed
+- clone Setting collection values instead of sharing them
+
 ## [v2.27.4] - 2026-08-16
 
 ### Added

@@ -81,7 +81,7 @@ void main() {
           PlayerCountCoverage(4, 109, 99),
         ];
 
-    testWidgets('renders a labelled row per player count', (tester) async {
+    testWidgets('renders an axis label per player count', (tester) async {
       await tester
           .pumpWidget(_wrap(PlayerCoverageChart(coverage: _coverage())));
 
@@ -90,55 +90,30 @@ void main() {
       expect(find.text('4'), findsOneWidget);
     });
 
-    testWidgets('overlays best bar over the supported bar per row',
-        (tester) async {
+    testWidgets('labels every best and supported point', (tester) async {
       await tester
           .pumpWidget(_wrap(PlayerCoverageChart(coverage: _coverage())));
 
-      final supported = tester
-          .widgetList<FractionallySizedBox>(
-              find.byKey(const ValueKey('coverage-supported')))
-          .toList();
-      final best = tester
-          .widgetList<FractionallySizedBox>(
-              find.byKey(const ValueKey('coverage-best')))
-          .toList();
-      expect(supported.length, 3);
-      expect(best.length, 3);
-      // Scaled against the maximum supported (109).
-      expect(supported.last.widthFactor, 1.0);
-      expect(best.first.widthFactor, closeTo(82 / 109, 0.001));
-    });
-
-    testWidgets('labels each segment with its own count at the bar end',
-        (tester) async {
-      await tester
-          .pumpWidget(_wrap(PlayerCoverageChart(coverage: _coverage())));
-
-      // Best count sits inside its solid segment; supported at the chevron end.
+      // Best counts.
       expect(find.text('82'), findsOneWidget);
-      expect(find.text('103'), findsOneWidget);
+      expect(find.text('95'), findsOneWidget);
       expect(find.text('99'), findsOneWidget);
+      // Supported counts.
+      expect(find.text('103'), findsOneWidget);
+      expect(find.text('108'), findsOneWidget);
       expect(find.text('109'), findsOneWidget);
-      // No combined "best/supported" label remains.
-      expect(find.text('82/103'), findsNothing);
     });
 
-    testWidgets('fills the supported region with a chevron pattern',
-        (tester) async {
+    testWidgets('draws the overlaid area', (tester) async {
       await tester
           .pumpWidget(_wrap(PlayerCoverageChart(coverage: _coverage())));
 
-      final supportedPaint = find.descendant(
-        of: find.byKey(const ValueKey('coverage-supported')),
-        matching: find.byType(CustomPaint),
-      );
-      expect(supportedPaint, findsWidgets);
+      expect(find.byKey(const ValueKey('coverage-area')), findsOneWidget);
     });
 
     testWidgets('renders nothing when coverage is empty', (tester) async {
       await tester.pumpWidget(_wrap(const PlayerCoverageChart(coverage: [])));
-      expect(find.byType(FractionallySizedBox), findsNothing);
+      expect(find.byKey(const ValueKey('coverage-area')), findsNothing);
     });
   });
 
@@ -161,6 +136,24 @@ void main() {
       expect(find.text('28'), findsOneWidget);
       expect(find.text('7.4'), findsWidgets); // rounded ratings
       expect(find.text('2.3'), findsOneWidget);
+    });
+
+    testWidgets('splits base vs expansions into a donut with legend',
+        (tester) async {
+      await tester.pumpWidget(_wrap(const InsightsSummaryGrid(
+        summary: CollectionSummary(
+          totalGames: 113,
+          baseGames: 85,
+          expansions: 28,
+        ),
+      )));
+
+      // Total in the donut centre, split in the legend.
+      expect(find.text('113'), findsOneWidget);
+      expect(find.text('Base'), findsOneWidget);
+      expect(find.text('85'), findsOneWidget);
+      expect(find.text('Expansions'), findsOneWidget);
+      expect(find.text('28'), findsOneWidget);
     });
 
     testWidgets('omits tiles for absent figures', (tester) async {

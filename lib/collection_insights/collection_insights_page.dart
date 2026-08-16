@@ -111,7 +111,8 @@ class _CollectionInsightsPageState extends State<CollectionInsightsPage>
     if (analytics.playerCountCoverage.isNotEmpty) {
       sections.add(_Section(
         title: 'Player Counts',
-        subtitle: 'Games that play best (solid) vs. support (faint) each count',
+        subtitle: 'Best/recommended (solid) within supported (shaded), '
+            'by player count',
         child: PlayerCoverageChart(coverage: analytics.playerCountCoverage),
       ));
     }

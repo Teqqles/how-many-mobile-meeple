@@ -169,6 +169,12 @@ class AppModel extends ChangeNotifier {
   List<MechanicCount> get topMechanics =>
       _collectionAnalytics?.topMechanics ?? const [];
 
+  @visibleForTesting
+  void setCollectionAnalyticsForTest(CollectionAnalytics? analytics) {
+    _collectionAnalytics = analytics;
+    notifyListeners();
+  }
+
   static const int _maxAnalyticsSeedAttempts = 5;
 
   /// Base retry delay (seconds), scaled by attempt for linear backoff.

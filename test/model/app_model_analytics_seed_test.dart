@@ -20,6 +20,10 @@ final _readyAnalytics = jsonEncode({
   'player_count_coverage': [
     {'player_count': 4, 'best_or_recommended': 99}
   ],
+  'top_mechanics': [
+    {'name': 'Hand Management', 'count': 43},
+    {'name': 'Set Collection', 'count': 39},
+  ],
 });
 
 http.Response _route(http.BaseRequest req, {required bool analyticsOk}) {
@@ -114,6 +118,33 @@ void main() {
     await model.analyticsSeedFuture;
 
     expect(_players(model), 4);
+  });
+
+  test('retains fetched analytics on the model after seeding', () async {
+    HttpRetryClient.setTestClient(
+        SyncMockClient((req) => _route(req, analyticsOk: true)));
+    final model = AppModel();
+    addTearDown(model.dispose);
+    expect(model.collectionAnalytics, isNull);
+
+    await model.addItem(Item('teqqles'));
+    await model.analyticsSeedFuture;
+
+    expect(model.collectionAnalytics, isNotNull);
+    expect(model.topMechanics.map((m) => m.name).toList(),
+        ['Hand Management', 'Set Collection']);
+  });
+
+  test('leaves analytics null when the fetch never succeeds', () async {
+    HttpRetryClient.setTestClient(
+        SyncMockClient((req) => _route(req, analyticsOk: false)));
+    final model = AppModel();
+    addTearDown(model.dispose);
+    await model.addItem(Item('teqqles'));
+    await model.analyticsSeedFuture;
+
+    expect(model.collectionAnalytics, isNull);
+    expect(model.topMechanics, isEmpty);
   });
 
   test('failed analytics leaves settings unchanged', () async {

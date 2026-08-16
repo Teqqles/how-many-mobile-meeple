@@ -1,6 +1,36 @@
 {
-  "version": "2.27.4",
+  "version": "2.32.1",
   "recent_changes": [
+    {
+      "type": "feat",
+      "scope": "",
+      "description": "surface top-mechanic chips in guided flow, quick picks, and mechanics section"
+    },
+    {
+      "type": "feat",
+      "scope": "",
+      "description": "show top-mechanics chips above the mechanics filter"
+    },
+    {
+      "type": "feat",
+      "scope": "",
+      "description": "add top-mechanics quick-filter chips"
+    },
+    {
+      "type": "fix",
+      "scope": "",
+      "description": "clone Setting collection values instead of sharing them"
+    },
+    {
+      "type": "feat",
+      "scope": "",
+      "description": "retain collection analytics on AppModel"
+    },
+    {
+      "type": "feat",
+      "scope": "",
+      "description": "parse top_mechanics from collection analytics"
+    },
     {
       "type": "fix",
       "scope": "",
@@ -72,13 +102,6 @@
       "number": 110,
       "title": "How Many Meeple is findable with a search engine",
       "labels": []
-    },
-    {
-      "number": 109,
-      "title": "Surface top mechanics as quick-filter chips",
-      "labels": [
-        "enhancement"
-      ]
     },
     {
       "number": 107,

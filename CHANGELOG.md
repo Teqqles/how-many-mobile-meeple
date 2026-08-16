@@ -3,6 +3,19 @@
 All notable changes to this project are documented here.
 This file is auto-generated from conventional commits on each release.
 
+## [v2.27.4] - 2026-08-16
+
+### Added
+- seed filter defaults from collection analytics on load
+- add FilterSeeder for position-only default seeding
+- add CollectionAnalyticsService
+- add CollectionAnalytics parse model
+
+### Fixed
+- seed filter defaults without a manual refresh
+- prevent inverted time range and align complexity floor in seeder
+- harden CollectionAnalytics parsing against malformed labels
+
 ## [v2.23.3] - 2026-08-14
 
 ### Fixed

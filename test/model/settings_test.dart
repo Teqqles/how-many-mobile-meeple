@@ -1,10 +1,20 @@
 @Tags(['unit'])
 library;
 
+import 'package:how_many_mobile_meeple/model/setting.dart';
 import 'package:how_many_mobile_meeple/model/settings.dart';
 import 'package:test/test.dart';
 
 main() {
+  group('Setting.clone', () {
+    test('list values are not shared between clone and original', () {
+      final original = Setting('mechanics', value: <String>['a']);
+      final clone = original.clone();
+      (clone.value as List).add('b');
+      expect(original.value, ['a']);
+    });
+  });
+
   group('changedSettings', () {
     test('returns no settings if settings identical to default', () {
       var mySettings = Settings.defaultSettings();

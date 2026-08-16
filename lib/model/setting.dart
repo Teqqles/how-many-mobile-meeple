@@ -33,8 +33,14 @@ class Setting {
   @override
   int get hashCode => toString().hashCode;
 
+  // Copy collection values so clones don't share a mutable list/map with the
+  // original (or with each other via defaultSettings()).
   Setting clone() => Setting(this.name,
-      value: this.value, header: this.header, enabled: this.enabled);
+      value: value is List
+          ? List<dynamic>.from(value)
+          : (value is Map ? Map<dynamic, dynamic>.from(value) : value),
+      header: this.header,
+      enabled: this.enabled);
 
   /// Type-safe getter for boolean values
   /// Handles string-to-bool conversion automatically

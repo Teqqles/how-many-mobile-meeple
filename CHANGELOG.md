@@ -3,6 +3,11 @@
 All notable changes to this project are documented here.
 This file is auto-generated from conventional commits on each release.
 
+## [v2.23.3] - 2026-08-14
+
+### Fixed
+- stop shelf-of-shame infinite reload loop
+
 ## [v2.23.1] - 2026-08-14
 
 ### Fixed

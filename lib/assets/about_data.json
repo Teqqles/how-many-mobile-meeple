@@ -1,6 +1,41 @@
 {
-  "version": "2.23.3",
+  "version": "2.27.4",
   "recent_changes": [
+    {
+      "type": "fix",
+      "scope": "",
+      "description": "seed filter defaults without a manual refresh"
+    },
+    {
+      "type": "fix",
+      "scope": "",
+      "description": "prevent inverted time range and align complexity floor in seeder"
+    },
+    {
+      "type": "feat",
+      "scope": "",
+      "description": "seed filter defaults from collection analytics on load"
+    },
+    {
+      "type": "feat",
+      "scope": "",
+      "description": "add FilterSeeder for position-only default seeding"
+    },
+    {
+      "type": "feat",
+      "scope": "",
+      "description": "add CollectionAnalyticsService"
+    },
+    {
+      "type": "fix",
+      "scope": "",
+      "description": "harden CollectionAnalytics parsing against malformed labels"
+    },
+    {
+      "type": "feat",
+      "scope": "",
+      "description": "add CollectionAnalytics parse model"
+    },
     {
       "type": "fix",
       "scope": "",
@@ -41,13 +76,6 @@
     {
       "number": 109,
       "title": "Surface top mechanics as quick-filter chips",
-      "labels": [
-        "enhancement"
-      ]
-    },
-    {
-      "number": 108,
-      "title": "Seed filter defaults from the collection's sweet spot",
       "labels": [
         "enhancement"
       ]

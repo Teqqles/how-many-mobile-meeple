@@ -1,5 +1,5 @@
 {
-  "version": "2.34.1",
+  "version": "2.34.2",
   "recent_changes": [
     {
       "type": "feat",
@@ -109,6 +109,13 @@
   ],
   "upcoming": [
     {
+      "number": 117,
+      "title": "Let players pick a specific theme instead of random",
+      "labels": [
+        "enhancement"
+      ]
+    },
+    {
       "number": 110,
       "title": "How Many Meeple is findable with a search engine",
       "labels": []
@@ -141,11 +148,6 @@
     {
       "number": 89,
       "title": "Setting to hide Shelf of Shame and play stats",
-      "labels": []
-    },
-    {
-      "number": 80,
-      "title": "Update to latest dependencies (breaking changes)",
       "labels": []
     },
     {

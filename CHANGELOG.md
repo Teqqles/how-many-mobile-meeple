@@ -3,6 +3,11 @@
 All notable changes to this project are documented here.
 This file is auto-generated from conventional commits on each release.
 
+## [v2.34.1] - 2026-08-17
+
+### Added
+- Collection Insights dashboard (#107)
+
 ## [v2.33.1] - 2026-08-16
 
 ### Added

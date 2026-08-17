@@ -113,7 +113,8 @@ class PlayInsights {
       }
     }
 
-    final years = perYear.keys.toList()..sort();
+    // Newest year first, so the current year heads the chart.
+    final years = perYear.keys.toList()..sort((a, b) => b.compareTo(a));
 
     return PlayInsights(
       totalGames: collectionGameIds.length,

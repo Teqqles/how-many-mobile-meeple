@@ -84,7 +84,7 @@ void main() {
       expect(stats.mostPlayed.single.name, 'Game #99');
     });
 
-    test('aggregates plays per year in ascending order', () {
+    test('aggregates plays per year, newest first', () {
       final stats = PlayInsights.from(
         collectionGameIds: {1},
         playsData: {
@@ -100,11 +100,11 @@ void main() {
       );
 
       expect(
-          stats.playsPerYear.map((y) => y.year).toList(), [2024, 2025, 2026]);
-      expect(stats.playsPerYear.map((y) => y.plays).toList(), [2, 1, 1]);
+          stats.playsPerYear.map((y) => y.year).toList(), [2026, 2025, 2024]);
+      expect(stats.playsPerYear.map((y) => y.plays).toList(), [1, 1, 2]);
       // All of game 1's plays are owned, so the collection subset matches.
       expect(
-          stats.playsPerYear.map((y) => y.collectionPlays).toList(), [2, 1, 1]);
+          stats.playsPerYear.map((y) => y.collectionPlays).toList(), [1, 1, 2]);
     });
 
     test('splits plays per year into collection vs all', () {

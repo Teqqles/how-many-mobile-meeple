@@ -1,0 +1,232 @@
+import 'package:flutter/material.dart';
+import 'package:how_many_mobile_meeple/model/game.dart';
+import 'package:how_many_mobile_meeple/model/game_night.dart';
+import 'package:how_many_mobile_meeple/model/model.dart';
+import 'package:how_many_mobile_meeple/model/settings.dart';
+
+/// Recommends a full evening's lineup - a filler, a main game and a backup -
+/// from the loaded collection within a chosen time budget. The user can pin
+/// any slot and regenerate the rest. The optional expansion slot is deferred
+/// until the backend exposes expansion relationships (issue #119).
+class GameNightView extends StatefulWidget {
+  final AppModel model;
+  final GameNightPlanner planner;
+
+  GameNightView({super.key, required this.model, GameNightPlanner? planner})
+    : planner = planner ?? GameNightPlanner();
+
+  @override
+  State<GameNightView> createState() => _GameNightViewState();
+}
+
+class _GameNightViewState extends State<GameNightView> {
+  static const List<_DurationPreset> _presets = [
+    _DurationPreset('2h', 120),
+    _DurationPreset('3h', 180),
+    _DurationPreset('4h', 240),
+    _DurationPreset('5h', 300),
+  ];
+
+  final Map<GameNightSlot, Game> _pinned = {};
+  GameNightLineup _lineup = const GameNightLineup();
+
+  int get _durationMinutes => widget.model.settings
+      .setting(Settings.gameNightDurationMinutes.name)
+      .getInt();
+
+  @override
+  void initState() {
+    super.initState();
+    _regenerate();
+  }
+
+  List<Game> get _pool => widget.model.bggCache.games.games;
+
+  void _regenerate() {
+    setState(() {
+      _lineup = widget.planner.plan(
+        pool: _pool,
+        durationMinutes: _durationMinutes,
+        pinned: Map.of(_pinned),
+      );
+    });
+  }
+
+  void _setDuration(int minutes) {
+    final setting = widget.model.settings.setting(
+      Settings.gameNightDurationMinutes.name,
+    );
+    setting.value = minutes;
+    setting.enabled = true;
+    widget.model.settings.updateSetting(setting);
+    widget.model.updateStore();
+    _regenerate();
+  }
+
+  void _togglePin(GameNightSlot slot) {
+    final game = _lineup.slot(slot);
+    setState(() {
+      if (_pinned.containsKey(slot)) {
+        _pinned.remove(slot);
+      } else if (game != null) {
+        _pinned[slot] = game;
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_pool.isEmpty) {
+      return const Center(
+        child: Padding(
+          padding: EdgeInsets.all(24),
+          child: Text(
+            'Load a collection to plan a game night.',
+            textAlign: TextAlign.center,
+          ),
+        ),
+      );
+    }
+
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          _buildDurationPicker(context),
+          const SizedBox(height: 20),
+          _buildSlot(context, GameNightSlot.filler, 'Filler', 'Warm-up'),
+          _buildSlot(context, GameNightSlot.main, 'Main', 'The centrepiece'),
+          _buildSlot(
+            context,
+            GameNightSlot.backup,
+            'Backup',
+            'If the mood shifts',
+          ),
+          const SizedBox(height: 8),
+          FilledButton.icon(
+            key: const ValueKey('game-night-regenerate'),
+            onPressed: _regenerate,
+            icon: const Icon(Icons.casino),
+            label: const Text('Regenerate'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDurationPicker(BuildContext context) {
+    final duration = _durationMinutes;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Text('Evening length', style: Theme.of(context).textTheme.titleMedium),
+        const SizedBox(height: 8),
+        Wrap(
+          spacing: 8,
+          children: [
+            for (final preset in _presets)
+              ChoiceChip(
+                label: Text(preset.label),
+                selected: duration == preset.minutes,
+                onSelected: (_) => _setDuration(preset.minutes),
+              ),
+          ],
+        ),
+        Row(
+          children: [
+            Expanded(
+              child: Slider(
+                min: 60,
+                max: 360,
+                divisions: 20,
+                value: duration.clamp(60, 360).toDouble(),
+                label: _formatDuration(duration),
+                onChanged: (value) => _setDuration(value.round()),
+              ),
+            ),
+            SizedBox(
+              width: 56,
+              child: Text(_formatDuration(duration), textAlign: TextAlign.end),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSlot(
+    BuildContext context,
+    GameNightSlot slot,
+    String title,
+    String subtitle,
+  ) {
+    final game = _lineup.slot(slot);
+    final pinned = _pinned.containsKey(slot);
+    return Card(
+      margin: const EdgeInsets.only(bottom: 12),
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '$title · $subtitle',
+                    style: Theme.of(context).textTheme.labelMedium,
+                  ),
+                  const SizedBox(height: 4),
+                  if (game != null) ...[
+                    Text(
+                      game.name,
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                    Text(
+                      '${game.maxPlaytime} min · ${_weightLabel(game.averageWeight)}',
+                      style: Theme.of(context).textTheme.bodySmall,
+                    ),
+                  ] else
+                    Text(
+                      'No fit for this slot',
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        fontStyle: FontStyle.italic,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                ],
+              ),
+            ),
+            if (game != null)
+              IconButton(
+                tooltip: pinned ? 'Unpin' : 'Pin',
+                icon: Icon(pinned ? Icons.push_pin : Icons.push_pin_outlined),
+                color: pinned ? Theme.of(context).colorScheme.primary : null,
+                onPressed: () => _togglePin(slot),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  static String _formatDuration(int minutes) {
+    final hours = minutes / 60;
+    if (minutes % 60 == 0) return '${minutes ~/ 60}h';
+    return '${hours.toStringAsFixed(1)}h';
+  }
+
+  static String _weightLabel(double weight) {
+    if (weight < 2.0) return 'Light';
+    if (weight <= 3.0) return 'Medium';
+    return 'Heavy';
+  }
+}
+
+class _DurationPreset {
+  final String label;
+  final int minutes;
+
+  const _DurationPreset(this.label, this.minutes);
+}

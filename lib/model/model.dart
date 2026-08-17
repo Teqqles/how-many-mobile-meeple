@@ -203,6 +203,12 @@ class AppModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  @visibleForTesting
+  void setGamesForTest(Games games) {
+    _bggCache = BggCache(games, _defaultCacheDurationInMinutes);
+    notifyListeners();
+  }
+
   static const int _maxAnalyticsSeedAttempts = 5;
 
   /// Base retry delay (seconds), scaled by attempt for linear backoff.

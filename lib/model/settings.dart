@@ -82,6 +82,18 @@ class Settings {
     enabled: true,
   );
 
+  static Setting gameNightMode = Setting(
+    "gameNightMode",
+    value: false,
+    enabled: true,
+  );
+
+  static Setting gameNightDurationMinutes = Setting(
+    "gameNightDurationMinutes",
+    value: 180,
+    enabled: true,
+  );
+
   static Settings defaultSettings() => Settings(
     Map.from({
       Settings.fieldsToReturnFromApi.name: Settings.fieldsToReturnFromApi
@@ -106,6 +118,9 @@ class Settings {
           .clone(),
       Settings.preferAdvancedMode.name: Settings.preferAdvancedMode.clone(),
       Settings.themeMode.name: Settings.themeMode.clone(),
+      Settings.gameNightMode.name: Settings.gameNightMode.clone(),
+      Settings.gameNightDurationMinutes.name: Settings.gameNightDurationMinutes
+          .clone(),
     }),
   );
 

@@ -1,6 +1,11 @@
 {
-  "version": "2.33.1",
+  "version": "2.34.1",
   "recent_changes": [
+    {
+      "type": "feat",
+      "scope": "",
+      "description": "Collection Insights dashboard (#107)"
+    },
     {
       "type": "feat",
       "scope": "",
@@ -107,13 +112,6 @@
       "number": 110,
       "title": "How Many Meeple is findable with a search engine",
       "labels": []
-    },
-    {
-      "number": 107,
-      "title": "Add a Collection Insights page",
-      "labels": [
-        "enhancement"
-      ]
     },
     {
       "number": 99,

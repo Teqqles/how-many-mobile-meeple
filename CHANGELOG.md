@@ -3,6 +3,11 @@
 All notable changes to this project are documented here.
 This file is auto-generated from conventional commits on each release.
 
+## [v2.33.1] - 2026-08-16
+
+### Added
+- show live collection match counts on guided-flow steps
+
 ## [v2.32.1] - 2026-08-16
 
 ### Added

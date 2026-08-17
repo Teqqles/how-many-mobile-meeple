@@ -5,6 +5,7 @@ import 'package:how_many_mobile_meeple/components/disclaimer_text.dart';
 import 'package:how_many_mobile_meeple/components/feature_drawer.dart';
 import 'package:how_many_mobile_meeple/components/insights_charts.dart';
 import 'package:how_many_mobile_meeple/components/list_empty_state.dart';
+import 'package:how_many_mobile_meeple/components/plays_loading_indicator.dart';
 import 'package:how_many_mobile_meeple/how_many_meeple_app_bar.dart';
 import 'package:how_many_mobile_meeple/model/collection_analytics.dart';
 import 'package:how_many_mobile_meeple/model/model.dart';
@@ -39,7 +40,10 @@ class _CollectionInsightsPageState extends State<CollectionInsightsPage>
           context: context, helpSection: 'collection-insights'),
       drawer: const FeatureDrawer(),
       endDrawer: pageDrawer(context),
-      bottomNavigationBar: const AppFooter(),
+      bottomNavigationBar: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: const [PlaysLoadingIndicator(), AppFooter()],
+      ),
       body: Consumer<AppModel>(
         builder: (context, model, child) {
           final analytics = model.collectionAnalytics;

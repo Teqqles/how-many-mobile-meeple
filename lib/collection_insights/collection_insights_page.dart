@@ -51,7 +51,7 @@ class _CollectionInsightsPageState extends State<CollectionInsightsPage>
           if (analytics == null || !analytics.hasData) {
             return _buildEmptyState(context);
           }
-          return _buildDashboard(context, model, analytics);
+          return _buildDashboard(model, analytics);
         },
       ),
     );
@@ -67,8 +67,7 @@ class _CollectionInsightsPageState extends State<CollectionInsightsPage>
     );
   }
 
-  Widget _buildDashboard(
-      BuildContext context, AppModel model, CollectionAnalytics analytics) {
+  Widget _buildDashboard(AppModel model, CollectionAnalytics analytics) {
     final sections = <Widget>[];
 
     final stats = (model.playsLoaded && model.collectionGameIds.isNotEmpty)
@@ -144,7 +143,7 @@ class _CollectionInsightsPageState extends State<CollectionInsightsPage>
       ));
     }
 
-    if (stats != null) _addPlaySections(context, stats, sections);
+    if (stats != null) _addPlaySections(stats, sections);
 
     return ListView(
       padding: const EdgeInsets.all(16),
@@ -152,8 +151,7 @@ class _CollectionInsightsPageState extends State<CollectionInsightsPage>
     );
   }
 
-  void _addPlaySections(
-      BuildContext context, PlayInsights stats, List<Widget> sections) {
+  void _addPlaySections(PlayInsights stats, List<Widget> sections) {
     if (stats.hasPlays) {
       sections.add(_Section(
         title: 'Play Activity',

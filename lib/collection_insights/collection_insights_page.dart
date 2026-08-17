@@ -101,6 +101,7 @@ class _CollectionInsightsPageState extends State<CollectionInsightsPage>
           secondaryValue: stats.unplayedGames,
           secondaryLabel: 'Unplayed',
           total: stats.totalGames,
+          centerLabel: 'Backlog',
         ),
       ));
     }

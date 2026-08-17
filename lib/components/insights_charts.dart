@@ -477,6 +477,7 @@ class InsightsSummaryGrid extends StatelessWidget {
           secondaryValue: backlogUnplayed!,
           secondaryLabel: 'Unplayed',
           total: backlogTotal,
+          centerLabel: 'Backlog',
         ),
       if (summary.averageRating != null)
         StatTile(

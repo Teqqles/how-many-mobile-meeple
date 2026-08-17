@@ -7,6 +7,7 @@ import 'package:how_many_mobile_meeple/model/collection_analytics.dart';
 import 'package:how_many_mobile_meeple/api/http_retry_client.dart';
 import 'package:how_many_mobile_meeple/api/plays_service.dart';
 import 'package:how_many_mobile_meeple/model/filter_seeder.dart';
+import 'package:how_many_mobile_meeple/model/game_night.dart';
 import 'package:how_many_mobile_meeple/model/play_data.dart';
 import 'package:how_many_mobile_meeple/play_log/play_log_service.dart';
 import 'package:how_many_mobile_meeple/platform/web/url_fragment_extractor.dart';
@@ -467,6 +468,24 @@ class AppModel extends ChangeNotifier {
       settings.updateSetting(disabled);
     }
     return GameRequest.from(settings, _items);
+  }
+
+  /// A clone of the current settings tuned for a shareable Game Night link:
+  /// Game Night mode on and the chosen [lineup] encoded, so a recipient lands
+  /// on the same collection, evening length, and exact games. The live settings
+  /// are untouched - the clone only shapes the permalink.
+  Settings gameNightPermalinkSettings(GameNightLineup lineup) {
+    final settings = _settings.clone();
+    final mode = settings.setting(Settings.gameNightMode.name).clone()
+      ..value = true
+      ..enabled = true;
+    settings.updateSetting(mode);
+    final encodedLineup =
+        settings.setting(Settings.gameNightLineup.name).clone()
+          ..value = GameNightPermalink.encode(lineup)
+          ..enabled = true;
+    settings.updateSetting(encodedLineup);
+    return settings;
   }
 
   void invalidateCache() {

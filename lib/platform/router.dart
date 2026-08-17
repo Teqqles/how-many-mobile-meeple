@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:how_many_mobile_meeple/favourites/favourites_service.dart';
 import 'package:how_many_mobile_meeple/favourites/ignored_games_service.dart';
+import 'package:how_many_mobile_meeple/model/game_night.dart';
 import 'package:how_many_mobile_meeple/model/model.dart';
 import 'package:how_many_mobile_meeple/platform/pages.dart';
 import 'package:how_many_mobile_meeple/platform/web/url_fragment_encoder.dart';
@@ -187,6 +188,18 @@ class Router {
       settings: settings,
     );
     return RouteSettings(name: encodedName);
+  }
+
+  /// A full shareable URL for the current Game Night lineup. Opening it lands
+  /// the recipient on the home page in Game Night mode, with the shared
+  /// collection loaded and the three games pinned (see GameNightView).
+  static String gameNightPermalink(AppModel model, GameNightLineup lineup) {
+    final fragment = UrlFragmentEncoder.encode(
+      homeRoute,
+      items: model.items,
+      settings: model.gameNightPermalinkSettings(lineup),
+    );
+    return Uri.base.removeFragment().replace(fragment: fragment).toString();
   }
 }
 

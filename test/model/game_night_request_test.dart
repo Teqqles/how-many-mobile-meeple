@@ -2,9 +2,22 @@
 library;
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:how_many_mobile_meeple/model/game.dart';
+import 'package:how_many_mobile_meeple/model/game_night.dart';
 import 'package:how_many_mobile_meeple/model/model.dart';
 import 'package:how_many_mobile_meeple/model/settings.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+Game _game(int id, int maxPlaytime) => Game(
+  id: id,
+  name: 'Game $id',
+  maxPlayers: 4,
+  minPlayers: 2,
+  maxPlaytime: maxPlaytime,
+  imageUrl: '',
+  averageRating: 7,
+  averageWeight: 2.5,
+);
 
 void _enable(AppModel model, String name) {
   final setting = model.settings.setting(name)..enabled = true;
@@ -44,6 +57,35 @@ void main() {
     expect(
       normalHeaders.containsKey(Settings.filterMaximumTimeToPlay.header),
       isTrue,
+    );
+  });
+
+  test('permalink settings turn on game night mode and encode the lineup', () {
+    final model = AppModel();
+    final lineup = GameNightLineup(filler: _game(12, 20), main: _game(45, 90));
+
+    final settings = model.gameNightPermalinkSettings(lineup);
+
+    expect(settings.setting(Settings.gameNightMode.name).getBool(), isTrue);
+    expect(
+      settings.setting(Settings.gameNightLineup.name).getString(),
+      '12-45-0',
+    );
+    expect(settings.setting(Settings.gameNightLineup.name).enabled, isTrue);
+  });
+
+  test('building permalink settings does not mutate the live settings', () {
+    final model = AppModel();
+
+    model.gameNightPermalinkSettings(GameNightLineup(main: _game(45, 90)));
+
+    expect(
+      model.settings.setting(Settings.gameNightMode.name).getBool(),
+      false,
+    );
+    expect(
+      model.settings.setting(Settings.gameNightLineup.name).enabled,
+      isFalse,
     );
   });
 }

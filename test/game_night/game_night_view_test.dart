@@ -8,6 +8,7 @@ import 'package:how_many_mobile_meeple/model/game.dart';
 import 'package:how_many_mobile_meeple/model/game_night.dart';
 import 'package:how_many_mobile_meeple/model/model.dart';
 import 'package:how_many_mobile_meeple/model/play_data.dart';
+import 'package:how_many_mobile_meeple/model/settings.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 Game _game(int id, String name, int maxPlaytime, double weight) => Game(
@@ -121,5 +122,59 @@ void main() {
     await tester.pump();
 
     expect(find.byIcon(Icons.push_pin), findsOneWidget);
+  });
+
+  testWidgets('play-history filter appears only once plays are loaded', (
+    tester,
+  ) async {
+    await tester.pumpWidget(_wrap(AppModel()));
+    expect(find.text('Play history'), findsNothing);
+
+    final model = AppModel()
+      ..setPlaysForTest(playsData: {}, collectionGameIds: {});
+    await tester.pumpWidget(_wrap(model));
+
+    expect(find.text('Play history'), findsOneWidget);
+  });
+
+  testWidgets('filtering to played narrows the lineup to played games', (
+    tester,
+  ) async {
+    final model = AppModel()
+      ..setPlaysForTest(
+        playsData: {2: PlayData(gameId: 2, gameName: 'Epic', totalPlays: 3)},
+        collectionGameIds: {2},
+      );
+    await tester.pumpWidget(_wrap(model));
+    expect(find.text('Quick'), findsOneWidget);
+
+    await tester.tap(find.text('Played'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Epic'), findsOneWidget);
+    expect(find.text('Quick'), findsNothing);
+  });
+
+  testWidgets('pins the games carried by a shared lineup', (tester) async {
+    final model = AppModel();
+    final setting = model.settings.setting(Settings.gameNightLineup.name)
+      ..value = '1-2-4'
+      ..enabled = true;
+    model.settings.updateSetting(setting);
+
+    await tester.pumpWidget(_wrap(model));
+    await tester.pump();
+
+    // Filler 1, main 2 and backup 4 all arrive pinned.
+    expect(find.byIcon(Icons.push_pin), findsNWidgets(3));
+    expect(find.byIcon(Icons.push_pin_outlined), findsNothing);
+  });
+
+  testWidgets('offers a share action for a filled lineup', (tester) async {
+    await tester.pumpWidget(_wrap(AppModel()));
+
+    final share = find.byKey(const ValueKey('game-night-share'));
+    expect(share, findsOneWidget);
+    expect(tester.widget<OutlinedButton>(share).onPressed, isNotNull);
   });
 }

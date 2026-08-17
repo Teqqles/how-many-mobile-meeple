@@ -25,6 +25,34 @@ class GameNightLineup {
   bool get isEmpty => filler == null && main == null && backup == null;
 }
 
+/// Serialises a lineup's game ids for a shareable permalink and reads them
+/// back. The token is three `-`-separated ids in slot order, with `0` marking
+/// an empty slot, e.g. `12-45-0` (filler 12, main 45, no backup).
+class GameNightPermalink {
+  static const String _separator = '-';
+
+  static String encode(GameNightLineup lineup) => [
+    lineup.filler?.id ?? 0,
+    lineup.main?.id ?? 0,
+    lineup.backup?.id ?? 0,
+  ].join(_separator);
+
+  /// Maps each slot to the game id carried in [token], skipping empty slots.
+  /// A malformed token yields an empty map so the lineup regenerates normally.
+  static Map<GameNightSlot, int> decode(String token) {
+    final ids = token.split(_separator).map(int.tryParse).toList();
+    if (ids.length != 3) return const {};
+
+    final bySlot = {
+      GameNightSlot.filler: ids[0],
+      GameNightSlot.main: ids[1],
+      GameNightSlot.backup: ids[2],
+    };
+    bySlot.removeWhere((_, id) => id == null || id <= 0);
+    return bySlot.map((slot, id) => MapEntry(slot, id!));
+  }
+}
+
 /// Builds a Game Night lineup from a pool of games and a time budget.
 ///
 /// Pure and dependency-free: selection among equally valid candidates goes
@@ -33,6 +61,11 @@ class GameNightPlanner {
   /// A filler is a short game played while waiting or warming up. The ceiling
   /// is inclusive so common 30-minute fillers qualify.
   static const int fillerMaxMinutes = 30;
+
+  /// The main can be any fitting game whose playtime is at least this fraction
+  /// of the longest fitting game, so regenerate varies the centrepiece instead
+  /// of always returning the single longest title.
+  static const double mainLengthTolerance = 0.7;
 
   final int Function(int count) _pick;
 
@@ -87,12 +120,15 @@ class GameNightPlanner {
         .toList();
     if (fitting.isEmpty) return null;
 
-    // The centrepiece is the longest game that still fits the budget.
+    // The centrepiece is a long game, but not rigidly the single longest -
+    // any game within a band below the longest is a fair candidate so
+    // regenerate can offer variety instead of always the same top game.
     final longest = fitting
         .map((g) => g.maxPlaytime)
         .reduce((a, b) => a > b ? a : b);
+    final threshold = longest * mainLengthTolerance;
     final centrepieces = fitting
-        .where((g) => g.maxPlaytime == longest)
+        .where((g) => g.maxPlaytime >= threshold)
         .toList();
     return _choose(centrepieces);
   }

@@ -94,6 +94,15 @@ class Settings {
     enabled: true,
   );
 
+  /// Carries a shared lineup's game ids in a permalink (see GameNightPermalink).
+  /// Disabled by default so it rides along only in a deliberately shared link,
+  /// never in a normal request or the everyday URL.
+  static Setting gameNightLineup = Setting(
+    "gameNightLineup",
+    value: "",
+    enabled: false,
+  );
+
   static Settings defaultSettings() => Settings(
     Map.from({
       Settings.fieldsToReturnFromApi.name: Settings.fieldsToReturnFromApi
@@ -121,6 +130,7 @@ class Settings {
       Settings.gameNightMode.name: Settings.gameNightMode.clone(),
       Settings.gameNightDurationMinutes.name: Settings.gameNightDurationMinutes
           .clone(),
+      Settings.gameNightLineup.name: Settings.gameNightLineup.clone(),
     }),
   );
 

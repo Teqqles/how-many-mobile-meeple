@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:how_many_mobile_meeple/components/platform_independent_image.dart';
 import 'package:how_many_mobile_meeple/model/game.dart';
 import 'package:how_many_mobile_meeple/model/game_night.dart';
 import 'package:how_many_mobile_meeple/model/model.dart';
 import 'package:how_many_mobile_meeple/model/settings.dart';
+import 'package:how_many_mobile_meeple/platform/router.dart' as r;
+import 'package:share_plus/share_plus.dart';
 
 /// Recommends a full evening's lineup - a filler, a main game and a backup -
 /// from a pool of games within a chosen time budget. The user can pin any slot
@@ -35,15 +38,85 @@ class _GameNightViewState extends State<GameNightView> {
 
   final Map<GameNightSlot, Game> _pinned = {};
   GameNightLineup _lineup = const GameNightLineup();
+  _PlayFilter _playFilter = _PlayFilter.all;
 
   int get _durationMinutes => widget.model.settings
       .setting(Settings.gameNightDurationMinutes.name)
       .getInt();
 
+  /// The pool narrowed to the chosen play-history filter. Filtering needs the
+  /// play counts, so it only applies once plays have loaded; otherwise every
+  /// game would look unplayed.
+  List<Game> get _effectivePool {
+    if (_playFilter == _PlayFilter.all || !widget.model.playsLoaded) {
+      return widget.pool;
+    }
+    final wantPlayed = _playFilter == _PlayFilter.played;
+    return widget.pool
+        .where((g) => (widget.model.getPlayCount(g.id) > 0) == wantPlayed)
+        .toList();
+  }
+
   @override
   void initState() {
     super.initState();
+    _restoreSharedLineup();
     _regenerate();
+  }
+
+  /// Pins the games carried by a shared permalink so the recipient sees the
+  /// exact lineup, then consumes the token so it neither persists nor re-pins
+  /// on later visits. Any game the shared collection no longer contains is
+  /// skipped, leaving that slot to regenerate normally.
+  void _restoreSharedLineup() {
+    final setting = widget.model.settings.setting(
+      Settings.gameNightLineup.name,
+    );
+    if (!setting.enabled) return;
+    final token = setting.getString();
+    if (token.isEmpty) return;
+
+    GameNightPermalink.decode(token).forEach((slot, id) {
+      final game = _findInPool(id);
+      if (game != null) _pinned[slot] = game;
+    });
+    _consumeSharedLineup();
+  }
+
+  Game? _findInPool(int id) {
+    for (final game in widget.pool) {
+      if (game.id == id) return game;
+    }
+    return null;
+  }
+
+  void _consumeSharedLineup() {
+    final setting = widget.model.settings.setting(Settings.gameNightLineup.name)
+      ..value = ''
+      ..enabled = false;
+    widget.model.settings.updateSetting(setting);
+    WidgetsBinding.instance.addPostFrameCallback(
+      (_) => widget.model.updateStore(),
+    );
+  }
+
+  Future<void> _share() async {
+    final url = r.Router.gameNightPermalink(widget.model, _lineup);
+    try {
+      await SharePlus.instance.share(
+        ShareParams(
+          title: 'My game night on How Many Meeple',
+          uri: Uri.parse(url),
+        ),
+      );
+    } catch (_) {
+      if (!mounted) return;
+      await Clipboard.setData(ClipboardData(text: url));
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Game night link copied to clipboard')),
+      );
+    }
   }
 
   @override
@@ -56,11 +129,17 @@ class _GameNightViewState extends State<GameNightView> {
   void _regenerate() {
     setState(() {
       _lineup = widget.planner.plan(
-        pool: widget.pool,
+        pool: _effectivePool,
         durationMinutes: _durationMinutes,
         pinned: Map.of(_pinned),
       );
     });
+  }
+
+  void _setPlayFilter(_PlayFilter filter) {
+    if (filter == _playFilter) return;
+    _playFilter = filter;
+    _regenerate();
   }
 
   void _setDuration(int minutes) {
@@ -105,21 +184,39 @@ class _GameNightViewState extends State<GameNightView> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           _buildDurationPicker(context),
+          if (widget.model.playsLoaded) ...[
+            const SizedBox(height: 16),
+            _buildPlayFilter(context),
+          ],
           const SizedBox(height: 20),
-          _buildSlot(context, GameNightSlot.filler, 'Filler', 'Warm-up'),
-          _buildSlot(context, GameNightSlot.main, 'Main', 'The centrepiece'),
+          _buildSlot(context, GameNightSlot.filler, 'Filler', 'Warm-up', 0),
+          _buildSlot(context, GameNightSlot.main, 'Main', 'The centrepiece', 1),
           _buildSlot(
             context,
             GameNightSlot.backup,
             'Backup',
             'If the mood shifts',
+            2,
           ),
           const SizedBox(height: 8),
-          FilledButton.icon(
-            key: const ValueKey('game-night-regenerate'),
-            onPressed: _regenerate,
-            icon: const Icon(Icons.casino),
-            label: const Text('Regenerate'),
+          Row(
+            children: [
+              Expanded(
+                child: FilledButton.icon(
+                  key: const ValueKey('game-night-regenerate'),
+                  onPressed: _regenerate,
+                  icon: const Icon(Icons.casino),
+                  label: const Text('Regenerate'),
+                ),
+              ),
+              const SizedBox(width: 8),
+              OutlinedButton.icon(
+                key: const ValueKey('game-night-share'),
+                onPressed: _lineup.isEmpty ? null : _share,
+                icon: const Icon(Icons.share),
+                label: const Text('Share'),
+              ),
+            ],
           ),
         ],
       ),
@@ -166,15 +263,42 @@ class _GameNightViewState extends State<GameNightView> {
     );
   }
 
+  Widget _buildPlayFilter(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Text('Play history', style: Theme.of(context).textTheme.titleMedium),
+        const SizedBox(height: 8),
+        SegmentedButton<_PlayFilter>(
+          segments: const [
+            ButtonSegment(value: _PlayFilter.all, label: Text('Show all')),
+            ButtonSegment(value: _PlayFilter.unplayed, label: Text('Unplayed')),
+            ButtonSegment(value: _PlayFilter.played, label: Text('Played')),
+          ],
+          selected: {_playFilter},
+          showSelectedIcon: false,
+          onSelectionChanged: (selection) => _setPlayFilter(selection.first),
+        ),
+      ],
+    );
+  }
+
   Widget _buildSlot(
     BuildContext context,
     GameNightSlot slot,
     String title,
     String subtitle,
+    int index,
   ) {
     final game = _lineup.slot(slot);
     final pinned = _pinned.containsKey(slot);
+    final scheme = Theme.of(context).colorScheme;
+    // Alternating row tints make the three slots easier to scan apart.
+    final stripe = index.isEven
+        ? scheme.surfaceContainerHighest
+        : scheme.surfaceContainerLow;
     return Card(
+      color: stripe,
       margin: const EdgeInsets.only(bottom: 12),
       child: Padding(
         padding: const EdgeInsets.all(12),
@@ -317,3 +441,7 @@ class _DurationPreset {
 
   const _DurationPreset(this.label, this.minutes);
 }
+
+/// Filters the pool by whether the primary player has logged plays of a game,
+/// so an evening can favour familiar games for teaching or fresh ones to try.
+enum _PlayFilter { all, unplayed, played }

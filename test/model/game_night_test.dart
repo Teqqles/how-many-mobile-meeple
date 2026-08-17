@@ -41,6 +41,20 @@ void main() {
       expect(lineup.main!.id, 3);
     });
 
+    test('varies the main among the longest fitting games on regenerate', () {
+      final pool = [_game(1, 120), _game(2, 110), _game(3, 100), _game(4, 15)];
+
+      // The filler is the only short game, so both planners pick it; the main
+      // is chosen from the long games, and a different index yields a different
+      // centrepiece.
+      final first = GameNightPlanner(pick: (_) => 0)
+          .plan(pool: pool, durationMinutes: 180);
+      final second = GameNightPlanner(pick: (count) => count > 1 ? 1 : 0)
+          .plan(pool: pool, durationMinutes: 180);
+
+      expect(first.main!.id, isNot(second.main!.id));
+    });
+
     test('keeps filler plus main within the budget', () {
       final lineup = _planner().plan(
         pool: [_game(1, 15), _game(2, 200)],
@@ -104,6 +118,39 @@ void main() {
     test('empty pool yields an empty lineup', () {
       final lineup = _planner().plan(pool: [], durationMinutes: 180);
       expect(lineup.isEmpty, isTrue);
+    });
+  });
+
+  group('GameNightPermalink', () {
+    test('round-trips a full lineup by slot', () {
+      final lineup = GameNightLineup(
+        filler: _game(12, 20),
+        main: _game(45, 90),
+        backup: _game(7, 80),
+      );
+
+      final decoded = GameNightPermalink.decode(
+        GameNightPermalink.encode(lineup),
+      );
+
+      expect(decoded, {
+        GameNightSlot.filler: 12,
+        GameNightSlot.main: 45,
+        GameNightSlot.backup: 7,
+      });
+    });
+
+    test('encodes an empty slot as zero and drops it on decode', () {
+      final lineup = GameNightLineup(main: _game(45, 90));
+
+      final token = GameNightPermalink.encode(lineup);
+      expect(token, '0-45-0');
+      expect(GameNightPermalink.decode(token), {GameNightSlot.main: 45});
+    });
+
+    test('a malformed token yields no pins', () {
+      expect(GameNightPermalink.decode('nonsense'), isEmpty);
+      expect(GameNightPermalink.decode('1-2'), isEmpty);
     });
   });
 }

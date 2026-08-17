@@ -104,20 +104,29 @@ void main() {
       expect(stats.playsPerYear.map((y) => y.plays).toList(), [2, 1, 1]);
     });
 
-    test('ignores plays for games outside the collection', () {
+    test('counts plays outside the collection in activity and most played', () {
       final stats = PlayInsights.from(
         collectionGameIds: {1},
         playsData: {
-          1: _data(1, 'A', 1,
+          1: _data(1, 'Owned', 1,
               plays: [BggPlay(playId: 1, date: DateTime(2026), length: 60)]),
-          2: _data(2, 'B', 1,
+          2: _data(2, 'Borrowed', 3,
               plays: [BggPlay(playId: 2, date: DateTime(2026), length: 90)]),
         },
-        playCount: (id) => 1,
+        playCount: (id) => {1: 1, 2: 3}[id]!,
         now: DateTime(2026),
       );
 
-      expect(stats.totalMinutes, 60);
+      // Minutes, plays and rankings span everything played...
+      expect(stats.totalMinutes, 150);
+      expect(stats.totalPlays, 4);
+      expect(stats.playsThisYear, 2);
+      expect(
+          stats.mostPlayed.map((m) => m.name).toList(), ['Borrowed', 'Owned']);
+      // ...but backlog stays scoped to the owned collection.
+      expect(stats.totalGames, 1);
+      expect(stats.playedGames, 1);
+      expect(stats.unplayedGames, 0);
     });
 
     test('hasPlays is false when nothing has been played', () {

@@ -56,22 +56,27 @@ class PlayInsights {
     required DateTime now,
     int topN = 8,
   }) {
-    var playedGames = 0;
+    // Backlog (played/unplayed) is a property of the owned collection, so it
+    // stays collection-scoped. Play activity and most-played span everything
+    // that has been played, including games no longer (or never) owned.
+    final allIds = <int>{...collectionGameIds, ...playsData.keys};
+
+    var collectionPlayed = 0;
     var playedOnce = 0;
     var playedRepeatedly = 0;
     var totalPlays = 0;
     final ranked = <MostPlayedEntry>[];
 
-    for (final id in collectionGameIds) {
+    for (final id in allIds) {
       final count = playCount(id);
       totalPlays += count;
       if (count > 0) {
-        playedGames++;
         if (count == 1) {
           playedOnce++;
         } else {
           playedRepeatedly++;
         }
+        if (collectionGameIds.contains(id)) collectionPlayed++;
         ranked.add(MostPlayedEntry(
           gameId: id,
           name: playsData[id]?.gameName ?? 'Game #$id',
@@ -88,9 +93,8 @@ class PlayInsights {
     var totalMinutes = 0;
     var playsThisYear = 0;
     final perYear = <int, int>{};
-    for (final entry in playsData.entries) {
-      if (!collectionGameIds.contains(entry.key)) continue;
-      for (final play in entry.value.plays) {
+    for (final data in playsData.values) {
+      for (final play in data.plays) {
         totalMinutes += play.length;
         final date = play.date;
         if (date != null) {
@@ -104,7 +108,7 @@ class PlayInsights {
 
     return PlayInsights(
       totalGames: collectionGameIds.length,
-      playedGames: playedGames,
+      playedGames: collectionPlayed,
       totalPlays: totalPlays,
       totalMinutes: totalMinutes,
       playsThisYear: playsThisYear,

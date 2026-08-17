@@ -71,11 +71,29 @@ class _CollectionInsightsPageState extends State<CollectionInsightsPage>
       BuildContext context, AppModel model, CollectionAnalytics analytics) {
     final sections = <Widget>[];
 
+    final stats = (model.playsLoaded && model.collectionGameIds.isNotEmpty)
+        ? PlayInsights.from(
+            collectionGameIds: model.collectionGameIds,
+            playsData: model.playsData,
+            playCount: model.getPlayCount,
+            now: DateTime.now(),
+          )
+        : null;
+
     final summary = analytics.summary;
-    if (summary != null) {
+    if (summary != null || stats != null) {
       sections.add(_Section(
         title: 'Overview',
-        child: InsightsSummaryGrid(summary: summary),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (summary != null) InsightsSummaryGrid(summary: summary),
+            if (stats != null) ...[
+              if (summary != null) const SizedBox(height: 20),
+              _Backlog(stats: stats),
+            ],
+          ],
+        ),
       ));
     }
 
@@ -118,7 +136,7 @@ class _CollectionInsightsPageState extends State<CollectionInsightsPage>
       ));
     }
 
-    _addPlaySections(context, model, sections);
+    if (stats != null) _addPlaySections(context, stats, sections);
 
     return ListView(
       padding: const EdgeInsets.all(16),
@@ -126,32 +144,10 @@ class _CollectionInsightsPageState extends State<CollectionInsightsPage>
     );
   }
 
-  /// Appends play-derived sections when the primary player's plays and
-  /// collection have loaded. Each subsection is guarded by its own emptiness so
-  /// a collection with no recorded plays degrades quietly.
+  /// Appends play-derived sections. Each subsection is guarded by its own
+  /// emptiness so a collection with no recorded plays degrades quietly.
   void _addPlaySections(
-      BuildContext context, AppModel model, List<Widget> sections) {
-    if (!model.playsLoaded || model.collectionGameIds.isEmpty) return;
-
-    final stats = PlayInsights.from(
-      collectionGameIds: model.collectionGameIds,
-      playsData: model.playsData,
-      playCount: model.getPlayCount,
-      now: DateTime.now(),
-    );
-
-    sections.add(_Section(
-      title: 'Backlog',
-      subtitle: '${stats.unplayedGames} of ${stats.totalGames} unplayed',
-      child: SplitDonut(
-        primaryValue: stats.playedGames,
-        primaryLabel: 'Played',
-        secondaryValue: stats.unplayedGames,
-        secondaryLabel: 'Unplayed',
-        total: stats.totalGames,
-      ),
-    ));
-
+      BuildContext context, PlayInsights stats, List<Widget> sections) {
     if (stats.hasPlays) {
       sections.add(_Section(
         title: 'Play Activity',
@@ -202,6 +198,41 @@ class _CollectionInsightsPageState extends State<CollectionInsightsPage>
   List<BarDatum> _bucketData(List<DistributionBucket> buckets) => [
         for (final b in buckets) BarDatum(label: b.name, value: b.count),
       ];
+}
+
+/// The played/unplayed split of the owned collection, shown inside the
+/// Overview card. Backlog is a property of the collection, so it lives beside
+/// the summary rather than among the broader play-activity sections.
+class _Backlog extends StatelessWidget {
+  const _Backlog({required this.stats});
+
+  final PlayInsights stats;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('Backlog',
+            style: theme.textTheme.titleSmall
+                ?.copyWith(fontWeight: FontWeight.bold)),
+        const SizedBox(height: 2),
+        Text('${stats.unplayedGames} of ${stats.totalGames} unplayed',
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+            )),
+        const SizedBox(height: 12),
+        SplitDonut(
+          primaryValue: stats.playedGames,
+          primaryLabel: 'Played',
+          secondaryValue: stats.unplayedGames,
+          secondaryLabel: 'Unplayed',
+          total: stats.totalGames,
+        ),
+      ],
+    );
+  }
 }
 
 class _Section extends StatelessWidget {

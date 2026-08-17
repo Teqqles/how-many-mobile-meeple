@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:how_many_mobile_meeple/game_night/game_night_view.dart';
+import 'package:how_many_mobile_meeple/guided_flow/step1_select_source.dart';
 import 'package:how_many_mobile_meeple/load_games.dart';
 import 'package:how_many_mobile_meeple/model/game_night.dart';
 import 'package:how_many_mobile_meeple/model/games.dart';
@@ -10,6 +11,9 @@ import 'package:how_many_mobile_meeple/model/model.dart';
 /// removed so the evening budget alone governs playtime - and hands it to the
 /// [GameNightView] planner. The single-game recommendation cache cannot be
 /// reused because that request carries the duration filters this mode drops.
+///
+/// When no source is set up yet it shows the same source picker as the
+/// one-game flow, so a collection can be added without leaving this page.
 class GameNightContent extends StatefulWidget {
   final AppModel model;
   final GameNightPlanner? planner;
@@ -24,18 +28,18 @@ class _GameNightContentState extends State<GameNightContent> {
   Future<Games>? _pool;
 
   @override
-  void initState() {
-    super.initState();
-    if (widget.model.items.itemList.isNotEmpty) {
-      _pool = LoadGames.fetchGames(widget.model.buildGameNightRequest());
-    }
-  }
-
-  @override
   Widget build(BuildContext context) {
     if (widget.model.items.itemList.isEmpty) {
-      return _message(context, 'Add a BGG collection to plan a game night.');
+      // Drop the stale pool so re-adding a source triggers a fresh fetch.
+      _pool = null;
+      return const SingleChildScrollView(
+        padding: EdgeInsets.symmetric(horizontal: 10, vertical: 16),
+        child: Step1SelectSource(),
+      );
     }
+
+    _pool ??= LoadGames.fetchGames(widget.model.buildGameNightRequest());
+
     return FutureBuilder<Games>(
       future: _pool,
       builder: (context, snapshot) {

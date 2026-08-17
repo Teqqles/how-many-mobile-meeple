@@ -41,33 +41,38 @@ class _QuickPickSheetState extends State<QuickPickSheet> {
   void _restoreFromModel() {
     final model = AppModel.of(context, listen: false);
 
-    final playerSetting =
-        model.settings.setting(Settings.filterNumberOfPlayers.name);
+    final playerSetting = model.settings.setting(
+      Settings.filterNumberOfPlayers.name,
+    );
     if (playerSetting.enabled &&
         _playerOptions.containsValue(playerSetting.value)) {
       _selectedPlayers = playerSetting.value as int;
     }
 
-    final maxTimeSetting =
-        model.settings.setting(Settings.filterMaximumTimeToPlay.name);
+    final maxTimeSetting = model.settings.setting(
+      Settings.filterMaximumTimeToPlay.name,
+    );
     if (maxTimeSetting.enabled &&
         _timeOptions.containsValue(maxTimeSetting.value)) {
       _selectedMaxTime = maxTimeSetting.value as int;
     }
 
-    final complexitySetting =
-        model.settings.setting(Settings.filterComplexity.name);
+    final complexitySetting = model.settings.setting(
+      Settings.filterComplexity.name,
+    );
     if (complexitySetting.enabled &&
         _weightOptions.containsValue(complexitySetting.value)) {
       _selectedWeight = complexitySetting.value as double;
     }
 
-    final sosSetting =
-        model.settings.setting(Settings.filterShelfOfShameOnly.name);
+    final sosSetting = model.settings.setting(
+      Settings.filterShelfOfShameOnly.name,
+    );
     _shelfOfShameOnly = sosSetting.enabled && sosSetting.getBool();
 
-    final mechanicsSetting =
-        model.settings.setting(Settings.filterMechanics.name);
+    final mechanicsSetting = model.settings.setting(
+      Settings.filterMechanics.name,
+    );
     if (mechanicsSetting.enabled) {
       _selectedMechanics
         ..clear()
@@ -75,11 +80,7 @@ class _QuickPickSheetState extends State<QuickPickSheet> {
     }
   }
 
-  static const Map<String, int> _playerOptions = {
-    '2': 2,
-    '3-4': 4,
-    '5+': 5,
-  };
+  static const Map<String, int> _playerOptions = {'2': 2, '3-4': 4, '5+': 5};
 
   static const Map<String, int> _timeOptions = {
     '< 30 min': 30,
@@ -121,17 +122,16 @@ class _QuickPickSheetState extends State<QuickPickSheet> {
             const SizedBox(height: 20),
             Text(
               'Quick Pick',
-              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
+              style: Theme.of(context).textTheme.headlineSmall
+                  ?.copyWith(fontWeight: FontWeight.bold),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 4),
             Text(
               'Pick what matters, skip what doesn\'t',
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                  ),
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 28),
@@ -171,7 +171,9 @@ class _QuickPickSheetState extends State<QuickPickSheet> {
                   label: Text(
                     hasSource ? 'Go!' : 'Add a source first',
                     style: const TextStyle(
-                        fontSize: 16, fontWeight: FontWeight.bold),
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   style: FilledButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 16),
@@ -201,9 +203,8 @@ class _QuickPickSheetState extends State<QuickPickSheet> {
             const SizedBox(width: 8),
             Text(
               label,
-              style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
+              style: Theme.of(context).textTheme.titleSmall
+                  ?.copyWith(fontWeight: FontWeight.bold),
             ),
           ],
         ),
@@ -230,8 +231,9 @@ class _QuickPickSheetState extends State<QuickPickSheet> {
   Widget _buildMechanicsRow() {
     return Consumer<AppModel>(
       builder: (context, model, child) {
-        final mechanics =
-            model.topMechanics.take(TopMechanicChipsWidget.maxChips).toList();
+        final mechanics = model.topMechanics
+            .take(TopMechanicChipsWidget.maxChips)
+            .toList();
         if (mechanics.isEmpty) return const SizedBox.shrink();
 
         return Column(
@@ -239,14 +241,15 @@ class _QuickPickSheetState extends State<QuickPickSheet> {
           children: [
             Row(
               children: [
-                Icon(Icons.category,
-                    size: 20, color: Theme.of(context).colorScheme.primary),
+                Icon(
+                  Icons.category,
+                  size: 20,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
                 const SizedBox(width: 8),
                 Text(
                   'Mechanics',
-                  style: Theme.of(context)
-                      .textTheme
-                      .titleSmall
+                  style: Theme.of(context).textTheme.titleSmall
                       ?.copyWith(fontWeight: FontWeight.bold),
                 ),
               ],
@@ -298,21 +301,23 @@ class _QuickPickSheetState extends State<QuickPickSheet> {
             ),
             child: Row(
               children: [
-                Icon(Icons.shelves,
-                    size: 20,
-                    color: hasPrimaryPlayer
-                        ? Theme.of(context).colorScheme.primary
-                        : Theme.of(context).colorScheme.onSurfaceVariant),
+                Icon(
+                  Icons.shelves,
+                  size: 20,
+                  color: hasPrimaryPlayer
+                      ? Theme.of(context).colorScheme.primary
+                      : Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
                     'Unplayed only',
                     style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: hasPrimaryPlayer
-                              ? null
-                              : Theme.of(context).colorScheme.onSurfaceVariant,
-                        ),
+                      fontWeight: FontWeight.bold,
+                      color: hasPrimaryPlayer
+                          ? null
+                          : Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
                   ),
                 ),
                 AppSwitch(
@@ -333,18 +338,21 @@ class _QuickPickSheetState extends State<QuickPickSheet> {
     final model = AppModel.of(context, listen: false);
 
     if (_selectedPlayers != null) {
-      final playerSetting =
-          model.settings.setting(Settings.filterNumberOfPlayers.name);
+      final playerSetting = model.settings.setting(
+        Settings.filterNumberOfPlayers.name,
+      );
       playerSetting.value = _selectedPlayers;
       playerSetting.enabled = true;
       model.settings.updateSetting(playerSetting);
     }
 
     if (_selectedMaxTime != null) {
-      final minTimeSetting =
-          model.settings.setting(Settings.filterMinimumTimeToPlay.name);
-      final maxTimeSetting =
-          model.settings.setting(Settings.filterMaximumTimeToPlay.name);
+      final minTimeSetting = model.settings.setting(
+        Settings.filterMinimumTimeToPlay.name,
+      );
+      final maxTimeSetting = model.settings.setting(
+        Settings.filterMaximumTimeToPlay.name,
+      );
       minTimeSetting.value = Settings.inferMinTime(_selectedMaxTime!);
       maxTimeSetting.value = _selectedMaxTime;
       minTimeSetting.enabled = true;
@@ -354,21 +362,24 @@ class _QuickPickSheetState extends State<QuickPickSheet> {
     }
 
     if (_selectedWeight != null) {
-      final complexitySetting =
-          model.settings.setting(Settings.filterComplexity.name);
+      final complexitySetting = model.settings.setting(
+        Settings.filterComplexity.name,
+      );
       complexitySetting.value = _selectedWeight;
       complexitySetting.enabled = true;
       model.settings.updateSetting(complexitySetting);
     }
 
-    final sosSetting =
-        model.settings.setting(Settings.filterShelfOfShameOnly.name);
+    final sosSetting = model.settings.setting(
+      Settings.filterShelfOfShameOnly.name,
+    );
     sosSetting.value = _shelfOfShameOnly;
     sosSetting.enabled = _shelfOfShameOnly;
     model.settings.updateSetting(sosSetting);
 
-    final mechanicsSetting =
-        model.settings.setting(Settings.filterMechanics.name);
+    final mechanicsSetting = model.settings.setting(
+      Settings.filterMechanics.name,
+    );
     mechanicsSetting.value = _selectedMechanics.toList();
     mechanicsSetting.enabled = _selectedMechanics.isNotEmpty;
     model.settings.updateSetting(mechanicsSetting);

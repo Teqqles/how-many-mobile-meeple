@@ -41,10 +41,7 @@ void main() {
           'minplayers': 1,
           'maxplaytime': 70,
           'image': 'http://example.com/img.jpg',
-          'stats': {
-            'average': 8.1,
-            'averageweight': 2.4,
-          },
+          'stats': {'average': 8.1, 'averageweight': 2.4},
         },
       });
 

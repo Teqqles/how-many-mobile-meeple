@@ -12,9 +12,7 @@ Widget _buildTestWidget(AppModel model, {VoidCallback? onSwitchToAdvanced}) {
   return ChangeNotifierProvider.value(
     value: model,
     child: MaterialApp(
-      routes: {
-        '/settings': (_) => const Scaffold(body: Text('Settings Page')),
-      },
+      routes: {'/settings': (_) => const Scaffold(body: Text('Settings Page'))},
       home: Scaffold(
         body: SingleChildScrollView(
           child: Step5FinalActions(
@@ -63,8 +61,9 @@ void main() {
       expect(find.text('Switch to Advanced Mode'), findsOneWidget);
     });
 
-    testWidgets('advanced mode button calls callback',
-        (WidgetTester tester) async {
+    testWidgets('advanced mode button calls callback', (
+      WidgetTester tester,
+    ) async {
       tester.view.physicalSize = const Size(800, 1200);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(() {
@@ -85,8 +84,9 @@ void main() {
       expect(callbackFired, true);
     });
 
-    testWidgets('Review My Settings navigates to settings route',
-        (WidgetTester tester) async {
+    testWidgets('Review My Settings navigates to settings route', (
+      WidgetTester tester,
+    ) async {
       final model = AppModel();
 
       await tester.pumpWidget(_buildTestWidget(model));

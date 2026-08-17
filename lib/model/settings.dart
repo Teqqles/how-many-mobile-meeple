@@ -1,74 +1,113 @@
 import 'package:how_many_mobile_meeple/model/setting.dart';
 
 class Settings {
-  static Setting fieldsToReturnFromApi = Setting("fieldsToUse",
-      header: "Bgg-Field-Whitelist",
-      value:
-          "id,name,maxplayers,minplayers,maxplaytime,image,thumbnail,stats,lastmodified",
-      enabled: true);
+  static Setting fieldsToReturnFromApi = Setting(
+    "fieldsToUse",
+    header: "Bgg-Field-Whitelist",
+    value: "id,name,maxplayers,minplayers,maxplaytime,image,thumbnail,stats,lastmodified",
+    enabled: true,
+  );
 
-  static Setting filterNumberOfPlayers =
-      Setting("numberOfPlayers", header: "Bgg-Filter-Player-Count", value: 5);
+  static Setting filterNumberOfPlayers = Setting(
+    "numberOfPlayers",
+    header: "Bgg-Filter-Player-Count",
+    value: 5,
+  );
 
-  static Setting filterMinimumTimeToPlay = Setting("minimumTimeToPlay",
-      header: "Bgg-Filter-Min-Duration", value: 30);
+  static Setting filterMinimumTimeToPlay = Setting(
+    "minimumTimeToPlay",
+    header: "Bgg-Filter-Min-Duration",
+    value: 30,
+  );
 
-  static Setting filterMaximumTimeToPlay = Setting("maximumTimeToPlay",
-      header: "Bgg-Filter-Max-Duration", value: 90);
+  static Setting filterMaximumTimeToPlay = Setting(
+    "maximumTimeToPlay",
+    header: "Bgg-Filter-Max-Duration",
+    value: 90,
+  );
 
-  static Setting filterComplexity =
-      Setting("complexity", header: "Bgg-Filter-Complexity", value: 0.0);
+  static Setting filterComplexity = Setting(
+    "complexity",
+    header: "Bgg-Filter-Complexity",
+    value: 0.0,
+  );
 
   static Setting filterUsingUserRecommendations = Setting(
-      "useUserRecommendedFilters",
-      header: "Bgg-Filter-Using-Recommended-Players",
-      value: true,
-      enabled: true);
+    "useUserRecommendedFilters",
+    header: "Bgg-Filter-Using-Recommended-Players",
+    value: true,
+    enabled: true,
+  );
 
-  static Setting filterMechanics = Setting("mechanicsFilters",
-      header: "Bgg-Filter-Mechanic", value: <String>[]);
+  static Setting filterMechanics = Setting(
+    "mechanicsFilters",
+    header: "Bgg-Filter-Mechanic",
+    value: <String>[],
+  );
 
-  static Setting filterUseAllMechanics =
-      Setting("useAllMechanicsFilters", value: false, enabled: true);
+  static Setting filterUseAllMechanics = Setting(
+    "useAllMechanicsFilters",
+    value: false,
+    enabled: true,
+  );
 
-  static Setting filterIncludesExpansions = Setting("includeExpansions",
-      header: "Bgg-Include-Expansions", value: false, enabled: true);
+  static Setting filterIncludesExpansions = Setting(
+    "includeExpansions",
+    header: "Bgg-Include-Expansions",
+    value: false,
+    enabled: true,
+  );
 
-  static Setting filterMinRating =
-      Setting("minimumRating", header: "Bgg-Filter-Min-Rating", value: 5.0);
+  static Setting filterMinRating = Setting(
+    "minimumRating",
+    header: "Bgg-Filter-Min-Rating",
+    value: 5.0,
+  );
 
-  static Setting filterShelfOfShameOnly =
-      Setting("shelfOfShameOnly", value: false, enabled: false);
+  static Setting filterShelfOfShameOnly = Setting(
+    "shelfOfShameOnly",
+    value: false,
+    enabled: false,
+  );
 
-  static Setting preferAdvancedMode =
-      Setting("preferAdvancedMode", value: false, enabled: true);
+  static Setting preferAdvancedMode = Setting(
+    "preferAdvancedMode",
+    value: false,
+    enabled: true,
+  );
 
-  static Setting themeMode =
-      Setting("themeMode", value: "system", enabled: true);
+  static Setting themeMode = Setting(
+    "themeMode",
+    value: "system",
+    enabled: true,
+  );
 
-  static Settings defaultSettings() => Settings(Map.from({
-        Settings.fieldsToReturnFromApi.name:
-            Settings.fieldsToReturnFromApi.clone(),
-        Settings.filterMinimumTimeToPlay.name:
-            Settings.filterMinimumTimeToPlay.clone(),
-        Settings.filterMaximumTimeToPlay.name:
-            Settings.filterMaximumTimeToPlay.clone(),
-        Settings.filterNumberOfPlayers.name:
-            Settings.filterNumberOfPlayers.clone(),
-        Settings.filterUsingUserRecommendations.name:
-            Settings.filterUsingUserRecommendations.clone(),
-        Settings.filterIncludesExpansions.name:
-            Settings.filterIncludesExpansions.clone(),
-        Settings.filterMechanics.name: Settings.filterMechanics.clone(),
-        Settings.filterUseAllMechanics.name:
-            Settings.filterUseAllMechanics.clone(),
-        Settings.filterComplexity.name: Settings.filterComplexity.clone(),
-        Settings.filterMinRating.name: Settings.filterMinRating.clone(),
-        Settings.filterShelfOfShameOnly.name:
-            Settings.filterShelfOfShameOnly.clone(),
-        Settings.preferAdvancedMode.name: Settings.preferAdvancedMode.clone(),
-        Settings.themeMode.name: Settings.themeMode.clone(),
-      }));
+  static Settings defaultSettings() => Settings(
+    Map.from({
+      Settings.fieldsToReturnFromApi.name: Settings.fieldsToReturnFromApi
+          .clone(),
+      Settings.filterMinimumTimeToPlay.name: Settings.filterMinimumTimeToPlay
+          .clone(),
+      Settings.filterMaximumTimeToPlay.name: Settings.filterMaximumTimeToPlay
+          .clone(),
+      Settings.filterNumberOfPlayers.name: Settings.filterNumberOfPlayers
+          .clone(),
+      Settings.filterUsingUserRecommendations.name: Settings
+          .filterUsingUserRecommendations
+          .clone(),
+      Settings.filterIncludesExpansions.name: Settings.filterIncludesExpansions
+          .clone(),
+      Settings.filterMechanics.name: Settings.filterMechanics.clone(),
+      Settings.filterUseAllMechanics.name: Settings.filterUseAllMechanics
+          .clone(),
+      Settings.filterComplexity.name: Settings.filterComplexity.clone(),
+      Settings.filterMinRating.name: Settings.filterMinRating.clone(),
+      Settings.filterShelfOfShameOnly.name: Settings.filterShelfOfShameOnly
+          .clone(),
+      Settings.preferAdvancedMode.name: Settings.preferAdvancedMode.clone(),
+      Settings.themeMode.name: Settings.themeMode.clone(),
+    }),
+  );
 
   Map<String, Setting> _settings = Map<String, Setting>();
 
@@ -77,8 +116,10 @@ class Settings {
   Map<String, Setting> get changedSettings {
     var defaults = defaultSettings();
     Map<String, Setting> filteredSettings = Map.from(_settings);
-    filteredSettings.removeWhere((_, setting) =>
-        !setting.enabled || defaults.allSettings.values.contains(setting));
+    filteredSettings.removeWhere(
+      (_, setting) =>
+          !setting.enabled || defaults.allSettings.values.contains(setting),
+    );
     return filteredSettings;
   }
 

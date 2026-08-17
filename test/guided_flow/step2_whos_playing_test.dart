@@ -29,8 +29,9 @@ void main() {
   });
 
   group('Step2WhosPlaying', () {
-    testWidgets('displays header and default player count',
-        (WidgetTester tester) async {
+    testWidgets('displays header and default player count', (
+      WidgetTester tester,
+    ) async {
       final model = AppModel();
 
       await tester.pumpWidget(_buildTestWidget(model));
@@ -41,11 +42,13 @@ void main() {
       expect(find.text('players'), findsOneWidget);
     });
 
-    testWidgets('shows singular label for 1 player',
-        (WidgetTester tester) async {
+    testWidgets('shows singular label for 1 player', (
+      WidgetTester tester,
+    ) async {
       final model = AppModel();
-      final setting =
-          model.settings.setting(Settings.filterNumberOfPlayers.name);
+      final setting = model.settings.setting(
+        Settings.filterNumberOfPlayers.name,
+      );
       setting.value = 1;
       setting.enabled = true;
       model.settings.updateSetting(setting);
@@ -68,8 +71,9 @@ void main() {
       expect(find.text('Party (8)'), findsOneWidget);
     });
 
-    testWidgets('tapping preset chip updates player count',
-        (WidgetTester tester) async {
+    testWidgets('tapping preset chip updates player count', (
+      WidgetTester tester,
+    ) async {
       final model = AppModel();
 
       await tester.pumpWidget(_buildTestWidget(model));
@@ -80,8 +84,9 @@ void main() {
       expect(find.text('2'), findsOneWidget);
       expect(find.text('players'), findsOneWidget);
 
-      final setting =
-          model.settings.setting(Settings.filterNumberOfPlayers.name);
+      final setting = model.settings.setting(
+        Settings.filterNumberOfPlayers.name,
+      );
       expect(setting.value, 2);
       expect(setting.enabled, true);
     });
@@ -111,8 +116,9 @@ void main() {
       );
     });
 
-    testWidgets('preset chip reflects current player count as selected',
-        (WidgetTester tester) async {
+    testWidgets('preset chip reflects current player count as selected', (
+      WidgetTester tester,
+    ) async {
       final model = AppModel();
 
       await tester.pumpWidget(_buildTestWidget(model));
@@ -125,13 +131,15 @@ void main() {
       await tester.tap(find.text('Gamers (5)'));
       await tester.pump();
 
-      final setting =
-          model.settings.setting(Settings.filterNumberOfPlayers.name);
+      final setting = model.settings.setting(
+        Settings.filterNumberOfPlayers.name,
+      );
       expect(setting.value, 5);
     });
 
-    testWidgets('slider has correct min and max bounds',
-        (WidgetTester tester) async {
+    testWidgets('slider has correct min and max bounds', (
+      WidgetTester tester,
+    ) async {
       final model = AppModel();
 
       await tester.pumpWidget(_buildTestWidget(model));
@@ -142,11 +150,13 @@ void main() {
       expect(slider.divisions, 9);
     });
 
-    testWidgets('player count at maximum boundary displays correctly',
-        (WidgetTester tester) async {
+    testWidgets('player count at maximum boundary displays correctly', (
+      WidgetTester tester,
+    ) async {
       final model = AppModel();
-      final setting =
-          model.settings.setting(Settings.filterNumberOfPlayers.name);
+      final setting = model.settings.setting(
+        Settings.filterNumberOfPlayers.name,
+      );
       setting.value = 10;
       setting.enabled = true;
       model.settings.updateSetting(setting);
@@ -160,14 +170,15 @@ void main() {
 
   group('Step2WhosPlaying match counts', () {
     CollectionAnalytics _coverage() => CollectionAnalytics.fromJson({
-          'player_count_coverage': [
-            {'player_count': 3, 'best_or_recommended': 95, 'supported': 108},
-            {'player_count': 5, 'best_or_recommended': 45, 'supported': 55},
-          ],
-        });
+      'player_count_coverage': [
+        {'player_count': 3, 'best_or_recommended': 95, 'supported': 108},
+        {'player_count': 5, 'best_or_recommended': 45, 'supported': 55},
+      ],
+    });
 
-    testWidgets('shows best-at count for the selected player count',
-        (WidgetTester tester) async {
+    testWidgets('shows best-at count for the selected player count', (
+      WidgetTester tester,
+    ) async {
       final model = AppModel();
       model.setCollectionAnalyticsForTest(_coverage());
 
@@ -177,8 +188,9 @@ void main() {
       expect(find.text('45 games play best at 5 players'), findsOneWidget);
     });
 
-    testWidgets('hides the count when analytics are absent',
-        (WidgetTester tester) async {
+    testWidgets('hides the count when analytics are absent', (
+      WidgetTester tester,
+    ) async {
       final model = AppModel();
 
       await tester.pumpWidget(_buildTestWidget(model));
@@ -186,11 +198,13 @@ void main() {
       expect(find.textContaining('play best at'), findsNothing);
     });
 
-    testWidgets('hides the count when the selected count is not covered',
-        (WidgetTester tester) async {
+    testWidgets('hides the count when the selected count is not covered', (
+      WidgetTester tester,
+    ) async {
       final model = AppModel();
-      final setting =
-          model.settings.setting(Settings.filterNumberOfPlayers.name);
+      final setting = model.settings.setting(
+        Settings.filterNumberOfPlayers.name,
+      );
       setting.value = 8;
       setting.enabled = true;
       model.settings.updateSetting(setting);

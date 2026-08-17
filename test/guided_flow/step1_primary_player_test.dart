@@ -6,7 +6,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:how_many_mobile_meeple/api/http_retry_client.dart';
 import 'package:how_many_mobile_meeple/api/plays_service.dart';
+
 import '../helpers/mock_api_client.dart';
+
 import 'package:how_many_mobile_meeple/guided_flow/step1_select_source.dart';
 import 'package:how_many_mobile_meeple/model/item.dart';
 import 'package:how_many_mobile_meeple/model/model.dart';
@@ -18,16 +20,15 @@ Widget _buildTestApp(AppModel model) {
     value: model,
     child: MaterialApp(
       home: Scaffold(
-        body: SingleChildScrollView(
-          child: const Step1SelectSource(),
-        ),
+        body: SingleChildScrollView(child: const Step1SelectSource()),
       ),
     ),
   );
 }
 
 Finder _findCrowns() => find.byWidgetPredicate(
-    (w) => w is FaIcon && w.icon == FontAwesomeIcons.crown.data);
+  (w) => w is FaIcon && w.icon == FontAwesomeIcons.crown.data,
+);
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -76,8 +77,9 @@ void main() {
       expect(_findCrowns(), findsNothing);
     });
 
-    testWidgets('first collection item has gold crown by default',
-        (tester) async {
+    testWidgets('first collection item has gold crown by default', (
+      tester,
+    ) async {
       final model = AppModel();
       await model.addItem(Item('teqqles'));
 

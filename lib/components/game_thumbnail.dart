@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import 'platform_independent_image.dart';
 
 /// Small rounded game thumbnail with a casino-icon fallback, used in list rows.
@@ -19,9 +20,11 @@ class GameThumbnail extends StatelessWidget {
             ? PlatformIndependentImage(imageUrl: thumbnail!, fit: BoxFit.cover)
             : Container(
                 color: Theme.of(context).colorScheme.primaryContainer,
-                child: Icon(Icons.casino,
-                    size: size / 2,
-                    color: Theme.of(context).colorScheme.onPrimaryContainer),
+                child: Icon(
+                  Icons.casino,
+                  size: size / 2,
+                  color: Theme.of(context).colorScheme.onPrimaryContainer,
+                ),
               ),
       ),
     );

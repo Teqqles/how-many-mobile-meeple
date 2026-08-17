@@ -30,10 +30,8 @@ class TimeFilterWidget extends StatelessWidget {
               height: 35,
               color: isEnabled
                   ? Theme.of(context).colorScheme.primaryContainer
-                  : Theme.of(context)
-                      .colorScheme
-                      .primary
-                      .withValues(alpha: 0.25),
+                  : Theme.of(context).colorScheme.primary
+                        .withValues(alpha: 0.25),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
@@ -42,8 +40,9 @@ class TimeFilterWidget extends StatelessWidget {
                       AppCommon.labelTime,
                       textAlign: TextAlign.left,
                       style: TextStyle(
-                        fontWeight:
-                            isEnabled ? FontWeight.bold : FontWeight.normal,
+                        fontWeight: isEnabled
+                            ? FontWeight.bold
+                            : FontWeight.normal,
                         color: isEnabled
                             ? Theme.of(context).colorScheme.onPrimaryContainer
                             : Theme.of(context).colorScheme.onSurfaceVariant,
@@ -51,18 +50,21 @@ class TimeFilterWidget extends StatelessWidget {
                     ),
                   ),
                   AppSwitch(
-                      style: AppSwitchStyle.subtle,
-                      onChanged: (bool value) {
-                        model.settings
-                            .setting(Settings.filterMinimumTimeToPlay.name)
-                            .enabled = value;
-                        model.settings
-                            .setting(Settings.filterMaximumTimeToPlay.name)
-                            .enabled = value;
-                        model.updateStore();
-                        model.invalidateCache();
-                      },
-                      value: isEnabled)
+                    style: AppSwitchStyle.subtle,
+                    onChanged: (bool value) {
+                      model.settings
+                              .setting(Settings.filterMinimumTimeToPlay.name)
+                              .enabled =
+                          value;
+                      model.settings
+                              .setting(Settings.filterMaximumTimeToPlay.name)
+                              .enabled =
+                          value;
+                      model.updateStore();
+                      model.invalidateCache();
+                    },
+                    value: isEnabled,
+                  ),
                 ],
               ),
             ),
@@ -76,32 +78,37 @@ class TimeFilterWidget extends StatelessWidget {
                     min: sliderMinValue,
                     max: sliderMaxValue,
                     divisions: sliderSteps,
-                    onChanged: !model.settings
+                    onChanged:
+                        !model.settings
                             .setting(Settings.filterMinimumTimeToPlay.name)
                             .enabled
                         ? null
                         : (time) {
                             model.settings
                                 .setting(Settings.filterMinimumTimeToPlay.name)
-                                .value = time.start.floor();
+                                .value = time.start
+                                .floor();
                             model.settings
                                 .setting(Settings.filterMaximumTimeToPlay.name)
-                                .value = time.end.floor();
+                                .value = time.end
+                                .floor();
                             model.updateStoreDebounced();
                             model.invalidateCache();
                           },
                     values: RangeValues(
-                        model.settings
-                            .setting(Settings.filterMinimumTimeToPlay.name)
-                            .getInt()
-                            .toDouble(),
-                        model.settings
-                            .setting(Settings.filterMaximumTimeToPlay.name)
-                            .getInt()
-                            .toDouble()),
+                      model.settings
+                          .setting(Settings.filterMinimumTimeToPlay.name)
+                          .getInt()
+                          .toDouble(),
+                      model.settings
+                          .setting(Settings.filterMaximumTimeToPlay.name)
+                          .getInt()
+                          .toDouble(),
+                    ),
                     labels: RangeLabels(
-                        "${model.settings.setting(Settings.filterMinimumTimeToPlay.name).value.toString()} mins",
-                        "${model.settings.setting(Settings.filterMaximumTimeToPlay.name).value.toString()} mins"),
+                      "${model.settings.setting(Settings.filterMinimumTimeToPlay.name).value.toString()} mins",
+                      "${model.settings.setting(Settings.filterMaximumTimeToPlay.name).value.toString()} mins",
+                    ),
                   ),
                 ),
                 FilterValueBadge(

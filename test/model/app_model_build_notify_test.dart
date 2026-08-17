@@ -9,6 +9,7 @@ import 'package:how_many_mobile_meeple/model/model.dart';
 import 'package:how_many_mobile_meeple/platform/web/url_fragment_extractor.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
 import '../helpers/mock_api_client.dart';
 
 AppModel _modelForFragment(String fragment) {
@@ -37,31 +38,32 @@ void main() {
   // not fire notifyListeners() synchronously during that build - doing so
   // throws "setState() or markNeedsBuild() called during build".
   testWidgets(
-      'consuming a URL model from inside build does not notify during build',
-      (tester) async {
-    final model = _modelForFragment('/random/%5Btrending%5D');
+    'consuming a URL model from inside build does not notify during build',
+    (tester) async {
+      final model = _modelForFragment('/random/%5Btrending%5D');
 
-    await tester.pumpWidget(
-      ChangeNotifierProvider<AppModel>.value(
-        value: model,
-        child: MaterialApp(
-          home: Consumer<AppModel>(
-            builder: (context, m, child) {
-              if (!m.hasLoadedPersistedData) {
-                m.loadStoredData();
-                m.refreshFromUrl();
-              }
-              return const SizedBox.shrink();
-            },
+      await tester.pumpWidget(
+        ChangeNotifierProvider<AppModel>.value(
+          value: model,
+          child: MaterialApp(
+            home: Consumer<AppModel>(
+              builder: (context, m, child) {
+                if (!m.hasLoadedPersistedData) {
+                  m.loadStoredData();
+                  m.refreshFromUrl();
+                }
+                return const SizedBox.shrink();
+              },
+            ),
           ),
         ),
-      ),
-    );
-    await tester.pumpAndSettle();
+      );
+      await tester.pumpAndSettle();
 
-    // No FlutterError was thrown, and the model still bootstrapped correctly.
-    expect(tester.takeException(), isNull);
-    expect(model.hasLoadedPersistedData, isTrue);
-    expect(model.items.itemList.map((i) => i.name), contains('trending'));
-  });
+      // No FlutterError was thrown, and the model still bootstrapped correctly.
+      expect(tester.takeException(), isNull);
+      expect(model.hasLoadedPersistedData, isTrue);
+      expect(model.items.itemList.map((i) => i.name), contains('trending'));
+    },
+  );
 }

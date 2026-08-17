@@ -37,8 +37,11 @@ class _CollectionInsightsPageState extends State<CollectionInsightsPage>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: HowManyMeepleAppBar('Collection Insights',
-          context: context, helpSection: 'collection-insights'),
+      appBar: HowManyMeepleAppBar(
+        'Collection Insights',
+        context: context,
+        helpSection: 'collection-insights',
+      ),
       drawer: const FeatureDrawer(),
       endDrawer: pageDrawer(context),
       bottomNavigationBar: Column(
@@ -61,7 +64,8 @@ class _CollectionInsightsPageState extends State<CollectionInsightsPage>
     return const ListEmptyState(
       icon: Icons.insights,
       title: 'Insights are on their way',
-      description: 'Your collection dashboard will appear here once we\'ve '
+      description:
+          'Your collection dashboard will appear here once we\'ve '
           'analysed your games. Add a BGG collection in Step 1 if you '
           'haven\'t yet.',
     );
@@ -81,130 +85,149 @@ class _CollectionInsightsPageState extends State<CollectionInsightsPage>
 
     final summary = analytics.summary;
     if (summary != null) {
-      sections.add(_Section(
-        title: 'Overview',
-        child: InsightsSummaryGrid(
-          summary: summary,
-          backlogPlayed: stats?.playedGames,
-          backlogUnplayed: stats?.unplayedGames,
-          backlogTotal: stats?.totalGames,
+      sections.add(
+        _Section(
+          title: 'Overview',
+          child: InsightsSummaryGrid(
+            summary: summary,
+            backlogPlayed: stats?.playedGames,
+            backlogUnplayed: stats?.unplayedGames,
+            backlogTotal: stats?.totalGames,
+          ),
         ),
-      ));
+      );
     } else if (stats != null) {
-      sections.add(_Section(
-        title: 'Overview',
-        child: SplitDonut(
-          primaryValue: stats.playedGames,
-          primaryLabel: 'Played',
-          secondaryValue: stats.unplayedGames,
-          secondaryLabel: 'Unplayed',
-          total: stats.totalGames,
-          centerLabel: 'Backlog',
+      sections.add(
+        _Section(
+          title: 'Overview',
+          child: SplitDonut(
+            primaryValue: stats.playedGames,
+            primaryLabel: 'Played',
+            secondaryValue: stats.unplayedGames,
+            secondaryLabel: 'Unplayed',
+            total: stats.totalGames,
+            centerLabel: 'Backlog',
+          ),
         ),
-      ));
+      );
     }
 
     if (analytics.complexityDistribution.isNotEmpty) {
-      sections.add(_Section(
-        title: 'Complexity',
-        child: HorizontalBarChart(
-          data: _bucketData(analytics.complexityDistribution),
+      sections.add(
+        _Section(
+          title: 'Complexity',
+          child: HorizontalBarChart(
+            data: _bucketData(analytics.complexityDistribution),
+          ),
         ),
-      ));
+      );
     }
 
     if (analytics.playtimeDistribution.isNotEmpty) {
-      sections.add(_Section(
-        title: 'Play Time',
-        child: HorizontalBarChart(
-          data: _bucketData(analytics.playtimeDistribution),
+      sections.add(
+        _Section(
+          title: 'Play Time',
+          child: HorizontalBarChart(
+            data: _bucketData(analytics.playtimeDistribution),
+          ),
         ),
-      ));
+      );
     }
 
     if (analytics.playerCountCoverage.isNotEmpty) {
-      sections.add(_Section(
-        title: 'Player Counts',
-        subtitle: 'Best/recommended (solid) within supported (shaded), '
-            'by player count',
-        child: PlayerCoverageChart(coverage: analytics.playerCountCoverage),
-      ));
+      sections.add(
+        _Section(
+          title: 'Player Counts',
+          subtitle:
+              'Best/recommended (solid) within supported (shaded), '
+              'by player count',
+          child: PlayerCoverageChart(coverage: analytics.playerCountCoverage),
+        ),
+      );
     }
 
     if (analytics.topMechanics.isNotEmpty) {
-      sections.add(_Section(
-        title: 'Top Mechanics',
-        child: MechanicChips(
-          data: [
-            for (final m in analytics.topMechanics)
-              BarDatum(label: m.name, value: m.count),
-          ],
+      sections.add(
+        _Section(
+          title: 'Top Mechanics',
+          child: MechanicChips(
+            data: [
+              for (final m in analytics.topMechanics)
+                BarDatum(label: m.name, value: m.count),
+            ],
+          ),
         ),
-      ));
+      );
     }
 
     if (stats != null) _addPlaySections(stats, sections);
 
-    return ListView(
-      padding: const EdgeInsets.all(16),
-      children: sections,
-    );
+    return ListView(padding: const EdgeInsets.all(16), children: sections);
   }
 
   void _addPlaySections(PlayInsights stats, List<Widget> sections) {
     if (stats.hasPlays) {
-      sections.add(_Section(
-        title: 'Play Activity',
-        child: Wrap(
-          spacing: 12,
-          runSpacing: 12,
-          children: [
-            StatTile(label: 'Total Plays', value: '${stats.totalPlays}'),
-            if (stats.totalMinutes > 0)
-              StatTile(
+      sections.add(
+        _Section(
+          title: 'Play Activity',
+          child: Wrap(
+            spacing: 12,
+            runSpacing: 12,
+            children: [
+              StatTile(label: 'Total Plays', value: '${stats.totalPlays}'),
+              if (stats.totalMinutes > 0)
+                StatTile(
                   label: 'Hours Played',
-                  value: '${(stats.totalMinutes / 60).round()}'),
-            StatTile(
-                label: 'Played this Year', value: '${stats.playsThisYear}'),
-            StatTile(label: 'Played Once', value: '${stats.playedOnce}'),
-            StatTile(label: 'Repeated', value: '${stats.playedRepeatedly}'),
-          ],
+                  value: '${(stats.totalMinutes / 60).round()}',
+                ),
+              StatTile(
+                label: 'Played this Year',
+                value: '${stats.playsThisYear}',
+              ),
+              StatTile(label: 'Played Once', value: '${stats.playedOnce}'),
+              StatTile(label: 'Repeated', value: '${stats.playedRepeatedly}'),
+            ],
+          ),
         ),
-      ));
+      );
     }
 
     if (stats.mostPlayed.isNotEmpty) {
-      sections.add(_Section(
-        title: 'Most Played',
-        child: MechanicChips(
-          data: [
-            for (final m in stats.mostPlayed)
-              BarDatum(label: m.name, value: m.plays),
-          ],
+      sections.add(
+        _Section(
+          title: 'Most Played',
+          child: MechanicChips(
+            data: [
+              for (final m in stats.mostPlayed)
+                BarDatum(label: m.name, value: m.plays),
+            ],
+          ),
         ),
-      ));
+      );
     }
 
     if (stats.playsPerYear.isNotEmpty) {
-      sections.add(_Section(
-        title: 'Plays Per Year',
-        child: PlaysPerYearChart(
-          data: [
-            for (final y in stats.playsPerYear)
-              YearPlaysDatum(
-                label: '${y.year}',
-                total: y.plays,
-                collection: y.collectionPlays,
-              ),
-          ],
+      sections.add(
+        _Section(
+          title: 'Plays Per Year',
+          child: PlaysPerYearChart(
+            data: [
+              for (final y in stats.playsPerYear)
+                YearPlaysDatum(
+                  label: '${y.year}',
+                  total: y.plays,
+                  collection: y.collectionPlays,
+                ),
+            ],
+          ),
         ),
-      ));
+      );
     }
   }
 
   List<BarDatum> _bucketData(List<DistributionBucket> buckets) => [
-        for (final b in buckets) BarDatum(label: b.name, value: b.count),
-      ];
+    for (final b in buckets) BarDatum(label: b.name, value: b.count),
+  ];
 }
 
 class _Section extends StatelessWidget {
@@ -224,15 +247,20 @@ class _Section extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(title,
-                style: theme.textTheme.titleMedium
-                    ?.copyWith(fontWeight: FontWeight.bold)),
+            Text(
+              title,
+              style: theme.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
             if (subtitle != null) ...[
               const SizedBox(height: 2),
-              Text(subtitle!,
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: theme.colorScheme.onSurfaceVariant,
-                  )),
+              Text(
+                subtitle!,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+              ),
             ],
             const SizedBox(height: 12),
             child,

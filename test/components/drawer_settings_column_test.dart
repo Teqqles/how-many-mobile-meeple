@@ -64,19 +64,22 @@ void main() {
     testWidgets('renders heading plus saved setting titles', (tester) async {
       final prefs = [
         AppPreferences(
-            '1',
-            'Game Night',
-            Items([Item('user1', itemType: ItemType.collection)]),
-            Settings.defaultSettings()),
+          '1',
+          'Game Night',
+          Items([Item('user1', itemType: ItemType.collection)]),
+          Settings.defaultSettings(),
+        ),
         AppPreferences(
-            '2',
-            'Solo Play',
-            Items([Item('user2', itemType: ItemType.collection)]),
-            Settings.defaultSettings()),
+          '2',
+          'Solo Play',
+          Items([Item('user2', itemType: ItemType.collection)]),
+          Settings.defaultSettings(),
+        ),
       ];
 
-      final model =
-          AppModel(preferencesHistory: _FakePreferencesHistory(prefs));
+      final model = AppModel(
+        preferencesHistory: _FakePreferencesHistory(prefs),
+      );
       final column = DrawerSettingsColumn('Saved Settings');
 
       await tester.pumpWidget(_buildTestApp(model, column));
@@ -87,8 +90,9 @@ void main() {
       expect(find.text('Solo Play'), findsOneWidget);
     });
 
-    testWidgets('renders only heading when no saved preferences',
-        (tester) async {
+    testWidgets('renders only heading when no saved preferences', (
+      tester,
+    ) async {
       final model = AppModel(preferencesHistory: _FakePreferencesHistory([]));
       final column = DrawerSettingsColumn('My Section');
 

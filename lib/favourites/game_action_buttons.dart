@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:share_plus/share_plus.dart';
+
 import 'favourite_game.dart';
 import 'favourites_service.dart';
 import 'ignored_games_service.dart';
@@ -71,8 +72,11 @@ class _GameActionButtonsState extends State<GameActionButtons> {
     }
 
     final game = widget.game;
-    final favGame =
-        FavouriteGame(id: game.id, name: game.name, thumbnail: game.thumbnail);
+    final favGame = FavouriteGame(
+      id: game.id,
+      name: game.name,
+      thumbnail: game.thumbnail,
+    );
     final isFav = _favService!.contains(game.id);
     final isIgnored = _ignoreService!.contains(game.id);
     final compact = MediaQuery.of(context).size.width < 480;
@@ -176,16 +180,17 @@ class _GameActionButtonsState extends State<GameActionButtons> {
     if (entry == null) return;
     service.logPlay(entry);
     if (context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Logged a play of ${game.name}')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Logged a play of ${game.name}')));
     }
   }
 
   void _share(BuildContext context, Game game) async {
     final baseUri = Uri.base.removeFragment();
     final uri = baseUri.replace(
-        fragment: '/game/${game.name.replaceAll(' ', '+')}/${game.id}');
+      fragment: '/game/${game.name.replaceAll(' ', '+')}/${game.id}',
+    );
     final url = uri.toString();
     try {
       await SharePlus.instance.share(

@@ -21,9 +21,7 @@ class FilterValueBadge extends StatelessWidget {
         color: isEnabled
             ? Theme.of(context).colorScheme.secondary
             : Theme.of(context).disabledColor,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8.0),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
       ),
       child: AppDefaultPadding(
         child: Text(

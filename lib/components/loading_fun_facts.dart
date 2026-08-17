@@ -60,9 +60,9 @@ class _LoadingFunFactsState extends State<LoadingFunFacts> {
         child: Text(
           _facts[_currentIndex],
           style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                fontStyle: FontStyle.italic,
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
-              ),
+            fontStyle: FontStyle.italic,
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
+          ),
           textAlign: TextAlign.center,
           softWrap: true,
           overflow: TextOverflow.visible,

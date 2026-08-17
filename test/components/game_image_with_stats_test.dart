@@ -10,46 +10,44 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 Game _gameWithRating(double rating) => Game(
-      id: 1,
-      name: 'Test Game',
-      maxPlayers: 4,
-      minPlayers: 2,
-      maxPlaytime: 60,
-      imageUrl: 'http://example.com/test.jpg',
-      averageRating: rating,
-      averageWeight: 2.5,
-    );
+  id: 1,
+  name: 'Test Game',
+  maxPlayers: 4,
+  minPlayers: 2,
+  maxPlaytime: 60,
+  imageUrl: 'http://example.com/test.jpg',
+  averageRating: rating,
+  averageWeight: 2.5,
+);
 
 Game _gameWithNoData() => Game(
-      id: 1,
-      name: 'Mystery Game',
-      maxPlayers: 0,
-      minPlayers: 0,
-      maxPlaytime: 0,
-      imageUrl: '',
-      averageRating: 0,
-      averageWeight: 0,
-    );
+  id: 1,
+  name: 'Mystery Game',
+  maxPlayers: 0,
+  minPlayers: 0,
+  maxPlaytime: 0,
+  imageUrl: '',
+  averageRating: 0,
+  averageWeight: 0,
+);
 
 Game _gameWithPartialData() => Game(
-      id: 1,
-      name: 'Partial Game',
-      maxPlayers: 4,
-      minPlayers: 2,
-      maxPlaytime: 0,
-      imageUrl: 'http://example.com/test.jpg',
-      averageRating: 7.5,
-      averageWeight: 0,
-    );
+  id: 1,
+  name: 'Partial Game',
+  maxPlayers: 4,
+  minPlayers: 2,
+  maxPlaytime: 0,
+  imageUrl: 'http://example.com/test.jpg',
+  averageRating: 7.5,
+  averageWeight: 0,
+);
 
 Widget _wrapWidget(Widget child) => ChangeNotifierProvider<AppModel>.value(
-      value: AppModel(),
-      child: MaterialApp(
-        home: Scaffold(
-          body: SizedBox(width: 400, height: 600, child: child),
-        ),
-      ),
-    );
+  value: AppModel(),
+  child: MaterialApp(
+    home: Scaffold(body: SizedBox(width: 400, height: 600, child: child)),
+  ),
+);
 
 void main() {
   setUp(() {
@@ -68,8 +66,9 @@ void main() {
       FlutterError.onError = FlutterError.presentError;
     });
 
-    testWidgets('displays rating text formatted to one decimal place',
-        (tester) async {
+    testWidgets('displays rating text formatted to one decimal place', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         _wrapWidget(GameImageWithStats(game: _gameWithRating(7.83))),
       );
@@ -159,8 +158,9 @@ void main() {
       expect(find.text('0.0'), findsNothing);
     });
 
-    testWidgets('hides player count when both min and max are 0',
-        (tester) async {
+    testWidgets('hides player count when both min and max are 0', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         _wrapWidget(GameImageWithStats(game: _gameWithNoData())),
       );

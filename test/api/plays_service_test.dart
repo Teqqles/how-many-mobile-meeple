@@ -2,14 +2,19 @@
 library;
 
 import 'dart:convert';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:how_many_mobile_meeple/api/http_retry_client.dart';
 import 'package:how_many_mobile_meeple/api/plays_service.dart';
+
 import '../helpers/sync_mock_client.dart';
 
-String _wrapResponse(List<Map<String, dynamic>> plays,
-    {bool complete = true, int? retryAfterSeconds}) {
+String _wrapResponse(
+  List<Map<String, dynamic>> plays, {
+  bool complete = true,
+  int? retryAfterSeconds,
+}) {
   final meta = <String, dynamic>{'complete': complete};
   if (retryAfterSeconds != null) {
     meta['retry_after_seconds'] = retryAfterSeconds;
@@ -80,10 +85,7 @@ void main() {
         SyncMockClient((_) => http.Response('error', 500)),
       );
 
-      expect(
-        () => PlaysService.fetchPlays('testuser'),
-        throwsException,
-      );
+      expect(() => PlaysService.fetchPlays('testuser'), throwsException);
     });
 
     test('calls correct URL with username', () async {
@@ -121,7 +123,7 @@ void main() {
           callCount++;
           return http.Response(
             _wrapResponse([
-              {'game_id': 1, 'game_name': 'Wingspan', 'total_plays': 5}
+              {'game_id': 1, 'game_name': 'Wingspan', 'total_plays': 5},
             ]),
             200,
           );
@@ -142,7 +144,7 @@ void main() {
           return http.Response(
             _wrapResponse(
               [
-                {'game_id': 1, 'game_name': 'Wingspan', 'total_plays': 5}
+                {'game_id': 1, 'game_name': 'Wingspan', 'total_plays': 5},
               ],
               complete: false,
               retryAfterSeconds: 30,
@@ -183,7 +185,7 @@ void main() {
           }
           return http.Response(
             _wrapResponse([
-              {'game_id': 1, 'game_name': 'Wingspan', 'total_plays': 5}
+              {'game_id': 1, 'game_name': 'Wingspan', 'total_plays': 5},
             ]),
             200,
           );
@@ -225,11 +227,14 @@ void main() {
 
     test('returns complete true when meta indicates complete', () async {
       HttpRetryClient.setTestClient(
-        SyncMockClient((_) => http.Response(
+        SyncMockClient(
+          (_) => http.Response(
             _wrapResponse([
-              {'game_id': 1, 'game_name': 'Azul', 'total_plays': 3}
+              {'game_id': 1, 'game_name': 'Azul', 'total_plays': 3},
             ]),
-            200)),
+            200,
+          ),
+        ),
       );
 
       final result = await PlaysService.fetchPlays('testuser');
@@ -238,25 +243,30 @@ void main() {
       expect(result.retryAfterSeconds, 0);
     });
 
-    test('returns incomplete with retry delay when meta indicates more data',
-        () async {
-      HttpRetryClient.setTestClient(
-        SyncMockClient((_) => http.Response(
-            _wrapResponse(
-              [
-                {'game_id': 1, 'game_name': 'Azul', 'total_plays': 3}
-              ],
-              complete: false,
-              retryAfterSeconds: 30,
+    test(
+      'returns incomplete with retry delay when meta indicates more data',
+      () async {
+        HttpRetryClient.setTestClient(
+          SyncMockClient(
+            (_) => http.Response(
+              _wrapResponse(
+                [
+                  {'game_id': 1, 'game_name': 'Azul', 'total_plays': 3},
+                ],
+                complete: false,
+                retryAfterSeconds: 30,
+              ),
+              200,
             ),
-            200)),
-      );
+          ),
+        );
 
-      final result = await PlaysService.fetchPlays('testuser');
+        final result = await PlaysService.fetchPlays('testuser');
 
-      expect(result.complete, isFalse);
-      expect(result.retryAfterSeconds, 30);
-      expect(result.plays.length, 1);
-    });
+        expect(result.complete, isFalse);
+        expect(result.retryAfterSeconds, 30);
+        expect(result.plays.length, 1);
+      },
+    );
   });
 }

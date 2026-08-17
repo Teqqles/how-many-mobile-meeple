@@ -7,6 +7,7 @@ import 'package:how_many_mobile_meeple/components/list_empty_state.dart';
 import 'package:how_many_mobile_meeple/how_many_meeple_app_bar.dart';
 import 'package:how_many_mobile_meeple/model/model.dart';
 import 'package:how_many_mobile_meeple/model/play_data.dart';
+
 import 'log_play_dialog.dart';
 import 'play_date_format.dart';
 import 'play_log_entry.dart';
@@ -84,8 +85,11 @@ class _PlayLogPageState extends State<PlayLogPage> with AppPage {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: HowManyMeepleAppBar('Play History',
-          context: context, helpSection: 'play-log'),
+      appBar: HowManyMeepleAppBar(
+        'Play History',
+        context: context,
+        helpSection: 'play-log',
+      ),
       drawer: const FeatureDrawer(),
       endDrawer: pageDrawer(context),
       body: _service == null
@@ -186,8 +190,10 @@ class _PlayLogPageState extends State<PlayLogPage> with AppPage {
       ),
       child: Row(
         children: [
-          Icon(Icons.lightbulb_outline,
-              color: Theme.of(context).colorScheme.onTertiaryContainer),
+          Icon(
+            Icons.lightbulb_outline,
+            color: Theme.of(context).colorScheme.onTertiaryContainer,
+          ),
           const SizedBox(width: 12),
           Expanded(
             child: Text(
@@ -219,10 +225,7 @@ class _PlayLogPageState extends State<PlayLogPage> with AppPage {
         title: Row(
           children: [
             Flexible(child: Text(item.name)),
-            if (item.isBgg) ...[
-              const SizedBox(width: 8),
-              _bggBadge(context),
-            ],
+            if (item.isBgg) ...[const SizedBox(width: 8), _bggBadge(context)],
           ],
         ),
         subtitle: Text(_buildSubtitle(item)),
@@ -230,8 +233,10 @@ class _PlayLogPageState extends State<PlayLogPage> with AppPage {
         trailing: item.isBgg
             ? null
             : IconButton(
-                icon: Icon(Icons.remove_circle_outline,
-                    color: Theme.of(context).colorScheme.error),
+                icon: Icon(
+                  Icons.remove_circle_outline,
+                  color: Theme.of(context).colorScheme.error,
+                ),
                 tooltip: 'Remove',
                 onPressed: () => _service!.remove(item.local!.id),
               ),
@@ -269,12 +274,15 @@ class _PlayLogPageState extends State<PlayLogPage> with AppPage {
       final play = item.bgg!.play;
       final date = play.date;
       final buffer = StringBuffer(
-          date != null ? PlayDateFormat.relative(date) : 'Date unknown');
+        date != null ? PlayDateFormat.relative(date) : 'Date unknown',
+      );
       if (play.players.isNotEmpty) {
         buffer.write('\n');
-        buffer.write(play.players
-            .map((p) => _formatParticipant(p.name, p.score, p.win))
-            .join(', '));
+        buffer.write(
+          play.players
+              .map((p) => _formatParticipant(p.name, p.score, p.win))
+              .join(', '),
+        );
       }
       return buffer.toString();
     }
@@ -283,9 +291,11 @@ class _PlayLogPageState extends State<PlayLogPage> with AppPage {
     final buffer = StringBuffer(PlayDateFormat.relative(entry.playedAt));
     if (entry.players.isNotEmpty) {
       buffer.write('\n');
-      buffer.write(entry.players
-          .map((p) => _formatParticipant(p.name, p.score, p.won))
-          .join(', '));
+      buffer.write(
+        entry.players
+            .map((p) => _formatParticipant(p.name, p.score, p.won))
+            .join(', '),
+      );
     }
     return buffer.toString();
   }

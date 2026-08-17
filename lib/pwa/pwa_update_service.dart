@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:package_info_plus/package_info_plus.dart';
@@ -23,8 +24,11 @@ class PwaUpdateService {
       final running = packageInfo.version;
 
       final response = await http
-          .get(Uri.parse(
-              '/version.json?_=${DateTime.now().millisecondsSinceEpoch}'))
+          .get(
+            Uri.parse(
+              '/version.json?_=${DateTime.now().millisecondsSinceEpoch}',
+            ),
+          )
           .timeout(const Duration(seconds: 10));
 
       if (response.statusCode != 200) return;

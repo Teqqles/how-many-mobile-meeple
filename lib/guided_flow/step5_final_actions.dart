@@ -10,10 +10,7 @@ import 'package:how_many_mobile_meeple/save_dialog.dart';
 class Step5FinalActions extends StatelessWidget {
   final VoidCallback onSwitchToAdvanced;
 
-  const Step5FinalActions({
-    super.key,
-    required this.onSwitchToAdvanced,
-  });
+  const Step5FinalActions({super.key, required this.onSwitchToAdvanced});
 
   @override
   Widget build(BuildContext context) {
@@ -46,9 +43,8 @@ class Step5FinalActions extends StatelessWidget {
 
                 Text(
                   'Ready to Find Games!',
-                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
+                  style: Theme.of(context).textTheme.headlineSmall
+                      ?.copyWith(fontWeight: FontWeight.bold),
                   textAlign: TextAlign.center,
                 ),
 
@@ -57,8 +53,8 @@ class Step5FinalActions extends StatelessWidget {
                 Text(
                   'Choose how you\'d like to explore',
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: Theme.of(context).colorScheme.onSurfaceVariant,
-                      ),
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
                   textAlign: TextAlign.center,
                 ),
 
@@ -74,7 +70,9 @@ class Step5FinalActions extends StatelessWidget {
                   ),
                   style: FilledButton.styleFrom(
                     padding: const EdgeInsets.symmetric(
-                        vertical: 20, horizontal: 24),
+                      vertical: 20,
+                      horizontal: 24,
+                    ),
                   ),
                 ),
 
@@ -96,7 +94,9 @@ class Step5FinalActions extends StatelessWidget {
                   ),
                   style: OutlinedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(
-                        vertical: 20, horizontal: 24),
+                      vertical: 20,
+                      horizontal: 24,
+                    ),
                   ),
                 ),
 
@@ -118,7 +118,9 @@ class Step5FinalActions extends StatelessWidget {
                   ),
                   style: OutlinedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(
-                        vertical: 20, horizontal: 24),
+                      vertical: 20,
+                      horizontal: 24,
+                    ),
                   ),
                 ),
 
@@ -129,7 +131,8 @@ class Step5FinalActions extends StatelessWidget {
                   onPressed: () {
                     final username = model.primaryPlayer ?? '';
                     Navigator.of(context).pushNamed(
-                        '${r.Router.shelfOfShameRoute}/${Uri.encodeComponent(username)}');
+                      '${r.Router.shelfOfShameRoute}/${Uri.encodeComponent(username)}',
+                    );
                   },
                   icon: const Icon(Icons.shelves, size: 24),
                   label: const Text(
@@ -138,7 +141,9 @@ class Step5FinalActions extends StatelessWidget {
                   ),
                   style: OutlinedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(
-                        vertical: 20, horizontal: 24),
+                      vertical: 20,
+                      horizontal: 24,
+                    ),
                   ),
                 ),
 
@@ -156,7 +161,9 @@ class Step5FinalActions extends StatelessWidget {
                   ),
                   style: OutlinedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(
-                        vertical: 20, horizontal: 24),
+                      vertical: 20,
+                      horizontal: 24,
+                    ),
                   ),
                 ),
 
@@ -185,8 +192,9 @@ class Step5FinalActions extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color:
-                        Theme.of(context).colorScheme.surfaceContainerHighest,
+                    color: Theme.of(context)
+                        .colorScheme
+                        .surfaceContainerHighest,
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Column(
@@ -202,12 +210,8 @@ class Step5FinalActions extends StatelessWidget {
                           Expanded(
                             child: Text(
                               'Need more control?',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .titleSmall
-                                  ?.copyWith(
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                              style: Theme.of(context).textTheme.titleSmall
+                                  ?.copyWith(fontWeight: FontWeight.bold),
                             ),
                           ),
                         ],
@@ -216,10 +220,8 @@ class Step5FinalActions extends StatelessWidget {
                       Text(
                         'Switch to Advanced Mode for full control over all filters and settings',
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .onSurfaceVariant,
-                            ),
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        ),
                       ),
                       const SizedBox(height: 12),
                       SizedBox(

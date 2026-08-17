@@ -23,14 +23,16 @@ main() {
       expect(extractor.containsModel(), true);
     });
 
-    test('returns false when fragment exists but does not contain model info',
-        () {
-      final mockUri = MockUri();
-      when(mockUri.hasFragment).thenReturn(true);
-      when(mockUri.fragment).thenReturn('/list');
-      var extractor = UrlFragmentExtractor(mockUri);
-      expect(extractor.containsModel(), false);
-    });
+    test(
+      'returns false when fragment exists but does not contain model info',
+      () {
+        final mockUri = MockUri();
+        when(mockUri.hasFragment).thenReturn(true);
+        when(mockUri.fragment).thenReturn('/list');
+        var extractor = UrlFragmentExtractor(mockUri);
+        expect(extractor.containsModel(), false);
+      },
+    );
 
     test('returns false when no fragment exists', () {
       final mockUri = MockUri();
@@ -78,8 +80,11 @@ main() {
     });
   });
 
-  var expectedItems =
-      Items([Item("testuser"), Item("1234"), Item("testuser2")]);
+  var expectedItems = Items([
+    Item("testuser"),
+    Item("1234"),
+    Item("testuser2"),
+  ]);
   var urlItems = expectedItems.itemList.map((item) => item.name).join("+");
 
   group('extractItems', () {
@@ -138,10 +143,7 @@ main() {
       var extractor = UrlFragmentExtractor(mockUri);
       expect(
         extractor.extractItems(),
-        Items([
-          Item('trending', itemType: ItemType.hotList),
-          Item('teqqles'),
-        ]),
+        Items([Item('trending', itemType: ItemType.hotList), Item('teqqles')]),
       );
     });
 
@@ -181,25 +183,27 @@ main() {
       expect(items.itemList.first.itemType, ItemType.collection);
     });
 
-    test('mixed geeklist and collection items are extracted with correct types',
-        () {
-      final mockUri = MockUri();
+    test(
+      'mixed geeklist and collection items are extracted with correct types',
+      () {
+        final mockUri = MockUri();
 
-      when(mockUri.hasFragment).thenReturn(true);
-      when(mockUri.fragment).thenReturn("/list/testuser+12345");
+        when(mockUri.hasFragment).thenReturn(true);
+        when(mockUri.fragment).thenReturn("/list/testuser+12345");
 
-      var extractor = UrlFragmentExtractor(mockUri);
-      var items = extractor.extractItems();
+        var extractor = UrlFragmentExtractor(mockUri);
+        var items = extractor.extractItems();
 
-      expect(items.itemList.length, 2);
-      expect(items.itemList[0].itemType, ItemType.collection);
-      expect(items.itemList[1].itemType, ItemType.geekList);
-    });
+        expect(items.itemList.length, 2);
+        expect(items.itemList[0].itemType, ItemType.collection);
+        expect(items.itemList[1].itemType, ItemType.geekList);
+      },
+    );
   });
 
   var customExpectedSettings = Settings({
     "setting1": Setting("setting1", value: "value1", enabled: true),
-    "setting2": Setting("setting2", value: "value2", enabled: true)
+    "setting2": Setting("setting2", value: "value2", enabled: true),
   });
   var urlSettings = customExpectedSettings.allSettings.values
       .map((setting) => "${setting.name}=${setting.value}")
@@ -264,7 +268,8 @@ main() {
 
       when(mockUri.hasFragment).thenReturn(true);
       when(mockUri.fragment).thenReturn(
-          "/list?${updatedSetting.name}=${Uri.encodeComponent(updatedSetting.value.toString())}");
+        "/list?${updatedSetting.name}=${Uri.encodeComponent(updatedSetting.value.toString())}",
+      );
 
       var extractor = UrlFragmentExtractor(mockUri);
       expect(extractor.extractSettings(), expectedSettings);

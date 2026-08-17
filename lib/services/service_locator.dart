@@ -39,13 +39,12 @@ class DefaultRecommendationsFetcher implements RecommendationsFetcher {
     required Map<String, String> headers,
     int limit = 10,
     List<int> excludeIds = const [],
-  }) =>
-      RecommendationsService.fetchRecommendations(
-        gameIds: gameIds,
-        headers: headers,
-        limit: limit,
-        excludeIds: excludeIds,
-      );
+  }) => RecommendationsService.fetchRecommendations(
+    gameIds: gameIds,
+    headers: headers,
+    limit: limit,
+    excludeIds: excludeIds,
+  );
 }
 
 class DefaultGameServices implements GameServices {

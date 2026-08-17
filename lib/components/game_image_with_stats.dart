@@ -1,4 +1,5 @@
 import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -22,7 +23,9 @@ class GameImageWithStats extends StatelessWidget with ScreenTools {
   @override
   Widget build(BuildContext context) {
     final maxHeight = getScreenHeightPercentageInPixels(
-        context, ScreenTools.fiftyPercentScreen);
+      context,
+      ScreenTools.fiftyPercentScreen,
+    );
     return ClipRect(
       child: ConstrainedBox(
         constraints: BoxConstraints(maxHeight: maxHeight),
@@ -119,11 +122,7 @@ class GameImageWithStats extends StatelessWidget with ScreenTools {
                           top: 8,
                           child: _RatingBadge(rating: game.averageRating),
                         ),
-                      Positioned(
-                        right: 0,
-                        bottom: 0,
-                        child: panel,
-                      ),
+                      Positioned(right: 0, bottom: 0, child: panel),
                     ],
                   );
                 },
@@ -191,14 +190,10 @@ class _StatsPanel extends StatelessWidget {
     final showRatingInPanel = ratingWouldOverlap;
 
     return Container(
-      constraints: BoxConstraints(
-        maxWidth: isNarrow ? 160 : 220,
-      ),
+      constraints: BoxConstraints(maxWidth: isNarrow ? 160 : 220),
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.primary.withAlpha(192),
-        borderRadius: const BorderRadius.only(
-          topLeft: Radius.circular(12),
-        ),
+        borderRadius: const BorderRadius.only(topLeft: Radius.circular(12)),
         border: Border.all(color: Colors.white, width: 1.5),
         boxShadow: [
           BoxShadow(
@@ -266,8 +261,9 @@ class _StatsPanel extends StatelessWidget {
           MouseRegion(
             cursor: SystemMouseCursors.click,
             child: GestureDetector(
-              onTap: () => launchUrl(Uri.parse(
-                  'https://www.boardgamegeek.com/boardgame/${game.id}')),
+              onTap: () => launchUrl(
+                Uri.parse('https://www.boardgamegeek.com/boardgame/${game.id}'),
+              ),
               child: _StatChip(
                 icon: Icons.open_in_new,
                 label: isNarrow ? 'BGG' : 'BoardGameGeek',
@@ -296,10 +292,7 @@ class _InlineRatingChip extends StatelessWidget {
         Container(
           width: compact ? 14 : 18,
           height: compact ? 14 : 18,
-          decoration: BoxDecoration(
-            color: bgColor,
-            shape: BoxShape.circle,
-          ),
+          decoration: BoxDecoration(color: bgColor, shape: BoxShape.circle),
           child: Icon(Icons.star, size: compact ? 10 : 12, color: Colors.white),
         ),
         SizedBox(width: compact ? 3 : 4),

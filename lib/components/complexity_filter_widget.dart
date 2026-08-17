@@ -26,27 +26,30 @@ class ComplexityFilterWidget extends StatelessWidget {
                   height: 35,
                   width: MediaQuery.of(context).size.width * 0.60,
                   child: Slider(
-                      activeColor: Theme.of(context).colorScheme.secondary,
-                      min: 0.5,
-                      max: 5.0,
-                      divisions: 9,
-                      onChanged: !model.settings
-                              .setting(Settings.filterComplexity.name)
-                              .enabled
-                          ? null
-                          : (complexity) {
-                              model.settings
-                                  .setting(Settings.filterComplexity.name)
-                                  .value = complexity;
-                              model.updateStoreDebounced();
-                              model.invalidateCache();
-                            },
-                      value: model.settings
-                          .setting(Settings.filterComplexity.name)
-                          .getDouble()
-                          .clamp(0.5, 5.0),
-                      label:
-                          "~${model.settings.setting(Settings.filterComplexity.name).value.toString()} weighting"),
+                    activeColor: Theme.of(context).colorScheme.secondary,
+                    min: 0.5,
+                    max: 5.0,
+                    divisions: 9,
+                    onChanged:
+                        !model.settings
+                            .setting(Settings.filterComplexity.name)
+                            .enabled
+                        ? null
+                        : (complexity) {
+                            model.settings
+                                    .setting(Settings.filterComplexity.name)
+                                    .value =
+                                complexity;
+                            model.updateStoreDebounced();
+                            model.invalidateCache();
+                          },
+                    value: model.settings
+                        .setting(Settings.filterComplexity.name)
+                        .getDouble()
+                        .clamp(0.5, 5.0),
+                    label:
+                        "~${model.settings.setting(Settings.filterComplexity.name).value.toString()} weighting",
+                  ),
                 ),
                 FilterValueBadge(
                   value:
@@ -57,7 +60,7 @@ class ComplexityFilterWidget extends StatelessWidget {
                 ),
               ],
             ),
-          )
+          ),
         ],
       ),
     );

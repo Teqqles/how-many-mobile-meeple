@@ -6,8 +6,11 @@ class MostPlayedEntry {
   final String name;
   final int plays;
 
-  const MostPlayedEntry(
-      {required this.gameId, required this.name, required this.plays});
+  const MostPlayedEntry({
+    required this.gameId,
+    required this.name,
+    required this.plays,
+  });
 }
 
 /// Play tally for a single calendar year. [plays] counts every recorded play;
@@ -17,8 +20,11 @@ class YearPlays {
   final int plays;
   final int collectionPlays;
 
-  const YearPlays(
-      {required this.year, required this.plays, this.collectionPlays = 0});
+  const YearPlays({
+    required this.year,
+    required this.plays,
+    this.collectionPlays = 0,
+  });
 }
 
 /// Insights derived from the primary player's plays and collection, computed
@@ -78,11 +84,13 @@ class PlayInsights {
           playedRepeatedly++;
         }
         if (collectionGameIds.contains(id)) collectionPlayed++;
-        ranked.add(MostPlayedEntry(
-          gameId: id,
-          name: playsData[id]?.gameName ?? 'Game #$id',
-          plays: count,
-        ));
+        ranked.add(
+          MostPlayedEntry(
+            gameId: id,
+            name: playsData[id]?.gameName ?? 'Game #$id',
+            plays: count,
+          ),
+        );
       }
     }
 

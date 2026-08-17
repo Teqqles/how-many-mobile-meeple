@@ -28,8 +28,9 @@ class StoredPreferences {
     Settings settings = settingsToRetrieve.clone();
     for (String settingName in settingsToRetrieve.allSettings.keys) {
       if (_prefs.containsKey(settingName)) {
-        Setting loadedSetting =
-            Setting.fromJson(jsonDecode(_prefs.getString(settingName)!));
+        Setting loadedSetting = Setting.fromJson(
+          jsonDecode(_prefs.getString(settingName)!),
+        );
         settings.updateSetting(loadedSetting);
       }
     }
@@ -43,7 +44,9 @@ class StoredPreferences {
     for (var i = 0; i < items.itemList.length; i++) {
       var item = items.itemList[i];
       await _prefs.setString(
-          "${Items.itemStoreNamePrefix}$i", json.encode(item));
+        "${Items.itemStoreNamePrefix}$i",
+        json.encode(item),
+      );
     }
     return true;
   }

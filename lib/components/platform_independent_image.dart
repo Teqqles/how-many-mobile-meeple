@@ -17,15 +17,18 @@ class PlatformIndependentImage extends StatelessWidget with ScreenTools {
 
   Widget buildWebImage(context) {
     return Image.network(
-        AppCommon.boardGameGeekProxyUrl +
-            "/cors-proxy/_" +
-            stringToBase64.encode(this.imageUrl),
-        height: fit == null
-            ? getScreenHeightPercentageInPixels(
-                context, ScreenTools.fiftyPercentScreen)
-            : null,
-        alignment: Alignment.topCenter,
-        fit: fit ?? BoxFit.fitHeight);
+      AppCommon.boardGameGeekProxyUrl +
+          "/cors-proxy/_" +
+          stringToBase64.encode(this.imageUrl),
+      height: fit == null
+          ? getScreenHeightPercentageInPixels(
+              context,
+              ScreenTools.fiftyPercentScreen,
+            )
+          : null,
+      alignment: Alignment.topCenter,
+      fit: fit ?? BoxFit.fitHeight,
+    );
   }
 
   Widget buildMobileCachedImage(context) {
@@ -34,19 +37,25 @@ class PlatformIndependentImage extends StatelessWidget with ScreenTools {
       imageBuilder: (context, provider) => Container(
         height: fit == null
             ? getScreenHeightPercentageInPixels(
-                context, ScreenTools.fiftyPercentScreen)
+                context,
+                ScreenTools.fiftyPercentScreen,
+              )
             : null,
         decoration: BoxDecoration(
           image: DecorationImage(
-              image: provider,
-              fit: fit ?? BoxFit.fitHeight,
-              alignment: Alignment.topCenter),
+            image: provider,
+            fit: fit ?? BoxFit.fitHeight,
+            alignment: Alignment.topCenter,
+          ),
         ),
       ),
       placeholder: (context, url) => SpinKitCubeGrid(
-          color: Theme.of(context).colorScheme.secondary,
-          size: getScreenWidthPercentageInPixels(
-              context, ScreenTools.fiftyPercentScreen)),
+        color: Theme.of(context).colorScheme.secondary,
+        size: getScreenWidthPercentageInPixels(
+          context,
+          ScreenTools.fiftyPercentScreen,
+        ),
+      ),
       errorWidget: (context, url, error) => Icon(Icons.error),
     );
   }

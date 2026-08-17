@@ -23,8 +23,9 @@ class BggPlayer {
     return BggPlayer(
       name: (name != null && name.isNotEmpty) ? name : username,
       username: username,
-      score:
-          score is num ? score.round() : int.tryParse(score?.toString() ?? ''),
+      score: score is num
+          ? score.round()
+          : int.tryParse(score?.toString() ?? ''),
       win: json['win'] == true,
     );
   }
@@ -45,14 +46,15 @@ class BggPlay {
   });
 
   factory BggPlay.fromJson(Map<String, dynamic> json) => BggPlay(
-        playId: json['play_id'] as int,
-        date: _parseDate(json['date']),
-        length: json['length'] ?? 0,
-        players: (json['players'] as List?)
-                ?.map((e) => BggPlayer.fromJson(e as Map<String, dynamic>))
-                .toList() ??
-            const [],
-      );
+    playId: json['play_id'] as int,
+    date: _parseDate(json['date']),
+    length: json['length'] ?? 0,
+    players:
+        (json['players'] as List?)
+            ?.map((e) => BggPlayer.fromJson(e as Map<String, dynamic>))
+            .toList() ??
+        const [],
+  );
 
   static DateTime? _parseDate(Object? value) {
     if (value is! String || value.isEmpty) return null;
@@ -89,14 +91,15 @@ class PlayData {
   });
 
   factory PlayData.fromJson(Map<String, dynamic> json) => PlayData(
-        gameId: json['game_id'],
-        gameName: json['game_name'],
-        totalPlays: json['total_plays'] ?? 0,
-        plays: (json['plays'] as List?)
-                ?.map((e) => BggPlay.fromJson(e as Map<String, dynamic>))
-                .toList() ??
-            const [],
-      );
+    gameId: json['game_id'],
+    gameName: json['game_name'],
+    totalPlays: json['total_plays'] ?? 0,
+    plays:
+        (json['plays'] as List?)
+            ?.map((e) => BggPlay.fromJson(e as Map<String, dynamic>))
+            .toList() ??
+        const [],
+  );
 
   @override
   bool operator ==(Object other) =>

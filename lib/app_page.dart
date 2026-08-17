@@ -7,6 +7,7 @@ import 'package:how_many_mobile_meeple/components/app_default_padding.dart';
 import 'package:how_many_mobile_meeple/components/theme_mode_control.dart';
 import 'package:how_many_mobile_meeple/components/quick_pick_sheet.dart';
 import 'package:how_many_mobile_meeple/favourites/ignored_games_service.dart';
+
 import 'app_common.dart';
 import 'components/component_factory.dart';
 import 'model/model.dart';
@@ -23,57 +24,60 @@ mixin AppPage {
   final double _imageButtonSize = 42;
 
   Container drawerHeader(BuildContext context) => Container(
-        height: 80.0,
-        child: DrawerHeader(
-          padding: const EdgeInsets.only(left: 8),
-          margin: EdgeInsets.zero,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              BackButton(color: Theme.of(context).selectedRowColor),
-              Padding(
-                padding: const EdgeInsets.only(right: 12),
-                child: Text(
-                  'Advanced Options',
-                  style: TextStyle(color: Theme.of(context).selectedRowColor),
-                ),
-              )
-            ],
+    height: 80.0,
+    child: DrawerHeader(
+      padding: const EdgeInsets.only(left: 8),
+      margin: EdgeInsets.zero,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: <Widget>[
+          BackButton(color: Theme.of(context).selectedRowColor),
+          Padding(
+            padding: const EdgeInsets.only(right: 12),
+            child: Text(
+              'Advanced Options',
+              style: TextStyle(color: Theme.of(context).selectedRowColor),
+            ),
           ),
-          decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.secondary,
-          ),
-        ),
-      );
+        ],
+      ),
+      decoration: BoxDecoration(color: Theme.of(context).colorScheme.secondary),
+    ),
+  );
 
   List<Widget> staticFilters(AppModel model, BuildContext context) => [
-        DrawerBggFilter(
-            "Recommended Player Count Filter",
-            model.settings
-                .setting(Settings.filterUsingUserRecommendations.name),
-            model,
-            context,
-            index: 0),
-        DrawerBggFilter(
-            "Include Expansions in Filter",
-            model.settings.setting(Settings.filterIncludesExpansions.name),
-            model,
-            context,
-            index: 1),
-        DrawerBggFilter(
-            "Show All Mechanics",
-            model.settings.setting(Settings.filterUseAllMechanics.name),
-            model,
-            context,
-            index: 2),
-        _buildAdvancedModeToggle(model, context, index: 3),
-        _buildHelpLink(context, index: 4),
-        _buildIgnoredGamesLink(context, index: 5),
-        ThemeModeControl(model),
-      ];
+    DrawerBggFilter(
+      "Recommended Player Count Filter",
+      model.settings.setting(Settings.filterUsingUserRecommendations.name),
+      model,
+      context,
+      index: 0,
+    ),
+    DrawerBggFilter(
+      "Include Expansions in Filter",
+      model.settings.setting(Settings.filterIncludesExpansions.name),
+      model,
+      context,
+      index: 1,
+    ),
+    DrawerBggFilter(
+      "Show All Mechanics",
+      model.settings.setting(Settings.filterUseAllMechanics.name),
+      model,
+      context,
+      index: 2,
+    ),
+    _buildAdvancedModeToggle(model, context, index: 3),
+    _buildHelpLink(context, index: 4),
+    _buildIgnoredGamesLink(context, index: 5),
+    ThemeModeControl(model),
+  ];
 
-  Widget _buildAdvancedModeToggle(AppModel model, BuildContext context,
-      {int index = 0}) {
+  Widget _buildAdvancedModeToggle(
+    AppModel model,
+    BuildContext context, {
+    int index = 0,
+  }) {
     final setting = model.settings.setting(Settings.preferAdvancedMode.name);
     final currentValue = setting.getBool();
 
@@ -101,7 +105,7 @@ mixin AppPage {
               Navigator.of(context).pop();
             },
             value: currentValue,
-          )
+          ),
         ],
       ),
     );
@@ -114,12 +118,12 @@ mixin AppPage {
           : Theme.of(context).colorScheme.surface,
       child: ListTile(
         dense: true,
-        leading: Icon(Icons.help_outline,
-            size: 20, color: Theme.of(context).colorScheme.secondary),
-        title: const Text(
-          'Help',
-          style: TextStyle(fontSize: 13),
+        leading: Icon(
+          Icons.help_outline,
+          size: 20,
+          color: Theme.of(context).colorScheme.secondary,
         ),
+        title: const Text('Help', style: TextStyle(fontSize: 13)),
         onTap: () {
           Navigator.of(context).pop();
           Navigator.of(context).pushNamed(r.Router.helpRoute);
@@ -139,8 +143,11 @@ mixin AppPage {
               : Theme.of(context).colorScheme.surface,
           child: ListTile(
             dense: true,
-            leading: Icon(Icons.visibility_off,
-                size: 20, color: Theme.of(context).colorScheme.secondary),
+            leading: Icon(
+              Icons.visibility_off,
+              size: 20,
+              color: Theme.of(context).colorScheme.secondary,
+            ),
             title: Text(
               'Ignored Games${count > 0 ? ' ($count)' : ''}',
               style: const TextStyle(fontSize: 13),
@@ -156,14 +163,21 @@ mixin AppPage {
   }
 
   Future<List<Widget>> drawerFilters(
-      BuildContext context, AppModel model) async {
-    var drawerSettingsColumn =
-        ComponentFactory.getDrawerSettingsColumn(AppCommon.savedSettings);
+    BuildContext context,
+    AppModel model,
+  ) async {
+    var drawerSettingsColumn = ComponentFactory.getDrawerSettingsColumn(
+      AppCommon.savedSettings,
+    );
     final staticFiltersList = staticFilters(model, context);
-    final allFilters = <Widget>[drawerHeader(context)] +
+    final allFilters =
+        <Widget>[drawerHeader(context)] +
         staticFiltersList +
         await drawerSettingsColumn.drawerContent(
-            context, model, staticFiltersList.length);
+          context,
+          model,
+          staticFiltersList.length,
+        );
     if (PwaInstallService.isWeb && !PwaInstallService.isAlreadyInstalled) {
       allFilters.add(_buildInstallDrawerItem(context, allFilters.length));
     }
@@ -212,8 +226,10 @@ mixin AppPage {
 
   void loadPage(BuildContext context, RouteSettings pageSettings) {
     AppModel.of(context, listen: false).pageRefreshed = true;
-    Navigator.of(context).pushReplacementNamed(pageSettings.name!,
-        arguments: pageSettings.arguments);
+    Navigator.of(context).pushReplacementNamed(
+      pageSettings.name!,
+      arguments: pageSettings.arguments,
+    );
   }
 
   void startPage(BuildContext context) {
@@ -245,68 +261,77 @@ mixin AppPage {
   }
 
   Widget iconButtonGroup(BuildContext context) => Row(
-        mainAxisAlignment: MainAxisAlignment.end,
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: <Widget>[
-          _floatingIconButton(
-            context,
-            icon: Icons.format_list_numbered,
-            tooltip: 'View List',
-            onPressed: () {
-              var listPageSettings = r.Router.generateRouteSettings(
-                  r.Router.listRoute, AppModel.of(context, listen: false));
-              loadPage(context, listPageSettings);
-            },
-          ),
-          Padding(
-            padding: const EdgeInsets.only(left: 8),
-            child: _floatingIconButton(
-              context,
-              icon: Icons.bolt,
-              tooltip: 'Quick Pick',
-              onPressed: () => QuickPickSheet.show(context),
+    mainAxisAlignment: MainAxisAlignment.end,
+    crossAxisAlignment: CrossAxisAlignment.end,
+    children: <Widget>[
+      _floatingIconButton(
+        context,
+        icon: Icons.format_list_numbered,
+        tooltip: 'View List',
+        onPressed: () {
+          var listPageSettings = r.Router.generateRouteSettings(
+            r.Router.listRoute,
+            AppModel.of(context, listen: false),
+          );
+          loadPage(context, listPageSettings);
+        },
+      ),
+      Padding(
+        padding: const EdgeInsets.only(left: 8),
+        child: _floatingIconButton(
+          context,
+          icon: Icons.bolt,
+          tooltip: 'Quick Pick',
+          onPressed: () => QuickPickSheet.show(context),
+        ),
+      ),
+      Padding(
+        padding: const EdgeInsets.only(left: 8, right: 8),
+        child: MaterialButton(
+          onPressed: () {
+            var randomPageSettings = r.Router.generateRouteSettings(
+              r.Router.randomRoute,
+              AppModel.of(context, listen: false),
+            );
+            loadPage(context, randomPageSettings);
+          },
+          child: Container(
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.secondary,
+              borderRadius: BorderRadius.circular(40.0),
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(left: 8, right: 8),
-            child: MaterialButton(
-              onPressed: () {
-                var randomPageSettings = r.Router.generateRouteSettings(
-                    r.Router.randomRoute, AppModel.of(context, listen: false));
-                loadPage(context, randomPageSettings);
-              },
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.secondary,
-                  borderRadius: BorderRadius.circular(40.0),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.only(
-                      left: 18, right: 12, top: 5, bottom: 5),
-                  child: Row(
-                    children: <Widget>[
-                      SizedBox(
-                        height: _imageButtonSize,
-                        width: _imageButtonSize,
-                        child: randomGameButtonIcon,
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(left: 8, right: 8),
-                        child: Text(
-                          randomGameLabel,
-                          style: TextStyle(
-                              color: Theme.of(context).selectedRowColor,
-                              fontWeight: FontWeight.bold),
-                        ),
-                      )
-                    ],
+            child: Padding(
+              padding: const EdgeInsets.only(
+                left: 18,
+                right: 12,
+                top: 5,
+                bottom: 5,
+              ),
+              child: Row(
+                children: <Widget>[
+                  SizedBox(
+                    height: _imageButtonSize,
+                    width: _imageButtonSize,
+                    child: randomGameButtonIcon,
                   ),
-                ),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 8, right: 8),
+                    child: Text(
+                      randomGameLabel,
+                      style: TextStyle(
+                        color: Theme.of(context).selectedRowColor,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
-        ],
-      );
+        ),
+      ),
+    ],
+  );
 
   Widget pageDrawer(BuildContext context) {
     var staticDataComponentLength = 6;
@@ -318,9 +343,11 @@ mixin AppPage {
             if (!snapshot.hasData ||
                 snapshot.data.length == staticDataComponentLength)
               return ListView(
-                  children: <Widget>[drawerHeader(context)] +
-                      staticFilters(model, context),
-                  padding: EdgeInsets.zero);
+                children:
+                    <Widget>[drawerHeader(context)] +
+                    staticFilters(model, context),
+                padding: EdgeInsets.zero,
+              );
             return ListView.builder(
               itemCount: snapshot.data.length,
               padding: EdgeInsets.zero,

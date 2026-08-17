@@ -5,7 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:how_many_mobile_meeple/api/http_retry_client.dart';
+
 import '../helpers/sync_mock_client.dart';
+
 import 'package:how_many_mobile_meeple/guided_flow/step4_game_style.dart';
 import 'package:how_many_mobile_meeple/model/collection_analytics.dart';
 import 'package:how_many_mobile_meeple/model/model.dart';
@@ -18,9 +20,7 @@ Widget _buildTestWidget(AppModel model) {
     home: Scaffold(
       body: ChangeNotifierProvider.value(
         value: model,
-        child: const SingleChildScrollView(
-          child: Step4GameStyle(),
-        ),
+        child: const SingleChildScrollView(child: Step4GameStyle()),
       ),
     ),
   );
@@ -31,7 +31,8 @@ void main() {
     SharedPreferences.setMockInitialValues({});
     HttpRetryClient.setDelayFunction((_) async {});
     HttpRetryClient.setTestClient(
-        SyncMockClient((_) => http.Response('[]', 200)));
+      SyncMockClient((_) => http.Response('[]', 200)),
+    );
   });
 
   tearDown(() {
@@ -49,23 +50,28 @@ void main() {
       expect(find.text('Choose difficulty and mechanics'), findsOneWidget);
     });
 
-    testWidgets('shows popular-in-collection chips when analytics are present',
-        (WidgetTester tester) async {
-      final model = AppModel();
-      model.setCollectionAnalyticsForTest(CollectionAnalytics.fromJson({
-        'top_mechanics': [
-          {'name': 'Hand Management', 'count': 43}
-        ]
-      }));
+    testWidgets(
+      'shows popular-in-collection chips when analytics are present',
+      (WidgetTester tester) async {
+        final model = AppModel();
+        model.setCollectionAnalyticsForTest(
+          CollectionAnalytics.fromJson({
+            'top_mechanics': [
+              {'name': 'Hand Management', 'count': 43},
+            ],
+          }),
+        );
 
-      await tester.pumpWidget(_buildTestWidget(model));
+        await tester.pumpWidget(_buildTestWidget(model));
 
-      expect(find.text('Popular in your collection'), findsOneWidget);
-      expect(find.text('Hand Management'), findsWidgets);
-    });
+        expect(find.text('Popular in your collection'), findsOneWidget);
+        expect(find.text('Hand Management'), findsWidgets);
+      },
+    );
 
-    testWidgets('hides popular chips when analytics are absent',
-        (WidgetTester tester) async {
+    testWidgets('hides popular chips when analytics are absent', (
+      WidgetTester tester,
+    ) async {
       final model = AppModel();
 
       await tester.pumpWidget(_buildTestWidget(model));
@@ -86,8 +92,9 @@ void main() {
       expect(find.text('Expert'), findsOneWidget);
     });
 
-    testWidgets('tapping difficulty panel updates setting',
-        (WidgetTester tester) async {
+    testWidgets('tapping difficulty panel updates setting', (
+      WidgetTester tester,
+    ) async {
       final model = AppModel();
 
       await tester.pumpWidget(_buildTestWidget(model));
@@ -130,16 +137,19 @@ void main() {
       expect(find.text('Unplayed only'), findsOneWidget);
     });
 
-    testWidgets('shows complexity distribution counts when analytics present',
-        (WidgetTester tester) async {
+    testWidgets('shows complexity distribution counts when analytics present', (
+      WidgetTester tester,
+    ) async {
       final model = AppModel();
-      model.setCollectionAnalyticsForTest(CollectionAnalytics.fromJson({
-        'complexity_distribution': [
-          {'label': 'light [0, 2.0)', 'count': 40},
-          {'label': 'medium-light [2.0, 2.5)', 'count': 28},
-          {'label': 'heavy [4.0+)', 'count': 2},
-        ],
-      }));
+      model.setCollectionAnalyticsForTest(
+        CollectionAnalytics.fromJson({
+          'complexity_distribution': [
+            {'label': 'light [0, 2.0)', 'count': 40},
+            {'label': 'medium-light [2.0, 2.5)', 'count': 28},
+            {'label': 'heavy [4.0+)', 'count': 2},
+          ],
+        }),
+      );
 
       await tester.pumpWidget(_buildTestWidget(model));
 
@@ -148,19 +158,22 @@ void main() {
       expect(find.text('heavy 2'), findsOneWidget);
     });
 
-    testWidgets('emphasises the complexity bucket for the selected weight',
-        (WidgetTester tester) async {
+    testWidgets('emphasises the complexity bucket for the selected weight', (
+      WidgetTester tester,
+    ) async {
       final model = AppModel();
       final setting = model.settings.setting(Settings.filterComplexity.name);
       setting.value = 2.2;
       setting.enabled = true;
       model.settings.updateSetting(setting);
-      model.setCollectionAnalyticsForTest(CollectionAnalytics.fromJson({
-        'complexity_distribution': [
-          {'label': 'light [0, 2.0)', 'count': 40},
-          {'label': 'medium-light [2.0, 2.5)', 'count': 28},
-        ],
-      }));
+      model.setCollectionAnalyticsForTest(
+        CollectionAnalytics.fromJson({
+          'complexity_distribution': [
+            {'label': 'light [0, 2.0)', 'count': 40},
+            {'label': 'medium-light [2.0, 2.5)', 'count': 28},
+          ],
+        }),
+      );
 
       await tester.pumpWidget(_buildTestWidget(model));
 
@@ -170,8 +183,9 @@ void main() {
       expect(inactive.style?.fontWeight, isNot(FontWeight.bold));
     });
 
-    testWidgets('hides complexity distribution when analytics are absent',
-        (WidgetTester tester) async {
+    testWidgets('hides complexity distribution when analytics are absent', (
+      WidgetTester tester,
+    ) async {
       final model = AppModel();
 
       await tester.pumpWidget(_buildTestWidget(model));
@@ -181,8 +195,9 @@ void main() {
   });
 
   group('Step4GameStyle mechanics interaction', () {
-    testWidgets('tapping Hand Management chip adds it to selection',
-        (WidgetTester tester) async {
+    testWidgets('tapping Hand Management chip adds it to selection', (
+      WidgetTester tester,
+    ) async {
       final model = AppModel();
 
       await tester.pumpWidget(_buildTestWidget(model));
@@ -196,8 +211,9 @@ void main() {
       expect(setting.enabled, true);
     });
 
-    testWidgets('tapping selected mechanic removes it',
-        (WidgetTester tester) async {
+    testWidgets('tapping selected mechanic removes it', (
+      WidgetTester tester,
+    ) async {
       final model = AppModel();
       final setting = model.settings.setting(Settings.filterMechanics.name);
       setting.value = ['Hand Management'];
@@ -213,8 +229,9 @@ void main() {
       expect(setting.enabled, false);
     });
 
-    testWidgets('displays difficulty description info box',
-        (WidgetTester tester) async {
+    testWidgets('displays difficulty description info box', (
+      WidgetTester tester,
+    ) async {
       final model = AppModel();
 
       await tester.pumpWidget(_buildTestWidget(model));

@@ -5,31 +5,27 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:how_many_mobile_meeple/model/collection_analytics.dart';
 
 Map<String, dynamic> _fullBody() => {
-      'summary': {
-        'average_weight': 2.3,
-        'median_rating': 7.42,
-        'total_games': 113
-      },
-      'complexity_distribution': [
-        {'label': 'light [0, 2.0)', 'count': 40},
-        {'label': 'medium [2.5, 3.0)', 'count': 23},
-      ],
-      'playtime_distribution': [
-        {'label': 'filler [0, 30)', 'count': 14},
-        {'label': 'short [30, 60)', 'count': 32},
-        {'label': 'medium [60, 90)', 'count': 26},
-      ],
-      'player_count_coverage': [
-        {'player_count': 2, 'best_or_recommended': 82, 'supported': 103},
-        {'player_count': 4, 'best_or_recommended': 99, 'supported': 109},
-        {'player_count': 3, 'best_or_recommended': 95, 'supported': 108},
-      ],
-      'top_mechanics': [
-        {'name': 'Hand Management', 'count': 43},
-        {'name': 'Set Collection', 'count': 39},
-        {'name': 'Dice Rolling', 'count': 38},
-      ],
-    };
+  'summary': {'average_weight': 2.3, 'median_rating': 7.42, 'total_games': 113},
+  'complexity_distribution': [
+    {'label': 'light [0, 2.0)', 'count': 40},
+    {'label': 'medium [2.5, 3.0)', 'count': 23},
+  ],
+  'playtime_distribution': [
+    {'label': 'filler [0, 30)', 'count': 14},
+    {'label': 'short [30, 60)', 'count': 32},
+    {'label': 'medium [60, 90)', 'count': 26},
+  ],
+  'player_count_coverage': [
+    {'player_count': 2, 'best_or_recommended': 82, 'supported': 103},
+    {'player_count': 4, 'best_or_recommended': 99, 'supported': 109},
+    {'player_count': 3, 'best_or_recommended': 95, 'supported': 108},
+  ],
+  'top_mechanics': [
+    {'name': 'Hand Management', 'count': 43},
+    {'name': 'Set Collection', 'count': 39},
+    {'name': 'Dice Rolling', 'count': 38},
+  ],
+};
 
 void main() {
   group('CollectionAnalytics.fromJson — Right', () {
@@ -45,8 +41,11 @@ void main() {
   group('CollectionAnalytics.topMechanics', () {
     test('parses top_mechanics as name/count pairs in order', () {
       final a = CollectionAnalytics.fromJson(_fullBody());
-      expect(a.topMechanics.map((m) => m.name).toList(),
-          ['Hand Management', 'Set Collection', 'Dice Rolling']);
+      expect(a.topMechanics.map((m) => m.name).toList(), [
+        'Hand Management',
+        'Set Collection',
+        'Dice Rolling',
+      ]);
       expect(a.topMechanics.first.count, 43);
     });
 
@@ -58,8 +57,11 @@ void main() {
           {'name': 'Mid', 'count': 20},
         ],
       });
-      expect(
-          a.topMechanics.map((m) => m.name).toList(), ['High', 'Mid', 'Low']);
+      expect(a.topMechanics.map((m) => m.name).toList(), [
+        'High',
+        'Mid',
+        'Low',
+      ]);
     });
 
     test('drops malformed entries without throwing', () {
@@ -80,8 +82,9 @@ void main() {
     test('missing or non-list top_mechanics yields an empty list', () {
       expect(CollectionAnalytics.fromJson({}).topMechanics, isEmpty);
       expect(
-          CollectionAnalytics.fromJson({'top_mechanics': 'nope'}).topMechanics,
-          isEmpty);
+        CollectionAnalytics.fromJson({'top_mechanics': 'nope'}).topMechanics,
+        isEmpty,
+      );
     });
   });
 
@@ -102,7 +105,7 @@ void main() {
           'average_rating': 7.39,
           'median_rating': 7.42,
           'average_weight': 2.3,
-        }
+        },
       }).summary!;
       expect(s.totalGames, 113);
       expect(s.baseGames, 85);
@@ -114,7 +117,7 @@ void main() {
 
     test('coerces int rating/weight to double', () {
       final s = CollectionAnalytics.fromJson({
-        'summary': {'average_rating': 7, 'average_weight': 2}
+        'summary': {'average_rating': 7, 'average_weight': 2},
       }).summary!;
       expect(s.averageRating, 7.0);
       expect(s.averageWeight, 2.0);
@@ -128,7 +131,7 @@ void main() {
 
     test('summary presence keeps hasData true', () {
       final a = CollectionAnalytics.fromJson({
-        'summary': {'total_games': 5}
+        'summary': {'total_games': 5},
       });
       expect(a.summary, isNotNull);
       expect(a.hasData, isTrue);
@@ -138,8 +141,11 @@ void main() {
   group('CollectionAnalytics raw distributions', () {
     test('parses player_count_coverage sorted ascending by player count', () {
       final a = CollectionAnalytics.fromJson(_fullBody());
-      expect(
-          a.playerCountCoverage.map((c) => c.playerCount).toList(), [2, 3, 4]);
+      expect(a.playerCountCoverage.map((c) => c.playerCount).toList(), [
+        2,
+        3,
+        4,
+      ]);
       final three = a.playerCountCoverage.firstWhere((c) => c.playerCount == 3);
       expect(three.supported, 108);
       expect(three.bestOrRecommended, 95);
@@ -160,8 +166,10 @@ void main() {
 
     test('parses complexity buckets with name and float range', () {
       final a = CollectionAnalytics.fromJson(_fullBody());
-      expect(a.complexityDistribution.map((b) => b.name).toList(),
-          ['light', 'medium']);
+      expect(a.complexityDistribution.map((b) => b.name).toList(), [
+        'light',
+        'medium',
+      ]);
       final light = a.complexityDistribution.first;
       expect(light.min, 0);
       expect(light.max, 2.0);
@@ -170,8 +178,11 @@ void main() {
 
     test('parses playtime buckets with name and int range', () {
       final a = CollectionAnalytics.fromJson(_fullBody());
-      expect(a.playtimeDistribution.map((b) => b.name).toList(),
-          ['filler', 'short', 'medium']);
+      expect(a.playtimeDistribution.map((b) => b.name).toList(), [
+        'filler',
+        'short',
+        'medium',
+      ]);
       final short = a.playtimeDistribution[1];
       expect(short.min, 30);
       expect(short.max, 60);
@@ -289,10 +300,13 @@ void main() {
     test('mostCoveredPlayerCount matches an independent argmax', () {
       final body = _fullBody();
       final list = (body['player_count_coverage'] as List).cast<Map>();
-      final expected = list.reduce((a, b) =>
-          (b['best_or_recommended'] as int) > (a['best_or_recommended'] as int)
-              ? b
-              : a)['player_count'];
+      final expected = list.reduce(
+        (a, b) =>
+            (b['best_or_recommended'] as int) >
+                (a['best_or_recommended'] as int)
+            ? b
+            : a,
+      )['player_count'];
       final a = CollectionAnalytics.fromJson(body);
       expect(a.mostCoveredPlayerCount, expected);
     });
@@ -300,7 +314,9 @@ void main() {
     test('averageWeight equals summary.average_weight verbatim', () {
       final a = CollectionAnalytics.fromJson(_fullBody());
       expect(
-          a.averageWeight, (_fullBody()['summary'] as Map)['average_weight']);
+        a.averageWeight,
+        (_fullBody()['summary'] as Map)['average_weight'],
+      );
     });
   });
 
@@ -332,39 +348,42 @@ void main() {
 
     test('int average_weight is coerced to double', () {
       final a = CollectionAnalytics.fromJson({
-        'summary': {'average_weight': 3}
+        'summary': {'average_weight': 3},
       });
       expect(a.averageWeight, 3.0);
     });
 
-    test('malformed complexity label (multiple dots) yields null averageWeight',
-        () {
-      final a = CollectionAnalytics.fromJson({
-        'complexity_distribution': [
-          {'label': 'bad [1.2.3, 4.5)', 'count': 10}
-        ],
-      });
-      expect(a.averageWeight, isNull);
-    });
+    test(
+      'malformed complexity label (multiple dots) yields null averageWeight',
+      () {
+        final a = CollectionAnalytics.fromJson({
+          'complexity_distribution': [
+            {'label': 'bad [1.2.3, 4.5)', 'count': 10},
+          ],
+        });
+        expect(a.averageWeight, isNull);
+      },
+    );
   });
 
   group('CollectionAnalytics.hasData', () {
     test('true when any field is usable', () {
       expect(CollectionAnalytics.fromJson(_fullBody()).hasData, isTrue);
       expect(
-          CollectionAnalytics.fromJson({
-            'player_count_coverage': [
-              {'player_count': 4, 'best_or_recommended': 99}
-            ]
-          }).hasData,
-          isTrue);
+        CollectionAnalytics.fromJson({
+          'player_count_coverage': [
+            {'player_count': 4, 'best_or_recommended': 99},
+          ],
+        }).hasData,
+        isTrue,
+      );
     });
 
     test('true when only top_mechanics is present', () {
       final a = CollectionAnalytics.fromJson({
         'top_mechanics': [
-          {'name': 'Hand Management', 'count': 43}
-        ]
+          {'name': 'Hand Management', 'count': 43},
+        ],
       });
       expect(a.hasData, isTrue);
     });
@@ -387,7 +406,9 @@ void main() {
   group('CollectionAnalytics.fromJson — Performance', () {
     test('parses a large distribution in linear time', () {
       final big = List.generate(
-          1000, (i) => {'player_count': i + 1, 'best_or_recommended': i});
+        1000,
+        (i) => {'player_count': i + 1, 'best_or_recommended': i},
+      );
       final sw = Stopwatch()..start();
       final a = CollectionAnalytics.fromJson({'player_count_coverage': big});
       sw.stop();

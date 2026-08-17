@@ -15,8 +15,11 @@ void main() {
     test('every section has a unique id and at least one item', () {
       final ids = <String>{};
       for (final section in HelpContent.sections) {
-        expect(ids.add(section.id), isTrue,
-            reason: 'duplicate section id ${section.id}');
+        expect(
+          ids.add(section.id),
+          isTrue,
+          reason: 'duplicate section id ${section.id}',
+        );
         expect(section.items, isNotEmpty);
       }
     });
@@ -29,8 +32,9 @@ void main() {
   });
 
   group('HelpPage', () {
-    testWidgets('renders the first section and can scroll to later ones',
-        (tester) async {
+    testWidgets('renders the first section and can scroll to later ones', (
+      tester,
+    ) async {
       await tester.pumpWidget(_wrap(const HelpPage()));
       await tester.pumpAndSettle();
 
@@ -43,8 +47,9 @@ void main() {
       expect(find.text(lastTitle), findsOneWidget);
     });
 
-    testWidgets('highlights the initial section then clears it',
-        (tester) async {
+    testWidgets('highlights the initial section then clears it', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         _wrap(const HelpPage(initialSectionId: HelpContent.home)),
       );
@@ -54,8 +59,8 @@ void main() {
       await tester.pump(const Duration(milliseconds: 500));
 
       bool anyHighlighted() => tester
-              .widgetList<AnimatedContainer>(find.byType(AnimatedContainer))
-              .any((c) {
+          .widgetList<AnimatedContainer>(find.byType(AnimatedContainer))
+          .any((c) {
             final border = (c.decoration as BoxDecoration).border as Border;
             return border.top.color != Colors.transparent;
           });
@@ -69,9 +74,7 @@ void main() {
     });
 
     testWidgets('unknown initial section id does not throw', (tester) async {
-      await tester.pumpWidget(
-        _wrap(const HelpPage(initialSectionId: 'nope')),
-      );
+      await tester.pumpWidget(_wrap(const HelpPage(initialSectionId: 'nope')));
       await tester.pumpAndSettle();
 
       expect(find.byType(HelpPage), findsOneWidget);

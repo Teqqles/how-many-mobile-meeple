@@ -9,8 +9,9 @@ import 'package:provider/provider.dart';
 
 void main() {
   group('Step1SelectSource', () {
-    testWidgets('Add Source button is disabled when text field is empty',
-        (WidgetTester tester) async {
+    testWidgets('Add Source button is disabled when text field is empty', (
+      WidgetTester tester,
+    ) async {
       final model = AppModel();
 
       await tester.pumpWidget(
@@ -39,8 +40,9 @@ void main() {
       expect(button.onPressed, isNull);
     });
 
-    testWidgets('Add Source button becomes enabled when text is entered',
-        (WidgetTester tester) async {
+    testWidgets('Add Source button becomes enabled when text is entered', (
+      WidgetTester tester,
+    ) async {
       final model = AppModel();
 
       await tester.pumpWidget(
@@ -77,47 +79,51 @@ void main() {
       expect(button.onPressed, isNotNull);
     });
 
-    testWidgets('Add Source button becomes disabled again when text is cleared',
-        (WidgetTester tester) async {
-      final model = AppModel();
+    testWidgets(
+      'Add Source button becomes disabled again when text is cleared',
+      (WidgetTester tester) async {
+        final model = AppModel();
 
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: SingleChildScrollView(
-              child: ChangeNotifierProvider.value(
-                value: model,
-                child: const Step1SelectSource(),
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              body: SingleChildScrollView(
+                child: ChangeNotifierProvider.value(
+                  value: model,
+                  child: const Step1SelectSource(),
+                ),
               ),
             ),
           ),
-        ),
-      );
+        );
 
-      // Switch to Collection tab
-      await tester.tap(find.text('Collection'));
-      await tester.pump();
+        // Switch to Collection tab
+        await tester.tap(find.text('Collection'));
+        await tester.pump();
 
-      // Find the text field
-      final textField = find.byType(TextField);
+        // Find the text field
+        final textField = find.byType(TextField);
 
-      // Enter text
-      await tester.enterText(textField, 'testuser');
-      await tester.pump();
+        // Enter text
+        await tester.enterText(textField, 'testuser');
+        await tester.pump();
 
-      // Verify button is enabled
-      FilledButton button =
-          tester.widget(find.widgetWithText(FilledButton, 'Add Collection'));
-      expect(button.onPressed, isNotNull);
+        // Verify button is enabled
+        FilledButton button = tester.widget(
+          find.widgetWithText(FilledButton, 'Add Collection'),
+        );
+        expect(button.onPressed, isNotNull);
 
-      // Clear the text
-      await tester.enterText(textField, '');
-      await tester.pump();
+        // Clear the text
+        await tester.enterText(textField, '');
+        await tester.pump();
 
-      // Button should be disabled again
-      button =
-          tester.widget(find.widgetWithText(FilledButton, 'Add Collection'));
-      expect(button.onPressed, isNull);
-    });
+        // Button should be disabled again
+        button = tester.widget(
+          find.widgetWithText(FilledButton, 'Add Collection'),
+        );
+        expect(button.onPressed, isNull);
+      },
+    );
   });
 }

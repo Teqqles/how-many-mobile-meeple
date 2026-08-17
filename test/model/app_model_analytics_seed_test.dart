@@ -2,6 +2,7 @@
 library;
 
 import 'dart:convert';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:how_many_mobile_meeple/api/http_retry_client.dart';
@@ -10,15 +11,16 @@ import 'package:how_many_mobile_meeple/model/item.dart';
 import 'package:how_many_mobile_meeple/model/model.dart';
 import 'package:how_many_mobile_meeple/model/settings.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
 import '../helpers/sync_mock_client.dart';
 
 final _readyAnalytics = jsonEncode({
   'summary': {'average_weight': 2.3},
   'playtime_distribution': [
-    {'label': 'short [30, 60)', 'count': 32}
+    {'label': 'short [30, 60)', 'count': 32},
   ],
   'player_count_coverage': [
-    {'player_count': 4, 'best_or_recommended': 99}
+    {'player_count': 4, 'best_or_recommended': 99},
   ],
   'top_mechanics': [
     {'name': 'Hand Management', 'count': 43},
@@ -34,11 +36,12 @@ http.Response _route(http.BaseRequest req, {required bool analyticsOk}) {
   }
   if (path.startsWith('/plays/')) {
     return http.Response(
-        jsonEncode({
-          'plays': [],
-          'meta': {'complete': true}
-        }),
-        200);
+      jsonEncode({
+        'plays': [],
+        'meta': {'complete': true},
+      }),
+      200,
+    );
   }
   if (path.startsWith('/collection/')) {
     return http.Response(jsonEncode([]), 200);
@@ -50,11 +53,12 @@ http.Response _routePlaysAndCollection(http.BaseRequest req) {
   final path = req.url.path;
   if (path.startsWith('/plays/')) {
     return http.Response(
-        jsonEncode({
-          'plays': [],
-          'meta': {'complete': true}
-        }),
-        200);
+      jsonEncode({
+        'plays': [],
+        'meta': {'complete': true},
+      }),
+      200,
+    );
   }
   if (path.startsWith('/collection/')) {
     return http.Response(jsonEncode([]), 200);
@@ -90,7 +94,8 @@ void main() {
 
   test('seeds untouched filters after loadPlays', () async {
     HttpRetryClient.setTestClient(
-        SyncMockClient((req) => _route(req, analyticsOk: true)));
+      SyncMockClient((req) => _route(req, analyticsOk: true)),
+    );
     final model = AppModel();
     addTearDown(model.dispose);
     await model.addItem(Item('teqqles'));
@@ -98,31 +103,39 @@ void main() {
     await model.analyticsSeedFuture;
 
     expect(_players(model), 4);
-    expect(model.settings.setting(Settings.filterMinimumTimeToPlay.name).value,
-        30);
+    expect(
+      model.settings.setting(Settings.filterMinimumTimeToPlay.name).value,
+      30,
+    );
     expect(model.settings.setting(Settings.filterComplexity.name).value, 2.3);
     // Position-only: not enabled.
-    expect(model.settings.setting(Settings.filterNumberOfPlayers.name).enabled,
-        isFalse);
+    expect(
+      model.settings.setting(Settings.filterNumberOfPlayers.name).enabled,
+      isFalse,
+    );
   });
 
-  test('adding the first collection seeds without an explicit loadPlays',
-      () async {
-    HttpRetryClient.setTestClient(
-        SyncMockClient((req) => _route(req, analyticsOk: true)));
-    final model = AppModel();
-    addTearDown(model.dispose);
+  test(
+    'adding the first collection seeds without an explicit loadPlays',
+    () async {
+      HttpRetryClient.setTestClient(
+        SyncMockClient((req) => _route(req, analyticsOk: true)),
+      );
+      final model = AppModel();
+      addTearDown(model.dispose);
 
-    // addItem establishes the primary player and must trigger seeding itself.
-    await model.addItem(Item('teqqles'));
-    await model.analyticsSeedFuture;
+      // addItem establishes the primary player and must trigger seeding itself.
+      await model.addItem(Item('teqqles'));
+      await model.analyticsSeedFuture;
 
-    expect(_players(model), 4);
-  });
+      expect(_players(model), 4);
+    },
+  );
 
   test('retains fetched analytics on the model after seeding', () async {
     HttpRetryClient.setTestClient(
-        SyncMockClient((req) => _route(req, analyticsOk: true)));
+      SyncMockClient((req) => _route(req, analyticsOk: true)),
+    );
     final model = AppModel();
     addTearDown(model.dispose);
     expect(model.collectionAnalytics, isNull);
@@ -131,13 +144,16 @@ void main() {
     await model.analyticsSeedFuture;
 
     expect(model.collectionAnalytics, isNotNull);
-    expect(model.topMechanics.map((m) => m.name).toList(),
-        ['Hand Management', 'Set Collection']);
+    expect(model.topMechanics.map((m) => m.name).toList(), [
+      'Hand Management',
+      'Set Collection',
+    ]);
   });
 
   test('leaves analytics null when the fetch never succeeds', () async {
     HttpRetryClient.setTestClient(
-        SyncMockClient((req) => _route(req, analyticsOk: false)));
+      SyncMockClient((req) => _route(req, analyticsOk: false)),
+    );
     final model = AppModel();
     addTearDown(model.dispose);
     await model.addItem(Item('teqqles'));
@@ -149,7 +165,8 @@ void main() {
 
   test('failed analytics leaves settings unchanged', () async {
     HttpRetryClient.setTestClient(
-        SyncMockClient((req) => _route(req, analyticsOk: false)));
+      SyncMockClient((req) => _route(req, analyticsOk: false)),
+    );
     final model = AppModel();
     addTearDown(model.dispose);
     final before = _players(model);
@@ -162,10 +179,12 @@ void main() {
 
   test('does not refetch analytics for the same username twice', () async {
     var analyticsCalls = 0;
-    HttpRetryClient.setTestClient(SyncMockClient((req) {
-      if (req.url.path.endsWith('/analytics')) analyticsCalls++;
-      return _route(req, analyticsOk: true);
-    }));
+    HttpRetryClient.setTestClient(
+      SyncMockClient((req) {
+        if (req.url.path.endsWith('/analytics')) analyticsCalls++;
+        return _route(req, analyticsOk: true);
+      }),
+    );
     final model = AppModel();
     addTearDown(model.dispose);
     await model.addItem(Item('teqqles'));
@@ -178,42 +197,48 @@ void main() {
     expect(analyticsCalls, 1);
   });
 
-  test('retries and seeds when analytics is not ready on the first call',
-      () async {
-    var analyticsCalls = 0;
-    HttpRetryClient.setTestClient(SyncMockClient((req) {
-      if (req.url.path.endsWith('/analytics')) {
-        analyticsCalls++;
-        // First response is a not-ready 200 (empty sections); then ready.
-        return analyticsCalls == 1
-            ? http.Response(jsonEncode({}), 200)
-            : http.Response(_readyAnalytics, 200);
-      }
-      return _routePlaysAndCollection(req);
-    }));
-    final model = AppModel();
-    addTearDown(model.dispose);
-    await model.addItem(Item('teqqles'));
-    await model.loadPlays();
-    await model.analyticsSeedFuture;
+  test(
+    'retries and seeds when analytics is not ready on the first call',
+    () async {
+      var analyticsCalls = 0;
+      HttpRetryClient.setTestClient(
+        SyncMockClient((req) {
+          if (req.url.path.endsWith('/analytics')) {
+            analyticsCalls++;
+            // First response is a not-ready 200 (empty sections); then ready.
+            return analyticsCalls == 1
+                ? http.Response(jsonEncode({}), 200)
+                : http.Response(_readyAnalytics, 200);
+          }
+          return _routePlaysAndCollection(req);
+        }),
+      );
+      final model = AppModel();
+      addTearDown(model.dispose);
+      await model.addItem(Item('teqqles'));
+      await model.loadPlays();
+      await model.analyticsSeedFuture;
 
-    // Not seeded yet on the first, not-ready response.
-    expect(_players(model), isNot(4));
+      // Not seeded yet on the first, not-ready response.
+      expect(_players(model), isNot(4));
 
-    await _pumpUntil(() => _players(model) == 4);
-    expect(_players(model), 4);
-    expect(analyticsCalls, greaterThanOrEqualTo(2));
-  });
+      await _pumpUntil(() => _players(model) == 4);
+      expect(_players(model), 4);
+      expect(analyticsCalls, greaterThanOrEqualTo(2));
+    },
+  );
 
   test('stops retrying after the maximum number of attempts', () async {
     var analyticsCalls = 0;
-    HttpRetryClient.setTestClient(SyncMockClient((req) {
-      if (req.url.path.endsWith('/analytics')) {
-        analyticsCalls++;
-        return http.Response(jsonEncode({}), 200); // never ready
-      }
-      return _routePlaysAndCollection(req);
-    }));
+    HttpRetryClient.setTestClient(
+      SyncMockClient((req) {
+        if (req.url.path.endsWith('/analytics')) {
+          analyticsCalls++;
+          return http.Response(jsonEncode({}), 200); // never ready
+        }
+        return _routePlaysAndCollection(req);
+      }),
+    );
     final model = AppModel();
     addTearDown(model.dispose);
     await model.addItem(Item('teqqles'));
@@ -227,7 +252,9 @@ void main() {
     // 1 initial attempt + at most 5 bounded retries.
     expect(settled, 6);
     expect(analyticsCalls, 6);
-    expect(_players(model),
-        Settings.filterNumberOfPlayers.value); // untouched default
+    expect(
+      _players(model),
+      Settings.filterNumberOfPlayers.value,
+    ); // untouched default
   });
 }

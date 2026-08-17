@@ -4,6 +4,7 @@ library;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:how_many_mobile_meeple/api/http_retry_client.dart';
+
 import '../helpers/sync_mock_client.dart';
 
 void main() {
@@ -26,8 +27,9 @@ void main() {
         }),
       );
 
-      final response =
-          await HttpRetryClient.getWithRetry(Uri.parse('http://test.com/api'));
+      final response = await HttpRetryClient.getWithRetry(
+        Uri.parse('http://test.com/api'),
+      );
 
       expect(response.statusCode, 200);
       expect(response.body, '{"data": "ok"}');
@@ -43,8 +45,9 @@ void main() {
         }),
       );
 
-      final response =
-          await HttpRetryClient.getWithRetry(Uri.parse('http://test.com/api'));
+      final response = await HttpRetryClient.getWithRetry(
+        Uri.parse('http://test.com/api'),
+      );
 
       expect(response.statusCode, 404);
       expect(callCount, 1);
@@ -62,8 +65,9 @@ void main() {
         }),
       );
 
-      final response =
-          await HttpRetryClient.getWithRetry(Uri.parse('http://test.com/api'));
+      final response = await HttpRetryClient.getWithRetry(
+        Uri.parse('http://test.com/api'),
+      );
 
       expect(response.statusCode, 200);
       expect(callCount, 3);
@@ -117,22 +121,24 @@ void main() {
       expect(capturedHeaders!['Accept-Encoding'], 'br');
     });
 
-    test('does not send Accept-Encoding gzip for cors-proxy requests',
-        () async {
-      Map<String, String>? capturedHeaders;
-      HttpRetryClient.setTestClient(
-        SyncMockClient((request) {
-          capturedHeaders = request.headers;
-          return http.Response('ok', 200);
-        }),
-      );
+    test(
+      'does not send Accept-Encoding gzip for cors-proxy requests',
+      () async {
+        Map<String, String>? capturedHeaders;
+        HttpRetryClient.setTestClient(
+          SyncMockClient((request) {
+            capturedHeaders = request.headers;
+            return http.Response('ok', 200);
+          }),
+        );
 
-      await HttpRetryClient.getWithRetry(
-        Uri.parse('http://test.com/cors-proxy/_abc123'),
-      );
+        await HttpRetryClient.getWithRetry(
+          Uri.parse('http://test.com/cors-proxy/_abc123'),
+        );
 
-      expect(capturedHeaders!.containsKey('Accept-Encoding'), isFalse);
-    });
+        expect(capturedHeaders!.containsKey('Accept-Encoding'), isFalse);
+      },
+    );
 
     test('returns non-retryable error status immediately', () async {
       int callCount = 0;
@@ -143,8 +149,9 @@ void main() {
         }),
       );
 
-      final response =
-          await HttpRetryClient.getWithRetry(Uri.parse('http://test.com/api'));
+      final response = await HttpRetryClient.getWithRetry(
+        Uri.parse('http://test.com/api'),
+      );
 
       expect(response.statusCode, 500);
       expect(callCount, 1);
@@ -232,9 +239,7 @@ void main() {
       );
     });
 
-    test(
-        'does not retry non-retryable status even if server returns it repeatedly',
-        () async {
+    test('does not retry non-retryable status even if server returns it repeatedly', () async {
       int callCount = 0;
       HttpRetryClient.setTestClient(
         SyncMockClient((_) {

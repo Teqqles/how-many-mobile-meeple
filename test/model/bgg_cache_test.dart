@@ -37,11 +37,13 @@ main() {
     });
   });
   group('isStale', () {
-    test('returns false when the given duration is beyond the current time',
-        () {
-      var cache = BggCache(games, duration);
-      expect(cache.isStale(), false);
-    });
+    test(
+      'returns false when the given duration is beyond the current time',
+      () {
+        var cache = BggCache(games, duration);
+        expect(cache.isStale(), false);
+      },
+    );
     test('returns true when the given duration is in the past', () {
       var cache = BggCache(games, -duration);
       expect(cache.isStale(), true);
@@ -137,13 +139,15 @@ main() {
       var cache = BggCache(games, duration);
       expect(cache.random, TypeMatcher<Game>());
     });
-    test('returns a different game when called multiple times if available',
-        () {
-      var cache = BggCache(games, duration);
-      var first = cache.random;
-      var second = cache.random;
-      expect(second != first, true);
-    });
+    test(
+      'returns a different game when called multiple times if available',
+      () {
+        var cache = BggCache(games, duration);
+        var first = cache.random;
+        var second = cache.random;
+        expect(second != first, true);
+      },
+    );
     test('returns the same random game when only one available', () {
       var cache = BggCache(Games(gamesByName: {game1.name: game1}), duration);
       var first = cache.random;
@@ -167,36 +171,45 @@ main() {
     });
   });
   group('random does not exhaust the collection', () {
-    test('keeps returning games when rolled far more times than the pool size',
-        () {
-      var cache = BggCache(games, duration);
+    test(
+      'keeps returning games when rolled far more times than the pool size',
+      () {
+        var cache = BggCache(games, duration);
 
-      // Two games in the pool; roll many times over. The pool must replenish
-      // rather than run dry and start returning null.
-      for (var i = 0; i < 50; i++) {
-        expect(cache.random, TypeMatcher<Game>(),
-            reason: 'roll $i should still yield a game');
-      }
-    });
+        // Two games in the pool; roll many times over. The pool must replenish
+        // rather than run dry and start returning null.
+        for (var i = 0; i < 50; i++) {
+          expect(
+            cache.random,
+            TypeMatcher<Game>(),
+            reason: 'roll $i should still yield a game',
+          );
+        }
+      },
+    );
 
-    test('replenished pool still only ever selects games from the collection',
-        () {
-      var cache = BggCache(games, duration);
-      final validIds = {game1.id, game2.id};
+    test(
+      'replenished pool still only ever selects games from the collection',
+      () {
+        var cache = BggCache(games, duration);
+        final validIds = {game1.id, game2.id};
 
-      for (var i = 0; i < 50; i++) {
-        final game = cache.random!;
-        expect(validIds.contains(game.id), true);
-      }
-    });
+        for (var i = 0; i < 50; i++) {
+          final game = cache.random!;
+          expect(validIds.contains(game.id), true);
+        }
+      },
+    );
 
-    test('single-game collection keeps returning that game on repeated rolls',
-        () {
-      var cache = BggCache(Games(gamesByName: {game1.name: game1}), duration);
+    test(
+      'single-game collection keeps returning that game on repeated rolls',
+      () {
+        var cache = BggCache(Games(gamesByName: {game1.name: game1}), duration);
 
-      for (var i = 0; i < 10; i++) {
-        expect(cache.random, game1);
-      }
-    });
+        for (var i = 0; i < 10; i++) {
+          expect(cache.random, game1);
+        }
+      },
+    );
   });
 }

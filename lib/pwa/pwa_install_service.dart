@@ -42,8 +42,8 @@ class PwaInstallService {
     if (!isWeb) return;
     try {
       if (onResult != null) {
-        js.context['_pwaInstallResultCallback'] =
-            (bool accepted) => onResult(accepted);
+        js.context['_pwaInstallResultCallback'] = (bool accepted) =>
+            onResult(accepted);
       }
       js.context.callMethod('triggerPwaInstall');
     } catch (_) {}

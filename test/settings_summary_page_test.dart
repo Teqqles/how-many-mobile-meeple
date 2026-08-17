@@ -12,9 +12,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 Widget _buildTestWidget(AppModel model) {
   return ChangeNotifierProvider<AppModel>.value(
     value: model,
-    child: MaterialApp(
-      home: SettingsSummaryPage(),
-    ),
+    child: MaterialApp(home: SettingsSummaryPage()),
   );
 }
 
@@ -61,8 +59,9 @@ void main() {
 
     testWidgets('shows correct player count value', (tester) async {
       final model = AppModel();
-      final setting =
-          model.settings.setting(Settings.filterNumberOfPlayers.name);
+      final setting = model.settings.setting(
+        Settings.filterNumberOfPlayers.name,
+      );
       setting.value = 3;
       setting.enabled = true;
       model.settings.updateSetting(setting);
@@ -75,8 +74,9 @@ void main() {
 
     testWidgets('shows singular player label for 1 player', (tester) async {
       final model = AppModel();
-      final setting =
-          model.settings.setting(Settings.filterNumberOfPlayers.name);
+      final setting = model.settings.setting(
+        Settings.filterNumberOfPlayers.name,
+      );
       setting.value = 1;
       setting.enabled = true;
       model.settings.updateSetting(setting);

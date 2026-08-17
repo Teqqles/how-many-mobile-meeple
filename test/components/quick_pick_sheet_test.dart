@@ -13,6 +13,7 @@ import 'package:how_many_mobile_meeple/model/model.dart';
 import 'package:how_many_mobile_meeple/model/settings.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
 import '../helpers/sync_mock_client.dart';
 
 Widget _buildTestApp({AppModel? model}) {
@@ -122,10 +123,7 @@ void main() {
       await tester.pumpAndSettle();
 
       final chip = tester.widget<ChoiceChip>(
-        find.ancestor(
-          of: find.text('3-4'),
-          matching: find.byType(ChoiceChip),
-        ),
+        find.ancestor(of: find.text('3-4'), matching: find.byType(ChoiceChip)),
       );
       expect(chip.selected, isTrue);
     });
@@ -141,16 +139,14 @@ void main() {
       await tester.pumpAndSettle();
 
       final chip = tester.widget<ChoiceChip>(
-        find.ancestor(
-          of: find.text('3-4'),
-          matching: find.byType(ChoiceChip),
-        ),
+        find.ancestor(of: find.text('3-4'), matching: find.byType(ChoiceChip)),
       );
       expect(chip.selected, isFalse);
     });
 
-    testWidgets('Go button is disabled when no source is added',
-        (tester) async {
+    testWidgets('Go button is disabled when no source is added', (
+      tester,
+    ) async {
       final model = AppModel();
       await tester.pumpWidget(_buildTestApp(model: model));
       await tester.tap(find.text('Open'));
@@ -173,8 +169,9 @@ void main() {
       await tester.tap(find.text('Go!'));
       await tester.pumpAndSettle();
 
-      final playerSetting =
-          model.settings.setting(Settings.filterNumberOfPlayers.name);
+      final playerSetting = model.settings.setting(
+        Settings.filterNumberOfPlayers.name,
+      );
       expect(playerSetting.value, 5);
       expect(playerSetting.enabled, isTrue);
     });
@@ -191,10 +188,12 @@ void main() {
       await tester.tap(find.text('Go!'));
       await tester.pumpAndSettle();
 
-      final maxTimeSetting =
-          model.settings.setting(Settings.filterMaximumTimeToPlay.name);
-      final minTimeSetting =
-          model.settings.setting(Settings.filterMinimumTimeToPlay.name);
+      final maxTimeSetting = model.settings.setting(
+        Settings.filterMaximumTimeToPlay.name,
+      );
+      final minTimeSetting = model.settings.setting(
+        Settings.filterMinimumTimeToPlay.name,
+      );
       expect(maxTimeSetting.value, 60);
       expect(minTimeSetting.value, 30);
       expect(maxTimeSetting.enabled, isTrue);
@@ -213,8 +212,9 @@ void main() {
       await tester.tap(find.text('Go!'));
       await tester.pumpAndSettle();
 
-      final complexitySetting =
-          model.settings.setting(Settings.filterComplexity.name);
+      final complexitySetting = model.settings.setting(
+        Settings.filterComplexity.name,
+      );
       expect(complexitySetting.value, 5.0);
       expect(complexitySetting.enabled, isTrue);
     });
@@ -223,20 +223,23 @@ void main() {
       final model = AppModel();
       await model.addItem(Item('testuser'));
 
-      final playerSetting =
-          model.settings.setting(Settings.filterNumberOfPlayers.name);
+      final playerSetting = model.settings.setting(
+        Settings.filterNumberOfPlayers.name,
+      );
       playerSetting.value = 4;
       playerSetting.enabled = true;
       model.settings.updateSetting(playerSetting);
 
-      final maxTimeSetting =
-          model.settings.setting(Settings.filterMaximumTimeToPlay.name);
+      final maxTimeSetting = model.settings.setting(
+        Settings.filterMaximumTimeToPlay.name,
+      );
       maxTimeSetting.value = 90;
       maxTimeSetting.enabled = true;
       model.settings.updateSetting(maxTimeSetting);
 
-      final complexitySetting =
-          model.settings.setting(Settings.filterComplexity.name);
+      final complexitySetting = model.settings.setting(
+        Settings.filterComplexity.name,
+      );
       complexitySetting.value = 2.0;
       complexitySetting.enabled = true;
       model.settings.updateSetting(complexitySetting);
@@ -252,27 +255,35 @@ void main() {
 
       final timeChip = tester.widget<ChoiceChip>(
         find.ancestor(
-            of: find.text('~60 min'), matching: find.byType(ChoiceChip)),
+          of: find.text('~60 min'),
+          matching: find.byType(ChoiceChip),
+        ),
       );
       expect(timeChip.selected, isTrue);
 
       final weightChip = tester.widget<ChoiceChip>(
         find.ancestor(
-            of: find.text('Light'), matching: find.byType(ChoiceChip)),
+          of: find.text('Light'),
+          matching: find.byType(ChoiceChip),
+        ),
       );
       expect(weightChip.selected, isTrue);
     });
 
-    testWidgets('Go button without selections does not alter filters',
-        (tester) async {
+    testWidgets('Go button without selections does not alter filters', (
+      tester,
+    ) async {
       final model = AppModel();
       await model.addItem(Item('testuser'));
-      final defaultPlayers =
-          model.settings.setting(Settings.filterNumberOfPlayers.name).value;
-      final defaultMaxTime =
-          model.settings.setting(Settings.filterMaximumTimeToPlay.name).value;
-      final defaultComplexity =
-          model.settings.setting(Settings.filterComplexity.name).value;
+      final defaultPlayers = model.settings
+          .setting(Settings.filterNumberOfPlayers.name)
+          .value;
+      final defaultMaxTime = model.settings
+          .setting(Settings.filterMaximumTimeToPlay.name)
+          .value;
+      final defaultComplexity = model.settings
+          .setting(Settings.filterComplexity.name)
+          .value;
 
       await tester.pumpWidget(_buildTestApp(model: model));
       await tester.tap(find.text('Open'));
@@ -280,30 +291,38 @@ void main() {
       await tester.tap(find.text('Go!'));
       await tester.pumpAndSettle();
 
-      expect(model.settings.setting(Settings.filterNumberOfPlayers.name).value,
-          defaultPlayers);
       expect(
-          model.settings.setting(Settings.filterMaximumTimeToPlay.name).value,
-          defaultMaxTime);
-      expect(model.settings.setting(Settings.filterComplexity.name).value,
-          defaultComplexity);
+        model.settings.setting(Settings.filterNumberOfPlayers.name).value,
+        defaultPlayers,
+      );
+      expect(
+        model.settings.setting(Settings.filterMaximumTimeToPlay.name).value,
+        defaultMaxTime,
+      );
+      expect(
+        model.settings.setting(Settings.filterComplexity.name).value,
+        defaultComplexity,
+      );
     });
 
     Future<AppModel> _modelWithMechanics(WidgetTester tester) async {
       final model = AppModel();
       await model.addItem(Item('testuser'));
       await model.analyticsSeedFuture;
-      model.setCollectionAnalyticsForTest(CollectionAnalytics.fromJson({
-        'top_mechanics': [
-          {'name': 'Hand Management', 'count': 43},
-          {'name': 'Set Collection', 'count': 39},
-        ]
-      }));
+      model.setCollectionAnalyticsForTest(
+        CollectionAnalytics.fromJson({
+          'top_mechanics': [
+            {'name': 'Hand Management', 'count': 43},
+            {'name': 'Set Collection', 'count': 39},
+          ],
+        }),
+      );
       return model;
     }
 
-    testWidgets('hides the mechanics row when analytics are absent',
-        (tester) async {
+    testWidgets('hides the mechanics row when analytics are absent', (
+      tester,
+    ) async {
       final model = AppModel();
       await model.addItem(Item('testuser'));
       await tester.pumpWidget(_buildTestApp(model: model));
@@ -313,8 +332,9 @@ void main() {
       expect(find.text('Mechanics'), findsNothing);
     });
 
-    testWidgets('shows top-mechanic chips when analytics are present',
-        (tester) async {
+    testWidgets('shows top-mechanic chips when analytics are present', (
+      tester,
+    ) async {
       final model = await _modelWithMechanics(tester);
       await tester.pumpWidget(_buildTestApp(model: model));
       await tester.tap(find.text('Open'));
@@ -356,8 +376,9 @@ void main() {
       expect(find.byIcon(Icons.shelves), findsOneWidget);
     });
 
-    testWidgets('Unplayed toggle disabled without primary player',
-        (tester) async {
+    testWidgets('Unplayed toggle disabled without primary player', (
+      tester,
+    ) async {
       final model = AppModel();
       await model.addItem(Item('trending', itemType: ItemType.hotList));
       await tester.pumpWidget(_buildTestApp(model: model));
@@ -381,8 +402,9 @@ void main() {
       await tester.tap(find.text('Go!'));
       await tester.pumpAndSettle();
 
-      final setting =
-          model.settings.setting(Settings.filterShelfOfShameOnly.name);
+      final setting = model.settings.setting(
+        Settings.filterShelfOfShameOnly.name,
+      );
       expect(setting.enabled, isTrue);
       expect(setting.getBool(), isTrue);
     });
@@ -390,8 +412,9 @@ void main() {
     testWidgets('restores Unplayed toggle from model', (tester) async {
       final model = AppModel();
       await model.addItem(Item('testuser'));
-      final setting =
-          model.settings.setting(Settings.filterShelfOfShameOnly.name);
+      final setting = model.settings.setting(
+        Settings.filterShelfOfShameOnly.name,
+      );
       setting.value = true;
       setting.enabled = true;
       model.settings.updateSetting(setting);

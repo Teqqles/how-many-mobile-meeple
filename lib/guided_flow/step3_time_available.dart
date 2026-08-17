@@ -38,10 +38,12 @@ class _Step3TimeAvailableState extends State<Step3TimeAvailable> {
   Widget build(BuildContext context) {
     return Consumer<AppModel>(
       builder: (context, model, child) {
-        final minTimeSetting =
-            model.settings.setting(Settings.filterMinimumTimeToPlay.name);
-        final maxTimeSetting =
-            model.settings.setting(Settings.filterMaximumTimeToPlay.name);
+        final minTimeSetting = model.settings.setting(
+          Settings.filterMinimumTimeToPlay.name,
+        );
+        final maxTimeSetting = model.settings.setting(
+          Settings.filterMaximumTimeToPlay.name,
+        );
 
         final minTime = minTimeSetting.getInt();
         final maxTime = maxTimeSetting.getInt();
@@ -70,21 +72,21 @@ class _Step3TimeAvailableState extends State<Step3TimeAvailable> {
                         AppCommon.minutesToTime(minTime) +
                             ' - ' +
                             AppCommon.minutesToTime(maxTime),
-                        style:
-                            Theme.of(context).textTheme.displayMedium?.copyWith(
-                                  color: Theme.of(context).colorScheme.primary,
-                                  fontWeight: FontWeight.bold,
-                                ),
+                        style: Theme.of(context).textTheme.displayMedium
+                            ?.copyWith(
+                              color: Theme.of(context).colorScheme.primary,
+                              fontWeight: FontWeight.bold,
+                            ),
                       ),
                       const SizedBox(height: 8),
                       Text(
                         _getSemanticLabel(maxTime),
-                        style:
-                            Theme.of(context).textTheme.titleMedium?.copyWith(
-                                  color: Theme.of(context)
-                                      .colorScheme
-                                      .onSurfaceVariant,
-                                ),
+                        style: Theme.of(context).textTheme.titleMedium
+                            ?.copyWith(
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSurfaceVariant,
+                            ),
                       ),
                     ],
                   ),
@@ -127,17 +129,15 @@ class _Step3TimeAvailableState extends State<Step3TimeAvailable> {
                       'Quick\n(15m)',
                       textAlign: TextAlign.center,
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color:
-                                Theme.of(context).colorScheme.onSurfaceVariant,
-                          ),
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
                     ),
                     Text(
                       'Epic\n(5h)',
                       textAlign: TextAlign.center,
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color:
-                                Theme.of(context).colorScheme.onSurfaceVariant,
-                          ),
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
                     ),
                   ],
                 ),
@@ -158,9 +158,8 @@ class _Step3TimeAvailableState extends State<Step3TimeAvailable> {
                 // Quick select chips
                 Text(
                   'Quick Select',
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
+                  style: Theme.of(context).textTheme.titleMedium
+                      ?.copyWith(fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 12),
 
@@ -185,8 +184,9 @@ class _Step3TimeAvailableState extends State<Step3TimeAvailable> {
                       onSelected: (selected) {
                         if (selected) {
                           setState(() {
-                            minTimeSetting.value =
-                                Settings.inferMinTime(targetTime);
+                            minTimeSetting.value = Settings.inferMinTime(
+                              targetTime,
+                            );
                             maxTimeSetting.value = targetTime;
                             minTimeSetting.enabled = true;
                             maxTimeSetting.enabled = true;

@@ -62,16 +62,14 @@ class AboutPage extends StatelessWidget {
         const SizedBox(height: 12),
         Text(
           'How Many Meeple?',
-          style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
+          style: Theme.of(context).textTheme.headlineSmall
+              ?.copyWith(fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 4),
         Text(
           'v$version',
-          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: Theme.of(context).disabledColor,
-              ),
+          style: Theme.of(context).textTheme.bodyMedium
+              ?.copyWith(color: Theme.of(context).disabledColor),
         ),
       ],
     );
@@ -86,9 +84,8 @@ class AboutPage extends StatelessWidget {
           children: [
             Text(
               'About',
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
+              style: Theme.of(context).textTheme.titleMedium
+                  ?.copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
             const Text(
@@ -111,9 +108,8 @@ class AboutPage extends StatelessWidget {
           children: [
             Text(
               "What's New",
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
+              style: Theme.of(context).textTheme.titleMedium
+                  ?.copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
             if (changes.isEmpty)
@@ -122,27 +118,27 @@ class AboutPage extends StatelessWidget {
                 style: TextStyle(color: Theme.of(context).disabledColor),
               )
             else
-              ...changes.map((change) => Padding(
-                    padding: const EdgeInsets.only(bottom: 6),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Icon(
-                          change['type'] == 'feat'
-                              ? Icons.auto_awesome
-                              : Icons.build,
-                          size: 16,
-                          color: change['type'] == 'feat'
-                              ? Theme.of(context).colorScheme.primary
-                              : Theme.of(context).colorScheme.tertiary,
-                        ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Text(change['description'] as String),
-                        ),
-                      ],
-                    ),
-                  )),
+              ...changes.map(
+                (change) => Padding(
+                  padding: const EdgeInsets.only(bottom: 6),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Icon(
+                        change['type'] == 'feat'
+                            ? Icons.auto_awesome
+                            : Icons.build,
+                        size: 16,
+                        color: change['type'] == 'feat'
+                            ? Theme.of(context).colorScheme.primary
+                            : Theme.of(context).colorScheme.tertiary,
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(child: Text(change['description'] as String)),
+                    ],
+                  ),
+                ),
+              ),
           ],
         ),
       ),
@@ -150,10 +146,12 @@ class AboutPage extends StatelessWidget {
   }
 
   Widget _buildUpcoming(BuildContext context, List<dynamic> issues) {
-    final bugs =
-        issues.where((i) => (i['labels'] as List).contains('bug')).toList();
-    final features =
-        issues.where((i) => !(i['labels'] as List).contains('bug')).toList();
+    final bugs = issues
+        .where((i) => (i['labels'] as List).contains('bug'))
+        .toList();
+    final features = issues
+        .where((i) => !(i['labels'] as List).contains('bug'))
+        .toList();
 
     return Card(
       child: Padding(
@@ -163,59 +161,60 @@ class AboutPage extends StatelessWidget {
           children: [
             Text(
               'Coming Soon',
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
+              style: Theme.of(context).textTheme.titleMedium
+                  ?.copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
             if (features.isNotEmpty) ...[
               Text(
                 'Features',
-                style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                      color: Theme.of(context).colorScheme.primary,
-                    ),
+                style: Theme.of(context).textTheme.labelLarge
+                    ?.copyWith(color: Theme.of(context).colorScheme.primary),
               ),
               const SizedBox(height: 4),
-              ...features.map((issue) => Padding(
-                    padding: const EdgeInsets.only(bottom: 4),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Icon(Icons.lightbulb_outline,
-                            size: 16,
-                            color: Theme.of(context).colorScheme.primary),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Text(issue['title'] as String),
-                        ),
-                      ],
-                    ),
-                  )),
+              ...features.map(
+                (issue) => Padding(
+                  padding: const EdgeInsets.only(bottom: 4),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Icon(
+                        Icons.lightbulb_outline,
+                        size: 16,
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(child: Text(issue['title'] as String)),
+                    ],
+                  ),
+                ),
+              ),
             ],
             if (bugs.isNotEmpty) ...[
               const SizedBox(height: 12),
               Text(
                 'Bug Fixes',
-                style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                      color: Theme.of(context).colorScheme.error,
-                    ),
+                style: Theme.of(context).textTheme.labelLarge
+                    ?.copyWith(color: Theme.of(context).colorScheme.error),
               ),
               const SizedBox(height: 4),
-              ...bugs.map((issue) => Padding(
-                    padding: const EdgeInsets.only(bottom: 4),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Icon(Icons.bug_report_outlined,
-                            size: 16,
-                            color: Theme.of(context).colorScheme.error),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Text(issue['title'] as String),
-                        ),
-                      ],
-                    ),
-                  )),
+              ...bugs.map(
+                (issue) => Padding(
+                  padding: const EdgeInsets.only(bottom: 4),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Icon(
+                        Icons.bug_report_outlined,
+                        size: 16,
+                        color: Theme.of(context).colorScheme.error,
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(child: Text(issue['title'] as String)),
+                    ],
+                  ),
+                ),
+              ),
             ],
           ],
         ),
@@ -239,32 +238,35 @@ class AboutPage extends StatelessWidget {
           children: [
             Text(
               'Contributors',
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
+              style: Theme.of(context).textTheme.titleMedium
+                  ?.copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
-            ...contributors.map((c) => Padding(
-                  padding: const EdgeInsets.only(bottom: 6),
-                  child: InkWell(
-                    onTap: () => _launchUrl(c['url']!),
-                    child: Row(
-                      children: [
-                        Icon(Icons.person_outline,
-                            size: 16,
-                            color: Theme.of(context).colorScheme.primary),
-                        const SizedBox(width: 8),
-                        Text(
-                          c['name']!,
-                          style: TextStyle(
-                            color: Theme.of(context).colorScheme.primary,
-                            decoration: TextDecoration.underline,
-                          ),
+            ...contributors.map(
+              (c) => Padding(
+                padding: const EdgeInsets.only(bottom: 6),
+                child: InkWell(
+                  onTap: () => _launchUrl(c['url']!),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.person_outline,
+                        size: 16,
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        c['name']!,
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.primary,
+                          decoration: TextDecoration.underline,
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
-                )),
+                ),
+              ),
+            ),
           ],
         ),
       ),
@@ -293,32 +295,35 @@ class AboutPage extends StatelessWidget {
           children: [
             Text(
               'Source Code',
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
+              style: Theme.of(context).textTheme.titleMedium
+                  ?.copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
-            ...links.map((link) => Padding(
-                  padding: const EdgeInsets.only(bottom: 6),
-                  child: InkWell(
-                    onTap: () => _launchUrl(link['url'] as String),
-                    child: Row(
-                      children: [
-                        Icon(link['icon'] as IconData,
-                            size: 16,
-                            color: Theme.of(context).colorScheme.primary),
-                        const SizedBox(width: 8),
-                        Text(
-                          link['label'] as String,
-                          style: TextStyle(
-                            color: Theme.of(context).colorScheme.primary,
-                            decoration: TextDecoration.underline,
-                          ),
+            ...links.map(
+              (link) => Padding(
+                padding: const EdgeInsets.only(bottom: 6),
+                child: InkWell(
+                  onTap: () => _launchUrl(link['url'] as String),
+                  child: Row(
+                    children: [
+                      Icon(
+                        link['icon'] as IconData,
+                        size: 16,
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        link['label'] as String,
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.primary,
+                          decoration: TextDecoration.underline,
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
-                )),
+                ),
+              ),
+            ),
           ],
         ),
       ),

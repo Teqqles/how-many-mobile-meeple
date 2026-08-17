@@ -26,27 +26,30 @@ class PlayerFilterWidget extends StatelessWidget {
                   height: 35,
                   width: MediaQuery.of(context).size.width * 0.60,
                   child: Slider(
-                      activeColor: Theme.of(context).colorScheme.secondary,
-                      min: 1.0,
-                      max: 10.0,
-                      divisions: 10,
-                      onChanged: !model.settings
-                              .setting(Settings.filterNumberOfPlayers.name)
-                              .enabled
-                          ? null
-                          : (players) {
-                              model.settings
-                                  .setting(Settings.filterNumberOfPlayers.name)
-                                  .value = players.floor();
-                              model.updateStoreDebounced();
-                              model.invalidateCache();
-                            },
-                      value: model.settings
-                          .setting(Settings.filterNumberOfPlayers.name)
-                          .getInt()
-                          .toDouble(),
-                      label:
-                          "${model.settings.setting(Settings.filterNumberOfPlayers.name).value.toString()} players"),
+                    activeColor: Theme.of(context).colorScheme.secondary,
+                    min: 1.0,
+                    max: 10.0,
+                    divisions: 10,
+                    onChanged:
+                        !model.settings
+                            .setting(Settings.filterNumberOfPlayers.name)
+                            .enabled
+                        ? null
+                        : (players) {
+                            model.settings
+                                .setting(Settings.filterNumberOfPlayers.name)
+                                .value = players
+                                .floor();
+                            model.updateStoreDebounced();
+                            model.invalidateCache();
+                          },
+                    value: model.settings
+                        .setting(Settings.filterNumberOfPlayers.name)
+                        .getInt()
+                        .toDouble(),
+                    label:
+                        "${model.settings.setting(Settings.filterNumberOfPlayers.name).value.toString()} players",
+                  ),
                 ),
                 FilterValueBadge(
                   value: model.settings
@@ -59,7 +62,7 @@ class PlayerFilterWidget extends StatelessWidget {
                 ),
               ],
             ),
-          )
+          ),
         ],
       ),
     );

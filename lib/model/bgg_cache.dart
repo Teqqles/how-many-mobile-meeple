@@ -78,7 +78,7 @@ class BggCache {
   Game? get lastRandom => _validatedSticky ?? random;
 
   BggCache(this._games, this._durationMinutes, {ClockFunction? clock})
-      : _clock = clock ?? DateTime.now {
+    : _clock = clock ?? DateTime.now {
     refreshCacheTimestamp();
     _remainingPool = _buildWeightedPool();
   }
@@ -125,7 +125,8 @@ class BggCache {
   void makeStale() => this._cacheTimestamp = 0;
 
   void refreshCacheTimestamp() {
-    this._cacheTimestamp = epochToSeconds(_clock().millisecondsSinceEpoch) +
+    this._cacheTimestamp =
+        epochToSeconds(_clock().millisecondsSinceEpoch) +
         (this.durationInMinutes * 60);
   }
 }

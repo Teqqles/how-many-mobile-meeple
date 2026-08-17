@@ -12,77 +12,91 @@ class DrawerSavedSetting extends Container {
   final AppPreferences preferences;
 
   DrawerSavedSetting(
-      this.preferencesTitle, this.preferences, BuildContext context,
-      {int index = 0, PreferencesHistoryInterface? storage})
-      : super(
-          padding:
-              const EdgeInsets.only(top: 12, bottom: 12, left: 8, right: 8),
-          decoration: BoxDecoration(
-              color: index % 2 == 0
-                  ? Theme.of(context).highlightColor
-                  : Theme.of(context).colorScheme.surface,
-              border: Border(
-                  bottom: BorderSide(
-                      width: 1,
-                      color: index % 2 == 0
-                          ? Theme.of(context).highlightColor
-                          : Theme.of(context).colorScheme.surface))),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              InkWell(
-                child: Text(
-                  preferencesTitle,
-                  textAlign: TextAlign.left,
-                  style: TextStyle(
-                      fontSize: 13, decoration: TextDecoration.underline),
-                ),
-                onTap: () async {
-                  var model = AppModel.of(context, listen: false);
+    this.preferencesTitle,
+    this.preferences,
+    BuildContext context, {
+    int index = 0,
+    PreferencesHistoryInterface? storage,
+  }) : super(
+         padding: const EdgeInsets.only(top: 12, bottom: 12, left: 8, right: 8),
+         decoration: BoxDecoration(
+           color: index % 2 == 0
+               ? Theme.of(context).highlightColor
+               : Theme.of(context).colorScheme.surface,
+           border: Border(
+             bottom: BorderSide(
+               width: 1,
+               color: index % 2 == 0
+                   ? Theme.of(context).highlightColor
+                   : Theme.of(context).colorScheme.surface,
+             ),
+           ),
+         ),
+         child: Row(
+           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+           children: <Widget>[
+             InkWell(
+               child: Text(
+                 preferencesTitle,
+                 textAlign: TextAlign.left,
+                 style: TextStyle(
+                   fontSize: 13,
+                   decoration: TextDecoration.underline,
+                 ),
+               ),
+               onTap: () async {
+                 var model = AppModel.of(context, listen: false);
 
-                  // Capture navigator before async operations
-                  final navigator = Navigator.of(context);
+                 // Capture navigator before async operations
+                 final navigator = Navigator.of(context);
 
-                  await model.replaceItems(preferences.items);
-                  await model.replaceSettings(preferences.settings);
-                  model.refreshState();
-                  navigator.pop();
+                 await model.replaceItems(preferences.items);
+                 await model.replaceSettings(preferences.settings);
+                 model.refreshState();
+                 navigator.pop();
 
-                  // Always show settings summary after loading saved settings
-                  Future.delayed(Duration(milliseconds: 300), () {
-                    navigator.pushNamed(r.Router.settingsRoute);
-                  });
-                },
-              ),
-              IconButton(
-                tooltip: 'Delete',
-                icon: Icon(
-                  Icons.delete,
-                  size: AppCommon.standardIconSize,
-                  color: Theme.of(context).colorScheme.error,
-                ),
-                onPressed: () {
-                  if (preferences.id == null) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                          content: Text('Cannot delete unsaved preference')),
-                    );
-                    return;
-                  }
-                  var model = AppModel.of(context, listen: false);
-                  var db = storage ?? StorageFactory.getPreferencesHistory();
-                  db.deletePreference(preferences.id!);
-                  model.invalidatePreferencesCache();
-                },
-              ),
-            ],
-          ),
-        );
+                 // Always show settings summary after loading saved settings
+                 Future.delayed(Duration(milliseconds: 300), () {
+                   navigator.pushNamed(r.Router.settingsRoute);
+                 });
+               },
+             ),
+             IconButton(
+               tooltip: 'Delete',
+               icon: Icon(
+                 Icons.delete,
+                 size: AppCommon.standardIconSize,
+                 color: Theme.of(context).colorScheme.error,
+               ),
+               onPressed: () {
+                 if (preferences.id == null) {
+                   ScaffoldMessenger.of(context).showSnackBar(
+                     const SnackBar(
+                       content: Text('Cannot delete unsaved preference'),
+                     ),
+                   );
+                   return;
+                 }
+                 var model = AppModel.of(context, listen: false);
+                 var db = storage ?? StorageFactory.getPreferencesHistory();
+                 db.deletePreference(preferences.id!);
+                 model.invalidatePreferencesCache();
+               },
+             ),
+           ],
+         ),
+       );
 
   static DrawerSavedSetting preferencesToDrawerSettings(
-      AppPreferences preferences, BuildContext context,
-      {int index = 0}) {
-    return DrawerSavedSetting(preferences.title, preferences, context,
-        index: index);
+    AppPreferences preferences,
+    BuildContext context, {
+    int index = 0,
+  }) {
+    return DrawerSavedSetting(
+      preferences.title,
+      preferences,
+      context,
+      index: index,
+    );
   }
 }

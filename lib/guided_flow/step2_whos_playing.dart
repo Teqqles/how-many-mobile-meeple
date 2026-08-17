@@ -40,9 +40,9 @@ class _Step2WhosPlayingState extends State<Step2WhosPlaying> {
       child: Text(
         '$best games play best at $players ${players == 1 ? 'player' : 'players'}',
         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: Theme.of(context).colorScheme.primary,
-              fontWeight: FontWeight.bold,
-            ),
+          color: Theme.of(context).colorScheme.primary,
+          fontWeight: FontWeight.bold,
+        ),
       ),
     );
   }
@@ -51,8 +51,9 @@ class _Step2WhosPlayingState extends State<Step2WhosPlaying> {
   Widget build(BuildContext context) {
     return Consumer<AppModel>(
       builder: (context, model, child) {
-        final playerSetting =
-            model.settings.setting(Settings.filterNumberOfPlayers.name);
+        final playerSetting = model.settings.setting(
+          Settings.filterNumberOfPlayers.name,
+        );
         final currentPlayers = playerSetting.getInt();
 
         return Card(
@@ -77,20 +78,20 @@ class _Step2WhosPlayingState extends State<Step2WhosPlaying> {
                     children: [
                       Text(
                         '$currentPlayers',
-                        style:
-                            Theme.of(context).textTheme.displayLarge?.copyWith(
-                                  color: Theme.of(context).colorScheme.primary,
-                                  fontWeight: FontWeight.bold,
-                                ),
+                        style: Theme.of(context).textTheme.displayLarge
+                            ?.copyWith(
+                              color: Theme.of(context).colorScheme.primary,
+                              fontWeight: FontWeight.bold,
+                            ),
                       ),
                       Text(
                         currentPlayers == 1 ? 'player' : 'players',
-                        style:
-                            Theme.of(context).textTheme.titleMedium?.copyWith(
-                                  color: Theme.of(context)
-                                      .colorScheme
-                                      .onSurfaceVariant,
-                                ),
+                        style: Theme.of(context).textTheme.titleMedium
+                            ?.copyWith(
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSurfaceVariant,
+                            ),
                       ),
                       _buildMatchCount(context, model, currentPlayers),
                     ],
@@ -127,16 +128,14 @@ class _Step2WhosPlayingState extends State<Step2WhosPlaying> {
                     Text(
                       '1',
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color:
-                                Theme.of(context).colorScheme.onSurfaceVariant,
-                          ),
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
                     ),
                     Text(
                       '10+',
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color:
-                                Theme.of(context).colorScheme.onSurfaceVariant,
-                          ),
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
                     ),
                   ],
                 ),
@@ -146,9 +145,8 @@ class _Step2WhosPlayingState extends State<Step2WhosPlaying> {
                 // Quick presets
                 Text(
                   'Quick Presets',
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
+                  style: Theme.of(context).textTheme.titleMedium
+                      ?.copyWith(fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 12),
 

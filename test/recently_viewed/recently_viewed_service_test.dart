@@ -30,15 +30,17 @@ void main() {
       expect(service.games.map((g) => g.id), [2, 1]);
     });
 
-    test('viewing a game again moves it to the front without duplicating',
-        () async {
-      final service = await RecentlyViewedService.instance();
-      service.add(game(1));
-      service.add(game(2));
-      service.add(game(3));
-      service.add(game(1));
-      expect(service.games.map((g) => g.id), [1, 3, 2]);
-    });
+    test(
+      'viewing a game again moves it to the front without duplicating',
+      () async {
+        final service = await RecentlyViewedService.instance();
+        service.add(game(1));
+        service.add(game(2));
+        service.add(game(3));
+        service.add(game(1));
+        expect(service.games.map((g) => g.id), [1, 3, 2]);
+      },
+    );
 
     test('re-adding the current most-recent game is a no-op', () async {
       final service = await RecentlyViewedService.instance();
@@ -48,8 +50,11 @@ void main() {
       service.addListener(() => notified = true);
       service.add(game(1));
 
-      expect(notified, isFalse,
-          reason: 're-viewing the front game must not notify or reorder');
+      expect(
+        notified,
+        isFalse,
+        reason: 're-viewing the front game must not notify or reorder',
+      );
       expect(service.games.map((g) => g.id), [1]);
     });
 
@@ -85,8 +90,7 @@ void main() {
 
     test('loads persisted games on init', () async {
       SharedPreferences.setMockInitialValues({
-        'recently_viewed_games':
-            '[{"id":7,"name":"Catan","thumbnail":"t"},{"id":8,"name":"Root","thumbnail":null}]',
+        'recently_viewed_games': '[{"id":7,"name":"Catan","thumbnail":"t"},{"id":8,"name":"Root","thumbnail":null}]',
       });
 
       final service = await RecentlyViewedService.instance();

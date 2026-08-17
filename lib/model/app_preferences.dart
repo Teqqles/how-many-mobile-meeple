@@ -20,16 +20,19 @@ class AppPreferences {
       'id': id,
       'title': title,
       'items': items.itemList.map((item) => item.toJson()).toList(),
-      'settings': settings.allSettings
-          .map((key, value) => MapEntry(key, value.toJson())),
+      'settings': settings.allSettings.map(
+        (key, value) => MapEntry(key, value.toJson()),
+      ),
     };
   }
 
   factory AppPreferences.fromJson(Map<String, dynamic> json) {
-    final itemsList =
-        (json['items'] as List).map((item) => Item.fromJson(item)).toList();
-    final settingsMap = (json['settings'] as Map<String, dynamic>)
-        .map((key, value) => MapEntry(key, Setting.fromJson(value)));
+    final itemsList = (json['items'] as List)
+        .map((item) => Item.fromJson(item))
+        .toList();
+    final settingsMap = (json['settings'] as Map<String, dynamic>).map(
+      (key, value) => MapEntry(key, Setting.fromJson(value)),
+    );
 
     return AppPreferences(
       json['id'],
@@ -49,7 +52,7 @@ class AppPreferences {
     "setting_mechanic",
     "setting_use_all_mechanics",
     "setting_include_expansions",
-    "setting_rating"
+    "setting_rating",
   ];
 
   factory AppPreferences.fromDb(Map<String, dynamic> row) {
@@ -62,11 +65,15 @@ class AppPreferences {
     }
 
     return AppPreferences(
-        row['id'],
-        row['title'],
-        Items.fromDb(json.decode(row['items'])),
-        Settings(Map.fromEntries(
-            settings.map((setting) => MapEntry(setting.name, setting)))));
+      row['id'],
+      row['title'],
+      Items.fromDb(json.decode(row['items'])),
+      Settings(
+        Map.fromEntries(
+          settings.map((setting) => MapEntry(setting.name, setting)),
+        ),
+      ),
+    );
   }
 
   factory AppPreferences.fromModel(AppModel model) {
@@ -74,6 +81,10 @@ class AppPreferences {
         items.itemList.map((item) => item.name).toString();
     String title = model.title ?? titleFromItems(model.items);
     return AppPreferences(
-        title.hashCode.toString(), title, model.items, model.settings);
+      title.hashCode.toString(),
+      title,
+      model.items,
+      model.settings,
+    );
   }
 }

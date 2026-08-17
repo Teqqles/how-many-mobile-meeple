@@ -29,8 +29,9 @@ void main() {
   });
 
   group('Step3TimeAvailable', () {
-    testWidgets('displays header and default time range',
-        (WidgetTester tester) async {
+    testWidgets('displays header and default time range', (
+      WidgetTester tester,
+    ) async {
       final model = AppModel();
 
       await tester.pumpWidget(_buildTestWidget(model));
@@ -50,8 +51,9 @@ void main() {
       expect(find.text('2h+'), findsOneWidget);
     });
 
-    testWidgets('tapping preset chip updates time settings',
-        (WidgetTester tester) async {
+    testWidgets('tapping preset chip updates time settings', (
+      WidgetTester tester,
+    ) async {
       final model = AppModel();
 
       await tester.pumpWidget(_buildTestWidget(model));
@@ -59,21 +61,25 @@ void main() {
       await tester.tap(find.text('60 min'));
       await tester.pump();
 
-      final minSetting =
-          model.settings.setting(Settings.filterMinimumTimeToPlay.name);
-      final maxSetting =
-          model.settings.setting(Settings.filterMaximumTimeToPlay.name);
+      final minSetting = model.settings.setting(
+        Settings.filterMinimumTimeToPlay.name,
+      );
+      final maxSetting = model.settings.setting(
+        Settings.filterMaximumTimeToPlay.name,
+      );
       expect(maxSetting.value, 60);
       expect(minSetting.value, 30);
       expect(minSetting.enabled, true);
       expect(maxSetting.enabled, true);
     });
 
-    testWidgets('displays semantic label for time range',
-        (WidgetTester tester) async {
+    testWidgets('displays semantic label for time range', (
+      WidgetTester tester,
+    ) async {
       final model = AppModel();
-      final maxSetting =
-          model.settings.setting(Settings.filterMaximumTimeToPlay.name);
+      final maxSetting = model.settings.setting(
+        Settings.filterMaximumTimeToPlay.name,
+      );
       maxSetting.value = 60;
       model.settings.updateSetting(maxSetting);
 
@@ -115,11 +121,13 @@ void main() {
       );
     });
 
-    testWidgets('displays Quick label at 30 min boundary',
-        (WidgetTester tester) async {
+    testWidgets('displays Quick label at 30 min boundary', (
+      WidgetTester tester,
+    ) async {
       final model = AppModel();
-      final maxSetting =
-          model.settings.setting(Settings.filterMaximumTimeToPlay.name);
+      final maxSetting = model.settings.setting(
+        Settings.filterMaximumTimeToPlay.name,
+      );
       maxSetting.value = 30;
       model.settings.updateSetting(maxSetting);
 
@@ -128,11 +136,13 @@ void main() {
       expect(find.text('Quick'), findsWidgets);
     });
 
-    testWidgets('displays Epic label at 121+ min boundary',
-        (WidgetTester tester) async {
+    testWidgets('displays Epic label at 121+ min boundary', (
+      WidgetTester tester,
+    ) async {
       final model = AppModel();
-      final maxSetting =
-          model.settings.setting(Settings.filterMaximumTimeToPlay.name);
+      final maxSetting = model.settings.setting(
+        Settings.filterMaximumTimeToPlay.name,
+      );
       maxSetting.value = 150;
       model.settings.updateSetting(maxSetting);
 
@@ -141,8 +151,9 @@ void main() {
       expect(find.text('Epic'), findsWidgets);
     });
 
-    testWidgets('range slider has correct min and max bounds',
-        (WidgetTester tester) async {
+    testWidgets('range slider has correct min and max bounds', (
+      WidgetTester tester,
+    ) async {
       final model = AppModel();
 
       await tester.pumpWidget(_buildTestWidget(model));
@@ -156,19 +167,21 @@ void main() {
 
   group('Step3TimeAvailable playtime distribution', () {
     CollectionAnalytics _dist() => CollectionAnalytics.fromJson({
-          'playtime_distribution': [
-            {'label': 'filler [0, 30)', 'count': 14},
-            {'label': 'short [30, 60)', 'count': 32},
-            {'label': 'medium [60, 90)', 'count': 26},
-            {'label': 'epic [120+)', 'count': 20},
-          ],
-        });
+      'playtime_distribution': [
+        {'label': 'filler [0, 30)', 'count': 14},
+        {'label': 'short [30, 60)', 'count': 32},
+        {'label': 'medium [60, 90)', 'count': 26},
+        {'label': 'epic [120+)', 'count': 20},
+      ],
+    });
 
     void _setRange(AppModel model, int min, int max) {
-      final minSetting =
-          model.settings.setting(Settings.filterMinimumTimeToPlay.name);
-      final maxSetting =
-          model.settings.setting(Settings.filterMaximumTimeToPlay.name);
+      final minSetting = model.settings.setting(
+        Settings.filterMinimumTimeToPlay.name,
+      );
+      final maxSetting = model.settings.setting(
+        Settings.filterMaximumTimeToPlay.name,
+      );
       minSetting.value = min;
       maxSetting.value = max;
       minSetting.enabled = true;
@@ -177,8 +190,9 @@ void main() {
       model.settings.updateSetting(maxSetting);
     }
 
-    testWidgets('shows a labelled count per playtime bucket',
-        (WidgetTester tester) async {
+    testWidgets('shows a labelled count per playtime bucket', (
+      WidgetTester tester,
+    ) async {
       final model = AppModel();
       model.setCollectionAnalyticsForTest(_dist());
 
@@ -189,8 +203,9 @@ void main() {
       expect(find.text('epic 20'), findsOneWidget);
     });
 
-    testWidgets('emphasises the bucket overlapping the selected range',
-        (WidgetTester tester) async {
+    testWidgets('emphasises the bucket overlapping the selected range', (
+      WidgetTester tester,
+    ) async {
       final model = AppModel();
       _setRange(model, 35, 55);
       model.setCollectionAnalyticsForTest(_dist());
@@ -203,8 +218,9 @@ void main() {
       expect(filler.style?.fontWeight, isNot(FontWeight.bold));
     });
 
-    testWidgets('shows nothing when analytics are absent',
-        (WidgetTester tester) async {
+    testWidgets('shows nothing when analytics are absent', (
+      WidgetTester tester,
+    ) async {
       final model = AppModel();
 
       await tester.pumpWidget(_buildTestWidget(model));

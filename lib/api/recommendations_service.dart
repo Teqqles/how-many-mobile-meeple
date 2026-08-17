@@ -1,4 +1,5 @@
 import 'dart:convert';
+
 import 'package:http/http.dart' as http;
 import 'package:how_many_mobile_meeple/app_common.dart';
 import 'package:how_many_mobile_meeple/model/recommendation.dart';
@@ -55,16 +56,14 @@ class RecommendationsService {
     required String key,
   }) async {
     final url = Uri.parse(
-        '${AppCommon.boardGameGeekProxyUrl}/recommendations/from-games');
+      '${AppCommon.boardGameGeekProxyUrl}/recommendations/from-games',
+    );
     final client = _testClient ?? http.Client();
 
     try {
       final response = await client.post(
         url,
-        headers: {
-          ...headers,
-          'Content-Type': 'application/json',
-        },
+        headers: {...headers, 'Content-Type': 'application/json'},
         body: json.encode({
           'game_ids': gameIds,
           'limit': limit,
@@ -77,7 +76,9 @@ class RecommendationsService {
         final list = body['recommendations'] as List<dynamic>;
         final results = list.map((r) => Recommendation.fromJson(r)).toList();
         _cache[key] = _CachedRecommendations(
-            results, DateTime.now().millisecondsSinceEpoch);
+          results,
+          DateTime.now().millisecondsSinceEpoch,
+        );
         return results;
       }
 

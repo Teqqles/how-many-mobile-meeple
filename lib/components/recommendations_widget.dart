@@ -75,7 +75,8 @@ class _RecommendationsWidgetState extends State<RecommendationsWidget> {
                 height: 140,
                 child: LayoutBuilder(
                   builder: (context, constraints) {
-                    final contentWidth = recommendations.length * 100.0 +
+                    final contentWidth =
+                        recommendations.length * 100.0 +
                         (recommendations.length - 1) * 12.0;
                     final needsScroll = contentWidth > constraints.maxWidth;
                     final row = Row(
@@ -88,11 +89,12 @@ class _RecommendationsWidgetState extends State<RecommendationsWidget> {
                     if (needsScroll) {
                       final controller = ScrollController();
                       return ScrollConfiguration(
-                        behavior: ScrollConfiguration.of(context)
-                            .copyWith(dragDevices: {
-                          PointerDeviceKind.touch,
-                          PointerDeviceKind.mouse,
-                        }),
+                        behavior: ScrollConfiguration.of(context).copyWith(
+                          dragDevices: {
+                            PointerDeviceKind.touch,
+                            PointerDeviceKind.mouse,
+                          },
+                        ),
                         child: Scrollbar(
                           controller: controller,
                           thumbVisibility: true,
@@ -135,7 +137,8 @@ class _RecommendationTile extends StatelessWidget {
       cursor: SystemMouseCursors.click,
       child: GestureDetector(
         onTap: () => Navigator.of(context).pushNamed(
-            '${r.Router.gameDetailRoute}/${recommendation.name.replaceAll(' ', '+')}/${recommendation.gameId}'),
+          '${r.Router.gameDetailRoute}/${recommendation.name.replaceAll(' ', '+')}/${recommendation.gameId}',
+        ),
         child: SizedBox(
           width: 100,
           child: Column(
@@ -147,8 +150,10 @@ class _RecommendationTile extends StatelessWidget {
                   width: 100,
                   child: recommendation.game?.imageUrl != null
                       ? Image.network(
-                          _proxyUrl(recommendation.game!.thumbnail ??
-                              recommendation.game!.imageUrl),
+                          _proxyUrl(
+                            recommendation.game!.thumbnail ??
+                                recommendation.game!.imageUrl,
+                          ),
                           fit: BoxFit.cover,
                           errorBuilder: (_, __, ___) =>
                               const Icon(Icons.image_not_supported),

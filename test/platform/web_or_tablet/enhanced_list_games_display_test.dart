@@ -2,6 +2,7 @@
 library;
 
 import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:how_many_mobile_meeple/api/http_retry_client.dart';
@@ -13,10 +14,16 @@ import 'package:how_many_mobile_meeple/model/model.dart';
 import 'package:how_many_mobile_meeple/platform/web_or_tablet/enhanced_list_games_display.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
 import '../../helpers/mock_api_client.dart';
 
-Map<String, dynamic> _gameJson(int id, String name,
-    {double rating = 7.5, int playtime = 60, double weight = 2.5}) {
+Map<String, dynamic> _gameJson(
+  int id,
+  String name, {
+  double rating = 7.5,
+  int playtime = 60,
+  double weight = 2.5,
+}) {
   return {
     'id': id,
     'name': name,
@@ -31,9 +38,7 @@ Map<String, dynamic> _gameJson(int id, String name,
 Widget _buildTestApp(AppModel model) {
   return ChangeNotifierProvider<AppModel>.value(
     value: model,
-    child: MaterialApp(
-      home: EnhancedListGamesDisplayPage(),
-    ),
+    child: MaterialApp(home: EnhancedListGamesDisplayPage()),
   );
 }
 
@@ -58,9 +63,9 @@ void main() {
 
   group('EnhancedListGamesDisplayPage', () {
     testWidgets('shows loading while services initialise', (tester) async {
-      HttpRetryClient.setTestClient(mockApiClient(
-        collection: [_gameJson(1, 'Wingspan')],
-      ));
+      HttpRetryClient.setTestClient(
+        mockApiClient(collection: [_gameJson(1, 'Wingspan')]),
+      );
 
       final model = AppModel();
       model.hasLoadedPersistedData = true;
@@ -73,12 +78,11 @@ void main() {
     });
 
     testWidgets('renders game list after data loads', (tester) async {
-      HttpRetryClient.setTestClient(mockApiClient(
-        collection: [
-          _gameJson(1, 'Wingspan'),
-          _gameJson(2, 'Catan'),
-        ],
-      ));
+      HttpRetryClient.setTestClient(
+        mockApiClient(
+          collection: [_gameJson(1, 'Wingspan'), _gameJson(2, 'Catan')],
+        ),
+      );
 
       final model = AppModel();
       model.hasLoadedPersistedData = true;
@@ -96,15 +100,14 @@ void main() {
         'ignored_games': jsonEncode([
           {'id': 1, 'name': 'Wingspan'},
           {'id': 2, 'name': 'Catan'},
-        ])
+        ]),
       });
 
-      HttpRetryClient.setTestClient(mockApiClient(
-        collection: [
-          _gameJson(1, 'Wingspan'),
-          _gameJson(2, 'Catan'),
-        ],
-      ));
+      HttpRetryClient.setTestClient(
+        mockApiClient(
+          collection: [_gameJson(1, 'Wingspan'), _gameJson(2, 'Catan')],
+        ),
+      );
 
       final model = AppModel();
       model.hasLoadedPersistedData = true;
@@ -121,15 +124,14 @@ void main() {
         'ignored_games': jsonEncode([
           {'id': 1, 'name': 'Wingspan'},
           {'id': 2, 'name': 'Catan'},
-        ])
+        ]),
       });
 
-      HttpRetryClient.setTestClient(mockApiClient(
-        collection: [
-          _gameJson(1, 'Wingspan'),
-          _gameJson(2, 'Catan'),
-        ],
-      ));
+      HttpRetryClient.setTestClient(
+        mockApiClient(
+          collection: [_gameJson(1, 'Wingspan'), _gameJson(2, 'Catan')],
+        ),
+      );
 
       final model = AppModel();
       model.hasLoadedPersistedData = true;
@@ -160,12 +162,11 @@ void main() {
     });
 
     testWidgets('name sort header is present', (tester) async {
-      HttpRetryClient.setTestClient(mockApiClient(
-        collection: [
-          _gameJson(1, 'Wingspan'),
-          _gameJson(2, 'Catan'),
-        ],
-      ));
+      HttpRetryClient.setTestClient(
+        mockApiClient(
+          collection: [_gameJson(1, 'Wingspan'), _gameJson(2, 'Catan')],
+        ),
+      );
 
       final model = AppModel();
       model.hasLoadedPersistedData = true;

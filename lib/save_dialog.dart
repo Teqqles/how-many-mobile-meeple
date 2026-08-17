@@ -19,9 +19,7 @@ class SaveDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Dialog(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(40),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(40)),
       elevation: 0.0,
       backgroundColor: Colors.transparent,
       child: dialogContent(context),
@@ -41,7 +39,9 @@ class SaveDialog extends StatelessWidget {
                 color: Theme.of(context).colorScheme.secondary,
                 shape: BoxShape.rectangle,
                 borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(8), topRight: Radius.circular(8)),
+                  topLeft: Radius.circular(8),
+                  topRight: Radius.circular(8),
+                ),
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black26,
@@ -84,8 +84,9 @@ class SaveDialog extends StatelessWidget {
                 color: Colors.white,
                 shape: BoxShape.rectangle,
                 borderRadius: BorderRadius.only(
-                    bottomLeft: Radius.circular(8),
-                    bottomRight: Radius.circular(8)),
+                  bottomLeft: Radius.circular(8),
+                  bottomRight: Radius.circular(8),
+                ),
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black26,
@@ -99,23 +100,26 @@ class SaveDialog extends StatelessWidget {
                 children: <Widget>[
                   SizedBox(height: 16.0),
                   TextFormField(
-                    decoration:
-                        InputDecoration(hintText: "Name your preferences"),
+                    decoration: InputDecoration(
+                      hintText: "Name your preferences",
+                    ),
                     controller: controller,
                   ),
                   SizedBox(height: 24.0),
                   Align(
                     alignment: Alignment.bottomRight,
                     child: ElevatedButton.icon(
-                        onPressed: () {
-                          model.title = controller.text;
-                          history
-                              .storePreference(AppPreferences.fromModel(model));
-                          model.invalidatePreferencesCache();
-                          Navigator.pop(context);
-                        },
-                        icon: const Icon(Icons.save),
-                        label: const Text("Save")),
+                      onPressed: () {
+                        model.title = controller.text;
+                        history.storePreference(
+                          AppPreferences.fromModel(model),
+                        );
+                        model.invalidatePreferencesCache();
+                        Navigator.pop(context);
+                      },
+                      icon: const Icon(Icons.save),
+                      label: const Text("Save"),
+                    ),
                   ),
                 ],
               ),

@@ -7,8 +7,11 @@ class BarDatum {
   final String label;
   final int value;
   final bool highlighted;
-  const BarDatum(
-      {required this.label, required this.value, this.highlighted = false});
+  const BarDatum({
+    required this.label,
+    required this.value,
+    this.highlighted = false,
+  });
 }
 
 /// A simple horizontal bar chart: label on the left, a bar whose length is
@@ -27,8 +30,9 @@ class HorizontalBarChart extends StatelessWidget {
     if (data.isEmpty) return const SizedBox.shrink();
 
     final theme = Theme.of(context);
-    final maxValue =
-        data.map((d) => d.value).fold<int>(0, (a, b) => b > a ? b : a);
+    final maxValue = data
+        .map((d) => d.value)
+        .fold<int>(0, (a, b) => b > a ? b : a);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -95,8 +99,11 @@ class YearPlaysDatum {
   final String label;
   final int total;
   final int collection;
-  const YearPlaysDatum(
-      {required this.label, required this.total, required this.collection});
+  const YearPlaysDatum({
+    required this.label,
+    required this.total,
+    required this.collection,
+  });
 }
 
 /// Plays per year drawn as stacked horizontal bars: the full bar is every
@@ -115,8 +122,9 @@ class PlaysPerYearChart extends StatelessWidget {
     if (data.isEmpty) return const SizedBox.shrink();
 
     final theme = Theme.of(context);
-    final maxValue =
-        data.map((d) => d.total).fold<int>(0, (a, b) => b > a ? b : a);
+    final maxValue = data
+        .map((d) => d.total)
+        .fold<int>(0, (a, b) => b > a ? b : a);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -128,13 +136,15 @@ class PlaysPerYearChart extends StatelessWidget {
             runSpacing: 4,
             children: [
               _LegendRow(
-                  color: theme.colorScheme.primary,
-                  label: 'From collection',
-                  value: ''),
+                color: theme.colorScheme.primary,
+                label: 'From collection',
+                value: '',
+              ),
               _LegendRow(
-                  color: theme.colorScheme.primary.withValues(alpha: 0.4),
-                  label: 'All plays',
-                  value: ''),
+                color: theme.colorScheme.primary.withValues(alpha: 0.4),
+                label: 'All plays',
+                value: '',
+              ),
             ],
           ),
         ),
@@ -145,9 +155,11 @@ class PlaysPerYearChart extends StatelessWidget {
               children: [
                 SizedBox(
                   width: _labelWidth,
-                  child: Text(datum.label,
-                      style: theme.textTheme.bodySmall,
-                      overflow: TextOverflow.ellipsis),
+                  child: Text(
+                    datum.label,
+                    style: theme.textTheme.bodySmall,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
                 Expanded(
                   child: _Track(
@@ -156,19 +168,22 @@ class PlaysPerYearChart extends StatelessWidget {
                         FractionallySizedBox(
                           key: const ValueKey('year-total-fill'),
                           alignment: Alignment.centerLeft,
-                          widthFactor:
-                              maxValue == 0 ? 0.0 : datum.total / maxValue,
+                          widthFactor: maxValue == 0
+                              ? 0.0
+                              : datum.total / maxValue,
                           child: Container(
                             height: 14,
-                            color: theme.colorScheme.primary
-                                .withValues(alpha: 0.4),
+                            color: theme.colorScheme.primary.withValues(
+                              alpha: 0.4,
+                            ),
                           ),
                         ),
                         FractionallySizedBox(
                           key: const ValueKey('year-collection-fill'),
                           alignment: Alignment.centerLeft,
-                          widthFactor:
-                              maxValue == 0 ? 0.0 : datum.collection / maxValue,
+                          widthFactor: maxValue == 0
+                              ? 0.0
+                              : datum.collection / maxValue,
                           child: Container(
                             height: 14,
                             color: theme.colorScheme.primary,
@@ -180,9 +195,11 @@ class PlaysPerYearChart extends StatelessWidget {
                 ),
                 SizedBox(
                   width: _valueWidth,
-                  child: Text('${datum.total}',
-                      textAlign: TextAlign.right,
-                      style: theme.textTheme.bodySmall),
+                  child: Text(
+                    '${datum.total}',
+                    textAlign: TextAlign.right,
+                    style: theme.textTheme.bodySmall,
+                  ),
                 ),
               ],
             ),
@@ -229,8 +246,10 @@ class MechanicChips extends StatelessWidget {
                 ),
                 const SizedBox(width: 6),
                 Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 2,
+                  ),
                   decoration: BoxDecoration(
                     color: theme.colorScheme.primary,
                     borderRadius: BorderRadius.circular(12),
@@ -270,8 +289,9 @@ class PlayerCoverageChart extends StatelessWidget {
     if (coverage.isEmpty) return const SizedBox.shrink();
 
     final theme = Theme.of(context);
-    final maxSupported =
-        coverage.map((c) => c.supported).fold<int>(0, (a, b) => b > a ? b : a);
+    final maxSupported = coverage
+        .map((c) => c.supported)
+        .fold<int>(0, (a, b) => b > a ? b : a);
     final n = coverage.length;
 
     double yFor(int value) => maxSupported == 0
@@ -454,7 +474,8 @@ class InsightsSummaryGrid extends StatelessWidget {
     // A base-vs-expansions split is a part-of-whole relationship, so it reads
     // better as a donut than as two separate tiles.
     final hasSplit = summary.baseGames != null && summary.expansions != null;
-    final hasBacklog = backlogPlayed != null &&
+    final hasBacklog =
+        backlogPlayed != null &&
         backlogUnplayed != null &&
         backlogTotal != null;
 
@@ -481,16 +502,19 @@ class InsightsSummaryGrid extends StatelessWidget {
         ),
       if (summary.averageRating != null)
         StatTile(
-            label: 'Avg Rating',
-            value: summary.averageRating!.toStringAsFixed(1)),
+          label: 'Avg Rating',
+          value: summary.averageRating!.toStringAsFixed(1),
+        ),
       if (summary.medianRating != null)
         StatTile(
-            label: 'Median Rating',
-            value: summary.medianRating!.toStringAsFixed(1)),
+          label: 'Median Rating',
+          value: summary.medianRating!.toStringAsFixed(1),
+        ),
       if (summary.averageWeight != null)
         StatTile(
-            label: 'Avg Weight',
-            value: summary.averageWeight!.toStringAsFixed(1)),
+          label: 'Avg Weight',
+          value: summary.averageWeight!.toStringAsFixed(1),
+        ),
     ];
 
     return Wrap(
@@ -572,14 +596,16 @@ class SplitDonut extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _LegendRow(
-                color: primaryColor,
-                label: primaryLabel,
-                value: '$primaryValue'),
+              color: primaryColor,
+              label: primaryLabel,
+              value: '$primaryValue',
+            ),
             const SizedBox(height: 6),
             _LegendRow(
-                color: secondaryColor,
-                label: secondaryLabel,
-                value: '$secondaryValue'),
+              color: secondaryColor,
+              label: secondaryLabel,
+              value: '$secondaryValue',
+            ),
           ],
         ),
       ],
@@ -614,8 +640,9 @@ class _LegendRow extends StatelessWidget {
           const SizedBox(width: 6),
           Text(
             value,
-            style: theme.textTheme.bodySmall
-                ?.copyWith(fontWeight: FontWeight.bold),
+            style: theme.textTheme.bodySmall?.copyWith(
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ],
       ],
@@ -659,8 +686,13 @@ class _DonutPainter extends CustomPainter {
       ..strokeWidth = _stroke;
 
     // Expansion segment first (full remainder), base drawn over its arc.
-    canvas.drawArc(rect, start + baseSweep, 6.283185307179586 - baseSweep,
-        false, expansionPaint);
+    canvas.drawArc(
+      rect,
+      start + baseSweep,
+      6.283185307179586 - baseSweep,
+      false,
+      expansionPaint,
+    );
     canvas.drawArc(rect, start, baseSweep, false, basePaint);
   }
 

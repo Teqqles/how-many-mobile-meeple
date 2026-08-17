@@ -46,7 +46,10 @@ class PlayerCountCoverage {
   final int supported;
   final int bestOrRecommended;
   const PlayerCountCoverage(
-      this.playerCount, this.supported, this.bestOrRecommended);
+    this.playerCount,
+    this.supported,
+    this.bestOrRecommended,
+  );
 }
 
 /// A labelled bucket of a distribution (complexity or playtime) with the count
@@ -57,8 +60,12 @@ class DistributionBucket {
   final num min;
   final num? max;
   final int count;
-  const DistributionBucket(
-      {required this.name, required this.min, this.max, required this.count});
+  const DistributionBucket({
+    required this.name,
+    required this.min,
+    this.max,
+    required this.count,
+  });
 
   /// True when [value] falls in the half-open range `[min, max)`.
   bool contains(num value) {
@@ -104,8 +111,9 @@ class CollectionAnalytics {
 
   factory CollectionAnalytics.fromJson(Map<String, dynamic> json) {
     return CollectionAnalytics(
-      mostCoveredPlayerCount:
-          _mostCoveredPlayerCount(json['player_count_coverage']),
+      mostCoveredPlayerCount: _mostCoveredPlayerCount(
+        json['player_count_coverage'],
+      ),
       averageWeight: _averageWeight(json),
       dominantPlaytime: _dominantPlaytime(json['playtime_distribution']),
       topMechanics: _topMechanics(json['top_mechanics']),
@@ -153,7 +161,9 @@ class CollectionAnalytics {
   /// Parses a distribution list into buckets, dropping malformed entries.
   /// [parseRange] extracts the `[min, max)` numeric range from a label.
   static List<DistributionBucket> _buckets(
-      dynamic dist, (num, num?)? Function(String) parseRange) {
+    dynamic dist,
+    (num, num?)? Function(String) parseRange,
+  ) {
     if (dist is! List) return const [];
     final result = <DistributionBucket>[];
     for (final entry in dist) {
@@ -163,12 +173,14 @@ class CollectionAnalytics {
       if (label is! String || count is! int) continue;
       final range = parseRange(label);
       if (range == null) continue;
-      result.add(DistributionBucket(
-        name: label.split('[').first.trim(),
-        min: range.$1,
-        max: range.$2,
-        count: count,
-      ));
+      result.add(
+        DistributionBucket(
+          name: label.split('[').first.trim(),
+          min: range.$1,
+          max: range.$2,
+          count: count,
+        ),
+      );
     }
     return result;
   }

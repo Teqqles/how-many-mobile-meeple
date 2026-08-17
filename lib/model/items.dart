@@ -14,8 +14,9 @@ class Items {
   String toUrlItems() => itemList.join("+");
 
   factory Items.fromDb(Map<String, dynamic> json) {
-    List<Item> items =
-        List<Item>.from(json['items'].map((item) => Item.fromJson(item)));
+    List<Item> items = List<Item>.from(
+      json['items'].map((item) => Item.fromJson(item)),
+    );
     return Items(items);
   }
 

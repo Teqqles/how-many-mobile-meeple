@@ -5,6 +5,7 @@ import 'package:how_many_mobile_meeple/components/game_thumbnail.dart';
 import 'package:how_many_mobile_meeple/components/list_empty_state.dart';
 import 'package:how_many_mobile_meeple/how_many_meeple_app_bar.dart';
 import 'package:how_many_mobile_meeple/platform/router.dart' as r;
+
 import 'favourite_game.dart';
 import 'game_list_service.dart';
 
@@ -56,8 +57,11 @@ class _GameListPageState extends State<GameListPage> with AppPage {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: HowManyMeepleAppBar(widget.title,
-          context: context, helpSection: 'favourites'),
+      appBar: HowManyMeepleAppBar(
+        widget.title,
+        context: context,
+        helpSection: 'favourites',
+      ),
       drawer: const FeatureDrawer(),
       endDrawer: pageDrawer(context),
       body: _service == null
@@ -106,13 +110,16 @@ class _GameListPageState extends State<GameListPage> with AppPage {
         leading: GameThumbnail(thumbnail: game.thumbnail),
         title: Text(game.name),
         trailing: IconButton(
-          icon: Icon(Icons.remove_circle_outline,
-              color: Theme.of(context).colorScheme.error),
+          icon: Icon(
+            Icons.remove_circle_outline,
+            color: Theme.of(context).colorScheme.error,
+          ),
           tooltip: 'Remove',
           onPressed: () => _service!.remove(game.id),
         ),
         onTap: () => Navigator.of(context).pushNamed(
-            '${r.Router.gameDetailRoute}/${game.name.replaceAll(' ', '+')}/${game.id}'),
+          '${r.Router.gameDetailRoute}/${game.name.replaceAll(' ', '+')}/${game.id}',
+        ),
       ),
     );
   }

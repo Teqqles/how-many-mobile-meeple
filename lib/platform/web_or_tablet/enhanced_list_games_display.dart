@@ -6,15 +6,21 @@ import 'package:how_many_mobile_meeple/favourites/favourite_game.dart';
 import 'package:how_many_mobile_meeple/favourites/favourites_service.dart';
 import 'package:how_many_mobile_meeple/favourites/ignored_games_service.dart';
 import 'package:how_many_mobile_meeple/platform/router.dart' as r;
+
 import '../../app_page.dart';
 import '../../app_common.dart';
+
 import 'package:how_many_mobile_meeple/components/heading_text.dart';
+
 import '../../how_many_meeple_app_bar.dart';
+
 import 'package:how_many_mobile_meeple/model/model.dart';
+
 import '../../model/game.dart';
 import '../../model/games.dart';
 import '../../network_content_widget.dart';
 import '../../screen_tools.dart';
+
 import 'package:how_many_mobile_meeple/components/platform_independent_image.dart';
 import 'package:how_many_mobile_meeple/components/rating_badge.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -24,13 +30,17 @@ class EnhancedListGamesDisplayPage extends NetworkWidget with AppPage {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: HowManyMeepleAppBar(AppCommon.listGamesPageTitle,
-            context: context, helpSection: 'list'),
-        drawer: const FeatureDrawer(),
-        endDrawer: pageDrawer(context),
-        persistentFooterButtons: [iconButtonGroup(context)],
-        bottomNavigationBar: const PlaysLoadingIndicator(),
-        body: Container(child: loadNetworkContent(displayGame)));
+      appBar: HowManyMeepleAppBar(
+        AppCommon.listGamesPageTitle,
+        context: context,
+        helpSection: 'list',
+      ),
+      drawer: const FeatureDrawer(),
+      endDrawer: pageDrawer(context),
+      persistentFooterButtons: [iconButtonGroup(context)],
+      bottomNavigationBar: const PlaysLoadingIndicator(),
+      body: Container(child: loadNetworkContent(displayGame)),
+    );
   }
 
   Widget displayGame(BuildContext context, AppModel model) {
@@ -110,14 +120,17 @@ class _GameListBodyState extends State<_GameListBody> with ScreenTools {
     final model = widget.model;
     var allGames = model.sortGameField == SortableGameField.plays
         ? _sortByPlays(model)
-        : model.bggCache.games
-            .getGamesBy(field: model.sortGameField, order: model.sortDirection);
+        : model.bggCache.games.getGamesBy(
+            field: model.sortGameField,
+            order: model.sortDirection,
+          );
     var games = _showIgnored
         ? allGames
         : allGames.where((g) => !widget.ignoredService.contains(g.id)).toList();
 
-    final sosSetting =
-        model.settings.setting(Settings.filterShelfOfShameOnly.name);
+    final sosSetting = model.settings.setting(
+      Settings.filterShelfOfShameOnly.name,
+    );
     if (sosSetting.enabled && sosSetting.getBool() && model.playsLoaded) {
       games = games.where((g) => model.isUnplayed(g.id)).toList();
     }
@@ -149,8 +162,11 @@ class _GameListBodyState extends State<_GameListBody> with ScreenTools {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.format_list_numbered,
-                size: 64, color: Theme.of(context).colorScheme.secondary),
+            Icon(
+              Icons.format_list_numbered,
+              size: 64,
+              color: Theme.of(context).colorScheme.secondary,
+            ),
             const SizedBox(height: 16),
             Text(
               'All games are currently hidden',
@@ -181,40 +197,64 @@ class _GameListBodyState extends State<_GameListBody> with ScreenTools {
     final isWide = isWideScreen(context);
     return Container(
       decoration: BoxDecoration(
-        border:
-            Border(bottom: BorderSide(color: Theme.of(context).dividerColor)),
+        border: Border(
+          bottom: BorderSide(color: Theme.of(context).dividerColor),
+        ),
       ),
       child: Row(
         children: [
           const SizedBox(width: 52),
           Expanded(
-            child: _sortButton(context, model, 'Name', SortableGameField.name,
-                alignment: Alignment.centerLeft),
+            child: _sortButton(
+              context,
+              model,
+              'Name',
+              SortableGameField.name,
+              alignment: Alignment.centerLeft,
+            ),
           ),
           if (isWide) ...[
             SizedBox(
               width: 80,
               child: _sortButton(
-                  context, model, null, SortableGameField.maxPlaytime,
-                  icon: Icons.timer),
+                context,
+                model,
+                null,
+                SortableGameField.maxPlaytime,
+                icon: Icons.timer,
+              ),
             ),
             SizedBox(
               width: 60,
-              child: _sortButton(context, model, null, SortableGameField.weight,
-                  icon: Icons.fitness_center),
+              child: _sortButton(
+                context,
+                model,
+                null,
+                SortableGameField.weight,
+                icon: Icons.fitness_center,
+              ),
             ),
             if (model.playsLoaded)
               SizedBox(
                 width: 60,
                 child: _sortButton(
-                    context, model, null, SortableGameField.plays,
-                    icon: Icons.sports_esports),
+                  context,
+                  model,
+                  null,
+                  SortableGameField.plays,
+                  icon: Icons.sports_esports,
+                ),
               ),
           ],
           SizedBox(
             width: isWide ? 60 : 50,
-            child: _sortButton(context, model, null, SortableGameField.rating,
-                icon: Icons.star),
+            child: _sortButton(
+              context,
+              model,
+              null,
+              SortableGameField.rating,
+              icon: Icons.star,
+            ),
           ),
           if (isWide) const SizedBox(width: 80),
         ],
@@ -222,9 +262,14 @@ class _GameListBodyState extends State<_GameListBody> with ScreenTools {
     );
   }
 
-  Widget _sortButton(BuildContext context, AppModel model, String? label,
-      SortableGameField field,
-      {IconData? icon, Alignment alignment = Alignment.centerRight}) {
+  Widget _sortButton(
+    BuildContext context,
+    AppModel model,
+    String? label,
+    SortableGameField field, {
+    IconData? icon,
+    Alignment alignment = Alignment.centerRight,
+  }) {
     return TextButton(
       style: TextButton.styleFrom(padding: EdgeInsets.zero),
       onPressed: () {
@@ -240,8 +285,11 @@ class _GameListBodyState extends State<_GameListBody> with ScreenTools {
           children: [
             if (label != null) HeadingText(label, context),
             if (icon != null)
-              Icon(icon,
-                  size: 18, color: Theme.of(context).colorScheme.secondary),
+              Icon(
+                icon,
+                size: 18,
+                color: Theme.of(context).colorScheme.secondary,
+              ),
             if (model.sortGameField == field)
               Icon(
                 model.sortDirection == SortOrder.Asc
@@ -258,8 +306,11 @@ class _GameListBodyState extends State<_GameListBody> with ScreenTools {
 
   Widget _buildDismissibleRow(BuildContext context, Game game, int index) {
     final isFav = widget.favouritesService.contains(game.id);
-    final favGame =
-        FavouriteGame(id: game.id, name: game.name, thumbnail: game.thumbnail);
+    final favGame = FavouriteGame(
+      id: game.id,
+      name: game.name,
+      thumbnail: game.thumbnail,
+    );
 
     return Dismissible(
       key: ValueKey(game.id),
@@ -270,12 +321,18 @@ class _GameListBodyState extends State<_GameListBody> with ScreenTools {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(isFav ? Icons.heart_broken : Icons.favorite,
-                color: Colors.white),
+            Icon(
+              isFav ? Icons.heart_broken : Icons.favorite,
+              color: Colors.white,
+            ),
             const SizedBox(width: 8),
-            Text(isFav ? 'Unfavourite' : 'Favourite',
-                style: const TextStyle(
-                    color: Colors.white, fontWeight: FontWeight.bold)),
+            Text(
+              isFav ? 'Unfavourite' : 'Favourite',
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
           ],
         ),
       ),
@@ -287,9 +344,13 @@ class _GameListBodyState extends State<_GameListBody> with ScreenTools {
           mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
-            Text('Ignore',
-                style: TextStyle(
-                    color: Colors.white, fontWeight: FontWeight.bold)),
+            Text(
+              'Ignore',
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
             SizedBox(width: 8),
             Icon(Icons.visibility_off, color: Colors.white),
           ],
@@ -311,16 +372,20 @@ class _GameListBodyState extends State<_GameListBody> with ScreenTools {
   Widget _buildRow(BuildContext context, Game game, int index, bool isFav) {
     final isEven = index % 2 == 0;
     final isWide = isWideScreen(context);
-    final favGame =
-        FavouriteGame(id: game.id, name: game.name, thumbnail: game.thumbnail);
+    final favGame = FavouriteGame(
+      id: game.id,
+      name: game.name,
+      thumbnail: game.thumbnail,
+    );
 
     return Container(
       decoration: BoxDecoration(
         color: isEven
             ? Colors.transparent
             : Theme.of(context).colorScheme.primary.withAlpha(8),
-        border:
-            Border(bottom: BorderSide(color: Theme.of(context).dividerColor)),
+        border: Border(
+          bottom: BorderSide(color: Theme.of(context).dividerColor),
+        ),
       ),
       child: Row(
         children: [
@@ -338,11 +403,13 @@ class _GameListBodyState extends State<_GameListBody> with ScreenTools {
                       )
                     : Container(
                         color: Theme.of(context).colorScheme.primaryContainer,
-                        child: Icon(Icons.casino,
-                            size: 22,
-                            color: Theme.of(context)
-                                .colorScheme
-                                .onPrimaryContainer),
+                        child: Icon(
+                          Icons.casino,
+                          size: 22,
+                          color: Theme.of(context)
+                              .colorScheme
+                              .onPrimaryContainer,
+                        ),
                       ),
               ),
             ),
@@ -351,45 +418,54 @@ class _GameListBodyState extends State<_GameListBody> with ScreenTools {
             child: AppDefaultPadding(
               child: InkWell(
                 onTap: () => Navigator.of(context).pushNamed(
-                    '${r.Router.gameDetailRoute}/${game.name.replaceAll(' ', '+')}/${game.id}'),
+                  '${r.Router.gameDetailRoute}/${game.name.replaceAll(' ', '+')}/${game.id}',
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text(game.name,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          decoration: TextDecoration.underline,
-                        )),
+                    Text(
+                      game.name,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        decoration: TextDecoration.underline,
+                      ),
+                    ),
                     const SizedBox(height: 2),
                     Row(
                       children: [
                         if (isFav) ...[
-                          Icon(Icons.favorite,
-                              size: 12, color: Colors.amber.shade700),
+                          Icon(
+                            Icons.favorite,
+                            size: 12,
+                            color: Colors.amber.shade700,
+                          ),
                           const SizedBox(width: 6),
                         ],
-                        Icon(Icons.people,
-                            size: 12,
-                            color: Theme.of(context).colorScheme.secondary),
+                        Icon(
+                          Icons.people,
+                          size: 12,
+                          color: Theme.of(context).colorScheme.secondary,
+                        ),
                         const SizedBox(width: 3),
                         Text(
                           game.minPlayers == game.maxPlayers
                               ? '${game.minPlayers}p'
                               : '${game.minPlayers}-${game.maxPlayers}p',
                           style: TextStyle(
-                              fontSize: 11,
-                              color: Theme.of(context).colorScheme.secondary),
+                            fontSize: 11,
+                            color: Theme.of(context).colorScheme.secondary,
+                          ),
                         ),
                         if (widget.model.primaryPlayer != null &&
                             widget.model.isInCollection(game.id)) ...[
                           const SizedBox(width: 6),
-                          FaIcon(FontAwesomeIcons.crown,
-                              size: 10,
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .secondary
-                                  .withAlpha(150)),
+                          FaIcon(
+                            FontAwesomeIcons.crown,
+                            size: 10,
+                            color: Theme.of(context).colorScheme.secondary
+                                .withAlpha(150),
+                          ),
                         ],
                         if (widget.model.playsLoaded) ...[
                           const SizedBox(width: 6),
@@ -401,10 +477,8 @@ class _GameListBodyState extends State<_GameListBody> with ScreenTools {
                               fontSize: 10,
                               color: widget.model.getPlayCount(game.id) > 0
                                   ? Theme.of(context).colorScheme.secondary
-                                  : Theme.of(context)
-                                      .colorScheme
-                                      .error
-                                      .withAlpha(180),
+                                  : Theme.of(context).colorScheme.error
+                                        .withAlpha(180),
                             ),
                           ),
                         ],
@@ -456,7 +530,9 @@ class _GameListBodyState extends State<_GameListBody> with ScreenTools {
             width: isWide ? 60 : 50,
             child: Center(
               child: MiniRatingBadge(
-                  rating: game.averageRating, size: isWide ? 38 : 34),
+                rating: game.averageRating,
+                size: isWide ? 38 : 34,
+              ),
             ),
           ),
           if (isWide) ...[

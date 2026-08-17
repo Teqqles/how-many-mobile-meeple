@@ -26,7 +26,8 @@ class ThemeModeControl extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final current = themeModeFromString(
-        model.settings.setting(Settings.themeMode.name).getString());
+      model.settings.setting(Settings.themeMode.name).getString(),
+    );
     return Padding(
       padding: const EdgeInsets.fromLTRB(12, 8, 12, 12),
       child: Column(

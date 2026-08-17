@@ -1,4 +1,5 @@
 import 'dart:convert';
+
 import 'package:http/http.dart' as http;
 import 'package:how_many_mobile_meeple/app_common.dart';
 import 'package:how_many_mobile_meeple/model/game.dart';
@@ -40,10 +41,15 @@ class GameDetailService {
     final client = _testClient ?? http.Client();
 
     try {
-      final response = await client.get(url, headers: {
-        Settings.fieldsToReturnFromApi.header!:
-            Settings.fieldsToReturnFromApi.value.toString(),
-      });
+      final response = await client.get(
+        url,
+        headers: {
+          Settings.fieldsToReturnFromApi.header!: Settings
+              .fieldsToReturnFromApi
+              .value
+              .toString(),
+        },
+      );
 
       if (response.statusCode == 200) {
         final game = Game.fromJson(jsonDecode(response.body));

@@ -28,45 +28,47 @@ class _BoardGameItemInputWidgetState extends State<BoardGameItemInputWidget> {
   @override
   Widget build(BuildContext context) {
     return Align(
-        alignment: Alignment.centerLeft,
-        child: AppDefaultPadding(
-          child: Row(
-            children: <Widget>[
-              Expanded(
-                child: SizedBox(
-                  height: 35,
-                  child: Consumer<AppModel>(
-                    builder: (context, model, child) => TextFormField(
-                      enabled: model.items.itemList.length <
-                          AppCommon.maxItemsFromBgg,
-                      controller: controller,
-                      decoration: InputDecoration(
-                        hintText: model.items.itemList.length <
-                                AppCommon.maxItemsFromBgg
-                            ? AppCommon.itemHintTextMessage
-                            : AppCommon.maxItemsMessage,
-                      ),
+      alignment: Alignment.centerLeft,
+      child: AppDefaultPadding(
+        child: Row(
+          children: <Widget>[
+            Expanded(
+              child: SizedBox(
+                height: 35,
+                child: Consumer<AppModel>(
+                  builder: (context, model, child) => TextFormField(
+                    enabled:
+                        model.items.itemList.length < AppCommon.maxItemsFromBgg,
+                    controller: controller,
+                    decoration: InputDecoration(
+                      hintText:
+                          model.items.itemList.length <
+                              AppCommon.maxItemsFromBgg
+                          ? AppCommon.itemHintTextMessage
+                          : AppCommon.maxItemsMessage,
                     ),
                   ),
                 ),
               ),
-              Consumer<AppModel>(
-                builder: (context, model, child) => Padding(
-                  padding: const EdgeInsets.only(left: 8),
-                  child: ElevatedButton(
-                    child: const Text('Add'),
-                    onPressed: () {
-                      if (controller.text.isEmpty) return;
-                      Item item = Item(controller.text.trim());
-                      model.addItem(item);
-                      controller.text = '';
-                      PrefetchService.warmCache(item);
-                    },
-                  ),
+            ),
+            Consumer<AppModel>(
+              builder: (context, model, child) => Padding(
+                padding: const EdgeInsets.only(left: 8),
+                child: ElevatedButton(
+                  child: const Text('Add'),
+                  onPressed: () {
+                    if (controller.text.isEmpty) return;
+                    Item item = Item(controller.text.trim());
+                    model.addItem(item);
+                    controller.text = '';
+                    PrefetchService.warmCache(item);
+                  },
                 ),
               ),
-            ],
-          ),
-        ));
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }

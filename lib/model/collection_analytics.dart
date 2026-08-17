@@ -10,6 +10,35 @@ class MechanicCount {
   const MechanicCount(this.name, this.count);
 }
 
+/// Headline figures for a collection. Every field is nullable so a partial
+/// summary still parses; callers show only what is present.
+class CollectionSummary {
+  final int? totalGames;
+  final int? baseGames;
+  final int? expansions;
+  final double? averageRating;
+  final double? medianRating;
+  final double? averageWeight;
+
+  const CollectionSummary({
+    this.totalGames,
+    this.baseGames,
+    this.expansions,
+    this.averageRating,
+    this.medianRating,
+    this.averageWeight,
+  });
+
+  /// True when at least one figure is present.
+  bool get hasData =>
+      totalGames != null ||
+      baseGames != null ||
+      expansions != null ||
+      averageRating != null ||
+      medianRating != null ||
+      averageWeight != null;
+}
+
 /// Per-player-count coverage: how many games [supported] that count, and how
 /// many play [bestOrRecommended] at it.
 class PlayerCountCoverage {
@@ -49,6 +78,7 @@ class CollectionAnalytics {
   final List<PlayerCountCoverage> playerCountCoverage;
   final List<DistributionBucket> complexityDistribution;
   final List<DistributionBucket> playtimeDistribution;
+  final CollectionSummary? summary;
 
   const CollectionAnalytics({
     this.mostCoveredPlayerCount,
@@ -58,10 +88,12 @@ class CollectionAnalytics {
     this.playerCountCoverage = const [],
     this.complexityDistribution = const [],
     this.playtimeDistribution = const [],
+    this.summary,
   });
 
   /// True when any field parsed; false for an empty/not-ready response.
   bool get hasData =>
+      summary != null ||
       mostCoveredPlayerCount != null ||
       averageWeight != null ||
       dominantPlaytime != null ||
@@ -80,7 +112,25 @@ class CollectionAnalytics {
       playerCountCoverage: _playerCountCoverage(json['player_count_coverage']),
       complexityDistribution: _floatBuckets(json['complexity_distribution']),
       playtimeDistribution: _intBuckets(json['playtime_distribution']),
+      summary: _summary(json['summary']),
     );
+  }
+
+  /// Parses the `summary` block, or null when absent or carrying no usable
+  /// figure (so a not-ready `{}` yields null, not an empty summary).
+  static CollectionSummary? _summary(dynamic summary) {
+    if (summary is! Map) return null;
+    int? asInt(dynamic v) => v is int ? v : null;
+    double? asDouble(dynamic v) => v is num ? v.toDouble() : null;
+    final parsed = CollectionSummary(
+      totalGames: asInt(summary['total_games']),
+      baseGames: asInt(summary['base_games']),
+      expansions: asInt(summary['expansions']),
+      averageRating: asDouble(summary['average_rating']),
+      medianRating: asDouble(summary['median_rating']),
+      averageWeight: asDouble(summary['average_weight']),
+    );
+    return parsed.hasData ? parsed : null;
   }
 
   /// Parses `[{player_count, supported, best_or_recommended}, ...]` ascending

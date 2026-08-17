@@ -84,6 +84,17 @@ class FeatureDrawer extends StatelessWidget {
                         '${r.Router.shelfOfShameRoute}/${Uri.encodeComponent(username)}');
                   },
                 ),
+                _buildItem(
+                  context,
+                  icon: Icons.insights,
+                  label: 'Collection Insights',
+                  enabled: hasCollection,
+                  disabledMessage: 'Add a BGG collection first',
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    Navigator.of(context).pushNamed(r.Router.insightsRoute);
+                  },
+                ),
                 const Divider(),
                 _buildSectionTitle(context, 'My Games'),
                 _buildItem(

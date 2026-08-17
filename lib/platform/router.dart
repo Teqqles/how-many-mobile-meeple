@@ -6,6 +6,8 @@ import 'package:how_many_mobile_meeple/platform/pages.dart';
 import 'package:how_many_mobile_meeple/platform/web/url_fragment_encoder.dart';
 
 import 'package:how_many_mobile_meeple/about_page.dart' deferred as about;
+import 'package:how_many_mobile_meeple/collection_insights/collection_insights_page.dart'
+    deferred as collection_insights;
 import 'package:how_many_mobile_meeple/favourites/game_list_page.dart'
     deferred as game_list;
 import 'package:how_many_mobile_meeple/help/help_page.dart' deferred as help;
@@ -30,11 +32,13 @@ class Router {
   static const String aboutRoute = '/about';
   static const String helpRoute = '/help';
   static const String shelfOfShameRoute = '/shelf-of-shame';
+  static const String insightsRoute = '/insights';
 
   static List<String> routeList = [
     randomRoute,
     listRoute,
     shelfOfShameRoute,
+    insightsRoute,
     settingsRoute,
     homeRoute
   ];
@@ -133,6 +137,13 @@ class Router {
             builder: (_) => _deferred(
                   shelf_of_shame.loadLibrary,
                   () => shelf_of_shame.ShelfOfShamePage(username: sosUsername),
+                ),
+            settings: settings);
+      case Router.insightsRoute:
+        return MaterialPageRoute(
+            builder: (_) => _deferred(
+                  collection_insights.loadLibrary,
+                  () => collection_insights.CollectionInsightsPage(),
                 ),
             settings: settings);
       case Router.aboutRoute:

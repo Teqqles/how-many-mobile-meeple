@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:how_many_mobile_meeple/components/platform_independent_image.dart';
 import 'package:how_many_mobile_meeple/model/game.dart';
 import 'package:how_many_mobile_meeple/model/game_night.dart';
 import 'package:how_many_mobile_meeple/model/model.dart';
@@ -227,31 +228,24 @@ class _GameNightViewState extends State<GameNightView> {
   }
 
   Widget _buildThumbnail(BuildContext context, Game game) {
-    final placeholder = Container(
-      width: 64,
-      height: 64,
-      color: Theme.of(context).colorScheme.surfaceContainerHighest,
-      child: Icon(
-        Icons.casino,
-        color: Theme.of(context).colorScheme.onSurfaceVariant,
-      ),
-    );
     final url = (game.thumbnail?.isNotEmpty ?? false)
         ? game.thumbnail!
         : game.imageUrl;
     return ClipRRect(
       borderRadius: BorderRadius.circular(8),
-      child: url.isEmpty
-          ? placeholder
-          : Image.network(
-              url,
-              width: 64,
-              height: 64,
-              fit: BoxFit.cover,
-              errorBuilder: (_, _, _) => placeholder,
-              loadingBuilder: (context, child, progress) =>
-                  progress == null ? child : placeholder,
-            ),
+      child: SizedBox(
+        width: 64,
+        height: 64,
+        child: url.isEmpty
+            ? Container(
+                color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                child: Icon(
+                  Icons.casino,
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
+              )
+            : PlatformIndependentImage(imageUrl: url, fit: BoxFit.cover),
+      ),
     );
   }
 
@@ -273,8 +267,15 @@ class _GameNightViewState extends State<GameNightView> {
           Icons.fitness_center,
           _weightLabel(game.averageWeight),
         ),
+        if (widget.model.playsLoaded)
+          _detail(context, Icons.history, _playsLabel(game)),
       ],
     );
+  }
+
+  String _playsLabel(Game game) {
+    final plays = widget.model.getPlayCount(game.id);
+    return plays > 0 ? 'Played $plays×' : 'Unplayed';
   }
 
   Widget _detail(BuildContext context, IconData icon, String text) {

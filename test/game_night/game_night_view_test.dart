@@ -7,6 +7,7 @@ import 'package:how_many_mobile_meeple/game_night/game_night_view.dart';
 import 'package:how_many_mobile_meeple/model/game.dart';
 import 'package:how_many_mobile_meeple/model/game_night.dart';
 import 'package:how_many_mobile_meeple/model/model.dart';
+import 'package:how_many_mobile_meeple/model/play_data.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 Game _game(int id, String name, int maxPlaytime, double weight) => Game(
@@ -80,6 +81,19 @@ void main() {
 
     expect(find.text('120 min'), findsOneWidget);
     expect(find.text('2-4 players'), findsWidgets);
+  });
+
+  testWidgets('shows play counts once plays are loaded', (tester) async {
+    final model = AppModel()
+      ..setPlaysForTest(
+        playsData: {2: PlayData(gameId: 2, gameName: 'Epic', totalPlays: 3)},
+        collectionGameIds: {2},
+      );
+
+    await tester.pumpWidget(_wrap(model));
+
+    expect(find.text('Played 3×'), findsOneWidget);
+    expect(find.text('Unplayed'), findsWidgets);
   });
 
   testWidgets('re-plans when a new pool arrives', (tester) async {

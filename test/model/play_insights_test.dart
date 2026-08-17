@@ -2,8 +2,12 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:how_many_mobile_meeple/model/play_data.dart';
 import 'package:how_many_mobile_meeple/model/play_insights.dart';
 
-PlayData _data(int id, String name, int totalPlays,
-        {List<BggPlay> plays = const []}) =>
+PlayData _data(
+  int id,
+  String name,
+  int totalPlays, {
+  List<BggPlay> plays = const [],
+}) =>
     PlayData(gameId: id, gameName: name, totalPlays: totalPlays, plays: plays);
 
 void main() {
@@ -11,10 +15,7 @@ void main() {
     test('splits played vs unplayed by play count', () {
       final stats = PlayInsights.from(
         collectionGameIds: {1, 2, 3},
-        playsData: {
-          1: _data(1, 'A', 3),
-          2: _data(2, 'B', 1),
-        },
+        playsData: {1: _data(1, 'A', 3), 2: _data(2, 'B', 1)},
         playCount: (id) => {1: 3, 2: 1, 3: 0}[id]!,
         now: DateTime(2026),
       );
@@ -41,11 +42,16 @@ void main() {
       final stats = PlayInsights.from(
         collectionGameIds: {1},
         playsData: {
-          1: _data(1, 'A', 3, plays: [
-            BggPlay(playId: 1, date: DateTime(2026, 3, 1), length: 60),
-            BggPlay(playId: 2, date: DateTime(2025, 6, 1), length: 45),
-            BggPlay(playId: 3, date: DateTime(2026, 9, 1), length: 30),
-          ]),
+          1: _data(
+            1,
+            'A',
+            3,
+            plays: [
+              BggPlay(playId: 1, date: DateTime(2026, 3, 1), length: 60),
+              BggPlay(playId: 2, date: DateTime(2025, 6, 1), length: 45),
+              BggPlay(playId: 3, date: DateTime(2026, 9, 1), length: 30),
+            ],
+          ),
         },
         playCount: (id) => 3,
         now: DateTime(2026, 8, 17),
@@ -88,35 +94,55 @@ void main() {
       final stats = PlayInsights.from(
         collectionGameIds: {1},
         playsData: {
-          1: _data(1, 'A', 4, plays: [
-            BggPlay(playId: 1, date: DateTime(2024, 1, 1)),
-            BggPlay(playId: 2, date: DateTime(2026, 1, 1)),
-            BggPlay(playId: 3, date: DateTime(2024, 5, 1)),
-            BggPlay(playId: 4, date: DateTime(2025, 1, 1)),
-          ]),
+          1: _data(
+            1,
+            'A',
+            4,
+            plays: [
+              BggPlay(playId: 1, date: DateTime(2024, 1, 1)),
+              BggPlay(playId: 2, date: DateTime(2026, 1, 1)),
+              BggPlay(playId: 3, date: DateTime(2024, 5, 1)),
+              BggPlay(playId: 4, date: DateTime(2025, 1, 1)),
+            ],
+          ),
         },
         playCount: (id) => 4,
         now: DateTime(2026),
       );
 
-      expect(
-          stats.playsPerYear.map((y) => y.year).toList(), [2026, 2025, 2024]);
+      expect(stats.playsPerYear.map((y) => y.year).toList(), [
+        2026,
+        2025,
+        2024,
+      ]);
       expect(stats.playsPerYear.map((y) => y.plays).toList(), [1, 1, 2]);
       // All of game 1's plays are owned, so the collection subset matches.
-      expect(
-          stats.playsPerYear.map((y) => y.collectionPlays).toList(), [1, 1, 2]);
+      expect(stats.playsPerYear.map((y) => y.collectionPlays).toList(), [
+        1,
+        1,
+        2,
+      ]);
     });
 
     test('splits plays per year into collection vs all', () {
       final stats = PlayInsights.from(
         collectionGameIds: {1},
         playsData: {
-          1: _data(1, 'Owned', 1,
-              plays: [BggPlay(playId: 1, date: DateTime(2026, 1, 1))]),
-          2: _data(2, 'Borrowed', 2, plays: [
-            BggPlay(playId: 2, date: DateTime(2026, 2, 1)),
-            BggPlay(playId: 3, date: DateTime(2026, 3, 1)),
-          ]),
+          1: _data(
+            1,
+            'Owned',
+            1,
+            plays: [BggPlay(playId: 1, date: DateTime(2026, 1, 1))],
+          ),
+          2: _data(
+            2,
+            'Borrowed',
+            2,
+            plays: [
+              BggPlay(playId: 2, date: DateTime(2026, 2, 1)),
+              BggPlay(playId: 3, date: DateTime(2026, 3, 1)),
+            ],
+          ),
         },
         playCount: (id) => {1: 1, 2: 2}[id]!,
         now: DateTime(2026),
@@ -132,10 +158,18 @@ void main() {
       final stats = PlayInsights.from(
         collectionGameIds: {1},
         playsData: {
-          1: _data(1, 'Owned', 1,
-              plays: [BggPlay(playId: 1, date: DateTime(2026), length: 60)]),
-          2: _data(2, 'Borrowed', 3,
-              plays: [BggPlay(playId: 2, date: DateTime(2026), length: 90)]),
+          1: _data(
+            1,
+            'Owned',
+            1,
+            plays: [BggPlay(playId: 1, date: DateTime(2026), length: 60)],
+          ),
+          2: _data(
+            2,
+            'Borrowed',
+            3,
+            plays: [BggPlay(playId: 2, date: DateTime(2026), length: 90)],
+          ),
         },
         playCount: (id) => {1: 1, 2: 3}[id]!,
         now: DateTime(2026),
@@ -145,8 +179,10 @@ void main() {
       expect(stats.totalMinutes, 150);
       expect(stats.totalPlays, 4);
       expect(stats.playsThisYear, 2);
-      expect(
-          stats.mostPlayed.map((m) => m.name).toList(), ['Borrowed', 'Owned']);
+      expect(stats.mostPlayed.map((m) => m.name).toList(), [
+        'Borrowed',
+        'Owned',
+      ]);
       // ...but backlog stays scoped to the owned collection.
       expect(stats.totalGames, 1);
       expect(stats.playedGames, 1);

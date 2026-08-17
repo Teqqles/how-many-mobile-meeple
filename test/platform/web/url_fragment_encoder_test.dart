@@ -21,8 +21,11 @@ main() {
       final mockSettings = MockSettings();
       when(mockItems.itemList).thenReturn([]);
       when(mockSettings.changedSettings).thenReturn({});
-      var encodedName = UrlFragmentEncoder.encode(expectedName,
-          items: mockItems, settings: mockSettings);
+      var encodedName = UrlFragmentEncoder.encode(
+        expectedName,
+        items: mockItems,
+        settings: mockSettings,
+      );
       expect(encodedName, expectedName);
     });
 
@@ -32,8 +35,11 @@ main() {
 
       when(mockItems.itemList).thenReturn([]);
       when(mockSettings.changedSettings).thenReturn({});
-      var encodedName = UrlFragmentEncoder.encode(expectedName,
-          items: mockItems, settings: mockSettings);
+      var encodedName = UrlFragmentEncoder.encode(
+        expectedName,
+        items: mockItems,
+        settings: mockSettings,
+      );
       expect(encodedName, expectedName);
     });
 
@@ -44,8 +50,11 @@ main() {
       when(mockItems.itemList).thenReturn([Item('test')]);
       when(mockSettings.changedSettings).thenReturn({});
       var expectedEncodedName = expectedName + '/test';
-      var encodedName = UrlFragmentEncoder.encode(expectedName,
-          items: mockItems, settings: mockSettings);
+      var encodedName = UrlFragmentEncoder.encode(
+        expectedName,
+        items: mockItems,
+        settings: mockSettings,
+      );
       expect(encodedName, expectedEncodedName);
     });
 
@@ -56,8 +65,11 @@ main() {
       when(mockItems.itemList).thenReturn([Item('test'), Item('test2')]);
       when(mockSettings.changedSettings).thenReturn({});
       var expectedEncodedName = expectedName + '/test+test2';
-      var encodedName = UrlFragmentEncoder.encode(expectedName,
-          items: mockItems, settings: mockSettings);
+      var encodedName = UrlFragmentEncoder.encode(
+        expectedName,
+        items: mockItems,
+        settings: mockSettings,
+      );
       expect(encodedName, expectedEncodedName);
     });
 
@@ -67,8 +79,11 @@ main() {
 
       when(mockItems.itemList).thenReturn([]);
       when(mockSettings.changedSettings).thenReturn({});
-      var encodedName = UrlFragmentEncoder.encode(expectedName,
-          items: mockItems, settings: mockSettings);
+      var encodedName = UrlFragmentEncoder.encode(
+        expectedName,
+        items: mockItems,
+        settings: mockSettings,
+      );
       expect(encodedName, expectedName);
     });
 
@@ -80,8 +95,11 @@ main() {
       when(mockSettings.changedSettings)
           .thenReturn({'test': Setting('setting', value: 'value')});
       var expectedEncodedName = expectedName + '/test?setting=value';
-      var encodedName = UrlFragmentEncoder.encode(expectedName,
-          items: mockItems, settings: mockSettings);
+      var encodedName = UrlFragmentEncoder.encode(
+        expectedName,
+        items: mockItems,
+        settings: mockSettings,
+      );
       expect(encodedName, expectedEncodedName);
     });
 
@@ -92,12 +110,15 @@ main() {
       when(mockItems.itemList).thenReturn([Item('test')]);
       when(mockSettings.changedSettings).thenReturn({
         'test': Setting('setting', value: 'value'),
-        'test2': Setting('setting2', value: 'value2')
+        'test2': Setting('setting2', value: 'value2'),
       });
       var expectedEncodedName =
           expectedName + '/test?setting=value&setting2=value2';
-      var encodedName = UrlFragmentEncoder.encode(expectedName,
-          items: mockItems, settings: mockSettings);
+      var encodedName = UrlFragmentEncoder.encode(
+        expectedName,
+        items: mockItems,
+        settings: mockSettings,
+      );
       expect(encodedName, expectedEncodedName);
     });
 
@@ -108,8 +129,11 @@ main() {
       when(mockItems.itemList).thenReturn([Item('12345')]);
       when(mockSettings.changedSettings).thenReturn({});
       var expectedEncodedName = expectedName + '/12345';
-      var encodedName = UrlFragmentEncoder.encode(expectedName,
-          items: mockItems, settings: mockSettings);
+      var encodedName = UrlFragmentEncoder.encode(
+        expectedName,
+        items: mockItems,
+        settings: mockSettings,
+      );
       expect(encodedName, expectedEncodedName);
     });
 
@@ -120,8 +144,11 @@ main() {
       when(mockItems.itemList).thenReturn([Item('testuser'), Item('12345')]);
       when(mockSettings.changedSettings).thenReturn({});
       var expectedEncodedName = expectedName + '/testuser+12345';
-      var encodedName = UrlFragmentEncoder.encode(expectedName,
-          items: mockItems, settings: mockSettings);
+      var encodedName = UrlFragmentEncoder.encode(
+        expectedName,
+        items: mockItems,
+        settings: mockSettings,
+      );
       expect(encodedName, expectedEncodedName);
     });
 
@@ -133,8 +160,11 @@ main() {
           .thenReturn([Item('trending', itemType: ItemType.hotList)]);
       when(mockSettings.changedSettings).thenReturn({});
       var expectedEncodedName = expectedName + '/[trending]';
-      var encodedName = UrlFragmentEncoder.encode(expectedName,
-          items: mockItems, settings: mockSettings);
+      var encodedName = UrlFragmentEncoder.encode(
+        expectedName,
+        items: mockItems,
+        settings: mockSettings,
+      );
       expect(encodedName, expectedEncodedName);
     });
   });

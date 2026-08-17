@@ -19,7 +19,8 @@ abstract class Pages {
 
   static bool isLargeDevice() {
     final data = MediaQueryData.fromView(
-        WidgetsBinding.instance.platformDispatcher.views.first);
+      WidgetsBinding.instance.platformDispatcher.views.first,
+    );
     return data.size.shortestSide >= 600;
   }
 }

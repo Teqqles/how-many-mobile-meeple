@@ -34,10 +34,11 @@ class Item {
   ItemType itemType;
 
   Item(this.name, {ItemType? itemType})
-      : itemType = itemType ??
-            (name.contains(RegExp(r"^\d+$"))
-                ? ItemType.geekList
-                : ItemType.collection);
+    : itemType =
+          itemType ??
+          (name.contains(RegExp(r"^\d+$"))
+              ? ItemType.geekList
+              : ItemType.collection);
 
   toJson() {
     return {'name': name, 'item_type': itemType};
@@ -64,8 +65,10 @@ class Item {
     if (decoded.length >= 2 &&
         decoded.startsWith('[') &&
         decoded.endsWith(']')) {
-      return Item(decoded.substring(1, decoded.length - 1),
-          itemType: ItemType.hotList);
+      return Item(
+        decoded.substring(1, decoded.length - 1),
+        itemType: ItemType.hotList,
+      );
     }
     return Item(decoded);
   }

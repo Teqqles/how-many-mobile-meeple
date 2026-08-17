@@ -48,8 +48,9 @@ void main() {
 
       test('errorForItems returns collection message when only BGG items', () {
         final model = AppModel();
-        model.items.itemList
-            .add(Item('user123', itemType: ItemType.collection));
+        model.items.itemList.add(
+          Item('user123', itemType: ItemType.collection),
+        );
 
         expect(
           NetworkWidget.errorForItems(model),
@@ -60,8 +61,9 @@ void main() {
       test('errorForItems returns generic message when mixed items', () {
         final model = AppModel();
         model.items.itemList.add(Item('hot', itemType: ItemType.hotList));
-        model.items.itemList
-            .add(Item('user123', itemType: ItemType.collection));
+        model.items.itemList.add(
+          Item('user123', itemType: ItemType.collection),
+        );
 
         expect(
           NetworkWidget.errorForItems(model),
@@ -71,8 +73,9 @@ void main() {
     });
 
     group('no sources state', () {
-      testWidgets('shows empty state when items are empty and data loaded',
-          (tester) async {
+      testWidgets('shows empty state when items are empty and data loaded', (
+        tester,
+      ) async {
         final model = AppModel();
         model.hasLoadedPersistedData = true;
 
@@ -89,8 +92,9 @@ void main() {
     });
 
     group('loading state', () {
-      testWidgets('shows finding games text during initial load',
-          (tester) async {
+      testWidgets('shows finding games text during initial load', (
+        tester,
+      ) async {
         final model = AppModel();
 
         await tester.pumpWidget(_buildTestWidget(model));

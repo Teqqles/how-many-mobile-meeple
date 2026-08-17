@@ -7,6 +7,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:how_many_mobile_meeple/api/recommendations_service.dart';
 import 'package:how_many_mobile_meeple/model/recommendation.dart';
+
 import '../helpers/sync_mock_client.dart';
 
 void main() {
@@ -17,23 +18,17 @@ void main() {
   group('RecommendationsService.fetchRecommendations', () {
     test('returns list of Recommendations on 200', () async {
       RecommendationsService.setTestClient(
-        SyncMockClient((_) => http.Response(
-              json.encode({
-                'recommendations': [
-                  {
-                    'game_id': 1,
-                    'name': 'Everdell',
-                    'similarity_score': 0.85,
-                  },
-                  {
-                    'game_id': 2,
-                    'name': 'Ark Nova',
-                    'similarity_score': 0.72,
-                  },
-                ]
-              }),
-              200,
-            )),
+        SyncMockClient(
+          (_) => http.Response(
+            json.encode({
+              'recommendations': [
+                {'game_id': 1, 'name': 'Everdell', 'similarity_score': 0.85},
+                {'game_id': 2, 'name': 'Ark Nova', 'similarity_score': 0.72},
+              ],
+            }),
+            200,
+          ),
+        ),
       );
 
       final results = await RecommendationsService.fetchRecommendations(
@@ -66,13 +61,12 @@ void main() {
       Map<String, dynamic>? capturedBody;
       RecommendationsService.setTestClient(
         SyncMockClient((request) {
-          capturedBody = json.decode(request.url.toString().contains('/')
-              ? (request as http.Request).body
-              : '{}');
-          return http.Response(
-            json.encode({'recommendations': []}),
-            200,
+          capturedBody = json.decode(
+            request.url.toString().contains('/')
+                ? (request as http.Request).body
+                : '{}',
           );
+          return http.Response(json.encode({'recommendations': []}), 200);
         }),
       );
 
@@ -93,10 +87,7 @@ void main() {
       RecommendationsService.setTestClient(
         SyncMockClient((request) {
           capturedHeaders = request.headers;
-          return http.Response(
-            json.encode({'recommendations': []}),
-            200,
-          );
+          return http.Response(json.encode({'recommendations': []}), 200);
         }),
       );
 

@@ -32,10 +32,7 @@ class _Step4GameStyleState extends State<Step4GameStyle> {
       'Team-Based Game',
       'Simultaneous Action Selection',
     ],
-    'Randomness & Input': [
-      'Dice Rolling',
-      'Card Drafting',
-    ],
+    'Randomness & Input': ['Dice Rolling', 'Card Drafting'],
   };
 
   String _getDifficultyLabel(double weight) {
@@ -64,10 +61,12 @@ class _Step4GameStyleState extends State<Step4GameStyle> {
   Widget build(BuildContext context) {
     return Consumer<AppModel>(
       builder: (context, model, child) {
-        final difficultySetting =
-            model.settings.setting(Settings.filterComplexity.name);
-        final mechanicsSetting =
-            model.settings.setting(Settings.filterMechanics.name);
+        final difficultySetting = model.settings.setting(
+          Settings.filterComplexity.name,
+        );
+        final mechanicsSetting = model.settings.setting(
+          Settings.filterMechanics.name,
+        );
 
         final difficulty = difficultySetting.getDouble();
         final selectedMechanics = mechanicsSetting.value as List<dynamic>;
@@ -91,9 +90,8 @@ class _Step4GameStyleState extends State<Step4GameStyle> {
                 // Difficulty section
                 Text(
                   'Difficulty',
-                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
+                  style: Theme.of(context).textTheme.titleLarge
+                      ?.copyWith(fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 16),
 
@@ -168,9 +166,7 @@ class _Step4GameStyleState extends State<Step4GameStyle> {
                 const SizedBox(height: 8),
 
                 // Difficulty description below slider
-                InfoMessageBox(
-                  message: _getDifficultyDescription(difficulty),
-                ),
+                InfoMessageBox(message: _getDifficultyDescription(difficulty)),
 
                 // Live count of games per complexity bucket, from analytics.
                 // Highlights the bucket holding the selected weight (unless
@@ -190,16 +186,15 @@ class _Step4GameStyleState extends State<Step4GameStyle> {
                 // Mechanics section
                 Text(
                   'Mechanics (Optional)',
-                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
+                  style: Theme.of(context).textTheme.titleLarge
+                      ?.copyWith(fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 8),
                 Text(
                   'Select preferred game mechanics',
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: Theme.of(context).colorScheme.onSurfaceVariant,
-                      ),
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
                 ),
                 const SizedBox(height: 16),
 
@@ -223,13 +218,12 @@ class _Step4GameStyleState extends State<Step4GameStyle> {
                             const SizedBox(width: 8),
                             Text(
                               category.key,
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .titleSmall
+                              style: Theme.of(context).textTheme.titleSmall
                                   ?.copyWith(
                                     fontWeight: FontWeight.bold,
-                                    color:
-                                        Theme.of(context).colorScheme.primary,
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .primary,
                                   ),
                             ),
                           ],
@@ -239,8 +233,9 @@ class _Step4GameStyleState extends State<Step4GameStyle> {
                         spacing: 8,
                         runSpacing: 8,
                         children: category.value.map((mechanic) {
-                          final isSelected =
-                              selectedMechanics.contains(mechanic);
+                          final isSelected = selectedMechanics.contains(
+                            mechanic,
+                          );
                           return AppMechanicChip(
                             label: mechanic,
                             selected: isSelected,
@@ -326,10 +321,8 @@ class _Step4GameStyleState extends State<Step4GameStyle> {
               border: Border.all(
                 color: isSelected
                     ? Theme.of(context).colorScheme.primary
-                    : Theme.of(context)
-                        .colorScheme
-                        .outline
-                        .withValues(alpha: 0.3),
+                    : Theme.of(context).colorScheme.outline
+                          .withValues(alpha: 0.3),
                 width: isSelected ? 2 : 1,
               ),
             ),
@@ -346,12 +339,13 @@ class _Step4GameStyleState extends State<Step4GameStyle> {
                 Text(
                   label,
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        fontWeight:
-                            isSelected ? FontWeight.bold : FontWeight.normal,
-                        color: isSelected
-                            ? Theme.of(context).colorScheme.onPrimaryContainer
-                            : Theme.of(context).colorScheme.onSurfaceVariant,
-                      ),
+                    fontWeight: isSelected
+                        ? FontWeight.bold
+                        : FontWeight.normal,
+                    color: isSelected
+                        ? Theme.of(context).colorScheme.onPrimaryContainer
+                        : Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
                   textAlign: TextAlign.center,
                   maxLines: 2,
                   softWrap: true,
@@ -387,7 +381,10 @@ class _Step4GameStyleState extends State<Step4GameStyle> {
 
   /// Updates difficulty setting when panel is tapped
   void _updateDifficulty(
-      AppModel model, dynamic difficultySetting, double value) {
+    AppModel model,
+    dynamic difficultySetting,
+    double value,
+  ) {
     setState(() {
       difficultySetting.value = value;
       difficultySetting.enabled = true;

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../model/game.dart';
 import 'play_date_format.dart';
 import 'play_log_entry.dart';
@@ -25,8 +26,10 @@ class LogPlayDialog extends StatefulWidget {
     this.existing,
     this.suggestedPlayers = const [],
     this.primaryPlayer,
-  }) : assert(game != null || existing != null,
-            'Provide a game to log or an entry to edit');
+  }) : assert(
+         game != null || existing != null,
+         'Provide a game to log or an entry to edit',
+       );
 
   bool get isEditing => existing != null;
 
@@ -144,7 +147,8 @@ class _LogPlayDialogState extends State<LogPlayDialog> {
 
   void _save() {
     final entry = PlayLogEntry(
-      id: widget.existing?.id ??
+      id:
+          widget.existing?.id ??
           DateTime.now().microsecondsSinceEpoch.toString(),
       gameId: widget.gameId,
       name: widget.gameName,
@@ -159,8 +163,9 @@ class _LogPlayDialogState extends State<LogPlayDialog> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final unusedSuggestions = widget.suggestedPlayers
-        .where((s) =>
-            !_players.any((p) => p.name.toLowerCase() == s.toLowerCase()))
+        .where(
+          (s) => !_players.any((p) => p.name.toLowerCase() == s.toLowerCase()),
+        )
         .toList();
 
     return SingleChildScrollView(
@@ -188,15 +193,17 @@ class _LogPlayDialogState extends State<LogPlayDialog> {
             const SizedBox(height: 20),
             Text(
               widget.isEditing ? 'Edit play' : 'Log a play',
-              style: theme.textTheme.headlineSmall
-                  ?.copyWith(fontWeight: FontWeight.bold),
+              style: theme.textTheme.headlineSmall?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 4),
             Text(
               widget.gameName,
-              style: theme.textTheme.bodyMedium
-                  ?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 24),
@@ -228,8 +235,9 @@ class _LogPlayDialogState extends State<LogPlayDialog> {
         const SizedBox(width: 8),
         Text(
           'Date',
-          style:
-              theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
+          style: theme.textTheme.titleSmall?.copyWith(
+            fontWeight: FontWeight.bold,
+          ),
         ),
         const Spacer(),
         OutlinedButton.icon(
@@ -251,14 +259,16 @@ class _LogPlayDialogState extends State<LogPlayDialog> {
             const SizedBox(width: 8),
             Text(
               'Players',
-              style: theme.textTheme.titleSmall
-                  ?.copyWith(fontWeight: FontWeight.bold),
+              style: theme.textTheme.titleSmall?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
             ),
             const SizedBox(width: 8),
             Text(
               '(optional)',
-              style: theme.textTheme.bodySmall
-                  ?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
             ),
           ],
         ),
@@ -270,19 +280,22 @@ class _LogPlayDialogState extends State<LogPlayDialog> {
           const SizedBox(height: 12),
           Text(
             'You often play with',
-            style: theme.textTheme.bodySmall
-                ?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
           ),
           const SizedBox(height: 6),
           Wrap(
             spacing: 8,
             runSpacing: 4,
             children: unusedSuggestions
-                .map((name) => ActionChip(
-                      avatar: const Icon(Icons.add, size: 16),
-                      label: Text(name),
-                      onPressed: () => _addPlayer(name),
-                    ))
+                .map(
+                  (name) => ActionChip(
+                    avatar: const Icon(Icons.add, size: 16),
+                    label: Text(name),
+                    onPressed: () => _addPlayer(name),
+                  ),
+                )
                 .toList(),
           ),
         ],

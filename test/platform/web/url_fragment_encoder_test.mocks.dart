@@ -26,23 +26,13 @@ import 'package:mockito/src/dummies.dart' as _i6;
 // ignore_for_file: invalid_use_of_internal_member
 
 class _FakeSetting_0 extends _i1.SmartFake implements _i2.Setting {
-  _FakeSetting_0(
-    Object parent,
-    Invocation parentInvocation,
-  ) : super(
-          parent,
-          parentInvocation,
-        );
+  _FakeSetting_0(Object parent, Invocation parentInvocation)
+    : super(parent, parentInvocation);
 }
 
 class _FakeSettings_1 extends _i1.SmartFake implements _i3.Settings {
-  _FakeSettings_1(
-    Object parent,
-    Invocation parentInvocation,
-  ) : super(
-          parent,
-          parentInvocation,
-        );
+  _FakeSettings_1(Object parent, Invocation parentInvocation)
+    : super(parent, parentInvocation);
 }
 
 /// A class which mocks [Items].
@@ -55,39 +45,29 @@ class MockItems extends _i1.Mock implements _i4.Items {
 
   @override
   List<_i5.Item> get itemList => (super.noSuchMethod(
-        Invocation.getter(#itemList),
-        returnValue: <_i5.Item>[],
-      ) as List<_i5.Item>);
+    Invocation.getter(#itemList),
+    returnValue: <_i5.Item>[],
+  ) as List<_i5.Item>);
 
   @override
-  bool get isEmpty => (super.noSuchMethod(
-        Invocation.getter(#isEmpty),
-        returnValue: false,
-      ) as bool);
+  bool get isEmpty =>
+      (super.noSuchMethod(Invocation.getter(#isEmpty), returnValue: false)
+          as bool);
 
   @override
   set itemList(List<_i5.Item>? value) => super.noSuchMethod(
-        Invocation.setter(
-          #itemList,
-          value,
-        ),
-        returnValueForMissingStub: null,
-      );
+    Invocation.setter(#itemList, value),
+    returnValueForMissingStub: null,
+  );
 
   @override
   String toUrlItems() => (super.noSuchMethod(
-        Invocation.method(
-          #toUrlItems,
-          [],
-        ),
-        returnValue: _i6.dummyValue<String>(
-          this,
-          Invocation.method(
-            #toUrlItems,
-            [],
-          ),
-        ),
-      ) as String);
+    Invocation.method(#toUrlItems, []),
+    returnValue: _i6.dummyValue<String>(
+      this,
+      Invocation.method(#toUrlItems, []),
+    ),
+  ) as String);
 }
 
 /// A class which mocks [Settings].
@@ -100,76 +80,49 @@ class MockSettings extends _i1.Mock implements _i3.Settings {
 
   @override
   Map<String, _i2.Setting> get allSettings => (super.noSuchMethod(
-        Invocation.getter(#allSettings),
-        returnValue: <String, _i2.Setting>{},
-      ) as Map<String, _i2.Setting>);
+    Invocation.getter(#allSettings),
+    returnValue: <String, _i2.Setting>{},
+  ) as Map<String, _i2.Setting>);
 
   @override
   Map<String, _i2.Setting> get changedSettings => (super.noSuchMethod(
-        Invocation.getter(#changedSettings),
-        returnValue: <String, _i2.Setting>{},
-      ) as Map<String, _i2.Setting>);
+    Invocation.getter(#changedSettings),
+    returnValue: <String, _i2.Setting>{},
+  ) as Map<String, _i2.Setting>);
 
   @override
   Map<String, _i2.Setting> get enabledSettings => (super.noSuchMethod(
-        Invocation.getter(#enabledSettings),
-        returnValue: <String, _i2.Setting>{},
-      ) as Map<String, _i2.Setting>);
+    Invocation.getter(#enabledSettings),
+    returnValue: <String, _i2.Setting>{},
+  ) as Map<String, _i2.Setting>);
 
   @override
   _i2.Setting setting(String? name) => (super.noSuchMethod(
-        Invocation.method(
-          #setting,
-          [name],
-        ),
-        returnValue: _FakeSetting_0(
-          this,
-          Invocation.method(
-            #setting,
-            [name],
-          ),
-        ),
-      ) as _i2.Setting);
+    Invocation.method(#setting, [name]),
+    returnValue: _FakeSetting_0(this, Invocation.method(#setting, [name])),
+  ) as _i2.Setting);
 
   @override
   void updateSetting(_i2.Setting? setting) => super.noSuchMethod(
-        Invocation.method(
-          #updateSetting,
-          [setting],
-        ),
-        returnValueForMissingStub: null,
-      );
+    Invocation.method(#updateSetting, [setting]),
+    returnValueForMissingStub: null,
+  );
 
   @override
   void updateAllSettings(_i3.Settings? settings) => super.noSuchMethod(
-        Invocation.method(
-          #updateAllSettings,
-          [settings],
-        ),
-        returnValueForMissingStub: null,
-      );
+    Invocation.method(#updateAllSettings, [settings]),
+    returnValueForMissingStub: null,
+  );
 
   @override
   Map<String, String> toQueryParameters() => (super.noSuchMethod(
-        Invocation.method(
-          #toQueryParameters,
-          [],
-        ),
-        returnValue: <String, String>{},
-      ) as Map<String, String>);
+    Invocation.method(#toQueryParameters, []),
+    returnValue: <String, String>{},
+  ) as Map<String, String>);
 
   @override
   _i3.Settings clone() => (super.noSuchMethod(
-        Invocation.method(
-          #clone,
-          [],
-        ),
-        returnValue: _FakeSettings_1(
-          this,
-          Invocation.method(
-            #clone,
-            [],
-          ),
-        ),
-      ) as _i3.Settings);
+    Invocation.method(#clone, []),
+    returnValue: _FakeSettings_1(this, Invocation.method(#clone, [])),
+  ) as _i3.Settings);
 }

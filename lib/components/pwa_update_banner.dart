@@ -1,4 +1,5 @@
 import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:how_many_mobile_meeple/pwa/pwa_update_service.dart';
@@ -55,9 +56,8 @@ class _PwaUpdateBannerState extends State<PwaUpdateBanner> {
             Expanded(
               child: Text(
                 'A new version is available',
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: textColor,
-                    ),
+                style: Theme.of(context).textTheme.bodySmall
+                    ?.copyWith(color: textColor),
               ),
             ),
             TextButton(

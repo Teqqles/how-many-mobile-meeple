@@ -12,27 +12,27 @@ void main() {
   setUp(() {
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(
-      const MethodChannel('dev.fluttercommunity.plus/package_info'),
-      (MethodCall call) async {
-        if (call.method == 'getAll') {
-          return <String, dynamic>{
-            'appName': 'How Many Meeple?',
-            'packageName': 'com.test',
-            'version': '2.11.4',
-            'buildNumber': '28',
-          };
-        }
-        return null;
-      },
-    );
+          const MethodChannel('dev.fluttercommunity.plus/package_info'),
+          (MethodCall call) async {
+            if (call.method == 'getAll') {
+              return <String, dynamic>{
+                'appName': 'How Many Meeple?',
+                'packageName': 'com.test',
+                'version': '2.11.4',
+                'buildNumber': '28',
+              };
+            }
+            return null;
+          },
+        );
   });
 
   tearDown(() {
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(
-      const MethodChannel('dev.fluttercommunity.plus/package_info'),
-      null,
-    );
+          const MethodChannel('dev.fluttercommunity.plus/package_info'),
+          null,
+        );
   });
 
   Widget buildApp() {

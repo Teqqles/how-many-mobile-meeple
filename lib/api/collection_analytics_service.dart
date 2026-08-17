@@ -22,7 +22,8 @@ class CollectionAnalyticsService {
   static Future<AnalyticsFetchResult> fetch(String username) async {
     try {
       final url = Uri.parse(
-          '${AppCommon.boardGameGeekProxyUrl}/collection/${Uri.encodeComponent(username)}/analytics');
+        '${AppCommon.boardGameGeekProxyUrl}/collection/${Uri.encodeComponent(username)}/analytics',
+      );
       final response = await HttpRetryClient.getWithRetry(url);
       final status = response.statusCode;
       if (status == 404) return AnalyticsFetchResult.givenUp; // no such user

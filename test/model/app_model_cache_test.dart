@@ -32,8 +32,7 @@ void main() {
       expect(model.bggCache.games, games);
     });
 
-    test(
-        'rejects response when items have changed since fetch started - '
+    test('rejects response when items have changed since fetch started - '
         'simulates background fetcher refilling cache after deleteItem', () {
       final model = AppModel()..hasLoadedPersistedData = true;
       // Setup: two items
@@ -52,12 +51,14 @@ void main() {
       model.replaceCache(staleGames, staleRequest);
 
       // Cache must remain stale - stale response was rejected
-      expect(model.bggCache.isStale(), true,
-          reason: 'stale response from old items set must be rejected');
+      expect(
+        model.bggCache.isStale(),
+        true,
+        reason: 'stale response from old items set must be rejected',
+      );
     });
 
-    test(
-        'rejects response when headers have changed since fetch started - '
+    test('rejects response when headers have changed since fetch started - '
         'simulates in-flight fetch completing after a filter change', () {
       final model = AppModel()..hasLoadedPersistedData = true;
       model.items.itemList.add(Item('teqqles'));
@@ -68,10 +69,7 @@ void main() {
           '8';
       settingsAt8Players.setting(Settings.filterNumberOfPlayers.name).enabled =
           true;
-      final staleRequest = GameRequest.from(
-        settingsAt8Players,
-        model.items,
-      );
+      final staleRequest = GameRequest.from(settingsAt8Players, model.items);
       final staleGames = TestHelpers.twoGames();
 
       // User changes player count to 6
@@ -83,12 +81,14 @@ void main() {
       // In-flight fetch for player=8 completes
       model.replaceCache(staleGames, staleRequest);
 
-      expect(model.bggCache.isStale(), true,
-          reason: 'stale response with old headers must be rejected');
+      expect(
+        model.bggCache.isStale(),
+        true,
+        reason: 'stale response with old headers must be rejected',
+      );
     });
 
-    test(
-        'accepts fresh response after deleteItem invalidates and new fetch '
+    test('accepts fresh response after deleteItem invalidates and new fetch '
         'completes with updated items', () {
       final model = AppModel()..hasLoadedPersistedData = true;
       model.items.itemList.add(Item('teqqles'));

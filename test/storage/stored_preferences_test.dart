@@ -19,8 +19,10 @@ import 'stored_preferences_test.mocks.dart';
 main() {
   var firstSetting = Setting("key-1", value: "value-1");
   var secondSetting = Setting("key-2", value: "value-2");
-  var settings = Settings(
-      {firstSetting.name: firstSetting, secondSetting.name: secondSetting});
+  var settings = Settings({
+    firstSetting.name: firstSetting,
+    secondSetting.name: secondSetting,
+  });
 
   group('saveSettings', () {
     test('returns true and stores setting data when supplied', () async {
@@ -86,8 +88,10 @@ main() {
       var expectedSetting = settingsTemplate.clone();
       expectedSetting.updateSetting(firstSetting);
 
-      expect(await storedPreferences.loadSettings(settingsTemplate),
-          expectedSetting);
+      expect(
+        await storedPreferences.loadSettings(settingsTemplate),
+        expectedSetting,
+      );
 
       verify(prefs.containsKey(firstSetting.name)).called(1);
       verify(prefs.getString(firstSetting.name)).called(1);
@@ -111,23 +115,35 @@ main() {
       when(prefs.remove("${Items.itemStoreNamePrefix}1"))
           .thenAnswer(((_) => Future(() => true)));
 
-      when(prefs.setString(
-              "${Items.itemStoreNamePrefix}0", json.encode(firstItem)))
-          .thenAnswer(((_) => Future(() => true)));
-      when(prefs.setString(
-              "${Items.itemStoreNamePrefix}1", json.encode(secondItem)))
-          .thenAnswer(((_) => Future(() => true)));
+      when(
+        prefs.setString(
+          "${Items.itemStoreNamePrefix}0",
+          json.encode(firstItem),
+        ),
+      ).thenAnswer(((_) => Future(() => true)));
+      when(
+        prefs.setString(
+          "${Items.itemStoreNamePrefix}1",
+          json.encode(secondItem),
+        ),
+      ).thenAnswer(((_) => Future(() => true)));
 
       var storedPreferences = StoredPreferences(prefs);
 
       expect(await storedPreferences.saveItems(items, maxItemsToLoad), isTrue);
 
-      verify(prefs.setString(
-              "${Items.itemStoreNamePrefix}0", json.encode(firstItem)))
-          .called(1);
-      verify(prefs.setString(
-              "${Items.itemStoreNamePrefix}1", json.encode(secondItem)))
-          .called(1);
+      verify(
+        prefs.setString(
+          "${Items.itemStoreNamePrefix}0",
+          json.encode(firstItem),
+        ),
+      ).called(1);
+      verify(
+        prefs.setString(
+          "${Items.itemStoreNamePrefix}1",
+          json.encode(secondItem),
+        ),
+      ).called(1);
     });
 
     test('deletes existing keys first', () async {
@@ -139,12 +155,18 @@ main() {
       when(prefs.remove("${Items.itemStoreNamePrefix}1"))
           .thenAnswer(((_) => Future(() => true)));
 
-      when(prefs.setString(
-              "${Items.itemStoreNamePrefix}0", json.encode(firstItem)))
-          .thenAnswer(((_) => Future(() => true)));
-      when(prefs.setString(
-              "${Items.itemStoreNamePrefix}1", json.encode(secondItem)))
-          .thenAnswer(((_) => Future(() => true)));
+      when(
+        prefs.setString(
+          "${Items.itemStoreNamePrefix}0",
+          json.encode(firstItem),
+        ),
+      ).thenAnswer(((_) => Future(() => true)));
+      when(
+        prefs.setString(
+          "${Items.itemStoreNamePrefix}1",
+          json.encode(secondItem),
+        ),
+      ).thenAnswer(((_) => Future(() => true)));
 
       var storedPreferences = StoredPreferences(prefs);
 
@@ -153,12 +175,18 @@ main() {
       verify(prefs.remove("${Items.itemStoreNamePrefix}0")).called(1);
       verify(prefs.remove("${Items.itemStoreNamePrefix}1")).called(1);
 
-      verify(prefs.setString(
-              "${Items.itemStoreNamePrefix}0", json.encode(firstItem)))
-          .called(1);
-      verify(prefs.setString(
-              "${Items.itemStoreNamePrefix}1", json.encode(secondItem)))
-          .called(1);
+      verify(
+        prefs.setString(
+          "${Items.itemStoreNamePrefix}0",
+          json.encode(firstItem),
+        ),
+      ).called(1);
+      verify(
+        prefs.setString(
+          "${Items.itemStoreNamePrefix}1",
+          json.encode(secondItem),
+        ),
+      ).called(1);
     });
   });
 

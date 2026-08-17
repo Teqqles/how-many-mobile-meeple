@@ -1,12 +1,15 @@
 // coverage:ignore-file
 import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
 import 'package:path/path.dart';
 
 // Conditional import for sqflite
 import 'sqflite_stub.dart' if (dart.library.io) 'package:sqflite/sqflite.dart';
-import 'sqflite_stub.dart' if (dart.library.io) 'package:sqflite/sqflite.dart'
+import 'sqflite_stub.dart'
+    if (dart.library.io) 'package:sqflite/sqflite.dart'
     as sqflite_common;
+
 import 'package:synchronized/synchronized.dart';
 
 abstract class MeepleDatabase {
@@ -39,10 +42,12 @@ abstract class MeepleDatabase {
         if (_db == null) {
           try {
             var path = await initDatabasePath();
-            _db = await openDatabase(path,
-                version: dbVersion(),
-                onCreate: _onCreate,
-                onUpgrade: _onUpdate);
+            _db = await openDatabase(
+              path,
+              version: dbVersion(),
+              onCreate: _onCreate,
+              onUpgrade: _onUpdate,
+            );
           } catch (e) {
             debugPrint(e.toString());
           }

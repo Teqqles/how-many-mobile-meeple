@@ -6,11 +6,7 @@ class HelpItem {
   final String title;
   final String body;
 
-  const HelpItem({
-    required this.icon,
-    required this.title,
-    required this.body,
-  });
+  const HelpItem({required this.icon, required this.title, required this.body});
 }
 
 /// A page-scoped group of help items. [id] matches the page it describes so
@@ -50,14 +46,16 @@ class HelpContent {
       id: home,
       icon: Icons.home_outlined,
       title: 'Finding Games',
-      summary: 'The home screen walks you through five steps to find the right '
+      summary:
+          'The home screen walks you through five steps to find the right '
           'game for your group. Swipe or tap the step dots to move around - '
           'you can also jump straight to results with Finish or Quick Pick.',
       items: [
         HelpItem(
           icon: Icons.source,
           title: 'Step 1 - Source',
-          body: 'Choose where your games come from: Trending pulls the hottest '
+          body:
+              'Choose where your games come from: Trending pulls the hottest '
               'games on BoardGameGeek (no account needed), Collection searches '
               'your own BGG collection by username, and Geeklist uses a '
               'community list ID. You can add several sources at once and set a '
@@ -66,20 +64,23 @@ class HelpContent {
         HelpItem(
           icon: Icons.people_outline,
           title: 'Step 2 - Players',
-          body: 'Set how many people are playing with the slider or a quick '
+          body:
+              'Set how many people are playing with the slider or a quick '
               'preset. Recommendations are filtered to games that support that '
               'player count.',
         ),
         HelpItem(
           icon: Icons.schedule,
           title: 'Step 3 - Time',
-          body: 'Drag the two handles to set the shortest and longest play '
+          body:
+              'Drag the two handles to set the shortest and longest play '
               'time you want. Presets below cover common session lengths.',
         ),
         HelpItem(
           icon: Icons.tune,
           title: 'Step 4 - Style',
-          body: 'Set game weight from Light to Expert (leave at 0 for any), '
+          body:
+              'Set game weight from Light to Expert (leave at 0 for any), '
               'and tap mechanic chips to prefer certain game types. Leave '
               'mechanics unselected to include everything.',
         ),
@@ -93,7 +94,8 @@ class HelpContent {
         HelpItem(
           icon: Icons.bolt,
           title: 'Advanced Mode',
-          body: 'Prefer all controls on one screen? Switch to Advanced Mode '
+          body:
+              'Prefer all controls on one screen? Switch to Advanced Mode '
               'from Step 5 or the settings drawer. Toggle "Always Use Advanced '
               'Mode" to make it the default.',
         ),
@@ -110,7 +112,8 @@ class HelpContent {
         HelpItem(
           icon: Icons.swipe,
           title: 'Swipe Actions',
-          body: 'Swipe a game right to add it to Favourites, or left to ignore '
+          body:
+              'Swipe a game right to add it to Favourites, or left to ignore '
               'it so it stays out of future results.',
         ),
         HelpItem(
@@ -133,7 +136,8 @@ class HelpContent {
         HelpItem(
           icon: Icons.refresh,
           title: 'Pick Again',
-          body: 'Not feeling it? Roll again for another game from the same '
+          body:
+              'Not feeling it? Roll again for another game from the same '
               'filtered set.',
         ),
       ],
@@ -149,13 +153,15 @@ class HelpContent {
         HelpItem(
           icon: Icons.favorite_border,
           title: 'Favourites',
-          body: 'Games you swipe right on, or tap the heart on, are saved here '
+          body:
+              'Games you swipe right on, or tap the heart on, are saved here '
               'for quick access.',
         ),
         HelpItem(
           icon: Icons.visibility_off_outlined,
           title: 'Ignored Games',
-          body: 'Games you swipe left on are hidden from future results. Open '
+          body:
+              'Games you swipe left on are hidden from future results. Open '
               'Ignored Games from the menu to restore them.',
         ),
       ],
@@ -169,7 +175,8 @@ class HelpContent {
         HelpItem(
           icon: Icons.add,
           title: 'Logging Plays',
-          body: 'Record a play from a game detail page. Your history is stored '
+          body:
+              'Record a play from a game detail page. Your history is stored '
               'on this device.',
         ),
       ],
@@ -185,7 +192,8 @@ class HelpContent {
         HelpItem(
           icon: Icons.person_outline,
           title: 'Whose Shelf?',
-          body: 'The shelf uses your primary player\'s BGG collection. Set the '
+          body:
+              'The shelf uses your primary player\'s BGG collection. Set the '
               'primary player with the crown icon on Step 1.',
         ),
       ],
@@ -202,19 +210,22 @@ class HelpContent {
         HelpItem(
           icon: Icons.grid_view,
           title: 'Overview',
-          body: 'Totals for base games and expansions, plus average and median '
+          body:
+              'Totals for base games and expansions, plus average and median '
               'ratings and average weight across the collection.',
         ),
         HelpItem(
           icon: Icons.bar_chart,
           title: 'Distributions',
-          body: 'Complexity and play-time bars show how your games spread '
+          body:
+              'Complexity and play-time bars show how your games spread '
               'across light-to-heavy and quick-to-epic bands.',
         ),
         HelpItem(
           icon: Icons.people_outline,
           title: 'Player Counts',
-          body: 'For each player count, the solid bar is how many games play '
+          body:
+              'For each player count, the solid bar is how many games play '
               'best there; the faint bar is how many support it.',
         ),
       ],
@@ -223,19 +234,22 @@ class HelpContent {
       id: settings,
       icon: Icons.settings,
       title: 'Settings & Filters',
-      summary: 'The settings drawer (gear icon) holds advanced filters and app '
+      summary:
+          'The settings drawer (gear icon) holds advanced filters and app '
           'preferences.',
       items: [
         HelpItem(
           icon: Icons.filter_alt_outlined,
           title: 'Advanced Filters',
-          body: 'Fine-tune results with options like recommended player-count '
+          body:
+              'Fine-tune results with options like recommended player-count '
               'filtering, including expansions, and showing all mechanics.',
         ),
         HelpItem(
           icon: Icons.save_outlined,
           title: 'Saved Settings',
-          body: 'Save a set of filters so you can reload them in one tap next '
+          body:
+              'Save a set of filters so you can reload them in one tap next '
               'time.',
         ),
       ],
@@ -249,13 +263,15 @@ class HelpContent {
         HelpItem(
           icon: Icons.favorite_border,
           title: 'Save & Log',
-          body: 'Tap the heart to favourite a game, and log a play to add it '
+          body:
+              'Tap the heart to favourite a game, and log a play to add it '
               'to your Play History.',
         ),
         HelpItem(
           icon: Icons.open_in_new,
           title: 'View on BGG',
-          body: 'Open the game on BoardGameGeek for full rules, images, and '
+          body:
+              'Open the game on BoardGameGeek for full rules, images, and '
               'community reviews.',
         ),
       ],

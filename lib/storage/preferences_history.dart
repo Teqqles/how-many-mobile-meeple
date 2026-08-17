@@ -20,7 +20,8 @@ class PreferencesHistoryDb extends MeepleDatabase
 
   @override
   Future<void> storePreference(AppPreferences preferences) async {
-    String insertStatement = "INSERT OR REPLACE INTO $tableName (id, "
+    String insertStatement =
+        "INSERT OR REPLACE INTO $tableName (id, "
         "title, "
         "timestamp, "
         "items, "
@@ -44,38 +45,50 @@ class PreferencesHistoryDb extends MeepleDatabase
       getSecondsTimestamp(),
       json.encode(preferences.items),
       json.encode(
-          preferences.settings.setting(Settings.fieldsToReturnFromApi.name)),
+        preferences.settings.setting(Settings.fieldsToReturnFromApi.name),
+      ),
       json.encode(
-          preferences.settings.setting(Settings.filterNumberOfPlayers.name)),
+        preferences.settings.setting(Settings.filterNumberOfPlayers.name),
+      ),
       json.encode(
-          preferences.settings.setting(Settings.filterMinimumTimeToPlay.name)),
+        preferences.settings.setting(Settings.filterMinimumTimeToPlay.name),
+      ),
       json.encode(
-          preferences.settings.setting(Settings.filterMaximumTimeToPlay.name)),
+        preferences.settings.setting(Settings.filterMaximumTimeToPlay.name),
+      ),
       json.encode(preferences.settings.setting(Settings.filterComplexity.name)),
-      json.encode(preferences.settings
-          .setting(Settings.filterUsingUserRecommendations.name)),
+      json.encode(
+        preferences.settings.setting(
+          Settings.filterUsingUserRecommendations.name,
+        ),
+      ),
       json.encode(preferences.settings.setting(Settings.filterMechanics.name)),
       json.encode(
-          preferences.settings.setting(Settings.filterUseAllMechanics.name)),
+        preferences.settings.setting(Settings.filterUseAllMechanics.name),
+      ),
       json.encode(
-          preferences.settings.setting(Settings.filterIncludesExpansions.name)),
+        preferences.settings.setting(Settings.filterIncludesExpansions.name),
+      ),
       json.encode(preferences.settings.setting(Settings.filterMinRating.name)),
     ]);
   }
 
   List<AppPreferences> _tableDataToPreferences(List<Map> records) {
-    Iterable<AppPreferences> prefs = records
-        .map((Map json) => AppPreferences.fromDb(json as Map<String, dynamic>));
+    Iterable<AppPreferences> prefs = records.map(
+      (Map json) => AppPreferences.fromDb(json as Map<String, dynamic>),
+    );
     return prefs.toList();
   }
 
   @override
   Future<AppPreferences> loadPreference(int preferenceId) async {
-    String selectPreferenceStatement = "SELECT * "
+    String selectPreferenceStatement =
+        "SELECT * "
         "FROM $tableName WHERE id = ?";
     var db = await getDb();
-    List<Map> list =
-        await db.rawQuery(selectPreferenceStatement, [preferenceId]);
+    List<Map> list = await db.rawQuery(selectPreferenceStatement, [
+      preferenceId,
+    ]);
     return _tableDataToPreferences(list).first;
   }
 
@@ -83,8 +96,9 @@ class PreferencesHistoryDb extends MeepleDatabase
   Future<bool> deletePreference(String preferenceId) async {
     String selectPreferenceStatement = 'DELETE FROM $tableName WHERE id = ?';
     var db = await getDb();
-    int deletions =
-        await db.rawDelete(selectPreferenceStatement, [preferenceId]);
+    int deletions = await db.rawDelete(selectPreferenceStatement, [
+      preferenceId,
+    ]);
     return deletions > 0;
   }
 
@@ -102,21 +116,23 @@ class PreferencesHistoryDb extends MeepleDatabase
 
   @override
   void createDatabase(Database db, int version) async {
-    await db.execute("CREATE TABLE $tableName (id TEXT PRIMARY KEY, "
-        "title TEXT, "
-        "timestamp INTEGER, "
-        "items TEXT, "
-        "setting_whitelist TEXT, "
-        "setting_num_players TEXT, "
-        "setting_min_time TEXT, "
-        "setting_max_time TEXT, "
-        "setting_complexity TEXT, "
-        "setting_user_recommendations TEXT, "
-        "setting_mechanic TEXT, "
-        "setting_use_all_mechanics TEXT, "
-        "setting_include_expansions TEXT, "
-        "setting_rating TEXT "
-        ")");
+    await db.execute(
+      "CREATE TABLE $tableName (id TEXT PRIMARY KEY, "
+      "title TEXT, "
+      "timestamp INTEGER, "
+      "items TEXT, "
+      "setting_whitelist TEXT, "
+      "setting_num_players TEXT, "
+      "setting_min_time TEXT, "
+      "setting_max_time TEXT, "
+      "setting_complexity TEXT, "
+      "setting_user_recommendations TEXT, "
+      "setting_mechanic TEXT, "
+      "setting_use_all_mechanics TEXT, "
+      "setting_include_expansions TEXT, "
+      "setting_rating TEXT "
+      ")",
+    );
   }
 
   @override

@@ -77,15 +77,20 @@ void main() {
       expect(find.byTooltip('Help'), findsOneWidget);
     });
 
-    testWidgets('Help button navigates to /help without a section',
-        (tester) async {
+    testWidgets('Help button navigates to /help without a section', (
+      tester,
+    ) async {
       var pushedRoute = '';
-      await tester.pumpWidget(_buildTestApp(routes: {
-        '/help': (_) {
-          pushedRoute = '/help';
-          return const Scaffold(body: Text('Help Page'));
-        },
-      }));
+      await tester.pumpWidget(
+        _buildTestApp(
+          routes: {
+            '/help': (_) {
+              pushedRoute = '/help';
+              return const Scaffold(body: Text('Help Page'));
+            },
+          },
+        ),
+      );
 
       await tester.tap(find.byTooltip('Help'));
       await tester.pumpAndSettle();
@@ -93,15 +98,21 @@ void main() {
       expect(pushedRoute, '/help');
     });
 
-    testWidgets('Help button navigates to page section when set',
-        (tester) async {
+    testWidgets('Help button navigates to page section when set', (
+      tester,
+    ) async {
       var pushedRoute = '';
-      await tester.pumpWidget(_buildTestApp(helpSection: 'list', routes: {
-        '/help/list': (_) {
-          pushedRoute = '/help/list';
-          return const Scaffold(body: Text('Help Page'));
-        },
-      }));
+      await tester.pumpWidget(
+        _buildTestApp(
+          helpSection: 'list',
+          routes: {
+            '/help/list': (_) {
+              pushedRoute = '/help/list';
+              return const Scaffold(body: Text('Help Page'));
+            },
+          },
+        ),
+      );
 
       await tester.tap(find.byTooltip('Help'));
       await tester.pumpAndSettle();
@@ -110,14 +121,16 @@ void main() {
     });
 
     testWidgets('shows Save button when hasSaveDialog is true', (tester) async {
-      await tester
-          .pumpWidget(_buildTestApp(hasSaveDialog: true, model: AppModel()));
+      await tester.pumpWidget(
+        _buildTestApp(hasSaveDialog: true, model: AppModel()),
+      );
 
       expect(find.byTooltip('Save Settings'), findsOneWidget);
     });
 
-    testWidgets('does not show Save button when hasSaveDialog is false',
-        (tester) async {
+    testWidgets('does not show Save button when hasSaveDialog is false', (
+      tester,
+    ) async {
       await tester.pumpWidget(_buildTestApp(hasSaveDialog: false));
 
       expect(find.byTooltip('Save Settings'), findsNothing);
@@ -129,8 +142,9 @@ void main() {
       expect(find.byIcon(Icons.menu), findsOneWidget);
     });
 
-    testWidgets('shows both hamburger and back button on sub-pages',
-        (tester) async {
+    testWidgets('shows both hamburger and back button on sub-pages', (
+      tester,
+    ) async {
       await tester.pumpWidget(_buildTestApp(isHomePage: false));
 
       expect(find.byIcon(Icons.menu), findsOneWidget);

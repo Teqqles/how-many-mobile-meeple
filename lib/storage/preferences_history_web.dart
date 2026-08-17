@@ -1,7 +1,9 @@
 // coverage:ignore-file
 import 'dart:convert';
+
 import 'package:how_many_mobile_meeple/model/app_preferences.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
 import 'preferences_history_interface.dart';
 
 /// Web implementation of preferences history using SharedPreferences
@@ -16,8 +18,9 @@ class PreferencesHistoryWeb implements PreferencesHistoryInterface {
 
     // Get current index list
     final indexJson = prefs.getString(_indexKey);
-    List<String> index =
-        indexJson != null ? List<String>.from(jsonDecode(indexJson)) : [];
+    List<String> index = indexJson != null
+        ? List<String>.from(jsonDecode(indexJson))
+        : [];
 
     // Add new preference ID to index
     final id =

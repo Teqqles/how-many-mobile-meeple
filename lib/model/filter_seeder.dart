@@ -84,7 +84,11 @@ class FilterSeeder {
   }
 
   static bool _seedDouble(
-      Setting setting, double? value, double lo, double hi) {
+    Setting setting,
+    double? value,
+    double lo,
+    double hi,
+  ) {
     if (value == null || setting.enabled) return false;
     final clamped = value.clamp(lo, hi).toDouble();
     if (setting.value == clamped) return false;

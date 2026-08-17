@@ -29,28 +29,33 @@ class MyApp extends StatelessWidget {
 
   // One random index picks both the light swatch and its companion dark
   // palette, so the accent stays coherent if the user flips light/dark.
-  static final int _themeIndex =
-      Random().nextInt(MeepleTheme.lightSwatches.length);
+  static final int _themeIndex = Random().nextInt(
+    MeepleTheme.lightSwatches.length,
+  );
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(create: (_) {
-      final model = AppModel();
-      PlayLogService.instance().then(model.attachPlayLog);
-      return model;
-    }, child: Consumer<AppModel>(
-      builder: (context, model, _) {
-        final mode = themeModeFromString(
-            model.settings.setting(Settings.themeMode.name).getString());
-        return MaterialApp(
-          title: 'How Many Meeple?',
-          theme: MeepleTheme.light(MeepleTheme.lightSwatches[_themeIndex]),
-          darkTheme: MeepleTheme.dark(MeepleTheme.darkPalettes[_themeIndex]),
-          themeMode: mode,
-          home: Pages.platformPages().homePage(),
-          onGenerateRoute: r.Router.generateRoute,
-        );
+    return ChangeNotifierProvider(
+      create: (_) {
+        final model = AppModel();
+        PlayLogService.instance().then(model.attachPlayLog);
+        return model;
       },
-    ));
+      child: Consumer<AppModel>(
+        builder: (context, model, _) {
+          final mode = themeModeFromString(
+            model.settings.setting(Settings.themeMode.name).getString(),
+          );
+          return MaterialApp(
+            title: 'How Many Meeple?',
+            theme: MeepleTheme.light(MeepleTheme.lightSwatches[_themeIndex]),
+            darkTheme: MeepleTheme.dark(MeepleTheme.darkPalettes[_themeIndex]),
+            themeMode: mode,
+            home: Pages.platformPages().homePage(),
+            onGenerateRoute: r.Router.generateRoute,
+          );
+        },
+      ),
+    );
   }
 }

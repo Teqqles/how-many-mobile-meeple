@@ -20,8 +20,12 @@ class Setting {
         ? enabled.toLowerCase() == 'true'
         : (enabled as bool? ?? false);
 
-    return Setting(json['name'],
-        value: json['value'], header: json['header'], enabled: enabledBool);
+    return Setting(
+      json['name'],
+      value: json['value'],
+      header: json['header'],
+      enabled: enabledBool,
+    );
   }
 
   @override
@@ -35,12 +39,14 @@ class Setting {
 
   // Copy collection values so clones don't share a mutable list/map with the
   // original (or with each other via defaultSettings()).
-  Setting clone() => Setting(this.name,
-      value: value is List
-          ? List<dynamic>.from(value)
-          : (value is Map ? Map<dynamic, dynamic>.from(value) : value),
-      header: this.header,
-      enabled: this.enabled);
+  Setting clone() => Setting(
+    this.name,
+    value: value is List
+        ? List<dynamic>.from(value)
+        : (value is Map ? Map<dynamic, dynamic>.from(value) : value),
+    header: this.header,
+    enabled: this.enabled,
+  );
 
   /// Type-safe getter for boolean values
   /// Handles string-to-bool conversion automatically

@@ -7,11 +7,7 @@ import 'package:how_many_mobile_meeple/model/play_data.dart';
 void main() {
   group('PlayData', () {
     test('fromJson parses complete play data', () {
-      final json = {
-        'game_id': 123,
-        'game_name': 'Wingspan',
-        'total_plays': 5,
-      };
+      final json = {'game_id': 123, 'game_name': 'Wingspan', 'total_plays': 5};
 
       final playData = PlayData.fromJson(json);
 
@@ -21,10 +17,7 @@ void main() {
     });
 
     test('fromJson defaults totalPlays to 0 when missing', () {
-      final json = {
-        'game_id': 456,
-        'game_name': 'Catan',
-      };
+      final json = {'game_id': 456, 'game_name': 'Catan'};
 
       final playData = PlayData.fromJson(json);
 
@@ -32,11 +25,7 @@ void main() {
     });
 
     test('fromJson defaults totalPlays to 0 when null', () {
-      final json = {
-        'game_id': 789,
-        'game_name': 'Azul',
-        'total_plays': null,
-      };
+      final json = {'game_id': 789, 'game_name': 'Azul', 'total_plays': null};
 
       final playData = PlayData.fromJson(json);
 
@@ -60,8 +49,11 @@ void main() {
     });
 
     test('toString returns descriptive string', () {
-      final playData =
-          PlayData(gameId: 123, gameName: 'Wingspan', totalPlays: 5);
+      final playData = PlayData(
+        gameId: 123,
+        gameName: 'Wingspan',
+        totalPlays: 5,
+      );
 
       expect(playData.toString(), 'Wingspan (id: 123, plays: 5)');
     });
@@ -81,7 +73,7 @@ void main() {
                 'username': 'Teqqles',
                 'name': 'David Long',
                 'score': null,
-                'win': false
+                'win': false,
               },
               {'username': '', 'name': 'Thomas', 'score': 42, 'win': true},
             ],
@@ -114,8 +106,12 @@ void main() {
     });
 
     test('BggPlayer falls back to username when name is blank', () {
-      final player = BggPlayer.fromJson(
-          {'username': 'DragonC', 'name': '', 'score': null, 'win': false});
+      final player = BggPlayer.fromJson({
+        'username': 'DragonC',
+        'name': '',
+        'score': null,
+        'win': false,
+      });
       expect(player.name, 'DragonC');
     });
 
@@ -125,26 +121,41 @@ void main() {
     });
 
     test('BggPlayer keeps a numeric double score', () {
-      final player = BggPlayer.fromJson(
-          {'username': 'a', 'name': 'A', 'score': 50.5, 'win': false});
+      final player = BggPlayer.fromJson({
+        'username': 'a',
+        'name': 'A',
+        'score': 50.5,
+        'win': false,
+      });
       expect(player.score, 51, reason: 'double score rounded, not dropped');
     });
 
     test('BggPlayer parses a string score', () {
-      final player = BggPlayer.fromJson(
-          {'username': 'a', 'name': 'A', 'score': '42', 'win': false});
+      final player = BggPlayer.fromJson({
+        'username': 'a',
+        'name': 'A',
+        'score': '42',
+        'win': false,
+      });
       expect(player.score, 42);
     });
 
     test('BggPlayer leaves a null score null', () {
-      final player = BggPlayer.fromJson(
-          {'username': 'a', 'name': 'A', 'score': null, 'win': false});
+      final player = BggPlayer.fromJson({
+        'username': 'a',
+        'name': 'A',
+        'score': null,
+        'win': false,
+      });
       expect(player.score, isNull);
     });
 
     test('BggPlayer retains the username alongside the display name', () {
-      final player = BggPlayer.fromJson(
-          {'username': 'Teqqles', 'name': 'David Long', 'win': false});
+      final player = BggPlayer.fromJson({
+        'username': 'Teqqles',
+        'name': 'David Long',
+        'win': false,
+      });
       expect(player.name, 'David Long');
       expect(player.username, 'Teqqles');
     });

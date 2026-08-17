@@ -10,6 +10,7 @@ import 'package:how_many_mobile_meeple/model/item.dart';
 import 'package:how_many_mobile_meeple/model/model.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
 import '../helpers/sync_mock_client.dart';
 
 Widget _buildTestApp({AppModel? model}) {
@@ -39,7 +40,8 @@ void main() {
     // Adding a collection seeds filter defaults from analytics; a 404 resolves
     // that fetch synchronously to a final result, so no retry timer is armed.
     HttpRetryClient.setTestClient(
-        SyncMockClient((_) => http.Response('', 404)));
+      SyncMockClient((_) => http.Response('', 404)),
+    );
   });
   tearDown(HttpRetryClient.resetTestClient);
 
@@ -100,8 +102,9 @@ void main() {
       expect(find.text('Shelf of Shame'), findsOneWidget);
     });
 
-    testWidgets('displays Collection Insights in Discover section',
-        (tester) async {
+    testWidgets('displays Collection Insights in Discover section', (
+      tester,
+    ) async {
       await tester.pumpWidget(_buildTestApp());
       await tester.tap(find.text('Open Drawer'));
       await tester.pumpAndSettle();
@@ -110,20 +113,21 @@ void main() {
     });
 
     testWidgets(
-        'shows collection-specific snackbar when tapping Collection Insights without collection',
-        (tester) async {
-      final model = AppModel();
-      await model.addItem(Item('trending', itemType: ItemType.hotList));
+      'shows collection-specific snackbar when tapping Collection Insights without collection',
+      (tester) async {
+        final model = AppModel();
+        await model.addItem(Item('trending', itemType: ItemType.hotList));
 
-      await tester.pumpWidget(_buildTestApp(model: model));
-      await tester.tap(find.text('Open Drawer'));
-      await tester.pumpAndSettle();
+        await tester.pumpWidget(_buildTestApp(model: model));
+        await tester.tap(find.text('Open Drawer'));
+        await tester.pumpAndSettle();
 
-      await tester.tap(find.text('Collection Insights'));
-      await tester.pumpAndSettle();
+        await tester.tap(find.text('Collection Insights'));
+        await tester.pumpAndSettle();
 
-      expect(find.text('Add a BGG collection first'), findsOneWidget);
-    });
+        expect(find.text('Add a BGG collection first'), findsOneWidget);
+      },
+    );
 
     testWidgets('displays Favourites in My Games section', (tester) async {
       await tester.pumpWidget(_buildTestApp());
@@ -146,13 +150,17 @@ void main() {
       await tester.tap(find.text('Open Drawer'));
       await tester.pumpAndSettle();
 
-      await tester.scrollUntilVisible(find.text('Board Game News'), 100,
-          scrollable: find.byType(Scrollable).first);
+      await tester.scrollUntilVisible(
+        find.text('Board Game News'),
+        100,
+        scrollable: find.byType(Scrollable).first,
+      );
       expect(find.text('Board Game News'), findsOneWidget);
     });
 
-    testWidgets('shows snackbar when tapping Quick Pick with no sources',
-        (tester) async {
+    testWidgets('shows snackbar when tapping Quick Pick with no sources', (
+      tester,
+    ) async {
       await tester.pumpWidget(_buildTestApp());
       await tester.tap(find.text('Open Drawer'));
       await tester.pumpAndSettle();
@@ -163,8 +171,9 @@ void main() {
       expect(find.text('Add a source first'), findsOneWidget);
     });
 
-    testWidgets('shows snackbar when tapping Random Game with no sources',
-        (tester) async {
+    testWidgets('shows snackbar when tapping Random Game with no sources', (
+      tester,
+    ) async {
       await tester.pumpWidget(_buildTestApp());
       await tester.tap(find.text('Open Drawer'));
       await tester.pumpAndSettle();
@@ -175,8 +184,9 @@ void main() {
       expect(find.text('Add a source first'), findsOneWidget);
     });
 
-    testWidgets('shows snackbar when tapping View List with no sources',
-        (tester) async {
+    testWidgets('shows snackbar when tapping View List with no sources', (
+      tester,
+    ) async {
       await tester.pumpWidget(_buildTestApp());
       await tester.tap(find.text('Open Drawer'));
       await tester.pumpAndSettle();
@@ -188,20 +198,21 @@ void main() {
     });
 
     testWidgets(
-        'shows collection-specific snackbar when tapping Shelf of Shame without collection',
-        (tester) async {
-      final model = AppModel();
-      await model.addItem(Item('trending', itemType: ItemType.hotList));
+      'shows collection-specific snackbar when tapping Shelf of Shame without collection',
+      (tester) async {
+        final model = AppModel();
+        await model.addItem(Item('trending', itemType: ItemType.hotList));
 
-      await tester.pumpWidget(_buildTestApp(model: model));
-      await tester.tap(find.text('Open Drawer'));
-      await tester.pumpAndSettle();
+        await tester.pumpWidget(_buildTestApp(model: model));
+        await tester.tap(find.text('Open Drawer'));
+        await tester.pumpAndSettle();
 
-      await tester.tap(find.text('Shelf of Shame'));
-      await tester.pumpAndSettle();
+        await tester.tap(find.text('Shelf of Shame'));
+        await tester.pumpAndSettle();
 
-      expect(find.text('Add a BGG collection first'), findsOneWidget);
-    });
+        expect(find.text('Add a BGG collection first'), findsOneWidget);
+      },
+    );
 
     testWidgets('Play items are enabled when sources exist', (tester) async {
       final model = AppModel();
@@ -211,10 +222,12 @@ void main() {
       await tester.tap(find.text('Open Drawer'));
       await tester.pumpAndSettle();
 
-      final quickPickTile = tester.widget<ListTile>(find.ancestor(
-        of: find.text('Quick Pick'),
-        matching: find.byType(ListTile),
-      ));
+      final quickPickTile = tester.widget<ListTile>(
+        find.ancestor(
+          of: find.text('Quick Pick'),
+          matching: find.byType(ListTile),
+        ),
+      );
       expect(quickPickTile.onTap, isNotNull);
     });
   });

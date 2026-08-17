@@ -3,11 +3,7 @@ class FavouriteGame {
   final String name;
   final String? thumbnail;
 
-  FavouriteGame({
-    required this.id,
-    required this.name,
-    this.thumbnail,
-  });
+  FavouriteGame({required this.id, required this.name, this.thumbnail});
 
   factory FavouriteGame.fromJson(Map<String, dynamic> json) {
     return FavouriteGame(
@@ -18,8 +14,8 @@ class FavouriteGame {
   }
 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'name': name,
-        'thumbnail': thumbnail,
-      };
+    'id': id,
+    'name': name,
+    'thumbnail': thumbnail,
+  };
 }

@@ -9,8 +9,12 @@ import 'package:how_many_mobile_meeple/model/setting.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-Widget _buildTestApp(AppModel model, Setting setting,
-    {String title = 'Test Filter', int index = 0}) {
+Widget _buildTestApp(
+  AppModel model,
+  Setting setting, {
+  String title = 'Test Filter',
+  int index = 0,
+}) {
   return ChangeNotifierProvider<AppModel>.value(
     value: model,
     child: MaterialApp(
@@ -36,15 +40,17 @@ void main() {
       final model = AppModel();
       final setting = Setting('test_filter', value: false);
 
-      await tester
-          .pumpWidget(_buildTestApp(model, setting, title: 'My Filter'));
+      await tester.pumpWidget(
+        _buildTestApp(model, setting, title: 'My Filter'),
+      );
       await tester.pump();
 
       expect(find.text('My Filter'), findsOneWidget);
     });
 
-    testWidgets('switch shows correct initial value when false',
-        (tester) async {
+    testWidgets('switch shows correct initial value when false', (
+      tester,
+    ) async {
       final model = AppModel();
       final setting = Setting('test_filter', value: false);
 
@@ -80,8 +86,9 @@ void main() {
       expect(setting.enabled, isTrue);
     });
 
-    testWidgets('renders without error at different index values',
-        (tester) async {
+    testWidgets('renders without error at different index values', (
+      tester,
+    ) async {
       final model = AppModel();
       final setting = Setting('test_filter', value: false);
 

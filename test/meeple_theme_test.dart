@@ -45,7 +45,9 @@ void main() {
     test('dark() builds for every palette without error', () {
       for (final palette in MeepleTheme.darkPalettes) {
         expect(
-            MeepleTheme.dark(palette).colorScheme.brightness, Brightness.dark);
+          MeepleTheme.dark(palette).colorScheme.brightness,
+          Brightness.dark,
+        );
       }
     });
 

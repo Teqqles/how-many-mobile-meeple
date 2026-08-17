@@ -20,7 +20,9 @@ void main() {
 
     test('handles single item', () async {
       final request = GameRequest.from(
-          Settings.defaultSettings(), Items([Item('testuser')]));
+        Settings.defaultSettings(),
+        Items([Item('testuser')]),
+      );
 
       expect(() => LoadGames.fetchGames(request), returnsNormally);
     });
@@ -46,16 +48,20 @@ void main() {
 
     test('GameRequest preserves geeklist item type', () {
       final item = Item('12345');
-      final request =
-          GameRequest.from(Settings.defaultSettings(), Items([item]));
+      final request = GameRequest.from(
+        Settings.defaultSettings(),
+        Items([item]),
+      );
 
       expect(request.items.itemList.first.itemType, ItemType.geekList);
     });
 
     test('GameRequest preserves collection item type', () {
       final item = Item('testuser');
-      final request =
-          GameRequest.from(Settings.defaultSettings(), Items([item]));
+      final request = GameRequest.from(
+        Settings.defaultSettings(),
+        Items([item]),
+      );
 
       expect(request.items.itemList.first.itemType, ItemType.collection);
     });
@@ -64,26 +70,36 @@ void main() {
       final geeklist = Item('12345');
       final collection = Item('testuser');
       final request = GameRequest.from(
-          Settings.defaultSettings(), Items([geeklist, collection]));
+        Settings.defaultSettings(),
+        Items([geeklist, collection]),
+      );
 
       expect(request.items.itemList[0].itemType, ItemType.geekList);
       expect(request.items.itemList[1].itemType, ItemType.collection);
     });
 
     test('two requests with same geeklist are equal', () {
-      final r1 =
-          GameRequest.from(Settings.defaultSettings(), Items([Item('12345')]));
-      final r2 =
-          GameRequest.from(Settings.defaultSettings(), Items([Item('12345')]));
+      final r1 = GameRequest.from(
+        Settings.defaultSettings(),
+        Items([Item('12345')]),
+      );
+      final r2 = GameRequest.from(
+        Settings.defaultSettings(),
+        Items([Item('12345')]),
+      );
 
       expect(r1, equals(r2));
     });
 
     test('geeklist and collection requests with same name are not equal', () {
-      final r1 = GameRequest.from(Settings.defaultSettings(),
-          Items([Item('12345', itemType: ItemType.geekList)]));
-      final r2 = GameRequest.from(Settings.defaultSettings(),
-          Items([Item('12345', itemType: ItemType.collection)]));
+      final r1 = GameRequest.from(
+        Settings.defaultSettings(),
+        Items([Item('12345', itemType: ItemType.geekList)]),
+      );
+      final r2 = GameRequest.from(
+        Settings.defaultSettings(),
+        Items([Item('12345', itemType: ItemType.collection)]),
+      );
 
       expect(r1, isNot(equals(r2)));
     });

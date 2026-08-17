@@ -7,6 +7,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:how_many_mobile_meeple/api/game_detail_service.dart';
 import 'package:how_many_mobile_meeple/model/game.dart';
+
 import '../helpers/sync_mock_client.dart';
 
 final _gameJson = json.encode({
@@ -16,10 +17,7 @@ final _gameJson = json.encode({
   'minplayers': 1,
   'maxplaytime': 70,
   'image': 'http://example.com/img.jpg',
-  'stats': {
-    'average': 8.1,
-    'averageweight': 2.4,
-  },
+  'stats': {'average': 8.1, 'averageweight': 2.4},
 });
 
 void main() {
@@ -45,10 +43,7 @@ void main() {
         SyncMockClient((_) => http.Response('not found', 404)),
       );
 
-      expect(
-        () => GameDetailService.fetchGame(999),
-        throwsException,
-      );
+      expect(() => GameDetailService.fetchGame(999), throwsException);
     });
 
     test('returns cached result on subsequent calls', () async {

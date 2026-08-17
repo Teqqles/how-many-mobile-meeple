@@ -22,13 +22,8 @@ import 'package:mockito/src/dummies.dart' as _i2;
 // ignore_for_file: invalid_use_of_internal_member
 
 class _FakeUri_0 extends _i1.SmartFake implements Uri {
-  _FakeUri_0(
-    Object parent,
-    Invocation parentInvocation,
-  ) : super(
-          parent,
-          parentInvocation,
-        );
+  _FakeUri_0(Object parent, Invocation parentInvocation)
+    : super(parent, parentInvocation);
 }
 
 /// A class which mocks [Uri].
@@ -41,173 +36,129 @@ class MockUri extends _i1.Mock implements Uri {
 
   @override
   String get scheme => (super.noSuchMethod(
-        Invocation.getter(#scheme),
-        returnValue: _i2.dummyValue<String>(
-          this,
-          Invocation.getter(#scheme),
-        ),
-      ) as String);
+    Invocation.getter(#scheme),
+    returnValue: _i2.dummyValue<String>(this, Invocation.getter(#scheme)),
+  ) as String);
 
   @override
   String get authority => (super.noSuchMethod(
-        Invocation.getter(#authority),
-        returnValue: _i2.dummyValue<String>(
-          this,
-          Invocation.getter(#authority),
-        ),
-      ) as String);
+    Invocation.getter(#authority),
+    returnValue: _i2.dummyValue<String>(this, Invocation.getter(#authority)),
+  ) as String);
 
   @override
   String get userInfo => (super.noSuchMethod(
-        Invocation.getter(#userInfo),
-        returnValue: _i2.dummyValue<String>(
-          this,
-          Invocation.getter(#userInfo),
-        ),
-      ) as String);
+    Invocation.getter(#userInfo),
+    returnValue: _i2.dummyValue<String>(this, Invocation.getter(#userInfo)),
+  ) as String);
 
   @override
   String get host => (super.noSuchMethod(
-        Invocation.getter(#host),
-        returnValue: _i2.dummyValue<String>(
-          this,
-          Invocation.getter(#host),
-        ),
-      ) as String);
+    Invocation.getter(#host),
+    returnValue: _i2.dummyValue<String>(this, Invocation.getter(#host)),
+  ) as String);
 
   @override
-  int get port => (super.noSuchMethod(
-        Invocation.getter(#port),
-        returnValue: 0,
-      ) as int);
+  int get port =>
+      (super.noSuchMethod(Invocation.getter(#port), returnValue: 0) as int);
 
   @override
   String get path => (super.noSuchMethod(
-        Invocation.getter(#path),
-        returnValue: _i2.dummyValue<String>(
-          this,
-          Invocation.getter(#path),
-        ),
-      ) as String);
+    Invocation.getter(#path),
+    returnValue: _i2.dummyValue<String>(this, Invocation.getter(#path)),
+  ) as String);
 
   @override
   String get query => (super.noSuchMethod(
-        Invocation.getter(#query),
-        returnValue: _i2.dummyValue<String>(
-          this,
-          Invocation.getter(#query),
-        ),
-      ) as String);
+    Invocation.getter(#query),
+    returnValue: _i2.dummyValue<String>(this, Invocation.getter(#query)),
+  ) as String);
 
   @override
   String get fragment => (super.noSuchMethod(
-        Invocation.getter(#fragment),
-        returnValue: _i2.dummyValue<String>(
-          this,
-          Invocation.getter(#fragment),
-        ),
-      ) as String);
+    Invocation.getter(#fragment),
+    returnValue: _i2.dummyValue<String>(this, Invocation.getter(#fragment)),
+  ) as String);
 
   @override
   List<String> get pathSegments => (super.noSuchMethod(
-        Invocation.getter(#pathSegments),
-        returnValue: <String>[],
-      ) as List<String>);
+    Invocation.getter(#pathSegments),
+    returnValue: <String>[],
+  ) as List<String>);
 
   @override
   Map<String, String> get queryParameters => (super.noSuchMethod(
-        Invocation.getter(#queryParameters),
-        returnValue: <String, String>{},
-      ) as Map<String, String>);
+    Invocation.getter(#queryParameters),
+    returnValue: <String, String>{},
+  ) as Map<String, String>);
 
   @override
   Map<String, List<String>> get queryParametersAll => (super.noSuchMethod(
-        Invocation.getter(#queryParametersAll),
-        returnValue: <String, List<String>>{},
-      ) as Map<String, List<String>>);
+    Invocation.getter(#queryParametersAll),
+    returnValue: <String, List<String>>{},
+  ) as Map<String, List<String>>);
 
   @override
-  bool get isAbsolute => (super.noSuchMethod(
-        Invocation.getter(#isAbsolute),
-        returnValue: false,
-      ) as bool);
+  bool get isAbsolute =>
+      (super.noSuchMethod(Invocation.getter(#isAbsolute), returnValue: false)
+          as bool);
 
   @override
-  bool get hasScheme => (super.noSuchMethod(
-        Invocation.getter(#hasScheme),
-        returnValue: false,
-      ) as bool);
+  bool get hasScheme =>
+      (super.noSuchMethod(Invocation.getter(#hasScheme), returnValue: false)
+          as bool);
 
   @override
-  bool get hasAuthority => (super.noSuchMethod(
-        Invocation.getter(#hasAuthority),
-        returnValue: false,
-      ) as bool);
+  bool get hasAuthority =>
+      (super.noSuchMethod(Invocation.getter(#hasAuthority), returnValue: false)
+          as bool);
 
   @override
-  bool get hasPort => (super.noSuchMethod(
-        Invocation.getter(#hasPort),
-        returnValue: false,
-      ) as bool);
+  bool get hasPort =>
+      (super.noSuchMethod(Invocation.getter(#hasPort), returnValue: false)
+          as bool);
 
   @override
-  bool get hasQuery => (super.noSuchMethod(
-        Invocation.getter(#hasQuery),
-        returnValue: false,
-      ) as bool);
+  bool get hasQuery =>
+      (super.noSuchMethod(Invocation.getter(#hasQuery), returnValue: false)
+          as bool);
 
   @override
-  bool get hasFragment => (super.noSuchMethod(
-        Invocation.getter(#hasFragment),
-        returnValue: false,
-      ) as bool);
+  bool get hasFragment =>
+      (super.noSuchMethod(Invocation.getter(#hasFragment), returnValue: false)
+          as bool);
 
   @override
-  bool get hasEmptyPath => (super.noSuchMethod(
-        Invocation.getter(#hasEmptyPath),
-        returnValue: false,
-      ) as bool);
+  bool get hasEmptyPath =>
+      (super.noSuchMethod(Invocation.getter(#hasEmptyPath), returnValue: false)
+          as bool);
 
   @override
   bool get hasAbsolutePath => (super.noSuchMethod(
-        Invocation.getter(#hasAbsolutePath),
-        returnValue: false,
-      ) as bool);
+    Invocation.getter(#hasAbsolutePath),
+    returnValue: false,
+  ) as bool);
 
   @override
   String get origin => (super.noSuchMethod(
-        Invocation.getter(#origin),
-        returnValue: _i2.dummyValue<String>(
-          this,
-          Invocation.getter(#origin),
-        ),
-      ) as String);
+    Invocation.getter(#origin),
+    returnValue: _i2.dummyValue<String>(this, Invocation.getter(#origin)),
+  ) as String);
 
   @override
   bool isScheme(String? scheme) => (super.noSuchMethod(
-        Invocation.method(
-          #isScheme,
-          [scheme],
-        ),
-        returnValue: false,
-      ) as bool);
+    Invocation.method(#isScheme, [scheme]),
+    returnValue: false,
+  ) as bool);
 
   @override
   String toFilePath({bool? windows}) => (super.noSuchMethod(
-        Invocation.method(
-          #toFilePath,
-          [],
-          {#windows: windows},
-        ),
-        returnValue: _i2.dummyValue<String>(
-          this,
-          Invocation.method(
-            #toFilePath,
-            [],
-            {#windows: windows},
-          ),
-        ),
-      ) as String);
+    Invocation.method(#toFilePath, [], {#windows: windows}),
+    returnValue: _i2.dummyValue<String>(
+      this,
+      Invocation.method(#toFilePath, [], {#windows: windows}),
+    ),
+  ) as String);
 
   @override
   Uri replace({
@@ -220,100 +171,55 @@ class MockUri extends _i1.Mock implements Uri {
     String? query,
     Map<String, dynamic>? queryParameters,
     String? fragment,
-  }) =>
-      (super.noSuchMethod(
-        Invocation.method(
-          #replace,
-          [],
-          {
-            #scheme: scheme,
-            #userInfo: userInfo,
-            #host: host,
-            #port: port,
-            #path: path,
-            #pathSegments: pathSegments,
-            #query: query,
-            #queryParameters: queryParameters,
-            #fragment: fragment,
-          },
-        ),
-        returnValue: _FakeUri_0(
-          this,
-          Invocation.method(
-            #replace,
-            [],
-            {
-              #scheme: scheme,
-              #userInfo: userInfo,
-              #host: host,
-              #port: port,
-              #path: path,
-              #pathSegments: pathSegments,
-              #query: query,
-              #queryParameters: queryParameters,
-              #fragment: fragment,
-            },
-          ),
-        ),
-      ) as Uri);
+  }) => (super.noSuchMethod(
+    Invocation.method(#replace, [], {
+      #scheme: scheme,
+      #userInfo: userInfo,
+      #host: host,
+      #port: port,
+      #path: path,
+      #pathSegments: pathSegments,
+      #query: query,
+      #queryParameters: queryParameters,
+      #fragment: fragment,
+    }),
+    returnValue: _FakeUri_0(
+      this,
+      Invocation.method(#replace, [], {
+        #scheme: scheme,
+        #userInfo: userInfo,
+        #host: host,
+        #port: port,
+        #path: path,
+        #pathSegments: pathSegments,
+        #query: query,
+        #queryParameters: queryParameters,
+        #fragment: fragment,
+      }),
+    ),
+  ) as Uri);
 
   @override
   Uri removeFragment() => (super.noSuchMethod(
-        Invocation.method(
-          #removeFragment,
-          [],
-        ),
-        returnValue: _FakeUri_0(
-          this,
-          Invocation.method(
-            #removeFragment,
-            [],
-          ),
-        ),
-      ) as Uri);
+    Invocation.method(#removeFragment, []),
+    returnValue: _FakeUri_0(this, Invocation.method(#removeFragment, [])),
+  ) as Uri);
 
   @override
   Uri resolve(String? reference) => (super.noSuchMethod(
-        Invocation.method(
-          #resolve,
-          [reference],
-        ),
-        returnValue: _FakeUri_0(
-          this,
-          Invocation.method(
-            #resolve,
-            [reference],
-          ),
-        ),
-      ) as Uri);
+    Invocation.method(#resolve, [reference]),
+    returnValue: _FakeUri_0(this, Invocation.method(#resolve, [reference])),
+  ) as Uri);
 
   @override
   Uri resolveUri(Uri? reference) => (super.noSuchMethod(
-        Invocation.method(
-          #resolveUri,
-          [reference],
-        ),
-        returnValue: _FakeUri_0(
-          this,
-          Invocation.method(
-            #resolveUri,
-            [reference],
-          ),
-        ),
-      ) as Uri);
+    Invocation.method(#resolveUri, [reference]),
+    returnValue: _FakeUri_0(this, Invocation.method(#resolveUri, [reference])),
+  ) as Uri);
 
   @override
   Uri normalizePath() => (super.noSuchMethod(
-        Invocation.method(
-          #normalizePath,
-          [],
-        ),
-        returnValue: _FakeUri_0(
-          this,
-          Invocation.method(
-            #normalizePath,
-            [],
-          ),
-        ),
-      ) as Uri);
+    Invocation.method(#normalizePath, []),
+    returnValue: _FakeUri_0(this, Invocation.method(#normalizePath, [])),
+  ) as Uri);
 }

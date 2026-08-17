@@ -61,7 +61,8 @@ class _GuidedFlowHomePageState extends State<GuidedFlowHomePage> {
     final value = model.settings.setting('preferAdvancedMode').getBool();
     if (value != _showAdvancedMode) {
       WidgetsBinding.instance.addPostFrameCallback(
-          (_) => setState(() => _showAdvancedMode = value));
+        (_) => setState(() => _showAdvancedMode = value),
+      );
     }
   }
 
@@ -102,8 +103,8 @@ class _GuidedFlowHomePageState extends State<GuidedFlowHomePage> {
           bottomNavigationBar: _buildFooter(context),
           persistentFooterButtons:
               !_showAdvancedMode && _currentStep == _totalSteps - 1
-                  ? [widget.iconButtonGroup(context)]
-                  : null,
+              ? [widget.iconButtonGroup(context)]
+              : null,
         );
       },
     );
@@ -113,9 +114,7 @@ class _GuidedFlowHomePageState extends State<GuidedFlowHomePage> {
     if (_featureDrawerLoaded) {
       return feature_drawer.FeatureDrawer();
     }
-    return const Drawer(
-      child: Center(child: CircularProgressIndicator()),
-    );
+    return const Drawer(child: Center(child: CircularProgressIndicator()));
   }
 
   /// Builds the guided flow with step progression
@@ -189,21 +188,23 @@ class _GuidedFlowHomePageState extends State<GuidedFlowHomePage> {
                       child: Container(
                         height: 8,
                         margin: EdgeInsets.only(
-                            right: index < _totalSteps - 1 ? 4 : 0),
+                          right: index < _totalSteps - 1 ? 4 : 0,
+                        ),
                         decoration: BoxDecoration(
                           color: isCompleted || isActive
                               ? Theme.of(context).colorScheme.primary
                               : Theme.of(context)
-                                  .colorScheme
-                                  .surfaceContainerHighest,
+                                    .colorScheme
+                                    .surfaceContainerHighest,
                           borderRadius: BorderRadius.circular(4),
                         ),
                         child: isActive
                             ? Container(
                                 decoration: BoxDecoration(
                                   border: Border.all(
-                                    color:
-                                        Theme.of(context).colorScheme.onPrimary,
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onPrimary,
                                     width: 2,
                                   ),
                                   borderRadius: BorderRadius.circular(4),
@@ -224,7 +225,10 @@ class _GuidedFlowHomePageState extends State<GuidedFlowHomePage> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 _buildStepLabel(
-                    0, 'Source', canAccessSteps || _currentStep == 0),
+                  0,
+                  'Source',
+                  canAccessSteps || _currentStep == 0,
+                ),
                 _buildStepLabel(1, 'Players', canAccessSteps),
                 _buildStepLabel(2, 'Time', canAccessSteps),
                 _buildStepLabel(3, 'Style', canAccessSteps),
@@ -240,24 +244,23 @@ class _GuidedFlowHomePageState extends State<GuidedFlowHomePage> {
   Widget _buildStepLabel(int stepIndex, String label, bool isAccessible) {
     final isActive = stepIndex == _currentStep;
     return InkWell(
-      onTap:
-          isAccessible ? () => setState(() => _currentStep = stepIndex) : null,
+      onTap: isAccessible
+          ? () => setState(() => _currentStep = stepIndex)
+          : null,
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
         child: Text(
           label,
           style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                fontSize: 10,
-                fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
-                color: isAccessible
-                    ? (isActive
-                        ? Theme.of(context).colorScheme.primary
-                        : Theme.of(context).colorScheme.onSurface)
-                    : Theme.of(context)
-                        .colorScheme
-                        .onSurfaceVariant
-                        .withValues(alpha: 0.5),
-              ),
+            fontSize: 10,
+            fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
+            color: isAccessible
+                ? (isActive
+                      ? Theme.of(context).colorScheme.primary
+                      : Theme.of(context).colorScheme.onSurface)
+                : Theme.of(context).colorScheme.onSurfaceVariant
+                      .withValues(alpha: 0.5),
+          ),
         ),
       ),
     );
@@ -325,8 +328,8 @@ class _GuidedFlowHomePageState extends State<GuidedFlowHomePage> {
                 FilledButton.icon(
                   onPressed: canProceedFromStep1
                       ? () => setState(() {
-                            if (_currentStep < _totalSteps - 1) _currentStep++;
-                          })
+                          if (_currentStep < _totalSteps - 1) _currentStep++;
+                        })
                       : null,
                   icon: const Icon(Icons.arrow_forward),
                   label: const Text('Next'),
@@ -390,10 +393,7 @@ class _GuidedFlowHomePageState extends State<GuidedFlowHomePage> {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: <Widget>[
-        Container(
-          height: double.infinity,
-          child: BGGAttribution(),
-        ),
+        Container(height: double.infinity, child: BGGAttribution()),
         Padding(
           padding: const EdgeInsets.only(right: 8.0),
           child: Row(
@@ -445,8 +445,9 @@ class _GuidedFlowHomePageState extends State<GuidedFlowHomePage> {
                   width: double.infinity,
                   child: OutlinedButton.icon(
                     onPressed: () async {
-                      final setting =
-                          model.settings.setting('preferAdvancedMode');
+                      final setting = model.settings.setting(
+                        'preferAdvancedMode',
+                      );
                       setting.value = false;
                       setting.enabled = true;
                       model.settings.updateSetting(setting);

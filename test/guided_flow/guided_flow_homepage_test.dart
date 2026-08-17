@@ -27,31 +27,34 @@ void main() {
 
   group('GuidedFlowHomePage advanced mode stability', () {
     testWidgets(
-        'stays in advanced mode when model notifies listeners after switching',
-        (WidgetTester tester) async {
-      final model = AppModel();
+      'stays in advanced mode when model notifies listeners after switching',
+      (WidgetTester tester) async {
+        final model = AppModel();
 
-      // Pre-set advanced mode before the widget loads so loadStoredData picks
-      // it up without triggering async network calls
-      final setting = model.settings.setting(Settings.preferAdvancedMode.name);
-      setting.value = true;
-      setting.enabled = true;
-      model.settings.updateSetting(setting);
-      model.hasLoadedPersistedData = true;
+        // Pre-set advanced mode before the widget loads so loadStoredData picks
+        // it up without triggering async network calls
+        final setting = model.settings.setting(
+          Settings.preferAdvancedMode.name,
+        );
+        setting.value = true;
+        setting.enabled = true;
+        model.settings.updateSetting(setting);
+        model.hasLoadedPersistedData = true;
 
-      await tester.pumpWidget(_buildTestApp(model));
-      await tester.pump(const Duration(milliseconds: 100));
+        await tester.pumpWidget(_buildTestApp(model));
+        await tester.pump(const Duration(milliseconds: 100));
 
-      // Guided flow step indicator must not be present in advanced mode
-      expect(find.text('Step 1 of 5'), findsNothing);
+        // Guided flow step indicator must not be present in advanced mode
+        expect(find.text('Step 1 of 5'), findsNothing);
 
-      // Simulate a model notification (e.g. a filter widget updating state)
-      model.refreshState();
-      await tester.pump(const Duration(milliseconds: 100));
+        // Simulate a model notification (e.g. a filter widget updating state)
+        model.refreshState();
+        await tester.pump(const Duration(milliseconds: 100));
 
-      // Must still be in advanced mode - not flipped back to guided flow
-      expect(find.text('Step 1 of 5'), findsNothing);
-    });
+        // Must still be in advanced mode - not flipped back to guided flow
+        expect(find.text('Step 1 of 5'), findsNothing);
+      },
+    );
 
     testWidgets('shows guided flow by default', (WidgetTester tester) async {
       final model = AppModel();
@@ -63,8 +66,9 @@ void main() {
       expect(find.text('Step 1 of 5'), findsOneWidget);
     });
 
-    testWidgets('switches back to guided flow when preference is cleared',
-        (WidgetTester tester) async {
+    testWidgets('switches back to guided flow when preference is cleared', (
+      WidgetTester tester,
+    ) async {
       final model = AppModel();
       model.hasLoadedPersistedData = true;
 

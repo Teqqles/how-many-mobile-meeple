@@ -10,7 +10,8 @@ class UrlFragmentExtractor {
 
   UrlFragmentExtractor(Uri uri) {
     this.uri = uri;
-    hasModelData = uri.hasFragment &&
+    hasModelData =
+        uri.hasFragment &&
         !Router.routeList.contains(uri.fragment) &&
         !_isGameDetailFragment(uri.fragment) &&
         !_isShelfOfShameFragment(uri.fragment);
@@ -82,10 +83,12 @@ class UrlFragmentExtractor {
       var parts = settingStr.split("=");
       if (parts.length == 2) {
         var settingHeader = defaults.setting(parts[0]).header;
-        var setting = Setting(parts[0],
-            value: Uri.decodeComponent(parts[1]),
-            header: settingHeader,
-            enabled: true);
+        var setting = Setting(
+          parts[0],
+          value: Uri.decodeComponent(parts[1]),
+          header: settingHeader,
+          enabled: true,
+        );
         settings.updateSetting(setting);
       }
     }

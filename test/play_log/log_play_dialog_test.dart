@@ -22,22 +22,24 @@ Future<PlayLogEntry?> _openDialog(
   List<String> suggested = const [],
 }) async {
   PlayLogEntry? result;
-  await tester.pumpWidget(MaterialApp(
-    home: Scaffold(
-      body: Builder(
-        builder: (context) => ElevatedButton(
-          onPressed: () async {
-            result = await LogPlayDialog.show(
-              context,
-              game: _game,
-              suggestedPlayers: suggested,
-            );
-          },
-          child: const Text('open'),
+  await tester.pumpWidget(
+    MaterialApp(
+      home: Scaffold(
+        body: Builder(
+          builder: (context) => ElevatedButton(
+            onPressed: () async {
+              result = await LogPlayDialog.show(
+                context,
+                game: _game,
+                suggestedPlayers: suggested,
+              );
+            },
+            child: const Text('open'),
+          ),
         ),
       ),
     ),
-  ));
+  );
   await tester.tap(find.text('open'));
   await tester.pumpAndSettle();
   return result;
@@ -45,16 +47,18 @@ Future<PlayLogEntry?> _openDialog(
 
 void main() {
   group('LogPlayDialog', () {
-    testWidgets('shows the game name and defaults date to today',
-        (tester) async {
+    testWidgets('shows the game name and defaults date to today', (
+      tester,
+    ) async {
       await _openDialog(tester);
       expect(find.text('Log a play'), findsOneWidget);
       expect(find.text('Wingspan'), findsOneWidget);
       expect(find.text('Today'), findsOneWidget);
     });
 
-    testWidgets('saving with no players returns an entry with empty players',
-        (tester) async {
+    testWidgets('saving with no players returns an entry with empty players', (
+      tester,
+    ) async {
       await _openDialog(tester);
       await tester.tap(find.text('Save play'));
       await tester.pumpAndSettle();
@@ -63,22 +67,25 @@ void main() {
       expect(find.text('Log a play'), findsNothing);
     });
 
-    testWidgets('pre-fills the primary player as a participant',
-        (tester) async {
-      await tester.pumpWidget(MaterialApp(
-        home: Scaffold(
-          body: Builder(
-            builder: (context) => ElevatedButton(
-              onPressed: () => LogPlayDialog.show(
-                context,
-                game: _game,
-                primaryPlayer: 'David',
+    testWidgets('pre-fills the primary player as a participant', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: Builder(
+              builder: (context) => ElevatedButton(
+                onPressed: () => LogPlayDialog.show(
+                  context,
+                  game: _game,
+                  primaryPlayer: 'David',
+                ),
+                child: const Text('open'),
               ),
-              child: const Text('open'),
             ),
           ),
         ),
-      ));
+      );
       await tester.tap(find.text('open'));
       await tester.pumpAndSettle();
 
@@ -93,20 +100,22 @@ void main() {
         playedAt: DateTime(2026, 1, 1),
         players: [PlayerResult(name: 'Bob')],
       );
-      await tester.pumpWidget(MaterialApp(
-        home: Scaffold(
-          body: Builder(
-            builder: (context) => ElevatedButton(
-              onPressed: () => LogPlayDialog.show(
-                context,
-                existing: existing,
-                primaryPlayer: 'David',
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: Builder(
+              builder: (context) => ElevatedButton(
+                onPressed: () => LogPlayDialog.show(
+                  context,
+                  existing: existing,
+                  primaryPlayer: 'David',
+                ),
+                child: const Text('open'),
               ),
-              child: const Text('open'),
             ),
           ),
         ),
-      ));
+      );
       await tester.tap(find.text('open'));
       await tester.pumpAndSettle();
 
@@ -116,22 +125,24 @@ void main() {
 
     testWidgets('winner is toggled with a checkbox', (tester) async {
       PlayLogEntry? result;
-      await tester.pumpWidget(MaterialApp(
-        home: Scaffold(
-          body: Builder(
-            builder: (context) => ElevatedButton(
-              onPressed: () async {
-                result = await LogPlayDialog.show(
-                  context,
-                  game: _game,
-                  primaryPlayer: 'David',
-                );
-              },
-              child: const Text('open'),
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: Builder(
+              builder: (context) => ElevatedButton(
+                onPressed: () async {
+                  result = await LogPlayDialog.show(
+                    context,
+                    game: _game,
+                    primaryPlayer: 'David',
+                  );
+                },
+                child: const Text('open'),
+              ),
             ),
           ),
         ),
-      ));
+      );
       await tester.tap(find.text('open'));
       await tester.pumpAndSettle();
 
@@ -159,8 +170,9 @@ void main() {
       expect(find.widgetWithText(ActionChip, 'Charlie'), findsOneWidget);
     });
 
-    testWidgets('edit mode pre-fills players and shows edit title',
-        (tester) async {
+    testWidgets('edit mode pre-fills players and shows edit title', (
+      tester,
+    ) async {
       final existing = PlayLogEntry(
         id: 'a',
         gameId: 42,
@@ -170,18 +182,23 @@ void main() {
       );
 
       PlayLogEntry? result;
-      await tester.pumpWidget(MaterialApp(
-        home: Scaffold(
-          body: Builder(
-            builder: (context) => ElevatedButton(
-              onPressed: () async {
-                result = await LogPlayDialog.show(context, existing: existing);
-              },
-              child: const Text('open'),
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: Builder(
+              builder: (context) => ElevatedButton(
+                onPressed: () async {
+                  result = await LogPlayDialog.show(
+                    context,
+                    existing: existing,
+                  );
+                },
+                child: const Text('open'),
+              ),
             ),
           ),
         ),
-      ));
+      );
       await tester.tap(find.text('open'));
       await tester.pumpAndSettle();
 
@@ -207,18 +224,23 @@ void main() {
       );
 
       PlayLogEntry? result;
-      await tester.pumpWidget(MaterialApp(
-        home: Scaffold(
-          body: Builder(
-            builder: (context) => ElevatedButton(
-              onPressed: () async {
-                result = await LogPlayDialog.show(context, existing: existing);
-              },
-              child: const Text('open'),
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: Builder(
+              builder: (context) => ElevatedButton(
+                onPressed: () async {
+                  result = await LogPlayDialog.show(
+                    context,
+                    existing: existing,
+                  );
+                },
+                child: const Text('open'),
+              ),
             ),
           ),
         ),
-      ));
+      );
       await tester.tap(find.text('open'));
       await tester.pumpAndSettle();
 
@@ -227,8 +249,11 @@ void main() {
       await tester.tap(find.text('Save play'));
       await tester.pumpAndSettle();
 
-      expect(result!.players.single.score, isNull,
-          reason: 'emptying the score field must clear it, not keep 78');
+      expect(
+        result!.players.single.score,
+        isNull,
+        reason: 'emptying the score field must clear it, not keep 78',
+      );
     });
 
     testWidgets('tapping a suggestion adds that player', (tester) async {

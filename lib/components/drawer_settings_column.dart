@@ -11,22 +11,35 @@ class DrawerSettingsColumn {
   DrawerSettingsColumn(this.drawerName);
 
   Future<List<Widget>> drawerContent(
-      BuildContext context, AppModel model, int startIndex) async {
+    BuildContext context,
+    AppModel model,
+    int startIndex,
+  ) async {
     List<Widget> fixedDrawerItems = [DrawerHeading(drawerName, context)];
-    List<Widget> dynamicDrawerItems =
-        await settingsFromModel(context, model, startIndex);
+    List<Widget> dynamicDrawerItems = await settingsFromModel(
+      context,
+      model,
+      startIndex,
+    );
     return fixedDrawerItems + dynamicDrawerItems;
   }
 
   Future<List<DrawerSavedSetting>> settingsFromModel(
-      BuildContext context, AppModel model, int startIndex) async {
+    BuildContext context,
+    AppModel model,
+    int startIndex,
+  ) async {
     List<AppPreferences> settings = await model.getSavedPreferences();
     return settings
         .asMap()
         .entries
-        .map((entry) => DrawerSavedSetting.preferencesToDrawerSettings(
-            entry.value, context,
-            index: startIndex + entry.key))
+        .map(
+          (entry) => DrawerSavedSetting.preferencesToDrawerSettings(
+            entry.value,
+            context,
+            index: startIndex + entry.key,
+          ),
+        )
         .toList();
   }
 }

@@ -5,11 +5,7 @@ class RecentlyViewedGame {
   final String name;
   final String? thumbnail;
 
-  RecentlyViewedGame({
-    required this.id,
-    required this.name,
-    this.thumbnail,
-  });
+  RecentlyViewedGame({required this.id, required this.name, this.thumbnail});
 
   factory RecentlyViewedGame.fromJson(Map<String, dynamic> json) {
     return RecentlyViewedGame(
@@ -20,8 +16,8 @@ class RecentlyViewedGame {
   }
 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'name': name,
-        'thumbnail': thumbnail,
-      };
+    'id': id,
+    'name': name,
+    'thumbnail': thumbnail,
+  };
 }

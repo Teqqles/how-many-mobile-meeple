@@ -20,14 +20,13 @@ void main() {
     DateTime playedAt, {
     String name = 'Game',
     List<PlayerResult> players = const [],
-  }) =>
-      PlayLogEntry(
-        id: id,
-        gameId: gameId,
-        name: name,
-        playedAt: playedAt,
-        players: players,
-      );
+  }) => PlayLogEntry(
+    id: id,
+    gameId: gameId,
+    name: name,
+    playedAt: playedAt,
+    players: players,
+  );
 
   group('PlayLogService', () {
     test('starts empty', () async {
@@ -85,13 +84,25 @@ void main() {
 
     test('frequentPlayers orders by appearance count', () async {
       final service = await PlayLogService.instance();
-      service.logPlay(entry('a', 1, DateTime(2026, 1, 1), players: [
-        PlayerResult(name: 'Alice'),
-        PlayerResult(name: 'Bob'),
-      ]));
-      service.logPlay(entry('b', 1, DateTime(2026, 2, 1), players: [
-        PlayerResult(name: 'Alice'),
-      ]));
+      service.logPlay(
+        entry(
+          'a',
+          1,
+          DateTime(2026, 1, 1),
+          players: [
+            PlayerResult(name: 'Alice'),
+            PlayerResult(name: 'Bob'),
+          ],
+        ),
+      );
+      service.logPlay(
+        entry(
+          'b',
+          1,
+          DateTime(2026, 2, 1),
+          players: [PlayerResult(name: 'Alice')],
+        ),
+      );
       final frequent = service.frequentPlayers();
       expect(frequent.first, 'Alice');
       expect(frequent, containsAll(['Alice', 'Bob']));
@@ -100,10 +111,15 @@ void main() {
     test('update replaces an entry by id', () async {
       final service = await PlayLogService.instance();
       service.logPlay(entry('a', 1, DateTime(2026, 1, 1), name: 'Catan'));
-      service
-          .update(entry('a', 1, DateTime(2026, 1, 1), name: 'Catan', players: [
-        PlayerResult(name: 'Alice', won: true),
-      ]));
+      service.update(
+        entry(
+          'a',
+          1,
+          DateTime(2026, 1, 1),
+          name: 'Catan',
+          players: [PlayerResult(name: 'Alice', won: true)],
+        ),
+      );
       expect(service.entries.length, 1);
       expect(service.entries.first.players.single.name, 'Alice');
     });
@@ -165,9 +181,7 @@ void main() {
 
     test('loads persisted entries on init', () async {
       final saved = entry('a', 1, DateTime(2026, 1, 1), name: 'Catan');
-      SharedPreferences.setMockInitialValues({
-        'play_log': '[${_json(saved)}]',
-      });
+      SharedPreferences.setMockInitialValues({'play_log': '[${_json(saved)}]'});
 
       final service = await PlayLogService.instance();
       expect(service.entries.length, 1);

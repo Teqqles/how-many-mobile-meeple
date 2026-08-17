@@ -7,6 +7,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:how_many_mobile_meeple/api/prefetch_service.dart';
 import 'package:how_many_mobile_meeple/model/item.dart';
+
 import '../helpers/sync_mock_client.dart';
 
 void main() {

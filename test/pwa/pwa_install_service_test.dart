@@ -13,10 +13,12 @@ void main() {
   });
 
   group('PwaInstallService persistence', () {
-    test('wasBannerDismissed returns false when key has never been set',
-        () async {
-      expect(await PwaInstallService.wasBannerDismissed(), isFalse);
-    });
+    test(
+      'wasBannerDismissed returns false when key has never been set',
+      () async {
+        expect(await PwaInstallService.wasBannerDismissed(), isFalse);
+      },
+    );
 
     test('wasBannerDismissed returns true after markBannerDismissed', () async {
       await PwaInstallService.markBannerDismissed();

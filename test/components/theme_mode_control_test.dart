@@ -53,11 +53,14 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(
-          model.settings.setting(Settings.themeMode.name).getString(), 'dark');
+        model.settings.setting(Settings.themeMode.name).getString(),
+        'dark',
+      );
     });
 
-    testWidgets('rebuilds live with the new selection after a tap',
-        (tester) async {
+    testWidgets('rebuilds live with the new selection after a tap', (
+      tester,
+    ) async {
       final model = AppModel();
       await tester.pumpWidget(_wrap(model));
       await tester.pumpAndSettle();
@@ -66,7 +69,8 @@ void main() {
       await tester.pumpAndSettle();
 
       final control = tester.widget<SegmentedButton<ThemeMode>>(
-          find.byType(SegmentedButton<ThemeMode>));
+        find.byType(SegmentedButton<ThemeMode>),
+      );
       expect(control.selected, {ThemeMode.dark});
     });
 
@@ -77,7 +81,8 @@ void main() {
       await tester.pumpAndSettle();
 
       final control = tester.widget<SegmentedButton<ThemeMode>>(
-          find.byType(SegmentedButton<ThemeMode>));
+        find.byType(SegmentedButton<ThemeMode>),
+      );
       expect(control.selected, {ThemeMode.light});
     });
   });

@@ -71,9 +71,8 @@ class _HelpPageState extends State<HelpPage> {
     return Text(
       'Here is what each part of How Many Meeple? does and where to find it. '
       'Open Help from any page to jump straight to that page\'s guidance.',
-      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-            color: Theme.of(context).colorScheme.onSurfaceVariant,
-          ),
+      style: Theme.of(context).textTheme.bodyMedium
+          ?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant),
     );
   }
 
@@ -143,10 +142,7 @@ class _HelpPageState extends State<HelpPage> {
                   ),
                 ),
                 const SizedBox(height: 2),
-                Text(
-                  item.body,
-                  style: theme.textTheme.bodySmall,
-                ),
+                Text(item.body, style: theme.textTheme.bodySmall),
               ],
             ),
           ),

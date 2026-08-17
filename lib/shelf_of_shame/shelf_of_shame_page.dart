@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -102,13 +103,18 @@ class _ShelfOfShamePageState extends State<ShelfOfShamePage>
   Future<Games> _doFetchCollection(String username) async {
     try {
       final url = Uri.parse(
-          '${AppCommon.boardGameGeekProxyUrl}/collection/${Uri.encodeComponent(username)}');
+        '${AppCommon.boardGameGeekProxyUrl}/collection/${Uri.encodeComponent(username)}',
+      );
       final headers = {
-        Settings.fieldsToReturnFromApi.header!:
-            Settings.fieldsToReturnFromApi.value.toString(),
+        Settings.fieldsToReturnFromApi.header!: Settings
+            .fieldsToReturnFromApi
+            .value
+            .toString(),
       };
-      final response =
-          await HttpRetryClient.getWithRetry(url, headers: headers);
+      final response = await HttpRetryClient.getWithRetry(
+        url,
+        headers: headers,
+      );
       if (response.statusCode == 200) {
         return Games.fromJson(jsonDecode(response.body));
       }
@@ -125,8 +131,9 @@ class _ShelfOfShamePageState extends State<ShelfOfShamePage>
       if (!mounted) return;
       setState(() => _targetPlays = result.plays);
       if (!result.complete) {
-        final seconds =
-            result.retryAfterSeconds > 0 ? result.retryAfterSeconds : 30;
+        final seconds = result.retryAfterSeconds > 0
+            ? result.retryAfterSeconds
+            : 30;
         _targetPlaysRetry.schedule(Duration(seconds: seconds), () {
           PlaysService.clearCache();
           _loadTargetPlays(username);
@@ -149,15 +156,19 @@ class _ShelfOfShamePageState extends State<ShelfOfShamePage>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: HowManyMeepleAppBar('Shelf of Shame',
-          context: context, helpSection: 'shelf-of-shame'),
+      appBar: HowManyMeepleAppBar(
+        'Shelf of Shame',
+        context: context,
+        helpSection: 'shelf-of-shame',
+      ),
       drawer: const FeatureDrawer(),
       endDrawer: pageDrawer(context),
       bottomNavigationBar: const PlaysLoadingIndicator(),
       body: Consumer<AppModel>(
         builder: (context, model, child) {
-          final hasCollection = model.items.itemList
-              .any((item) => item.itemType == ItemType.collection);
+          final hasCollection = model.items.itemList.any(
+            (item) => item.itemType == ItemType.collection,
+          );
           if (!hasCollection && widget.username == null) {
             return _buildNoCollection(context);
           }
@@ -183,8 +194,11 @@ class _ShelfOfShamePageState extends State<ShelfOfShamePage>
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.shelves,
-                size: 64, color: Theme.of(context).colorScheme.secondary),
+            Icon(
+              Icons.shelves,
+              size: 64,
+              color: Theme.of(context).colorScheme.secondary,
+            ),
             const SizedBox(height: 16),
             Text(
               'No collection added',
@@ -195,8 +209,8 @@ class _ShelfOfShamePageState extends State<ShelfOfShamePage>
               'Shelf of Shame requires a BGG collection. Add your BGG username in Step 1 to get started.',
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                  ),
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
             ),
           ],
         ),
@@ -211,8 +225,11 @@ class _ShelfOfShamePageState extends State<ShelfOfShamePage>
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.shelves,
-                size: 64, color: Theme.of(context).colorScheme.secondary),
+            Icon(
+              Icons.shelves,
+              size: 64,
+              color: Theme.of(context).colorScheme.secondary,
+            ),
             const SizedBox(height: 16),
             Text(
               'No primary player set',
@@ -223,8 +240,8 @@ class _ShelfOfShamePageState extends State<ShelfOfShamePage>
               'Add a BGG collection in Step 1 and tap the crown icon to designate your primary player for play tracking.',
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                  ),
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
             ),
           ],
         ),
@@ -234,8 +251,9 @@ class _ShelfOfShamePageState extends State<ShelfOfShamePage>
 
   Widget _buildLoadingScreen(BuildContext context) {
     final spinnerSize = getScreenWidthPercentageInPixels(
-            context, ScreenTools.fiftyPercentScreen)
-        .clamp(0.0, 200.0);
+      context,
+      ScreenTools.fiftyPercentScreen,
+    ).clamp(0.0, 200.0);
 
     return Center(
       child: ConstrainedBox(
@@ -256,8 +274,10 @@ class _ShelfOfShamePageState extends State<ShelfOfShamePage>
               },
             ),
             const SizedBox(height: 16),
-            Text(NetworkWidget.findingGames,
-                style: const TextStyle(fontWeight: FontWeight.bold)),
+            Text(
+              NetworkWidget.findingGames,
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
             Text(
               NetworkWidget.speedDisclaimer,
               style: const TextStyle(fontSize: 12),
@@ -272,10 +292,11 @@ class _ShelfOfShamePageState extends State<ShelfOfShamePage>
 
   Widget _buildBody(BuildContext context, AppModel model) {
     final allGames = _fullCollection!;
-    final unplayedGames = allGames.gamesByName.values
-        .where((game) => _isUnplayed(model, game.id))
-        .toList()
-      ..sort(_worstOffenderFirst);
+    final unplayedGames =
+        allGames.gamesByName.values
+            .where((game) => _isUnplayed(model, game.id))
+            .toList()
+          ..sort(_worstOffenderFirst);
 
     if (unplayedGames.isEmpty) {
       return Center(
@@ -284,8 +305,11 @@ class _ShelfOfShamePageState extends State<ShelfOfShamePage>
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(Icons.celebration,
-                  size: 64, color: Theme.of(context).colorScheme.secondary),
+              Icon(
+                Icons.celebration,
+                size: 64,
+                color: Theme.of(context).colorScheme.secondary,
+              ),
               const SizedBox(height: 16),
               Text(
                 'No shame here!',
@@ -296,8 +320,8 @@ class _ShelfOfShamePageState extends State<ShelfOfShamePage>
                 'All your games have been played at least once. Well done!',
                 textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
-                    ),
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
               ),
             ],
           ),
@@ -329,7 +353,10 @@ class _ShelfOfShamePageState extends State<ShelfOfShamePage>
       widget.username != null && widget.username != model.primaryPlayer;
 
   Widget _buildCollectionBanner(
-      BuildContext context, AppModel model, int count) {
+    BuildContext context,
+    AppModel model,
+    int count,
+  ) {
     final scheme = Theme.of(context).colorScheme;
     final displayName = _targetUsername ?? model.primaryPlayer ?? '';
     final viewingOther = _isViewingOtherPlayer(model);
@@ -337,8 +364,9 @@ class _ShelfOfShamePageState extends State<ShelfOfShamePage>
     final background =
         (viewingOther ? scheme.tertiaryContainer : scheme.primaryContainer)
             .withAlpha(120);
-    final foreground =
-        viewingOther ? scheme.onTertiaryContainer : scheme.onPrimaryContainer;
+    final foreground = viewingOther
+        ? scheme.onTertiaryContainer
+        : scheme.onPrimaryContainer;
     final label = viewingOther
         ? 'Viewing $displayName\'s shelf • $count unplayed'
         : '$displayName\'s collection • $count unplayed';
@@ -357,10 +385,8 @@ class _ShelfOfShamePageState extends State<ShelfOfShamePage>
           Expanded(
             child: Text(
               label,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    fontWeight: FontWeight.w500,
-                    color: foreground,
-                  ),
+              style: Theme.of(context).textTheme.bodyMedium
+                  ?.copyWith(fontWeight: FontWeight.w500, color: foreground),
             ),
           ),
         ],
@@ -387,17 +413,19 @@ class _ShelfOfShamePageState extends State<ShelfOfShamePage>
                   )
                 : Container(
                     color: Theme.of(context).colorScheme.primaryContainer,
-                    child: Icon(Icons.casino,
-                        size: 22,
-                        color:
-                            Theme.of(context).colorScheme.onPrimaryContainer),
+                    child: Icon(
+                      Icons.casino,
+                      size: 22,
+                      color: Theme.of(context).colorScheme.onPrimaryContainer,
+                    ),
                   ),
           ),
         ),
         title: Text(game.name),
         subtitle: _buildTileSubtitle(context, game),
         onTap: () => Navigator.of(context).pushNamed(
-            '${r.Router.gameDetailRoute}/${game.name.replaceAll(' ', '+')}/${game.id}'),
+          '${r.Router.gameDetailRoute}/${game.name.replaceAll(' ', '+')}/${game.id}',
+        ),
       ),
     );
   }
@@ -449,7 +477,9 @@ class _ShelfOfShamePageState extends State<ShelfOfShamePage>
     return Text(
       '${game.minPlayers}-${game.maxPlayers} players',
       style: TextStyle(
-          fontSize: 12, color: Theme.of(context).colorScheme.secondary),
+        fontSize: 12,
+        color: Theme.of(context).colorScheme.secondary,
+      ),
     );
   }
 
@@ -470,7 +500,9 @@ class _ShelfOfShamePageState extends State<ShelfOfShamePage>
     return Text(
       _ownershipLabel(owned, years),
       style: TextStyle(
-          fontSize: 12, color: Theme.of(context).colorScheme.onSurfaceVariant),
+        fontSize: 12,
+        color: Theme.of(context).colorScheme.onSurfaceVariant,
+      ),
     );
   }
 
@@ -497,8 +529,11 @@ class _ShelfOfShamePageState extends State<ShelfOfShamePage>
           padding: const EdgeInsets.all(16),
           child: Row(
             children: [
-              Icon(Icons.bar_chart,
-                  size: 24, color: Theme.of(context).colorScheme.primary),
+              Icon(
+                Icons.bar_chart,
+                size: 24,
+                color: Theme.of(context).colorScheme.primary,
+              ),
               const SizedBox(width: 12),
               Expanded(
                 child: Column(
@@ -512,9 +547,8 @@ class _ShelfOfShamePageState extends State<ShelfOfShamePage>
                     Text(
                       'Log plays with BG Stats to keep your shelf of shame up to date',
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color:
-                                Theme.of(context).colorScheme.onSurfaceVariant,
-                          ),
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
                     ),
                   ],
                 ),

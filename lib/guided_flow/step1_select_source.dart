@@ -50,8 +50,9 @@ class _Step1SelectSourceState extends State<Step1SelectSource> {
   }
 
   bool _hasHotList(AppModel model) {
-    return model.items.itemList
-        .any((item) => item.itemType == ItemType.hotList);
+    return model.items.itemList.any(
+      (item) => item.itemType == ItemType.hotList,
+    );
   }
 
   @override
@@ -76,10 +77,18 @@ class _Step1SelectSourceState extends State<Step1SelectSource> {
                 _buildTrendingContent(context, model)
               else if (_tabIndex == 1)
                 _buildInputContent(
-                    context, model, ItemType.collection, 'Collection')
+                  context,
+                  model,
+                  ItemType.collection,
+                  'Collection',
+                )
               else
                 _buildInputContent(
-                    context, model, ItemType.geekList, 'Geeklist'),
+                  context,
+                  model,
+                  ItemType.geekList,
+                  'Geeklist',
+                ),
               // Show added sources (shared across both tabs)
               if (model.items.itemList.isNotEmpty) ...[
                 const SizedBox(height: 24),
@@ -87,13 +96,13 @@ class _Step1SelectSourceState extends State<Step1SelectSource> {
                 const SizedBox(height: 16),
                 Text(
                   'Added Sources (${model.items.itemList.length}/${AppCommon.maxItemsFromBgg})',
-                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
+                  style: Theme.of(context).textTheme.titleSmall
+                      ?.copyWith(fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 12),
-                ...model.items.itemList
-                    .map((item) => _buildSourceChip(context, model, item)),
+                ...model.items.itemList.map(
+                  (item) => _buildSourceChip(context, model, item),
+                ),
               ],
               // Status message
               if (model.items.itemList.isEmpty) ...[
@@ -104,8 +113,7 @@ class _Step1SelectSourceState extends State<Step1SelectSource> {
               ] else ...[
                 const SizedBox(height: 24),
                 const InfoMessageBox.success(
-                  message:
-                      'Great! You can add more sources or continue to the next step',
+                  message: 'Great! You can add more sources or continue to the next step',
                 ),
               ],
             ],
@@ -133,8 +141,11 @@ class _Step1SelectSourceState extends State<Step1SelectSource> {
         ),
         const ButtonSegment(
           value: 1,
-          label:
-              Text('Collection', overflow: TextOverflow.ellipsis, maxLines: 1),
+          label: Text(
+            'Collection',
+            overflow: TextOverflow.ellipsis,
+            maxLines: 1,
+          ),
           icon: Icon(Icons.person, size: 16),
         ),
         const ButtonSegment(
@@ -161,9 +172,8 @@ class _Step1SelectSourceState extends State<Step1SelectSource> {
       children: [
         Text(
           'Browse the hottest games on BoardGameGeek - no account needed.',
-          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
-              ),
+          style: Theme.of(context).textTheme.bodyMedium
+              ?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant),
         ),
         const SizedBox(height: 16),
         SizedBox(
@@ -180,8 +190,8 @@ class _Step1SelectSourceState extends State<Step1SelectSource> {
               : FilledButton.tonalIcon(
                   onPressed:
                       model.items.itemList.length >= AppCommon.maxItemsFromBgg
-                          ? null
-                          : () => _addHotList(model),
+                      ? null
+                      : () => _addHotList(model),
                   icon: const Icon(Icons.local_fire_department),
                   label: const Text('Use Trending Games'),
                   style: FilledButton.styleFrom(
@@ -194,7 +204,11 @@ class _Step1SelectSourceState extends State<Step1SelectSource> {
   }
 
   Widget _buildInputContent(
-      BuildContext context, AppModel model, ItemType itemType, String label) {
+    BuildContext context,
+    AppModel model,
+    ItemType itemType,
+    String label,
+  ) {
     final isCollection = itemType == ItemType.collection;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -223,15 +237,14 @@ class _Step1SelectSourceState extends State<Step1SelectSource> {
         SizedBox(
           width: double.infinity,
           child: FilledButton.icon(
-            onPressed: _controller.text.isEmpty ||
+            onPressed:
+                _controller.text.isEmpty ||
                     model.items.itemList.length >= AppCommon.maxItemsFromBgg
                 ? null
                 : () => _addSource(model, itemType),
             icon: const Icon(Icons.add_circle_outline),
             label: Text('Add $label'),
-            style: FilledButton.styleFrom(
-              padding: const EdgeInsets.all(16),
-            ),
+            style: FilledButton.styleFrom(padding: const EdgeInsets.all(16)),
           ),
         ),
       ],
@@ -287,7 +300,8 @@ class _Step1SelectSourceState extends State<Step1SelectSource> {
       label = item.name;
     }
 
-    final isPrimary = item.itemType == ItemType.collection &&
+    final isPrimary =
+        item.itemType == ItemType.collection &&
         model.primaryPlayer == item.name;
 
     return Padding(
@@ -295,9 +309,7 @@ class _Step1SelectSourceState extends State<Step1SelectSource> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: BoxDecoration(
-          color: Theme.of(context)
-              .colorScheme
-              .primaryContainer
+          color: Theme.of(context).colorScheme.primaryContainer
               .withValues(alpha: 0.5),
           borderRadius: BorderRadius.circular(8),
           border: Border.all(
@@ -315,9 +327,8 @@ class _Step1SelectSourceState extends State<Step1SelectSource> {
             Expanded(
               child: Text(
                 label,
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      fontWeight: FontWeight.w500,
-                    ),
+                style: Theme.of(context).textTheme.bodyMedium
+                    ?.copyWith(fontWeight: FontWeight.w500),
               ),
             ),
             if (item.itemType == ItemType.collection)

@@ -5,16 +5,16 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:how_many_mobile_meeple/model/game.dart';
 
 Map<String, dynamic> _gameJson({Object? lastmodified = _absent}) => {
-      'id': 174430,
-      'name': 'Gloomhaven',
-      'minplayers': 1,
-      'maxplayers': 4,
-      'maxplaytime': 120,
-      'image': 'http://example.com/gloom.jpg',
-      'thumbnail': 'http://example.com/gloom_t.jpg',
-      'stats': {'average': 8.6, 'averageweight': 3.9},
-      if (!identical(lastmodified, _absent)) 'lastmodified': lastmodified,
-    };
+  'id': 174430,
+  'name': 'Gloomhaven',
+  'minplayers': 1,
+  'maxplayers': 4,
+  'maxplaytime': 120,
+  'image': 'http://example.com/gloom.jpg',
+  'thumbnail': 'http://example.com/gloom_t.jpg',
+  'stats': {'average': 8.6, 'averageweight': 3.9},
+  if (!identical(lastmodified, _absent)) 'lastmodified': lastmodified,
+};
 
 const Object _absent = Object();
 

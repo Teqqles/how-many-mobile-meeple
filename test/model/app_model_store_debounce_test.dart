@@ -28,30 +28,38 @@ void main() {
         model.updateStoreDebounced();
       }
 
-      expect(model.storeWriteCount, 0,
-          reason: 'nothing should persist until the debounce settles');
+      expect(
+        model.storeWriteCount,
+        0,
+        reason: 'nothing should persist until the debounce settles',
+      );
 
       await Future<void>.delayed(const Duration(milliseconds: 60));
 
-      expect(model.storeWriteCount, 1,
-          reason: 'five rapid calls must persist exactly once after settling');
+      expect(
+        model.storeWriteCount,
+        1,
+        reason: 'five rapid calls must persist exactly once after settling',
+      );
     });
 
-    test('notifies listeners immediately on every call for a responsive UI',
-        () async {
-      final model = AppModel()..hasLoadedPersistedData = true;
-      var notifications = 0;
-      model.addListener(() => notifications++);
+    test(
+      'notifies listeners immediately on every call for a responsive UI',
+      () async {
+        final model = AppModel()..hasLoadedPersistedData = true;
+        var notifications = 0;
+        model.addListener(() => notifications++);
 
-      model.updateStoreDebounced();
-      model.updateStoreDebounced();
-      model.updateStoreDebounced();
+        model.updateStoreDebounced();
+        model.updateStoreDebounced();
+        model.updateStoreDebounced();
 
-      // No delay: the notifications must have already fired synchronously,
-      // well before the debounced write lands.
-      expect(notifications, 3);
-      expect(model.storeWriteCount, 0);
-    });
+        // No delay: the notifications must have already fired synchronously,
+        // well before the debounced write lands.
+        expect(notifications, 3);
+        expect(model.storeWriteCount, 0);
+      },
+    );
 
     test('flushes a pending write on dispose so no changes are lost', () async {
       final model = AppModel()..hasLoadedPersistedData = true;
@@ -65,8 +73,11 @@ void main() {
 
       await Future<void>.delayed(const Duration(milliseconds: 5));
 
-      expect(model.storeWriteCount, 1,
-          reason: 'the pending write must flush when the model is disposed');
+      expect(
+        model.storeWriteCount,
+        1,
+        reason: 'the pending write must flush when the model is disposed',
+      );
     });
 
     test('does not write again on dispose when nothing is pending', () async {
@@ -78,8 +89,11 @@ void main() {
       model.dispose();
       await Future<void>.delayed(const Duration(milliseconds: 5));
 
-      expect(model.storeWriteCount, 1,
-          reason: 'dispose must not trigger a redundant write');
+      expect(
+        model.storeWriteCount,
+        1,
+        reason: 'dispose must not trigger a redundant write',
+      );
     });
   });
 
@@ -90,20 +104,28 @@ void main() {
 
       await model.updateStore();
 
-      expect(model.storeWriteCount, 1,
-          reason: 'the write completes before updateStore returns');
+      expect(
+        model.storeWriteCount,
+        1,
+        reason: 'the write completes before updateStore returns',
+      );
     });
 
-    test('cancels a pending debounced write so it is not written twice',
-        () async {
-      final model = AppModel()..hasLoadedPersistedData = true;
+    test(
+      'cancels a pending debounced write so it is not written twice',
+      () async {
+        final model = AppModel()..hasLoadedPersistedData = true;
 
-      model.updateStoreDebounced();
-      await model.updateStore();
-      await Future<void>.delayed(const Duration(milliseconds: 60));
+        model.updateStoreDebounced();
+        await model.updateStore();
+        await Future<void>.delayed(const Duration(milliseconds: 60));
 
-      expect(model.storeWriteCount, 1,
-          reason: 'the immediate write subsumes the pending debounced one');
-    });
+        expect(
+          model.storeWriteCount,
+          1,
+          reason: 'the immediate write subsumes the pending debounced one',
+        );
+      },
+    );
   });
 }

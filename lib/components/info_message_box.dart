@@ -14,23 +14,17 @@ class InfoMessageBox extends StatelessWidget {
     this.type = InfoMessageType.info,
   });
 
-  const InfoMessageBox.info({
-    super.key,
-    required this.message,
-  })  : icon = Icons.info_outline,
-        type = InfoMessageType.info;
+  const InfoMessageBox.info({super.key, required this.message})
+    : icon = Icons.info_outline,
+      type = InfoMessageType.info;
 
-  const InfoMessageBox.success({
-    super.key,
-    required this.message,
-  })  : icon = Icons.check_circle_outline,
-        type = InfoMessageType.success;
+  const InfoMessageBox.success({super.key, required this.message})
+    : icon = Icons.check_circle_outline,
+      type = InfoMessageType.success;
 
-  const InfoMessageBox.warning({
-    super.key,
-    required this.message,
-  })  : icon = Icons.warning_amber_outlined,
-        type = InfoMessageType.warning;
+  const InfoMessageBox.warning({super.key, required this.message})
+    : icon = Icons.warning_amber_outlined,
+      type = InfoMessageType.warning;
 
   @override
   Widget build(BuildContext context) {
@@ -46,18 +40,13 @@ class InfoMessageBox extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Icon(
-            icon,
-            size: 20,
-            color: iconColor,
-          ),
+          Icon(icon, size: 20, color: iconColor),
           const SizedBox(width: 12),
           Expanded(
             child: Text(
               message,
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: textColor,
-                  ),
+              style: Theme.of(context).textTheme.bodySmall
+                  ?.copyWith(color: textColor),
             ),
           ),
         ],
@@ -99,8 +88,4 @@ class InfoMessageBox extends StatelessWidget {
   }
 }
 
-enum InfoMessageType {
-  info,
-  success,
-  warning,
-}
+enum InfoMessageType { info, success, warning }

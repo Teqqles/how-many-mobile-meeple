@@ -1,4 +1,5 @@
 import 'dart:convert';
+
 import 'package:how_many_mobile_meeple/api/http_retry_client.dart';
 import 'package:how_many_mobile_meeple/app_common.dart';
 import 'package:how_many_mobile_meeple/model/play_data.dart';
@@ -46,8 +47,9 @@ class PlaysService {
 
   static Future<PlaysResult> _doFetch(String username) async {
     try {
-      final url =
-          Uri.parse('${AppCommon.boardGameGeekProxyUrl}/plays/$username');
+      final url = Uri.parse(
+        '${AppCommon.boardGameGeekProxyUrl}/plays/$username',
+      );
       final response = await HttpRetryClient.getWithRetry(
         url,
         headers: {'Bgg-Plays-Meta': 'true'},
@@ -72,8 +74,10 @@ class PlaysService {
           complete: complete,
           retryAfterSeconds: retryAfter,
         );
-        _cache[username] =
-            _CachedPlays(result, DateTime.now().millisecondsSinceEpoch);
+        _cache[username] = _CachedPlays(
+          result,
+          DateTime.now().millisecondsSinceEpoch,
+        );
         return result;
       }
 
@@ -82,7 +86,8 @@ class PlaysService {
       }
 
       throw Exception(
-          'Failed to load plays for $username (${response.statusCode})');
+        'Failed to load plays for $username (${response.statusCode})',
+      );
     } finally {
       _inFlight.remove(username);
     }

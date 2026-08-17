@@ -24,29 +24,32 @@ class ToggleableHomepageMenuItemWidget extends StatelessWidget {
     return Consumer<AppModel>(
       builder: (context, model, child) {
         final isEnabled = model.settings.setting(this.setting.name).enabled;
-        return Column(children: <Widget>[
-          Container(
-            height: 35,
-            color: isEnabled
-                ? Theme.of(context).colorScheme.primaryContainer
-                : Theme.of(context).colorScheme.primary.withValues(alpha: 0.25),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                AppDefaultPadding(
-                  child: Text(
-                    this.label,
-                    textAlign: TextAlign.left,
-                    style: TextStyle(
-                      fontWeight:
-                          isEnabled ? FontWeight.bold : FontWeight.normal,
-                      color: isEnabled
-                          ? Theme.of(context).colorScheme.onPrimaryContainer
-                          : Theme.of(context).colorScheme.onSurfaceVariant,
+        return Column(
+          children: <Widget>[
+            Container(
+              height: 35,
+              color: isEnabled
+                  ? Theme.of(context).colorScheme.primaryContainer
+                  : Theme.of(context).colorScheme.primary
+                        .withValues(alpha: 0.25),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  AppDefaultPadding(
+                    child: Text(
+                      this.label,
+                      textAlign: TextAlign.left,
+                      style: TextStyle(
+                        fontWeight: isEnabled
+                            ? FontWeight.bold
+                            : FontWeight.normal,
+                        color: isEnabled
+                            ? Theme.of(context).colorScheme.onPrimaryContainer
+                            : Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
                     ),
                   ),
-                ),
-                AppSwitch(
+                  AppSwitch(
                     style: AppSwitchStyle.subtle,
                     onChanged: (bool value) {
                       var setting = model.settings.setting(this.setting.name);
@@ -55,13 +58,15 @@ class ToggleableHomepageMenuItemWidget extends StatelessWidget {
                       model.updateStore();
                       model.invalidateCache();
                     },
-                    value: isEnabled)
-              ],
+                    value: isEnabled,
+                  ),
+                ],
+              ),
             ),
-          ),
-          AppHomeMenuPadding(),
-          menuWidget
-        ]);
+            AppHomeMenuPadding(),
+            menuWidget,
+          ],
+        );
       },
     );
   }

@@ -24,10 +24,7 @@ final _testGame = Game.fromJson(const {
   'minplayers': 1,
   'maxplaytime': 70,
   'image': '',
-  'stats': {
-    'average': 8.1,
-    'averageweight': 2.4,
-  },
+  'stats': {'average': 8.1, 'averageweight': 2.4},
 });
 
 class _FakeGameDetailFetcher implements GameDetailFetcher {
@@ -52,8 +49,7 @@ class _FakeRecommendationsFetcher implements RecommendationsFetcher {
     required Map<String, String> headers,
     int limit = 10,
     List<int> excludeIds = const [],
-  }) =>
-      Future.value([]);
+  }) => Future.value([]);
 }
 
 class _FakeGameServices implements GameServices {
@@ -84,12 +80,11 @@ Widget _buildTestApp(
       dependencies: [
         Dependency<GameDetailFetcher>((_) => fetcher),
         Dependency<RecommendationsFetcher>(
-            (_) => recommendations ?? _FakeRecommendationsFetcher()),
+          (_) => recommendations ?? _FakeRecommendationsFetcher(),
+        ),
         if (services != null) Dependency<GameServices>((_) => services),
       ],
-      builder: (_) => MaterialApp(
-        home: GameDetailPage(gameId: gameId),
-      ),
+      builder: (_) => MaterialApp(home: GameDetailPage(gameId: gameId)),
     ),
   );
 }
@@ -125,19 +120,22 @@ void main() {
     testWidgets('shows Game Details title in app bar', (tester) async {
       final fetcher = _FakeGameDetailFetcher(game: _testGame);
       await mockNetworkImagesFor(() async {
-        await tester.pumpWidget(_buildTestApp(
-          model,
-          fetcher: fetcher,
-          services: _FakeGameServices(favs, ignored, playLog),
-        ));
+        await tester.pumpWidget(
+          _buildTestApp(
+            model,
+            fetcher: fetcher,
+            services: _FakeGameServices(favs, ignored, playLog),
+          ),
+        );
         await tester.pump();
       });
 
       expect(find.text('Game Details'), findsOneWidget);
     });
 
-    testWidgets('shows loading indicator when fetch is pending',
-        (tester) async {
+    testWidgets('shows loading indicator when fetch is pending', (
+      tester,
+    ) async {
       final fetcher = _FakeGameDetailFetcher(game: _testGame);
       await tester.pumpWidget(_buildTestApp(model, fetcher: fetcher));
 
@@ -147,11 +145,13 @@ void main() {
     testWidgets('renders game name after data arrives', (tester) async {
       final fetcher = _FakeGameDetailFetcher(game: _testGame);
       await mockNetworkImagesFor(() async {
-        await tester.pumpWidget(_buildTestApp(
-          model,
-          fetcher: fetcher,
-          services: _FakeGameServices(favs, ignored, playLog),
-        ));
+        await tester.pumpWidget(
+          _buildTestApp(
+            model,
+            fetcher: fetcher,
+            services: _FakeGameServices(favs, ignored, playLog),
+          ),
+        );
         await tester.pump();
       });
 
@@ -169,12 +169,14 @@ void main() {
     testWidgets('calls fetchGame with the provided gameId', (tester) async {
       final fetcher = _FakeGameDetailFetcher(game: _testGame);
       await mockNetworkImagesFor(() async {
-        await tester.pumpWidget(_buildTestApp(
-          model,
-          fetcher: fetcher,
-          services: _FakeGameServices(favs, ignored, playLog),
-          gameId: 99,
-        ));
+        await tester.pumpWidget(
+          _buildTestApp(
+            model,
+            fetcher: fetcher,
+            services: _FakeGameServices(favs, ignored, playLog),
+            gameId: 99,
+          ),
+        );
         await tester.pump();
       });
 
@@ -184,11 +186,13 @@ void main() {
     testWidgets('does not refetch on rebuild', (tester) async {
       final fetcher = _FakeGameDetailFetcher(game: _testGame);
       await mockNetworkImagesFor(() async {
-        await tester.pumpWidget(_buildTestApp(
-          model,
-          fetcher: fetcher,
-          services: _FakeGameServices(favs, ignored, playLog),
-        ));
+        await tester.pumpWidget(
+          _buildTestApp(
+            model,
+            fetcher: fetcher,
+            services: _FakeGameServices(favs, ignored, playLog),
+          ),
+        );
         await tester.pump();
         await tester.pump();
         await tester.pump();
@@ -197,15 +201,18 @@ void main() {
       expect(fetcher.callCount, 1);
     });
 
-    testWidgets('renders game action buttons when services loaded',
-        (tester) async {
+    testWidgets('renders game action buttons when services loaded', (
+      tester,
+    ) async {
       final fetcher = _FakeGameDetailFetcher(game: _testGame);
       await mockNetworkImagesFor(() async {
-        await tester.pumpWidget(_buildTestApp(
-          model,
-          fetcher: fetcher,
-          services: _FakeGameServices(favs, ignored, playLog),
-        ));
+        await tester.pumpWidget(
+          _buildTestApp(
+            model,
+            fetcher: fetcher,
+            services: _FakeGameServices(favs, ignored, playLog),
+          ),
+        );
         await tester.pump();
         await tester.pump();
       });
@@ -213,15 +220,18 @@ void main() {
       expect(find.text('Favourite'), findsOneWidget);
     });
 
-    testWidgets('records the game as recently viewed once it loads',
-        (tester) async {
+    testWidgets('records the game as recently viewed once it loads', (
+      tester,
+    ) async {
       final fetcher = _FakeGameDetailFetcher(game: _testGame);
       await mockNetworkImagesFor(() async {
-        await tester.pumpWidget(_buildTestApp(
-          model,
-          fetcher: fetcher,
-          services: _FakeGameServices(favs, ignored, playLog),
-        ));
+        await tester.pumpWidget(
+          _buildTestApp(
+            model,
+            fetcher: fetcher,
+            services: _FakeGameServices(favs, ignored, playLog),
+          ),
+        );
         await tester.pumpAndSettle();
       });
 

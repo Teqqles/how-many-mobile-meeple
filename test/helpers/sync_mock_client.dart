@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:typed_data';
+
 import 'package:http/http.dart' as http;
 
 typedef SyncHandler = http.Response Function(http.BaseRequest request);
@@ -14,10 +15,15 @@ class SyncMockClient implements http.Client {
   SyncMockClient(this._handler);
 
   SyncMockClient.respond(int statusCode, String body)
-      : _handler = ((_) => http.Response(body, statusCode));
+    : _handler = ((_) => http.Response(body, statusCode));
 
-  http.Response _call(String method, Uri url,
-      {Map<String, String>? headers, Object? body, Encoding? encoding}) {
+  http.Response _call(
+    String method,
+    Uri url, {
+    Map<String, String>? headers,
+    Object? body,
+    Encoding? encoding,
+  }) {
     final request = http.Request(method, url);
     if (headers != null) request.headers.addAll(headers);
     if (body != null) {
@@ -38,28 +44,44 @@ class SyncMockClient implements http.Client {
       Future.value(_call('GET', url, headers: headers));
 
   @override
-  Future<http.Response> post(Uri url,
-          {Map<String, String>? headers, Object? body, Encoding? encoding}) =>
-      Future.value(
-          _call('POST', url, headers: headers, body: body, encoding: encoding));
+  Future<http.Response> post(
+    Uri url, {
+    Map<String, String>? headers,
+    Object? body,
+    Encoding? encoding,
+  }) => Future.value(
+    _call('POST', url, headers: headers, body: body, encoding: encoding),
+  );
 
   @override
-  Future<http.Response> put(Uri url,
-          {Map<String, String>? headers, Object? body, Encoding? encoding}) =>
-      Future.value(
-          _call('PUT', url, headers: headers, body: body, encoding: encoding));
+  Future<http.Response> put(
+    Uri url, {
+    Map<String, String>? headers,
+    Object? body,
+    Encoding? encoding,
+  }) => Future.value(
+    _call('PUT', url, headers: headers, body: body, encoding: encoding),
+  );
 
   @override
-  Future<http.Response> patch(Uri url,
-          {Map<String, String>? headers, Object? body, Encoding? encoding}) =>
-      Future.value(_call('PATCH', url,
-          headers: headers, body: body, encoding: encoding));
+  Future<http.Response> patch(
+    Uri url, {
+    Map<String, String>? headers,
+    Object? body,
+    Encoding? encoding,
+  }) => Future.value(
+    _call('PATCH', url, headers: headers, body: body, encoding: encoding),
+  );
 
   @override
-  Future<http.Response> delete(Uri url,
-          {Map<String, String>? headers, Object? body, Encoding? encoding}) =>
-      Future.value(_call('DELETE', url,
-          headers: headers, body: body, encoding: encoding));
+  Future<http.Response> delete(
+    Uri url, {
+    Map<String, String>? headers,
+    Object? body,
+    Encoding? encoding,
+  }) => Future.value(
+    _call('DELETE', url, headers: headers, body: body, encoding: encoding),
+  );
 
   @override
   Future<http.Response> head(Uri url, {Map<String, String>? headers}) =>
@@ -77,14 +99,16 @@ class SyncMockClient implements http.Client {
   Future<http.StreamedResponse> send(http.BaseRequest request) {
     final response = _handler(request);
     final bytes = utf8.encode(response.body);
-    return Future.value(http.StreamedResponse(
-      Stream.value(bytes),
-      response.statusCode,
-      headers: response.headers,
-      reasonPhrase: response.reasonPhrase,
-      contentLength: bytes.length,
-      request: request,
-    ));
+    return Future.value(
+      http.StreamedResponse(
+        Stream.value(bytes),
+        response.statusCode,
+        headers: response.headers,
+        reasonPhrase: response.reasonPhrase,
+        contentLength: bytes.length,
+        request: request,
+      ),
+    );
   }
 
   @override

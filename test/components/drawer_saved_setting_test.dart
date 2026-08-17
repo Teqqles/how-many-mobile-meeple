@@ -85,15 +85,18 @@ void main() {
       await tester.pump();
 
       expect(find.text('My Saved Game'), findsOneWidget);
-      final inkWell = tester.widget<InkWell>(find.ancestor(
-        of: find.text('My Saved Game'),
-        matching: find.byType(InkWell),
-      ));
+      final inkWell = tester.widget<InkWell>(
+        find.ancestor(
+          of: find.text('My Saved Game'),
+          matching: find.byType(InkWell),
+        ),
+      );
       expect(inkWell.onTap, isNotNull);
     });
 
-    testWidgets('delete button calls storage and model when id is not null',
-        (tester) async {
+    testWidgets('delete button calls storage and model when id is not null', (
+      tester,
+    ) async {
       final model = AppModel();
       final storage = _FakePreferencesHistory();
       final prefs = _makePreferences(id: 'pref-123');

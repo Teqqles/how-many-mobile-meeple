@@ -26,26 +26,29 @@ class RatingFilterWidget extends StatelessWidget {
                   height: 35,
                   width: MediaQuery.of(context).size.width * 0.60,
                   child: Slider(
-                      activeColor: Theme.of(context).colorScheme.secondary,
-                      min: 0.0,
-                      max: 10.0,
-                      divisions: 20,
-                      onChanged: !model.settings
-                              .setting(Settings.filterMinRating.name)
-                              .enabled
-                          ? null
-                          : (rating) {
-                              model.settings
-                                  .setting(Settings.filterMinRating.name)
-                                  .value = rating;
-                              model.updateStoreDebounced();
-                              model.invalidateCache();
-                            },
-                      value: model.settings
-                          .setting(Settings.filterMinRating.name)
-                          .getDouble(),
-                      label:
-                          "${model.settings.setting(Settings.filterMinRating.name).value.toString()} rating"),
+                    activeColor: Theme.of(context).colorScheme.secondary,
+                    min: 0.0,
+                    max: 10.0,
+                    divisions: 20,
+                    onChanged:
+                        !model.settings
+                            .setting(Settings.filterMinRating.name)
+                            .enabled
+                        ? null
+                        : (rating) {
+                            model.settings
+                                    .setting(Settings.filterMinRating.name)
+                                    .value =
+                                rating;
+                            model.updateStoreDebounced();
+                            model.invalidateCache();
+                          },
+                    value: model.settings
+                        .setting(Settings.filterMinRating.name)
+                        .getDouble(),
+                    label:
+                        "${model.settings.setting(Settings.filterMinRating.name).value.toString()} rating",
+                  ),
                 ),
                 FilterValueBadge(
                   value: model.settings
@@ -58,7 +61,7 @@ class RatingFilterWidget extends StatelessWidget {
                 ),
               ],
             ),
-          )
+          ),
         ],
       ),
     );

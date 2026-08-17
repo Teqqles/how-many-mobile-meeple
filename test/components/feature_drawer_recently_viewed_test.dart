@@ -39,8 +39,9 @@ void main() {
   });
 
   group('FeatureDrawer recently viewed', () {
-    testWidgets('hides the section when no games have been viewed',
-        (tester) async {
+    testWidgets('hides the section when no games have been viewed', (
+      tester,
+    ) async {
       await tester.pumpWidget(_buildTestApp());
       await tester.tap(find.text('Open Drawer'));
       await tester.pumpAndSettle();
@@ -57,8 +58,11 @@ void main() {
       await tester.tap(find.text('Open Drawer'));
       await tester.pumpAndSettle();
 
-      await tester.scrollUntilVisible(find.text('Recently Viewed'), 100,
-          scrollable: find.byType(Scrollable).first);
+      await tester.scrollUntilVisible(
+        find.text('Recently Viewed'),
+        100,
+        scrollable: find.byType(Scrollable).first,
+      );
       expect(find.text('Recently Viewed'), findsOneWidget);
       expect(find.text('Catan'), findsOneWidget);
       expect(find.text('Wingspan'), findsOneWidget);
@@ -72,8 +76,11 @@ void main() {
       await tester.tap(find.text('Open Drawer'));
       await tester.pumpAndSettle();
 
-      await tester.scrollUntilVisible(find.text('Root'), 100,
-          scrollable: find.byType(Scrollable).first);
+      await tester.scrollUntilVisible(
+        find.text('Root'),
+        100,
+        scrollable: find.byType(Scrollable).first,
+      );
       await tester.pumpAndSettle();
       await tester.tap(find.text('Root'));
       await tester.pumpAndSettle();

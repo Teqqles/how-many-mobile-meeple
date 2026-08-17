@@ -28,54 +28,69 @@ void main() {
 
   group('All pages have an endDrawer', () {
     testWidgets('favourites page has endDrawer', (tester) async {
-      await tester.pumpWidget(_buildTestApp(
-        GameListPage(
-          title: 'Favourites',
-          emptyIcon: Icons.favorite_border,
-          emptyTitle: 'No favourites yet',
-          emptyDescription: 'Swipe right on a game in the list.',
-          serviceFactory: FavouritesService.instance,
+      await tester.pumpWidget(
+        _buildTestApp(
+          GameListPage(
+            title: 'Favourites',
+            emptyIcon: Icons.favorite_border,
+            emptyTitle: 'No favourites yet',
+            emptyDescription: 'Swipe right on a game in the list.',
+            serviceFactory: FavouritesService.instance,
+          ),
         ),
-      ));
+      );
       await tester.pumpAndSettle();
 
       final scaffold = tester.widget<Scaffold>(find.byType(Scaffold).first);
-      expect(scaffold.endDrawer, isNotNull,
-          reason: 'Favourites page must have an endDrawer');
+      expect(
+        scaffold.endDrawer,
+        isNotNull,
+        reason: 'Favourites page must have an endDrawer',
+      );
     });
 
     testWidgets('ignored games page has endDrawer', (tester) async {
-      await tester.pumpWidget(_buildTestApp(
-        GameListPage(
-          title: 'Ignored Games',
-          emptyIcon: Icons.visibility_off_outlined,
-          emptyTitle: 'No ignored games',
-          emptyDescription: 'Swipe left on a game in the list.',
-          serviceFactory: IgnoredGamesService.instance,
+      await tester.pumpWidget(
+        _buildTestApp(
+          GameListPage(
+            title: 'Ignored Games',
+            emptyIcon: Icons.visibility_off_outlined,
+            emptyTitle: 'No ignored games',
+            emptyDescription: 'Swipe left on a game in the list.',
+            serviceFactory: IgnoredGamesService.instance,
+          ),
         ),
-      ));
+      );
       await tester.pumpAndSettle();
 
       final scaffold = tester.widget<Scaffold>(find.byType(Scaffold).first);
-      expect(scaffold.endDrawer, isNotNull,
-          reason: 'Ignored games page must have an endDrawer');
+      expect(
+        scaffold.endDrawer,
+        isNotNull,
+        reason: 'Ignored games page must have an endDrawer',
+      );
     });
 
     testWidgets('GameListPage always includes endDrawer', (tester) async {
-      await tester.pumpWidget(_buildTestApp(
-        GameListPage(
-          title: 'Test List',
-          emptyIcon: Icons.star,
-          emptyTitle: 'Empty',
-          emptyDescription: 'No items',
-          serviceFactory: FavouritesService.instance,
+      await tester.pumpWidget(
+        _buildTestApp(
+          GameListPage(
+            title: 'Test List',
+            emptyIcon: Icons.star,
+            emptyTitle: 'Empty',
+            emptyDescription: 'No items',
+            serviceFactory: FavouritesService.instance,
+          ),
         ),
-      ));
+      );
       await tester.pumpAndSettle();
 
       final scaffold = tester.widget<Scaffold>(find.byType(Scaffold).first);
-      expect(scaffold.endDrawer, isNotNull,
-          reason: 'GameListPage must have an endDrawer');
+      expect(
+        scaffold.endDrawer,
+        isNotNull,
+        reason: 'GameListPage must have an endDrawer',
+      );
     });
   });
 }

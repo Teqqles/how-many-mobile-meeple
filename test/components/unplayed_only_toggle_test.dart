@@ -12,6 +12,7 @@ import 'package:how_many_mobile_meeple/model/model.dart';
 import 'package:how_many_mobile_meeple/model/settings.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
 import '../helpers/sync_mock_client.dart';
 
 Widget _wrap(Widget child, AppModel model) {
@@ -74,8 +75,9 @@ void main() {
       await tester.tap(find.byType(Switch));
       await tester.pumpAndSettle();
 
-      final setting =
-          model.settings.setting(Settings.filterShelfOfShameOnly.name);
+      final setting = model.settings.setting(
+        Settings.filterShelfOfShameOnly.name,
+      );
       expect(setting.enabled, isTrue);
       expect(setting.getBool(), isTrue);
     });
@@ -83,8 +85,9 @@ void main() {
     testWidgets('toggling off disables setting', (tester) async {
       final model = AppModel();
       await model.addItem(Item('testuser'));
-      final setting =
-          model.settings.setting(Settings.filterShelfOfShameOnly.name);
+      final setting = model.settings.setting(
+        Settings.filterShelfOfShameOnly.name,
+      );
       setting.value = true;
       setting.enabled = true;
       model.settings.updateSetting(setting);
@@ -101,10 +104,12 @@ void main() {
     testWidgets('shows compact label', (tester) async {
       final model = AppModel();
       await model.addItem(Item('testuser'));
-      await tester.pumpWidget(_wrap(
-        const UnplayedOnlyToggle(style: UnplayedToggleStyle.compact),
-        model,
-      ));
+      await tester.pumpWidget(
+        _wrap(
+          const UnplayedOnlyToggle(style: UnplayedToggleStyle.compact),
+          model,
+        ),
+      );
 
       expect(find.text('Unplayed Only (Shelf of Shame)'), findsOneWidget);
     });

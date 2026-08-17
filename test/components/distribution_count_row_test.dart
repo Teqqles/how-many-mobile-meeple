@@ -16,32 +16,36 @@ Widget _app(Widget child) => MaterialApp(home: Scaffold(body: child));
 
 void main() {
   testWidgets('renders nothing when there are no buckets', (tester) async {
-    await tester.pumpWidget(_app(
-      DistributionCountRow(buckets: const [], isActive: (_) => false),
-    ));
+    await tester.pumpWidget(
+      _app(DistributionCountRow(buckets: const [], isActive: (_) => false)),
+    );
 
     expect(find.byType(Text), findsNothing);
   });
 
-  testWidgets('renders a segment per bucket with name and count',
-      (tester) async {
-    await tester.pumpWidget(_app(
-      DistributionCountRow(buckets: _buckets, isActive: (_) => false),
-    ));
+  testWidgets('renders a segment per bucket with name and count', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      _app(DistributionCountRow(buckets: _buckets, isActive: (_) => false)),
+    );
 
     expect(find.text('light 40'), findsOneWidget);
     expect(find.text('medium 23'), findsOneWidget);
     expect(find.text('heavy 2'), findsOneWidget);
   });
 
-  testWidgets('emphasises the active bucket and mutes the rest',
-      (tester) async {
-    await tester.pumpWidget(_app(
-      DistributionCountRow(
-        buckets: _buckets,
-        isActive: (b) => b.name == 'medium',
+  testWidgets('emphasises the active bucket and mutes the rest', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      _app(
+        DistributionCountRow(
+          buckets: _buckets,
+          isActive: (b) => b.name == 'medium',
+        ),
       ),
-    ));
+    );
 
     final active = tester.widget<Text>(find.text('medium 23'));
     final inactive = tester.widget<Text>(find.text('light 40'));

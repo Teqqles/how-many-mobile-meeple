@@ -19,8 +19,8 @@ class MechanicFilterWidget extends StatelessWidget {
       builder: (context, model, child) {
         var mechanics =
             model.settings.setting(Settings.filterUseAllMechanics.name).value
-                ? Mechanics.bggMechanics
-                : Mechanics.popularMechanics;
+            ? Mechanics.bggMechanics
+            : Mechanics.popularMechanics;
         return Column(
           children: <Widget>[
             ToggleableHomepageMenuItemWidget(
@@ -49,13 +49,13 @@ class MechanicFilterWidget extends StatelessWidget {
                         onSelected: (bool selected) {
                           selected
                               ? model.settings
-                                  .setting(Settings.filterMechanics.name)
-                                  .value
-                                  .add(value)
+                                    .setting(Settings.filterMechanics.name)
+                                    .value
+                                    .add(value)
                               : model.settings
-                                  .setting(Settings.filterMechanics.name)
-                                  .value
-                                  .remove(value);
+                                    .setting(Settings.filterMechanics.name)
+                                    .value
+                                    .remove(value);
                           model.invalidateCache();
                           model.updateStore();
                         },
@@ -64,7 +64,7 @@ class MechanicFilterWidget extends StatelessWidget {
                   ),
                 ],
               ),
-            )
+            ),
           ],
         );
       },

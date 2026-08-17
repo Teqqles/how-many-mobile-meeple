@@ -42,18 +42,23 @@ class _GameDetailPageState extends State<GameDetailPage>
 
   void _recordRecentlyViewed(Game game) async {
     final service = await RecentlyViewedService.instance();
-    service.add(RecentlyViewedGame(
-      id: game.id,
-      name: game.name,
-      thumbnail: game.thumbnail,
-    ));
+    service.add(
+      RecentlyViewedGame(
+        id: game.id,
+        name: game.name,
+        thumbnail: game.thumbnail,
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: HowManyMeepleAppBar('Game Details',
-          context: context, helpSection: 'game-detail'),
+      appBar: HowManyMeepleAppBar(
+        'Game Details',
+        context: context,
+        helpSection: 'game-detail',
+      ),
       drawer: const FeatureDrawer(),
       endDrawer: pageDrawer(context),
       persistentFooterButtons: [iconButtonGroup(context)],
@@ -79,7 +84,9 @@ class _GameDetailPageState extends State<GameDetailPage>
       child: Center(
         child: Container(
           width: getScreenWidthPercentageInPixels(
-              context, ScreenTools.eightyPercentScreen),
+            context,
+            ScreenTools.eightyPercentScreen,
+          ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.stretch,

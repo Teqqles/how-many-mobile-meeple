@@ -8,6 +8,7 @@ import 'package:how_many_mobile_meeple/model/item.dart';
 import 'package:how_many_mobile_meeple/model/items.dart';
 import 'package:how_many_mobile_meeple/model/model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
 import '../helpers/mock_api_client.dart';
 
 void main() {
@@ -54,14 +55,15 @@ void main() {
     });
 
     test(
-        'does not override existing primary player when adding more collections',
-        () async {
-      final model = AppModel();
-      await model.addItem(Item('teqqles'));
-      await model.addItem(Item('otheruser'));
+      'does not override existing primary player when adding more collections',
+      () async {
+        final model = AppModel();
+        await model.addItem(Item('teqqles'));
+        await model.addItem(Item('otheruser'));
 
-      expect(model.primaryPlayer, 'teqqles');
-    });
+        expect(model.primaryPlayer, 'teqqles');
+      },
+    );
 
     test('can be set explicitly', () async {
       final model = AppModel();
@@ -73,18 +75,20 @@ void main() {
       expect(model.primaryPlayer, 'otheruser');
     });
 
-    test('resets to next collection when primary player item is deleted',
-        () async {
-      final model = AppModel();
-      await model.addItem(Item('teqqles'));
-      await model.addItem(Item('otheruser'));
+    test(
+      'resets to next collection when primary player item is deleted',
+      () async {
+        final model = AppModel();
+        await model.addItem(Item('teqqles'));
+        await model.addItem(Item('otheruser'));
 
-      expect(model.primaryPlayer, 'teqqles');
+        expect(model.primaryPlayer, 'teqqles');
 
-      await model.deleteItem(Item('teqqles'));
+        await model.deleteItem(Item('teqqles'));
 
-      expect(model.primaryPlayer, 'otheruser');
-    });
+        expect(model.primaryPlayer, 'otheruser');
+      },
+    );
 
     test('resets to null when last collection item is deleted', () async {
       final model = AppModel();
@@ -129,8 +133,7 @@ void main() {
       expect(model.primaryPlayer, 'saveduser');
     });
 
-    test(
-        'sets primary player to first collection on refresh when stored value '
+    test('sets primary player to first collection on refresh when stored value '
         'is missing', () async {
       // A stored collection with no persisted primary player (e.g. cleared in a
       // prior session) must still surface a primary player on refresh.
@@ -145,8 +148,7 @@ void main() {
       expect(model.primaryPlayer, 'firstuser');
     });
 
-    test(
-        'resets primary player to first collection on refresh when stored '
+    test('resets primary player to first collection on refresh when stored '
         'value is no longer in the list', () async {
       SharedPreferences.setMockInitialValues({
         'primary_player': 'goneuser',
@@ -187,43 +189,49 @@ void main() {
 
   group('AppModel.replaceItems primary player reconciliation', () {
     test(
-        'switches primary player when items are replaced with a new collection',
-        () async {
-      final model = AppModel();
-      await model.addItem(Item('olduser'));
-      expect(model.primaryPlayer, 'olduser');
+      'switches primary player when items are replaced with a new collection',
+      () async {
+        final model = AppModel();
+        await model.addItem(Item('olduser'));
+        expect(model.primaryPlayer, 'olduser');
 
-      await model.replaceItems(Items([Item('newuser')]));
+        await model.replaceItems(Items([Item('newuser')]));
 
-      expect(model.primaryPlayer, 'newuser');
-    });
+        expect(model.primaryPlayer, 'newuser');
+      },
+    );
 
-    test('keeps primary player when it is still among the replaced items',
-        () async {
-      final model = AppModel();
-      await model.addItem(Item('teqqles'));
+    test(
+      'keeps primary player when it is still among the replaced items',
+      () async {
+        final model = AppModel();
+        await model.addItem(Item('teqqles'));
 
-      await model.replaceItems(Items([Item('teqqles'), Item('otheruser')]));
+        await model.replaceItems(Items([Item('teqqles'), Item('otheruser')]));
 
-      expect(model.primaryPlayer, 'teqqles');
-    });
+        expect(model.primaryPlayer, 'teqqles');
+      },
+    );
 
-    test('clears primary player when no collections remain after replace',
-        () async {
-      final model = AppModel();
-      await model.addItem(Item('olduser'));
+    test(
+      'clears primary player when no collections remain after replace',
+      () async {
+        final model = AppModel();
+        await model.addItem(Item('olduser'));
 
-      await model
-          .replaceItems(Items([Item('hot', itemType: ItemType.hotList)]));
+        await model.replaceItems(
+          Items([Item('hot', itemType: ItemType.hotList)]),
+        );
 
-      expect(model.primaryPlayer, isNull);
-    });
+        expect(model.primaryPlayer, isNull);
+      },
+    );
 
-    test('replacing collection reloads plays for the new primary player',
-        () async {
+    test('replacing collection reloads plays for the new primary player', () async {
       final capturedPaths = <String>[];
       HttpRetryClient.setTestClient(
-          mockApiClient(onRequest: (r) => capturedPaths.add(r.url.path)));
+        mockApiClient(onRequest: (r) => capturedPaths.add(r.url.path)),
+      );
 
       final model = AppModel();
       await model.addItem(Item('olduser'));

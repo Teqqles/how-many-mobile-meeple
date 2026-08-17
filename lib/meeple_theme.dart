@@ -134,12 +134,13 @@ class MeepleTheme {
   static ThemeData light(MaterialColor swatch) {
     return ThemeData(
       primarySwatch: swatch,
-      colorScheme: ColorScheme.fromSwatch(
-        primarySwatch: swatch,
-        brightness: Brightness.light,
-      ).copyWith(
-        onPrimary: Colors.white, // White text on primary color buttons
-      ),
+      colorScheme:
+          ColorScheme.fromSwatch(
+            primarySwatch: swatch,
+            brightness: Brightness.light,
+          ).copyWith(
+            onPrimary: Colors.white, // White text on primary color buttons
+          ),
       highlightColor: swatch.shade50,
       switchTheme: SwitchThemeData(
         thumbColor: WidgetStateProperty.resolveWith(
@@ -183,20 +184,21 @@ class MeepleTheme {
     // lock the roles the app paints directly to the exact palette tones. This
     // stops Material's default baseline colours leaking through container-based
     // widgets (e.g. source chips) as an off-palette "old scheme".
-    final scheme = ColorScheme.fromSeed(
-      seedColor: p.chrome,
-      brightness: Brightness.dark,
-    ).copyWith(
-      primary: p.chrome,
-      onPrimary: Colors.white,
-      secondary: p.chrome,
-      onSecondary: Colors.white,
-      surface: p.surface,
-      onSurface: _darkOnSurface,
-      surfaceContainerHighest: p.surfaceAlt,
-      tertiary: p.accent,
-      onTertiary: Colors.black,
-    );
+    final scheme =
+        ColorScheme.fromSeed(
+          seedColor: p.chrome,
+          brightness: Brightness.dark,
+        ).copyWith(
+          primary: p.chrome,
+          onPrimary: Colors.white,
+          secondary: p.chrome,
+          onSecondary: Colors.white,
+          surface: p.surface,
+          onSurface: _darkOnSurface,
+          surfaceContainerHighest: p.surfaceAlt,
+          tertiary: p.accent,
+          onTertiary: Colors.black,
+        );
 
     return ThemeData(
       useMaterial3: true,
@@ -234,8 +236,9 @@ class MeepleTheme {
           (states) =>
               states.contains(WidgetState.selected) ? p.chrome : p.surfaceAlt,
         ),
-        trackOutlineColor:
-            WidgetStateProperty.resolveWith((states) => p.accent),
+        trackOutlineColor: WidgetStateProperty.resolveWith(
+          (states) => p.accent,
+        ),
       ),
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(

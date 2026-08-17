@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+
 import 'package:flutter/cupertino.dart';
 import 'package:how_many_mobile_meeple/api/collection_analytics_service.dart';
 import 'package:how_many_mobile_meeple/model/collection_analytics.dart';
@@ -128,15 +129,15 @@ class AppModel extends ChangeNotifier {
   /// Every individual play loaded from BGG, flattened across games and paired
   /// with the game it belongs to. Aggregated-only games contribute nothing.
   List<BggPlayRecord> get bggPlays => [
-        for (final data in _playsData.values)
-          for (final play in data.plays)
-            BggPlayRecord(
-              gameId: data.gameId,
-              gameName: data.gameName,
-              thumbnail: _collectionThumbnails[data.gameId],
-              play: play,
-            ),
-      ];
+    for (final data in _playsData.values)
+      for (final play in data.plays)
+        BggPlayRecord(
+          gameId: data.gameId,
+          gameName: data.gameName,
+          thumbnail: _collectionThumbnails[data.gameId],
+          play: play,
+        ),
+  ];
 
   /// Attaches the local play log so locally logged plays are counted alongside
   /// the plays fetched from BGG. Listens for changes so counts update live.
@@ -310,10 +311,13 @@ class AppModel extends ChangeNotifier {
 
   Future<List<dynamic>> _fetchCollection(String username) async {
     final url = Uri.parse(
-        '${AppCommon.boardGameGeekProxyUrl}/collection/${Uri.encodeComponent(username)}');
+      '${AppCommon.boardGameGeekProxyUrl}/collection/${Uri.encodeComponent(username)}',
+    );
     final headers = {
-      Settings.fieldsToReturnFromApi.header!:
-          Settings.fieldsToReturnFromApi.value.toString(),
+      Settings.fieldsToReturnFromApi.header!: Settings
+          .fieldsToReturnFromApi
+          .value
+          .toString(),
     };
     final response = await HttpRetryClient.getWithRetry(url, headers: headers);
     if (response.statusCode == 200) {
@@ -340,9 +344,9 @@ class AppModel extends ChangeNotifier {
   AppModel({
     PreferencesHistoryInterface? preferencesHistory,
     UrlFragmentExtractor? urlExtractor,
-  })  : _preferencesHistory =
-            preferencesHistory ?? StorageFactory.getPreferencesHistory(),
-        _extractor = urlExtractor ?? UrlFragmentExtractor(Uri.base) {
+  }) : _preferencesHistory =
+           preferencesHistory ?? StorageFactory.getPreferencesHistory(),
+       _extractor = urlExtractor ?? UrlFragmentExtractor(Uri.base) {
     _settings = Settings.defaultSettings();
   }
 
@@ -374,15 +378,17 @@ class AppModel extends ChangeNotifier {
   Future<void> _deferPastCurrentBuild() => Future<void>.microtask(() {});
 
   Settings _rebuildUrlMechanics(Settings extractedSettings) {
-    final mechanicsSetting =
-        extractedSettings.setting(Settings.filterMechanics.name);
+    final mechanicsSetting = extractedSettings.setting(
+      Settings.filterMechanics.name,
+    );
     mechanicsSetting.value = mechanicsSetting.getList();
     return extractedSettings;
   }
 
   void toggleSortDirection() {
-    sortDirection =
-        sortDirection == SortOrder.Asc ? SortOrder.Desc : SortOrder.Asc;
+    sortDirection = sortDirection == SortOrder.Asc
+        ? SortOrder.Desc
+        : SortOrder.Asc;
   }
 
   Future<void> addItem(Item item) async {
@@ -422,7 +428,8 @@ class AppModel extends ChangeNotifier {
     final collections = _items.itemList
         .where((i) => i.itemType == ItemType.collection)
         .toList();
-    final stillPresent = _primaryPlayer != null &&
+    final stillPresent =
+        _primaryPlayer != null &&
         collections.any((i) => i.name == _primaryPlayer);
     if (stillPresent) return;
     primaryPlayer = collections.isNotEmpty ? collections.first.name : null;
@@ -462,8 +469,9 @@ class AppModel extends ChangeNotifier {
       final nextCollection = _items.itemList
           .where((i) => i.itemType == ItemType.collection)
           .toList();
-      _primaryPlayer =
-          nextCollection.isNotEmpty ? nextCollection.first.name : null;
+      _primaryPlayer = nextCollection.isNotEmpty
+          ? nextCollection.first.name
+          : null;
       _persistPrimaryPlayer();
     }
     invalidateCache();
@@ -504,10 +512,7 @@ class AppModel extends ChangeNotifier {
     _storeDebounceTimer?.cancel();
     _storeDebounceTimer = null;
     storeWriteCount++;
-    await Future.wait([
-      _storeSettings(settings),
-      _storeItems(_items),
-    ]);
+    await Future.wait([_storeSettings(settings), _storeItems(_items)]);
   }
 
   Future<List<AppPreferences>> getSavedPreferences() async {

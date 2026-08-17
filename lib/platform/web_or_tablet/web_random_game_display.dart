@@ -13,31 +13,40 @@ import 'package:how_many_mobile_meeple/recently_viewed/recently_viewed_service.d
 import 'package:how_many_mobile_meeple/screen_tools.dart';
 
 import 'package:how_many_mobile_meeple/components/app_default_padding.dart';
+
 import '../../app_common.dart';
 import '../../how_many_meeple_app_bar.dart';
+
 import 'package:how_many_mobile_meeple/model/model.dart';
+
 import '../../model/game.dart';
 
 class WebRandomGameDisplayPage extends GameDisplayPage {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: HowManyMeepleAppBar(AppCommon.randomGamePageTitle,
-            context: context, helpSection: 'random'),
-        drawer: const FeatureDrawer(),
-        endDrawer: pageDrawer(context),
-        persistentFooterButtons: [iconButtonGroup(context)],
-        bottomNavigationBar: const PlaysLoadingIndicator(),
-        body: Container(child: loadNetworkContent(displayGame)));
+      appBar: HowManyMeepleAppBar(
+        AppCommon.randomGamePageTitle,
+        context: context,
+        helpSection: 'random',
+      ),
+      drawer: const FeatureDrawer(),
+      endDrawer: pageDrawer(context),
+      persistentFooterButtons: [iconButtonGroup(context)],
+      bottomNavigationBar: const PlaysLoadingIndicator(),
+      body: Container(child: loadNetworkContent(displayGame)),
+    );
   }
 
   Widget displayGame(BuildContext context, AppModel model) {
     var cachedGames = model.bggCache;
-    Game? game =
-        hasPageRefreshed(model) ? cachedGames.random : cachedGames.lastRandom;
+    Game? game = hasPageRefreshed(model)
+        ? cachedGames.random
+        : cachedGames.lastRandom;
 
-    final sosSetting =
-        model.settings.setting(Settings.filterShelfOfShameOnly.name);
+    final sosSetting = model.settings.setting(
+      Settings.filterShelfOfShameOnly.name,
+    );
     final shelfOnly =
         sosSetting.enabled && sosSetting.getBool() && model.playsLoaded;
 
@@ -54,22 +63,25 @@ class WebRandomGameDisplayPage extends GameDisplayPage {
       child: Center(
         child: Container(
           width: getScreenWidthPercentageInPixels(
-              context, ScreenTools.eightyPercentScreen),
+            context,
+            ScreenTools.eightyPercentScreen,
+          ),
           child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                AppDefaultPadding(
-                  child: Text(
-                    game.name,
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                    textAlign: TextAlign.center,
-                  ),
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              AppDefaultPadding(
+                child: Text(
+                  game.name,
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                  textAlign: TextAlign.center,
                 ),
-                AppDefaultPadding(child: GameImageWithStats(game: game)),
-                GameActionButtons(game: game),
-                RecommendationsWidget(sourceGame: game, model: model),
-              ]),
+              ),
+              AppDefaultPadding(child: GameImageWithStats(game: game)),
+              GameActionButtons(game: game),
+              RecommendationsWidget(sourceGame: game, model: model),
+            ],
+          ),
         ),
       ),
     );
@@ -87,11 +99,13 @@ class WebRandomGameDisplayPage extends GameDisplayPage {
     }
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       final service = await RecentlyViewedService.instance();
-      service.add(RecentlyViewedGame(
-        id: game.id,
-        name: game.name,
-        thumbnail: game.thumbnail,
-      ));
+      service.add(
+        RecentlyViewedGame(
+          id: game.id,
+          name: game.name,
+          thumbnail: game.thumbnail,
+        ),
+      );
     });
   }
 
@@ -113,8 +127,11 @@ class WebRandomGameDisplayPage extends GameDisplayPage {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.casino_outlined,
-                size: 64, color: Theme.of(context).colorScheme.secondary),
+            Icon(
+              Icons.casino_outlined,
+              size: 64,
+              color: Theme.of(context).colorScheme.secondary,
+            ),
             const SizedBox(height: 16),
             Text(
               "You've seen all available games",
@@ -134,7 +151,8 @@ class WebRandomGameDisplayPage extends GameDisplayPage {
                   final game = model.bggCache.randomIncludingIgnored();
                   if (game != null) {
                     Navigator.of(context).pushReplacementNamed(
-                        '${r.Router.gameDetailRoute}/${game.name.replaceAll(' ', '+')}/${game.id}');
+                      '${r.Router.gameDetailRoute}/${game.name.replaceAll(' ', '+')}/${game.id}',
+                    );
                   }
                 },
                 icon: const Icon(Icons.refresh),

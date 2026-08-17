@@ -45,8 +45,9 @@ class AdvancedModeWidget extends StatelessWidget {
   Widget _buildTrendingButton(BuildContext context) {
     return Consumer<AppModel>(
       builder: (context, model, child) {
-        final hasHot = model.items.itemList
-            .any((item) => item.itemType == ItemType.hotList);
+        final hasHot = model.items.itemList.any(
+          (item) => item.itemType == ItemType.hotList,
+        );
         final atMax = model.items.itemList.length >= AppCommon.maxItemsFromBgg;
 
         if (hasHot) return const SizedBox.shrink();

@@ -69,20 +69,16 @@ class SettingsSummaryPage extends StatelessWidget with AppPage {
                       const SizedBox(height: 16),
                       Text(
                         'Your Game Preferences',
-                        style:
-                            Theme.of(context).textTheme.headlineSmall?.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                ),
+                        style: Theme.of(context).textTheme.headlineSmall
+                            ?.copyWith(fontWeight: FontWeight.bold),
                         textAlign: TextAlign.center,
                       ),
                       const SizedBox(height: 8),
                       Text(
                         'Here\'s what you\'re looking for',
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .onSurfaceVariant,
-                            ),
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        ),
                         textAlign: TextAlign.center,
                       ),
                     ],
@@ -173,14 +169,15 @@ class SettingsSummaryPage extends StatelessWidget with AppPage {
           children: [
             Row(
               children: [
-                Icon(Icons.source,
-                    color: Theme.of(context).colorScheme.primary),
+                Icon(
+                  Icons.source,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
                 const SizedBox(width: 12),
                 Text(
                   'Game Sources',
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
+                  style: Theme.of(context).textTheme.titleMedium
+                      ?.copyWith(fontWeight: FontWeight.bold),
                 ),
               ],
             ),
@@ -189,40 +186,42 @@ class SettingsSummaryPage extends StatelessWidget with AppPage {
               Text(
                 'No sources selected',
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
-                    ),
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
               )
             else
-              ...model.items.itemList.map((item) => Padding(
-                    padding: const EdgeInsets.only(bottom: 8),
-                    child: Row(
-                      children: [
-                        Icon(
+              ...model.items.itemList.map(
+                (item) => Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: Row(
+                    children: [
+                      Icon(
+                        item.itemType.toString().contains('collection')
+                            ? Icons.person
+                            : Icons.list,
+                        size: 16,
+                        color: Theme.of(context).colorScheme.secondary,
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          item.name,
+                          style: Theme.of(context).textTheme.bodyMedium,
+                        ),
+                      ),
+                      Chip(
+                        label: Text(
                           item.itemType.toString().contains('collection')
-                              ? Icons.person
-                              : Icons.list,
-                          size: 16,
-                          color: Theme.of(context).colorScheme.secondary,
+                              ? 'Collection'
+                              : 'Geeklist',
+                          style: const TextStyle(fontSize: 10),
                         ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            item.name,
-                            style: Theme.of(context).textTheme.bodyMedium,
-                          ),
-                        ),
-                        Chip(
-                          label: Text(
-                            item.itemType.toString().contains('collection')
-                                ? 'Collection'
-                                : 'Geeklist',
-                            style: const TextStyle(fontSize: 10),
-                          ),
-                          padding: const EdgeInsets.symmetric(horizontal: 4),
-                        ),
-                      ],
-                    ),
-                  )),
+                        padding: const EdgeInsets.symmetric(horizontal: 4),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
           ],
         ),
       ),
@@ -230,8 +229,9 @@ class SettingsSummaryPage extends StatelessWidget with AppPage {
   }
 
   Widget _buildPlayersSection(BuildContext context, AppModel model) {
-    final playerSetting =
-        model.settings.setting(Settings.filterNumberOfPlayers.name);
+    final playerSetting = model.settings.setting(
+      Settings.filterNumberOfPlayers.name,
+    );
     final players = playerSetting.getInt();
 
     return _buildSettingCard(
@@ -245,10 +245,12 @@ class SettingsSummaryPage extends StatelessWidget with AppPage {
   }
 
   Widget _buildTimeSection(BuildContext context, AppModel model) {
-    final minSetting =
-        model.settings.setting(Settings.filterMinimumTimeToPlay.name);
-    final maxSetting =
-        model.settings.setting(Settings.filterMaximumTimeToPlay.name);
+    final minSetting = model.settings.setting(
+      Settings.filterMinimumTimeToPlay.name,
+    );
+    final maxSetting = model.settings.setting(
+      Settings.filterMaximumTimeToPlay.name,
+    );
     final min = minSetting.getInt();
     final max = maxSetting.getInt();
 
@@ -304,20 +306,23 @@ class SettingsSummaryPage extends StatelessWidget with AppPage {
           children: [
             Row(
               children: [
-                Icon(Icons.extension,
-                    color: Theme.of(context).colorScheme.primary),
+                Icon(
+                  Icons.extension,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
                 const SizedBox(width: 12),
                 Text(
                   'Game Mechanics',
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
+                  style: Theme.of(context).textTheme.titleMedium
+                      ?.copyWith(fontWeight: FontWeight.bold),
                 ),
                 const Spacer(),
                 if (!setting.enabled)
                   Chip(
-                    label:
-                        const Text('Disabled', style: TextStyle(fontSize: 10)),
+                    label: const Text(
+                      'Disabled',
+                      style: TextStyle(fontSize: 10),
+                    ),
                     padding: const EdgeInsets.symmetric(horizontal: 4),
                   ),
               ],
@@ -327,8 +332,8 @@ class SettingsSummaryPage extends StatelessWidget with AppPage {
               Text(
                 'No mechanics selected - showing all types',
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
-                    ),
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
               )
             else
               Wrap(
@@ -337,8 +342,9 @@ class SettingsSummaryPage extends StatelessWidget with AppPage {
                 children: mechanics.map((mechanic) {
                   return Chip(
                     label: Text(mechanic.toString()),
-                    backgroundColor:
-                        Theme.of(context).colorScheme.secondaryContainer,
+                    backgroundColor: Theme.of(context)
+                        .colorScheme
+                        .secondaryContainer,
                   );
                 }).toList(),
               ),
@@ -352,9 +358,8 @@ class SettingsSummaryPage extends StatelessWidget with AppPage {
                 ),
                 child: Text(
                   'Technical: ${mechanics.length} mechanics selected',
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        fontFamily: 'monospace',
-                      ),
+                  style: Theme.of(context).textTheme.bodySmall
+                      ?.copyWith(fontFamily: 'monospace'),
                 ),
               ),
             ],
@@ -365,10 +370,12 @@ class SettingsSummaryPage extends StatelessWidget with AppPage {
   }
 
   Widget _buildOtherFiltersSection(BuildContext context, AppModel model) {
-    final expansions =
-        model.settings.setting(Settings.filterIncludesExpansions.name);
-    final recommended =
-        model.settings.setting(Settings.filterUsingUserRecommendations.name);
+    final expansions = model.settings.setting(
+      Settings.filterIncludesExpansions.name,
+    );
+    final recommended = model.settings.setting(
+      Settings.filterUsingUserRecommendations.name,
+    );
 
     return Card(
       child: Padding(
@@ -378,14 +385,15 @@ class SettingsSummaryPage extends StatelessWidget with AppPage {
           children: [
             Row(
               children: [
-                Icon(Icons.filter_list,
-                    color: Theme.of(context).colorScheme.primary),
+                Icon(
+                  Icons.filter_list,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
                 const SizedBox(width: 12),
                 Text(
                   'Additional Filters',
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
+                  style: Theme.of(context).textTheme.titleMedium
+                      ?.copyWith(fontWeight: FontWeight.bold),
                 ),
               ],
             ),
@@ -429,15 +437,16 @@ class SettingsSummaryPage extends StatelessWidget with AppPage {
                 const SizedBox(width: 12),
                 Text(
                   title,
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
+                  style: Theme.of(context).textTheme.titleMedium
+                      ?.copyWith(fontWeight: FontWeight.bold),
                 ),
                 const Spacer(),
                 if (!isEnabled)
                   Chip(
-                    label:
-                        const Text('Disabled', style: TextStyle(fontSize: 10)),
+                    label: const Text(
+                      'Disabled',
+                      style: TextStyle(fontSize: 10),
+                    ),
                     padding: const EdgeInsets.symmetric(horizontal: 4),
                   ),
               ],
@@ -445,9 +454,8 @@ class SettingsSummaryPage extends StatelessWidget with AppPage {
             const SizedBox(height: 12),
             Text(
               friendlyValue,
-              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                    fontWeight: FontWeight.w500,
-                  ),
+              style: Theme.of(context).textTheme.bodyLarge
+                  ?.copyWith(fontWeight: FontWeight.w500),
             ),
             const SizedBox(height: 8),
             Container(
@@ -468,10 +476,9 @@ class SettingsSummaryPage extends StatelessWidget with AppPage {
                     child: Text(
                       technicalValue,
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            fontFamily: 'monospace',
-                            color:
-                                Theme.of(context).colorScheme.onSurfaceVariant,
-                          ),
+                        fontFamily: 'monospace',
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
                     ),
                   ),
                 ],
@@ -501,16 +508,16 @@ class SettingsSummaryPage extends StatelessWidget with AppPage {
           child: Text(
             label,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  decoration: !isEnabled ? TextDecoration.lineThrough : null,
-                ),
+              decoration: !isEnabled ? TextDecoration.lineThrough : null,
+            ),
           ),
         ),
         Text(
           value ? 'Yes' : 'No',
           style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                fontWeight: FontWeight.bold,
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
-              ),
+            fontWeight: FontWeight.bold,
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
+          ),
         ),
       ],
     );
@@ -536,10 +543,7 @@ class SettingsSummaryPage extends StatelessWidget with AppPage {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: <Widget>[
-        Container(
-          height: double.infinity,
-          child: BGGAttribution(),
-        ),
+        Container(height: double.infinity, child: BGGAttribution()),
         Padding(
           padding: const EdgeInsets.only(right: 8.0),
           child: Row(
@@ -548,9 +552,8 @@ class SettingsSummaryPage extends StatelessWidget with AppPage {
               DisclaimerText("(v:$version)", context),
               const SizedBox(width: 4),
               GestureDetector(
-                onTap: () => Navigator.of(context).push(
-                  MaterialPageRoute(builder: (_) => const AboutPage()),
-                ),
+                onTap: () => Navigator.of(context)
+                    .push(MaterialPageRoute(builder: (_) => const AboutPage())),
                 child: Icon(
                   Icons.info_outline,
                   size: 20,

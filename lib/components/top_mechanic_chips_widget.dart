@@ -8,8 +8,10 @@ import 'package:provider/provider.dart';
 /// sourced from analytics. Renders nothing until analytics arrive, so it
 /// degrades gracefully while the endpoint is not-ready or unavailable.
 class TopMechanicChipsWidget extends StatelessWidget {
-  const TopMechanicChipsWidget(
-      {super.key, this.alignment = WrapAlignment.center});
+  const TopMechanicChipsWidget({
+    super.key,
+    this.alignment = WrapAlignment.center,
+  });
 
   /// Horizontal alignment of the label and chip row. Centered for the filter
   /// list; [WrapAlignment.start] for the left-aligned guided-flow card.
@@ -29,8 +31,9 @@ class TopMechanicChipsWidget extends StatelessWidget {
         return Padding(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
           child: Column(
-            crossAxisAlignment:
-                start ? CrossAxisAlignment.start : CrossAxisAlignment.center,
+            crossAxisAlignment: start
+                ? CrossAxisAlignment.start
+                : CrossAxisAlignment.center,
             children: <Widget>[
               Text(
                 'Popular in your collection',

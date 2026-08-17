@@ -14,17 +14,18 @@ import 'package:how_many_mobile_meeple/model/model.dart';
 import 'package:how_many_mobile_meeple/platform/web_or_tablet/web_random_game_display.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
 import '../../helpers/sync_mock_client.dart';
 
 Map<String, dynamic> _gameJson(int id, String name) => {
-      'id': id,
-      'name': name,
-      'maxplayers': 4,
-      'minplayers': 2,
-      'maxplaytime': 60,
-      'image': 'https://example.com/$id.jpg',
-      'stats': {'average': 7.5, 'averageweight': 2.5},
-    };
+  'id': id,
+  'name': name,
+  'maxplayers': 4,
+  'minplayers': 2,
+  'maxplaytime': 60,
+  'image': 'https://example.com/$id.jpg',
+  'stats': {'average': 7.5, 'averageweight': 2.5},
+};
 
 Widget _buildTestApp(AppModel model, {Size size = const Size(800, 1200)}) {
   return ChangeNotifierProvider<AppModel>.value(
@@ -63,8 +64,9 @@ void main() {
   });
 
   group('WebRandomGameDisplayPage', () {
-    testWidgets('shows no sources message when items are empty',
-        (tester) async {
+    testWidgets('shows no sources message when items are empty', (
+      tester,
+    ) async {
       HttpRetryClient.setTestClient(
         SyncMockClient((_) => http.Response('[]', 200)),
       );
@@ -104,8 +106,9 @@ void main() {
       await tester.pump();
 
       final gameNames = ['Wingspan', 'Catan', 'Azul'];
-      final found =
-          gameNames.any((name) => find.text(name).evaluate().isNotEmpty);
+      final found = gameNames.any(
+        (name) => find.text(name).evaluate().isNotEmpty,
+      );
       expect(found, isTrue);
     });
 

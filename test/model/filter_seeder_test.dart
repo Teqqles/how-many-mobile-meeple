@@ -10,12 +10,11 @@ CollectionAnalytics _analytics({
   int? players = 4,
   double? weight = 2.3,
   PlaytimeRange? time = const PlaytimeRange(30, 60),
-}) =>
-    CollectionAnalytics(
-      mostCoveredPlayerCount: players,
-      averageWeight: weight,
-      dominantPlaytime: time,
-    );
+}) => CollectionAnalytics(
+  mostCoveredPlayerCount: players,
+  averageWeight: weight,
+  dominantPlaytime: time,
+);
 
 void main() {
   group('FilterSeeder.seed — Right', () {
@@ -41,30 +40,34 @@ void main() {
       expect(s.setting(Settings.filterNumberOfPlayers.name).value, 10);
     });
 
-    test('open-ended bucket with both time settings untouched seeds max to 300',
-        () {
-      final s = Settings.defaultSettings();
-      FilterSeeder.seed(_analytics(time: const PlaytimeRange(120, null)), s);
-      final min = s.setting(Settings.filterMinimumTimeToPlay.name).value;
-      final max = s.setting(Settings.filterMaximumTimeToPlay.name).value;
-      expect(min, 120);
-      expect(max, 300); // open-ended → slider max
-      expect(min <= max, isTrue, reason: 'min must not exceed max');
-    });
+    test(
+      'open-ended bucket with both time settings untouched seeds max to 300',
+      () {
+        final s = Settings.defaultSettings();
+        FilterSeeder.seed(_analytics(time: const PlaytimeRange(120, null)), s);
+        final min = s.setting(Settings.filterMinimumTimeToPlay.name).value;
+        final max = s.setting(Settings.filterMaximumTimeToPlay.name).value;
+        expect(min, 120);
+        expect(max, 300); // open-ended → slider max
+        expect(min <= max, isTrue, reason: 'min must not exceed max');
+      },
+    );
 
-    test('open-ended bucket with max user-set clamps seeded min to that max',
-        () {
-      final s = Settings.defaultSettings();
-      final maxSetting = s.setting(Settings.filterMaximumTimeToPlay.name);
-      maxSetting.value = 90;
-      maxSetting.enabled = true; // user-set
-      FilterSeeder.seed(_analytics(time: const PlaytimeRange(120, null)), s);
-      final min = s.setting(Settings.filterMinimumTimeToPlay.name).value;
-      final max = maxSetting.value;
-      expect(max, 90); // user-set, unchanged
-      expect(min, 90); // clamped to max
-      expect(min <= max, isTrue, reason: 'min must not exceed max');
-    });
+    test(
+      'open-ended bucket with max user-set clamps seeded min to that max',
+      () {
+        final s = Settings.defaultSettings();
+        final maxSetting = s.setting(Settings.filterMaximumTimeToPlay.name);
+        maxSetting.value = 90;
+        maxSetting.enabled = true; // user-set
+        FilterSeeder.seed(_analytics(time: const PlaytimeRange(120, null)), s);
+        final min = s.setting(Settings.filterMinimumTimeToPlay.name).value;
+        final max = maxSetting.value;
+        expect(max, 90); // user-set, unchanged
+        expect(min, 90); // clamped to max
+        expect(min <= max, isTrue, reason: 'min must not exceed max');
+      },
+    );
 
     test('closed bucket min exceeding user-set max is clamped', () {
       final s = Settings.defaultSettings();
@@ -124,11 +127,14 @@ void main() {
   group('FilterSeeder.seed — Error (null fields)', () {
     test('null field seeds nothing for that filter', () {
       final s = Settings.defaultSettings();
-      final playersBefore =
-          s.setting(Settings.filterNumberOfPlayers.name).value;
+      final playersBefore = s
+          .setting(Settings.filterNumberOfPlayers.name)
+          .value;
       FilterSeeder.seed(_analytics(players: null, time: null, weight: 2.3), s);
       expect(
-          s.setting(Settings.filterNumberOfPlayers.name).value, playersBefore);
+        s.setting(Settings.filterNumberOfPlayers.name).value,
+        playersBefore,
+      );
       expect(s.setting(Settings.filterComplexity.name).value, 2.3);
     });
 

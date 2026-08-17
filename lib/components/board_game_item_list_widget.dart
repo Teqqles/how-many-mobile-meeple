@@ -17,23 +17,27 @@ class BoardGameItemListWidget extends StatelessWidget {
       builder: (context, model, child) => Column(
         children: <Widget>[
           Container(
-              height: 35,
-              color: Theme.of(context).colorScheme.primaryContainer,
-              child: AppDefaultPadding(
-                child: Row(children: [
+            height: 35,
+            color: Theme.of(context).colorScheme.primaryContainer,
+            child: AppDefaultPadding(
+              child: Row(
+                children: [
                   Text(
                     "Usernames/Geeklists Selected",
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       color: Theme.of(context).colorScheme.onPrimaryContainer,
                     ),
-                  )
-                ]),
-              )),
+                  ),
+                ],
+              ),
+            ),
+          ),
           Column(
             children: ListTile.divideTiles(
-                    context: context, tiles: _itemsSelected(context, model))
-                .toList(),
+              context: context,
+              tiles: _itemsSelected(context, model),
+            ).toList(),
           ),
         ],
       ),
@@ -44,11 +48,14 @@ class BoardGameItemListWidget extends StatelessWidget {
     if (model.items.isEmpty) {
       return [
         ListTile(
-            title: Text(
-          "No Items Selected",
-          style:
-              TextStyle(fontSize: 13, color: Theme.of(context).disabledColor),
-        ))
+          title: Text(
+            "No Items Selected",
+            style: TextStyle(
+              fontSize: 13,
+              color: Theme.of(context).disabledColor,
+            ),
+          ),
+        ),
       ];
     }
     return model.items.itemList.map(
@@ -58,9 +65,11 @@ class BoardGameItemListWidget extends StatelessWidget {
           size: AppCommon.standardIconSize,
           color: Theme.of(context).colorScheme.secondary,
         ),
-        title: Text(item.itemType == ItemType.hotList
-            ? 'Trending Games'
-            : _limitTitleLength(item.name)),
+        title: Text(
+          item.itemType == ItemType.hotList
+              ? 'Trending Games'
+              : _limitTitleLength(item.name),
+        ),
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
           children: [

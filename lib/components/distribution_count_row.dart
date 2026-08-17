@@ -25,24 +25,28 @@ class DistributionCountRow extends StatelessWidget {
     final segments = <Widget>[];
     for (var i = 0; i < buckets.length; i++) {
       if (i > 0) {
-        segments.add(Text(
-          '·',
-          style: theme.textTheme.bodySmall?.copyWith(
-            color: theme.colorScheme.onSurfaceVariant,
+        segments.add(
+          Text(
+            '·',
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
           ),
-        ));
+        );
       }
       final bucket = buckets[i];
       final active = isActive(bucket);
-      segments.add(Text(
-        '${bucket.name} ${bucket.count}',
-        style: theme.textTheme.bodySmall?.copyWith(
-          fontWeight: active ? FontWeight.bold : FontWeight.normal,
-          color: active
-              ? theme.colorScheme.primary
-              : theme.colorScheme.onSurfaceVariant,
+      segments.add(
+        Text(
+          '${bucket.name} ${bucket.count}',
+          style: theme.textTheme.bodySmall?.copyWith(
+            fontWeight: active ? FontWeight.bold : FontWeight.normal,
+            color: active
+                ? theme.colorScheme.primary
+                : theme.colorScheme.onSurfaceVariant,
+          ),
         ),
-      ));
+      );
     }
 
     return Wrap(

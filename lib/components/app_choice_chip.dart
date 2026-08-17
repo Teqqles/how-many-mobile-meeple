@@ -100,8 +100,8 @@ class AppMechanicChip extends StatelessWidget {
       side: BorderSide(
         color: enabled
             ? (selected
-                ? Theme.of(context).colorScheme.secondary
-                : Theme.of(context).colorScheme.outline)
+                  ? Theme.of(context).colorScheme.secondary
+                  : Theme.of(context).colorScheme.outline)
             : Theme.of(context).colorScheme.outlineVariant,
         width: 1.5,
       ),
@@ -111,8 +111,8 @@ class AppMechanicChip extends StatelessWidget {
         color: selected && enabled
             ? Theme.of(context).colorScheme.onSecondary
             : (enabled
-                ? Theme.of(context).colorScheme.onSurface
-                : Theme.of(context).disabledColor),
+                  ? Theme.of(context).colorScheme.onSurface
+                  : Theme.of(context).disabledColor),
       ),
     );
   }

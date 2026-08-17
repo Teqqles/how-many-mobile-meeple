@@ -17,8 +17,9 @@ class FeatureDrawer extends StatelessWidget {
     return Consumer<AppModel>(
       builder: (context, model, child) {
         final hasSources = model.items.itemList.isNotEmpty;
-        final hasCollection = model.items.itemList
-            .any((item) => item.itemType == ItemType.collection);
+        final hasCollection = model.items.itemList.any(
+          (item) => item.itemType == ItemType.collection,
+        );
 
         return Drawer(
           child: SafeArea(
@@ -45,7 +46,9 @@ class FeatureDrawer extends StatelessWidget {
                   onTap: () {
                     Navigator.of(context).pop();
                     final settings = r.Router.generateRouteSettings(
-                        r.Router.randomRoute, model);
+                      r.Router.randomRoute,
+                      model,
+                    );
                     model.pageRefreshed = true;
                     Navigator.of(context).pushReplacementNamed(
                       settings.name!,
@@ -61,7 +64,9 @@ class FeatureDrawer extends StatelessWidget {
                   onTap: () {
                     Navigator.of(context).pop();
                     final settings = r.Router.generateRouteSettings(
-                        r.Router.listRoute, model);
+                      r.Router.listRoute,
+                      model,
+                    );
                     model.pageRefreshed = true;
                     Navigator.of(context).pushReplacementNamed(
                       settings.name!,
@@ -81,7 +86,8 @@ class FeatureDrawer extends StatelessWidget {
                     Navigator.of(context).pop();
                     final username = model.primaryPlayer ?? '';
                     Navigator.of(context).pushNamed(
-                        '${r.Router.shelfOfShameRoute}/${Uri.encodeComponent(username)}');
+                      '${r.Router.shelfOfShameRoute}/${Uri.encodeComponent(username)}',
+                    );
                   },
                 ),
                 _buildItem(
@@ -174,7 +180,9 @@ class FeatureDrawer extends StatelessWidget {
   }
 
   Widget _buildRecentlyViewedTile(
-      BuildContext context, RecentlyViewedGame game) {
+    BuildContext context,
+    RecentlyViewedGame game,
+  ) {
     final thumbnail = game.thumbnail;
     return ListTile(
       dense: true,
@@ -210,9 +218,7 @@ class FeatureDrawer extends StatelessWidget {
       child: DrawerHeader(
         padding: const EdgeInsets.only(left: 16),
         margin: EdgeInsets.zero,
-        decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.primary,
-        ),
+        decoration: BoxDecoration(color: Theme.of(context).colorScheme.primary),
         child: Align(
           alignment: Alignment.centerLeft,
           child: Text(
@@ -234,9 +240,9 @@ class FeatureDrawer extends StatelessWidget {
       child: Text(
         title,
         style: Theme.of(context).textTheme.labelMedium?.copyWith(
-              color: Theme.of(context).colorScheme.primary,
-              fontWeight: FontWeight.bold,
-            ),
+          color: Theme.of(context).colorScheme.primary,
+          fontWeight: FontWeight.bold,
+        ),
       ),
     );
   }
@@ -251,18 +257,22 @@ class FeatureDrawer extends StatelessWidget {
   }) {
     return ListTile(
       dense: true,
-      leading: Icon(icon,
-          size: 20,
+      leading: Icon(
+        icon,
+        size: 20,
+        color: enabled
+            ? null
+            : Theme.of(context).colorScheme.onSurface.withAlpha(100),
+      ),
+      title: Text(
+        label,
+        style: TextStyle(
+          fontSize: 14,
           color: enabled
               ? null
-              : Theme.of(context).colorScheme.onSurface.withAlpha(100)),
-      title: Text(label,
-          style: TextStyle(
-            fontSize: 14,
-            color: enabled
-                ? null
-                : Theme.of(context).colorScheme.onSurface.withAlpha(100),
-          )),
+              : Theme.of(context).colorScheme.onSurface.withAlpha(100),
+        ),
+      ),
       onTap: enabled
           ? onTap
           : () {

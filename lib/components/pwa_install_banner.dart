@@ -43,9 +43,11 @@ class _PwaInstallBannerState extends State<PwaInstallBanner> {
 
   void _install(BuildContext context) {
     if (PwaInstallService.isInstallAvailable) {
-      PwaInstallService.triggerInstall(onResult: (accepted) {
-        if (mounted) setState(() => _visible = false);
-      });
+      PwaInstallService.triggerInstall(
+        onResult: (accepted) {
+          if (mounted) setState(() => _visible = false);
+        },
+      );
     } else {
       showDialog(
         context: context,
@@ -85,15 +87,17 @@ class _PwaInstallBannerState extends State<PwaInstallBanner> {
                 onTap: () => _install(context),
                 child: Row(
                   children: [
-                    const Icon(Icons.install_mobile,
-                        size: 20, color: textColor),
+                    const Icon(
+                      Icons.install_mobile,
+                      size: 20,
+                      color: textColor,
+                    ),
                     const SizedBox(width: 10),
                     Expanded(
                       child: Text(
                         'Add to your home screen for quick access',
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                              color: textColor,
-                            ),
+                        style: Theme.of(context).textTheme.bodySmall
+                            ?.copyWith(color: textColor),
                       ),
                     ),
                     const Padding(

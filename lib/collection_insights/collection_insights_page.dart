@@ -120,7 +120,7 @@ class _CollectionInsightsPageState extends State<CollectionInsightsPage>
     if (analytics.topMechanics.isNotEmpty) {
       sections.add(_Section(
         title: 'Top Mechanics',
-        child: HorizontalBarChart(
+        child: MechanicChips(
           data: [
             for (final m in analytics.topMechanics)
               BarDatum(label: m.name, value: m.count),

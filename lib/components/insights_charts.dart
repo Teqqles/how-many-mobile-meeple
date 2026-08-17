@@ -62,10 +62,7 @@ class HorizontalBarChart extends StatelessWidget {
                       child: Container(
                         height: 14,
                         decoration: BoxDecoration(
-                          color: datum.highlighted
-                              ? theme.colorScheme.primary
-                              : theme.colorScheme.primary
-                                  .withValues(alpha: 0.82),
+                          color: theme.colorScheme.primary,
                           borderRadius: BorderRadius.circular(4),
                         ),
                       ),
@@ -81,6 +78,65 @@ class HorizontalBarChart extends StatelessWidget {
                       fontWeight: datum.highlighted
                           ? FontWeight.bold
                           : FontWeight.normal,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+      ],
+    );
+  }
+}
+
+/// The top mechanics rendered as count-badged chips rather than a chart — a
+/// flat ranked list of labels reads better as chips than as bars. Renders
+/// nothing for empty data so callers degrade gracefully.
+class MechanicChips extends StatelessWidget {
+  const MechanicChips({super.key, required this.data});
+
+  final List<BarDatum> data;
+
+  @override
+  Widget build(BuildContext context) {
+    if (data.isEmpty) return const SizedBox.shrink();
+
+    final theme = Theme.of(context);
+    return Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      children: [
+        for (final datum in data)
+          Container(
+            padding: const EdgeInsets.fromLTRB(12, 6, 6, 6),
+            decoration: BoxDecoration(
+              color: theme.colorScheme.primaryContainer,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: theme.colorScheme.primary, width: 1),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  datum.label,
+                  style: theme.textTheme.labelLarge?.copyWith(
+                    color: theme.colorScheme.onPrimaryContainer,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(width: 6),
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.primary,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    '${datum.value}',
+                    style: theme.textTheme.labelMedium?.copyWith(
+                      color: theme.colorScheme.onPrimary,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
                 ),

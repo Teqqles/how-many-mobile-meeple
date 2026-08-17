@@ -74,6 +74,26 @@ void main() {
     });
   });
 
+  group('MechanicChips', () {
+    testWidgets('renders a chip with name and count per mechanic',
+        (tester) async {
+      await tester.pumpWidget(_wrap(const MechanicChips(data: [
+        BarDatum(label: 'Hand Management', value: 43),
+        BarDatum(label: 'Dice Rolling', value: 38),
+      ])));
+
+      expect(find.text('Hand Management'), findsOneWidget);
+      expect(find.text('43'), findsOneWidget);
+      expect(find.text('Dice Rolling'), findsOneWidget);
+      expect(find.text('38'), findsOneWidget);
+    });
+
+    testWidgets('renders nothing when data is empty', (tester) async {
+      await tester.pumpWidget(_wrap(const MechanicChips(data: [])));
+      expect(find.byType(Wrap), findsNothing);
+    });
+  });
+
   group('PlayerCoverageChart', () {
     List<PlayerCountCoverage> _coverage() => const [
           PlayerCountCoverage(2, 103, 82),

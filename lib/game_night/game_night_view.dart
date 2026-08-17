@@ -5,15 +5,20 @@ import 'package:how_many_mobile_meeple/model/model.dart';
 import 'package:how_many_mobile_meeple/model/settings.dart';
 
 /// Recommends a full evening's lineup - a filler, a main game and a backup -
-/// from the loaded collection within a chosen time budget. The user can pin
-/// any slot and regenerate the rest. The optional expansion slot is deferred
-/// until the backend exposes expansion relationships (issue #119).
+/// from a pool of games within a chosen time budget. The user can pin any slot
+/// and regenerate the rest. The optional expansion slot is deferred until the
+/// backend exposes expansion relationships (issue #119).
 class GameNightView extends StatefulWidget {
   final AppModel model;
+  final List<Game> pool;
   final GameNightPlanner planner;
 
-  GameNightView({super.key, required this.model, GameNightPlanner? planner})
-    : planner = planner ?? GameNightPlanner();
+  GameNightView({
+    super.key,
+    required this.model,
+    required this.pool,
+    GameNightPlanner? planner,
+  }) : planner = planner ?? GameNightPlanner();
 
   @override
   State<GameNightView> createState() => _GameNightViewState();
@@ -40,12 +45,10 @@ class _GameNightViewState extends State<GameNightView> {
     _regenerate();
   }
 
-  List<Game> get _pool => widget.model.bggCache.games.games;
-
   void _regenerate() {
     setState(() {
       _lineup = widget.planner.plan(
-        pool: _pool,
+        pool: widget.pool,
         durationMinutes: _durationMinutes,
         pinned: Map.of(_pinned),
       );
@@ -76,7 +79,7 @@ class _GameNightViewState extends State<GameNightView> {
 
   @override
   Widget build(BuildContext context) {
-    if (_pool.isEmpty) {
+    if (widget.pool.isEmpty) {
       return const Center(
         child: Padding(
           padding: EdgeInsets.all(24),
@@ -168,14 +171,21 @@ class _GameNightViewState extends State<GameNightView> {
       child: Padding(
         padding: const EdgeInsets.all(12),
         child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            if (game != null) ...[
+              _buildThumbnail(context, game),
+              const SizedBox(width: 12),
+            ],
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     '$title · $subtitle',
-                    style: Theme.of(context).textTheme.labelMedium,
+                    style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
                   ),
                   const SizedBox(height: 4),
                   if (game != null) ...[
@@ -183,10 +193,8 @@ class _GameNightViewState extends State<GameNightView> {
                       game.name,
                       style: Theme.of(context).textTheme.titleMedium,
                     ),
-                    Text(
-                      '${game.maxPlaytime} min · ${_weightLabel(game.averageWeight)}',
-                      style: Theme.of(context).textTheme.bodySmall,
-                    ),
+                    const SizedBox(height: 6),
+                    _buildGameDetails(context, game),
                   ] else
                     Text(
                       'No fit for this slot',
@@ -209,6 +217,77 @@ class _GameNightViewState extends State<GameNightView> {
         ),
       ),
     );
+  }
+
+  Widget _buildThumbnail(BuildContext context, Game game) {
+    final placeholder = Container(
+      width: 64,
+      height: 64,
+      color: Theme.of(context).colorScheme.surfaceContainerHighest,
+      child: Icon(
+        Icons.casino,
+        color: Theme.of(context).colorScheme.onSurfaceVariant,
+      ),
+    );
+    final url = (game.thumbnail?.isNotEmpty ?? false)
+        ? game.thumbnail!
+        : game.imageUrl;
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(8),
+      child: url.isEmpty
+          ? placeholder
+          : Image.network(
+              url,
+              width: 64,
+              height: 64,
+              fit: BoxFit.cover,
+              errorBuilder: (_, _, _) => placeholder,
+              loadingBuilder: (context, child, progress) =>
+                  progress == null ? child : placeholder,
+            ),
+    );
+  }
+
+  Widget _buildGameDetails(BuildContext context, Game game) {
+    return Wrap(
+      spacing: 12,
+      runSpacing: 4,
+      children: [
+        _detail(context, Icons.schedule, '${game.maxPlaytime} min'),
+        _detail(context, Icons.people_outline, _playerRange(game)),
+        if (game.averageRating > 0)
+          _detail(
+            context,
+            Icons.star_outline,
+            game.averageRating.toStringAsFixed(1),
+          ),
+        _detail(
+          context,
+          Icons.fitness_center,
+          _weightLabel(game.averageWeight),
+        ),
+      ],
+    );
+  }
+
+  Widget _detail(BuildContext context, IconData icon, String text) {
+    final color = Theme.of(context).colorScheme.onSurfaceVariant;
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(icon, size: 14, color: color),
+        const SizedBox(width: 3),
+        Text(
+          text,
+          style: Theme.of(context).textTheme.bodySmall?.copyWith(color: color),
+        ),
+      ],
+    );
+  }
+
+  static String _playerRange(Game game) {
+    if (game.minPlayers == game.maxPlayers) return '${game.maxPlayers} players';
+    return '${game.minPlayers}-${game.maxPlayers} players';
   }
 
   static String _formatDuration(int minutes) {

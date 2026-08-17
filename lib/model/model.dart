@@ -453,6 +453,22 @@ class AppModel extends ChangeNotifier {
 
   GameRequest buildRequest() => GameRequest.from(_settings, _items);
 
+  /// The pool for a game night ignores the per-game duration filters: the
+  /// evening budget governs playtime, so the planner needs the short fillers
+  /// and long centrepieces those filters would otherwise exclude. All other
+  /// filters (players, mechanics, rating, complexity) still apply.
+  GameRequest buildGameNightRequest() {
+    final settings = _settings.clone();
+    for (final name in [
+      Settings.filterMinimumTimeToPlay.name,
+      Settings.filterMaximumTimeToPlay.name,
+    ]) {
+      final disabled = settings.setting(name).clone()..enabled = false;
+      settings.updateSetting(disabled);
+    }
+    return GameRequest.from(settings, _items);
+  }
+
   void invalidateCache() {
     _bggCache.makeStale();
     notifyListeners();

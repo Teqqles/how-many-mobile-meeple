@@ -30,8 +30,9 @@ class GameNightLineup {
 /// Pure and dependency-free: selection among equally valid candidates goes
 /// through [_pick], which tests override for deterministic results.
 class GameNightPlanner {
-  /// A filler is a short game played while waiting or warming up.
-  static const int fillerMaxMinutes = 20;
+  /// A filler is a short game played while waiting or warming up. The ceiling
+  /// is inclusive so common 30-minute fillers qualify.
+  static const int fillerMaxMinutes = 30;
 
   final int Function(int count) _pick;
 
@@ -69,7 +70,7 @@ class GameNightPlanner {
           (g) =>
               !used.contains(g.id) &&
               g.maxPlaytime > 0 &&
-              g.maxPlaytime < fillerMaxMinutes,
+              g.maxPlaytime <= fillerMaxMinutes,
         )
         .toList();
     return _choose(candidates);

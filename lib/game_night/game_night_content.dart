@@ -1,21 +1,71 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:how_many_mobile_meeple/game_night/game_night_view.dart';
+import 'package:how_many_mobile_meeple/load_games.dart';
 import 'package:how_many_mobile_meeple/model/game_night.dart';
-import 'package:how_many_mobile_meeple/network_content_widget.dart';
+import 'package:how_many_mobile_meeple/model/games.dart';
+import 'package:how_many_mobile_meeple/model/model.dart';
 
-/// Fetches the server-filtered game pool - exactly as the single-game flow
-/// does - before handing it to the [GameNightView] planner. Without this the
-/// planner reads an empty cache whenever a collection is loaded but no
-/// recommendation has been requested yet.
-class GameNightContent extends NetworkWidget {
+/// Fetches the game-night pool - the collection with per-game duration filters
+/// removed so the evening budget alone governs playtime - and hands it to the
+/// [GameNightView] planner. The single-game recommendation cache cannot be
+/// reused because that request carries the duration filters this mode drops.
+class GameNightContent extends StatefulWidget {
+  final AppModel model;
   final GameNightPlanner? planner;
 
-  GameNightContent({this.planner});
+  const GameNightContent({super.key, required this.model, this.planner});
+
+  @override
+  State<GameNightContent> createState() => _GameNightContentState();
+}
+
+class _GameNightContentState extends State<GameNightContent> {
+  Future<Games>? _pool;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.model.items.itemList.isNotEmpty) {
+      _pool = LoadGames.fetchGames(widget.model.buildGameNightRequest());
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    return loadNetworkContent(
-      (context, model) => GameNightView(model: model, planner: planner),
+    if (widget.model.items.itemList.isEmpty) {
+      return _message(context, 'Add a BGG collection to plan a game night.');
+    }
+    return FutureBuilder<Games>(
+      future: _pool,
+      builder: (context, snapshot) {
+        if (snapshot.hasError) {
+          return _message(
+            context,
+            'Could not load your games. Check your connection and try again.',
+          );
+        }
+        if (!snapshot.hasData) {
+          return Center(
+            child: SpinKitCubeGrid(
+              size: 64,
+              color: Theme.of(context).colorScheme.secondary,
+            ),
+          );
+        }
+        return GameNightView(
+          model: widget.model,
+          pool: snapshot.data!.games,
+          planner: widget.planner,
+        );
+      },
     );
   }
+
+  Widget _message(BuildContext context, String text) => Center(
+    child: Padding(
+      padding: const EdgeInsets.all(24),
+      child: Text(text, textAlign: TextAlign.center),
+    ),
+  );
 }

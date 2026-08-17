@@ -155,7 +155,7 @@ class _GuidedFlowHomePageState extends State<GuidedFlowHomePage> {
   }
 
   Widget _buildModeBody(BuildContext context, AppModel model) {
-    if (_showGameNight) return GameNightContent();
+    if (_showGameNight) return GameNightContent(model: model);
     if (_showAdvancedMode) return _buildAdvancedMode(context);
     return _buildGuidedFlow(context);
   }

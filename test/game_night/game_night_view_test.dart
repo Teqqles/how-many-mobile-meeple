@@ -6,7 +6,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:how_many_mobile_meeple/game_night/game_night_view.dart';
 import 'package:how_many_mobile_meeple/model/game.dart';
 import 'package:how_many_mobile_meeple/model/game_night.dart';
-import 'package:how_many_mobile_meeple/model/games.dart';
 import 'package:how_many_mobile_meeple/model/model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -21,19 +20,18 @@ Game _game(int id, String name, int maxPlaytime, double weight) => Game(
   averageWeight: weight,
 );
 
-Games _pool() => Games(
-  gamesByName: {
-    'Quick': _game(1, 'Quick', 15, 2.0),
-    'Epic': _game(2, 'Epic', 120, 3.5),
-    'Mid': _game(3, 'Mid', 60, 2.5),
-    'Alt': _game(4, 'Alt', 100, 1.5),
-  },
-);
+List<Game> _pool() => [
+  _game(1, 'Quick', 15, 2.0),
+  _game(2, 'Epic', 120, 3.5),
+  _game(3, 'Mid', 60, 2.5),
+  _game(4, 'Alt', 100, 1.5),
+];
 
-Widget _wrap(AppModel model) => MaterialApp(
+Widget _wrap(AppModel model, {List<Game>? pool}) => MaterialApp(
   home: Scaffold(
     body: GameNightView(
       model: model,
+      pool: pool ?? _pool(),
       planner: GameNightPlanner(pick: (_) => 0),
     ),
   ),
@@ -43,9 +41,7 @@ void main() {
   setUp(() => SharedPreferences.setMockInitialValues({}));
 
   testWidgets('fills filler, main and backup from the pool', (tester) async {
-    final model = AppModel()..setGamesForTest(_pool());
-
-    await tester.pumpWidget(_wrap(model));
+    await tester.pumpWidget(_wrap(AppModel()));
 
     // Filler is the short game; main is the longest that fits 180 - 15; backup
     // is a similarly-timed game in a different complexity band.
@@ -58,22 +54,19 @@ void main() {
   testWidgets('prompts to load a collection when the pool is empty', (
     tester,
   ) async {
-    final model = AppModel();
-    await tester.pumpWidget(_wrap(model));
+    await tester.pumpWidget(_wrap(AppModel(), pool: const []));
 
     expect(find.textContaining('Load a collection'), findsOneWidget);
   });
 
   testWidgets('offers a regenerate action', (tester) async {
-    final model = AppModel()..setGamesForTest(_pool());
-    await tester.pumpWidget(_wrap(model));
+    await tester.pumpWidget(_wrap(AppModel()));
 
     expect(find.byKey(const ValueKey('game-night-regenerate')), findsOneWidget);
   });
 
   testWidgets('shows duration presets', (tester) async {
-    final model = AppModel()..setGamesForTest(_pool());
-    await tester.pumpWidget(_wrap(model));
+    await tester.pumpWidget(_wrap(AppModel()));
 
     expect(find.text('2h'), findsOneWidget);
     expect(find.text('4h'), findsOneWidget);
@@ -82,9 +75,15 @@ void main() {
     expect(find.text('3h'), findsNWidgets(2));
   });
 
+  testWidgets('shows game details for a filled slot', (tester) async {
+    await tester.pumpWidget(_wrap(AppModel()));
+
+    expect(find.text('120 min'), findsOneWidget);
+    expect(find.text('2-4 players'), findsWidgets);
+  });
+
   testWidgets('pinning a slot marks it pinned', (tester) async {
-    final model = AppModel()..setGamesForTest(_pool());
-    await tester.pumpWidget(_wrap(model));
+    await tester.pumpWidget(_wrap(AppModel()));
 
     expect(find.byIcon(Icons.push_pin), findsNothing);
     await tester.tap(find.byIcon(Icons.push_pin_outlined).first);

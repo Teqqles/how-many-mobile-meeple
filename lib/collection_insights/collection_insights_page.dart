@@ -4,6 +4,7 @@ import 'package:how_many_mobile_meeple/app_page.dart';
 import 'package:how_many_mobile_meeple/components/disclaimer_text.dart';
 import 'package:how_many_mobile_meeple/components/feature_drawer.dart';
 import 'package:how_many_mobile_meeple/components/insights_charts.dart';
+import 'package:how_many_mobile_meeple/components/list_empty_state.dart';
 import 'package:how_many_mobile_meeple/how_many_meeple_app_bar.dart';
 import 'package:how_many_mobile_meeple/model/collection_analytics.dart';
 import 'package:how_many_mobile_meeple/model/model.dart';
@@ -52,30 +53,12 @@ class _CollectionInsightsPageState extends State<CollectionInsightsPage>
   }
 
   Widget _buildEmptyState(BuildContext context) {
-    final theme = Theme.of(context);
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(32),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(Icons.insights, size: 64, color: theme.colorScheme.secondary),
-            const SizedBox(height: 16),
-            Text('Insights are on their way',
-                style: theme.textTheme.titleMedium),
-            const SizedBox(height: 8),
-            Text(
-              'Your collection dashboard will appear here once we\'ve '
-              'analysed your games. Add a BGG collection in Step 1 if you '
-              'haven\'t yet.',
-              textAlign: TextAlign.center,
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
-            ),
-          ],
-        ),
-      ),
+    return const ListEmptyState(
+      icon: Icons.insights,
+      title: 'Insights are on their way',
+      description: 'Your collection dashboard will appear here once we\'ve '
+          'analysed your games. Add a BGG collection in Step 1 if you '
+          'haven\'t yet.',
     );
   }
 

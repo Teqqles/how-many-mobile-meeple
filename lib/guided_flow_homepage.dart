@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:how_many_mobile_meeple/model/model.dart';
 import 'package:how_many_mobile_meeple/model/settings.dart';
-import 'package:how_many_mobile_meeple/game_night/game_night_view.dart';
+import 'package:how_many_mobile_meeple/game_night/game_night_content.dart';
 import 'package:how_many_mobile_meeple/how_many_meeple_app_bar.dart';
 import 'package:how_many_mobile_meeple/app_common.dart';
 import 'package:how_many_mobile_meeple/app_page.dart';
@@ -155,7 +155,7 @@ class _GuidedFlowHomePageState extends State<GuidedFlowHomePage> {
   }
 
   Widget _buildModeBody(BuildContext context, AppModel model) {
-    if (_showGameNight) return GameNightView(model: model);
+    if (_showGameNight) return GameNightContent();
     if (_showAdvancedMode) return _buildAdvancedMode(context);
     return _buildGuidedFlow(context);
   }

@@ -583,12 +583,10 @@ class _Track extends StatelessWidget {
     return Container(
       height: 14,
       decoration: BoxDecoration(
-        color: theme.colorScheme.surfaceContainerHighest,
+        // Shaded primary tint (matching the coverage graph's supported area)
+        // rather than a light neutral, so the unfilled portion reads clearly.
+        color: theme.colorScheme.primary.withValues(alpha: 0.22),
         borderRadius: BorderRadius.circular(4),
-        border: Border.all(
-          color: theme.colorScheme.outlineVariant,
-          width: 1,
-        ),
       ),
       clipBehavior: Clip.antiAlias,
       child: child,

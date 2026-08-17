@@ -443,8 +443,8 @@ class InsightsSummaryGrid extends StatelessWidget {
 
   final CollectionSummary summary;
 
-  /// Optional backlog split shown as a second donut alongside the summary
-  /// figures. All three must be provided together for the donut to render.
+  /// Backlog split shown as a second donut; all three render together or not
+  /// at all.
   final int? backlogPlayed;
   final int? backlogUnplayed;
   final int? backlogTotal;

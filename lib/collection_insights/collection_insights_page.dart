@@ -92,7 +92,6 @@ class _CollectionInsightsPageState extends State<CollectionInsightsPage>
         ),
       ));
     } else if (stats != null) {
-      // No summary block, but plays loaded: still surface the backlog donut.
       sections.add(_Section(
         title: 'Overview',
         child: SplitDonut(
@@ -153,8 +152,6 @@ class _CollectionInsightsPageState extends State<CollectionInsightsPage>
     );
   }
 
-  /// Appends play-derived sections. Each subsection is guarded by its own
-  /// emptiness so a collection with no recorded plays degrades quietly.
   void _addPlaySections(
       BuildContext context, PlayInsights stats, List<Widget> sections) {
     if (stats.hasPlays) {

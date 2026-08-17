@@ -49,7 +49,6 @@ class PlayInsights {
 
   int get unplayedGames => totalGames - playedGames;
 
-  /// True when there is anything play-related worth showing.
   bool get hasPlays => totalPlays > 0;
 
   factory PlayInsights.from({
@@ -59,9 +58,8 @@ class PlayInsights {
     required DateTime now,
     int topN = 8,
   }) {
-    // Backlog (played/unplayed) is a property of the owned collection, so it
-    // stays collection-scoped. Play activity and most-played span everything
-    // that has been played, including games no longer (or never) owned.
+    // Backlog stays collection-scoped; activity and rankings span every
+    // played game, including those no longer (or never) owned.
     final allIds = <int>{...collectionGameIds, ...playsData.keys};
 
     var collectionPlayed = 0;
@@ -113,7 +111,6 @@ class PlayInsights {
       }
     }
 
-    // Newest year first, so the current year heads the chart.
     final years = perYear.keys.toList()..sort((a, b) => b.compareTo(a));
 
     return PlayInsights(

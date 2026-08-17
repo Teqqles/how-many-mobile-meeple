@@ -170,8 +170,7 @@ class _CollectionInsightsPageState extends State<CollectionInsightsPage>
                   label: 'Hours Played',
                   value: '${(stats.totalMinutes / 60).round()}'),
             StatTile(
-                label: 'Played in ${DateTime.now().year}',
-                value: '${stats.playsThisYear}'),
+                label: 'Played this Year', value: '${stats.playsThisYear}'),
             StatTile(label: 'Played Once', value: '${stats.playedOnce}'),
             StatTile(label: 'Repeated', value: '${stats.playedRepeatedly}'),
           ],

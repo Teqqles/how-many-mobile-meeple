@@ -81,18 +81,26 @@ class _CollectionInsightsPageState extends State<CollectionInsightsPage>
         : null;
 
     final summary = analytics.summary;
-    if (summary != null || stats != null) {
+    if (summary != null) {
       sections.add(_Section(
         title: 'Overview',
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            if (summary != null) InsightsSummaryGrid(summary: summary),
-            if (stats != null) ...[
-              if (summary != null) const SizedBox(height: 20),
-              _Backlog(stats: stats),
-            ],
-          ],
+        child: InsightsSummaryGrid(
+          summary: summary,
+          backlogPlayed: stats?.playedGames,
+          backlogUnplayed: stats?.unplayedGames,
+          backlogTotal: stats?.totalGames,
+        ),
+      ));
+    } else if (stats != null) {
+      // No summary block, but plays loaded: still surface the backlog donut.
+      sections.add(_Section(
+        title: 'Overview',
+        child: SplitDonut(
+          primaryValue: stats.playedGames,
+          primaryLabel: 'Played',
+          secondaryValue: stats.unplayedGames,
+          secondaryLabel: 'Unplayed',
+          total: stats.totalGames,
         ),
       ));
     }
@@ -185,10 +193,14 @@ class _CollectionInsightsPageState extends State<CollectionInsightsPage>
     if (stats.playsPerYear.isNotEmpty) {
       sections.add(_Section(
         title: 'Plays Per Year',
-        child: HorizontalBarChart(
+        child: PlaysPerYearChart(
           data: [
             for (final y in stats.playsPerYear)
-              BarDatum(label: '${y.year}', value: y.plays),
+              YearPlaysDatum(
+                label: '${y.year}',
+                total: y.plays,
+                collection: y.collectionPlays,
+              ),
           ],
         ),
       ));
@@ -198,41 +210,6 @@ class _CollectionInsightsPageState extends State<CollectionInsightsPage>
   List<BarDatum> _bucketData(List<DistributionBucket> buckets) => [
         for (final b in buckets) BarDatum(label: b.name, value: b.count),
       ];
-}
-
-/// The played/unplayed split of the owned collection, shown inside the
-/// Overview card. Backlog is a property of the collection, so it lives beside
-/// the summary rather than among the broader play-activity sections.
-class _Backlog extends StatelessWidget {
-  const _Backlog({required this.stats});
-
-  final PlayInsights stats;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text('Backlog',
-            style: theme.textTheme.titleSmall
-                ?.copyWith(fontWeight: FontWeight.bold)),
-        const SizedBox(height: 2),
-        Text('${stats.unplayedGames} of ${stats.totalGames} unplayed',
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: theme.colorScheme.onSurfaceVariant,
-            )),
-        const SizedBox(height: 12),
-        SplitDonut(
-          primaryValue: stats.playedGames,
-          primaryLabel: 'Played',
-          secondaryValue: stats.unplayedGames,
-          secondaryLabel: 'Unplayed',
-          total: stats.totalGames,
-        ),
-      ],
-    );
-  }
 }
 
 class _Section extends StatelessWidget {

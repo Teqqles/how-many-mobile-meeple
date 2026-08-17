@@ -102,6 +102,30 @@ void main() {
       expect(
           stats.playsPerYear.map((y) => y.year).toList(), [2024, 2025, 2026]);
       expect(stats.playsPerYear.map((y) => y.plays).toList(), [2, 1, 1]);
+      // All of game 1's plays are owned, so the collection subset matches.
+      expect(
+          stats.playsPerYear.map((y) => y.collectionPlays).toList(), [2, 1, 1]);
+    });
+
+    test('splits plays per year into collection vs all', () {
+      final stats = PlayInsights.from(
+        collectionGameIds: {1},
+        playsData: {
+          1: _data(1, 'Owned', 1,
+              plays: [BggPlay(playId: 1, date: DateTime(2026, 1, 1))]),
+          2: _data(2, 'Borrowed', 2, plays: [
+            BggPlay(playId: 2, date: DateTime(2026, 2, 1)),
+            BggPlay(playId: 3, date: DateTime(2026, 3, 1)),
+          ]),
+        },
+        playCount: (id) => {1: 1, 2: 2}[id]!,
+        now: DateTime(2026),
+      );
+
+      final year = stats.playsPerYear.single;
+      expect(year.year, 2026);
+      expect(year.plays, 3);
+      expect(year.collectionPlays, 1);
     });
 
     test('counts plays outside the collection in activity and most played', () {

@@ -10,12 +10,15 @@ class MostPlayedEntry {
       {required this.gameId, required this.name, required this.plays});
 }
 
-/// Play tally for a single calendar year.
+/// Play tally for a single calendar year. [plays] counts every recorded play;
+/// [collectionPlays] counts only those of games in the current collection.
 class YearPlays {
   final int year;
   final int plays;
+  final int collectionPlays;
 
-  const YearPlays({required this.year, required this.plays});
+  const YearPlays(
+      {required this.year, required this.plays, this.collectionPlays = 0});
 }
 
 /// Insights derived from the primary player's plays and collection, computed
@@ -93,12 +96,18 @@ class PlayInsights {
     var totalMinutes = 0;
     var playsThisYear = 0;
     final perYear = <int, int>{};
+    final perYearCollection = <int, int>{};
     for (final data in playsData.values) {
+      final owned = collectionGameIds.contains(data.gameId);
       for (final play in data.plays) {
         totalMinutes += play.length;
         final date = play.date;
         if (date != null) {
           perYear[date.year] = (perYear[date.year] ?? 0) + 1;
+          if (owned) {
+            perYearCollection[date.year] =
+                (perYearCollection[date.year] ?? 0) + 1;
+          }
           if (date.year == now.year) playsThisYear++;
         }
       }
@@ -116,7 +125,12 @@ class PlayInsights {
       playedRepeatedly: playedRepeatedly,
       mostPlayed: ranked.take(topN).toList(),
       playsPerYear: [
-        for (final y in years) YearPlays(year: y, plays: perYear[y]!),
+        for (final y in years)
+          YearPlays(
+            year: y,
+            plays: perYear[y]!,
+            collectionPlays: perYearCollection[y] ?? 0,
+          ),
       ],
     );
   }

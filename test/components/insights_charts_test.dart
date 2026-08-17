@@ -94,6 +94,48 @@ void main() {
     });
   });
 
+  group('PlaysPerYearChart', () {
+    testWidgets('renders a labelled row and total per year', (tester) async {
+      await tester.pumpWidget(_wrap(const PlaysPerYearChart(data: [
+        YearPlaysDatum(label: '2025', total: 10, collection: 6),
+        YearPlaysDatum(label: '2026', total: 4, collection: 4),
+      ])));
+
+      expect(find.text('2025'), findsOneWidget);
+      expect(find.text('2026'), findsOneWidget);
+      expect(find.text('10'), findsOneWidget);
+      expect(find.text('4'), findsOneWidget);
+    });
+
+    testWidgets('keys legend for collection and all plays', (tester) async {
+      await tester.pumpWidget(_wrap(const PlaysPerYearChart(data: [
+        YearPlaysDatum(label: '2026', total: 4, collection: 4),
+      ])));
+
+      expect(find.text('From collection'), findsOneWidget);
+      expect(find.text('All plays'), findsOneWidget);
+    });
+
+    testWidgets('scales total and collection fills against the maximum',
+        (tester) async {
+      await tester.pumpWidget(_wrap(const PlaysPerYearChart(data: [
+        YearPlaysDatum(label: '2025', total: 10, collection: 5),
+      ])));
+
+      final total = tester.widget<FractionallySizedBox>(
+          find.byKey(const ValueKey('year-total-fill')));
+      final collection = tester.widget<FractionallySizedBox>(
+          find.byKey(const ValueKey('year-collection-fill')));
+      expect(total.widthFactor, 1.0);
+      expect(collection.widthFactor, 0.5);
+    });
+
+    testWidgets('renders nothing when data is empty', (tester) async {
+      await tester.pumpWidget(_wrap(const PlaysPerYearChart(data: [])));
+      expect(find.byKey(const ValueKey('year-total-fill')), findsNothing);
+    });
+  });
+
   group('PlayerCoverageChart', () {
     List<PlayerCountCoverage> _coverage() => const [
           PlayerCountCoverage(2, 103, 82),
@@ -174,6 +216,21 @@ void main() {
       expect(find.text('85'), findsOneWidget);
       expect(find.text('Expansions'), findsOneWidget);
       expect(find.text('28'), findsOneWidget);
+    });
+
+    testWidgets('appends a played/unplayed backlog donut when provided',
+        (tester) async {
+      await tester.pumpWidget(_wrap(const InsightsSummaryGrid(
+        summary: CollectionSummary(totalGames: 113),
+        backlogPlayed: 63,
+        backlogUnplayed: 50,
+        backlogTotal: 113,
+      )));
+
+      expect(find.text('Played'), findsOneWidget);
+      expect(find.text('Unplayed'), findsOneWidget);
+      expect(find.text('63'), findsOneWidget);
+      expect(find.text('50'), findsOneWidget);
     });
 
     testWidgets('omits tiles for absent figures', (tester) async {

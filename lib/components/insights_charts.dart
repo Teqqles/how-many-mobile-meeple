@@ -89,6 +89,109 @@ class HorizontalBarChart extends StatelessWidget {
   }
 }
 
+/// One year in a [PlaysPerYearChart]: [total] plays with [collection] of them
+/// belonging to games in the current collection.
+class YearPlaysDatum {
+  final String label;
+  final int total;
+  final int collection;
+  const YearPlaysDatum(
+      {required this.label, required this.total, required this.collection});
+}
+
+/// Plays per year drawn as stacked horizontal bars: the full bar is every
+/// recorded play, with the darker inner portion the subset owned in the current
+/// collection. A legend keys the two. Renders nothing for empty data.
+class PlaysPerYearChart extends StatelessWidget {
+  const PlaysPerYearChart({super.key, required this.data});
+
+  final List<YearPlaysDatum> data;
+
+  static const double _labelWidth = 96;
+  static const double _valueWidth = 32;
+
+  @override
+  Widget build(BuildContext context) {
+    if (data.isEmpty) return const SizedBox.shrink();
+
+    final theme = Theme.of(context);
+    final maxValue =
+        data.map((d) => d.total).fold<int>(0, (a, b) => b > a ? b : a);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(bottom: 8),
+          child: Wrap(
+            spacing: 16,
+            runSpacing: 4,
+            children: [
+              _LegendRow(
+                  color: theme.colorScheme.primary,
+                  label: 'From collection',
+                  value: ''),
+              _LegendRow(
+                  color: theme.colorScheme.primary.withValues(alpha: 0.4),
+                  label: 'All plays',
+                  value: ''),
+            ],
+          ),
+        ),
+        for (final datum in data)
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 4),
+            child: Row(
+              children: [
+                SizedBox(
+                  width: _labelWidth,
+                  child: Text(datum.label,
+                      style: theme.textTheme.bodySmall,
+                      overflow: TextOverflow.ellipsis),
+                ),
+                Expanded(
+                  child: _Track(
+                    child: Stack(
+                      children: [
+                        FractionallySizedBox(
+                          key: const ValueKey('year-total-fill'),
+                          alignment: Alignment.centerLeft,
+                          widthFactor:
+                              maxValue == 0 ? 0.0 : datum.total / maxValue,
+                          child: Container(
+                            height: 14,
+                            color: theme.colorScheme.primary
+                                .withValues(alpha: 0.4),
+                          ),
+                        ),
+                        FractionallySizedBox(
+                          key: const ValueKey('year-collection-fill'),
+                          alignment: Alignment.centerLeft,
+                          widthFactor:
+                              maxValue == 0 ? 0.0 : datum.collection / maxValue,
+                          child: Container(
+                            height: 14,
+                            color: theme.colorScheme.primary,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  width: _valueWidth,
+                  child: Text('${datum.total}',
+                      textAlign: TextAlign.right,
+                      style: theme.textTheme.bodySmall),
+                ),
+              ],
+            ),
+          ),
+      ],
+    );
+  }
+}
+
 /// The top mechanics rendered as count-badged chips rather than a chart — a
 /// flat ranked list of labels reads better as chips than as bars. Renders
 /// nothing for empty data so callers degrade gracefully.
@@ -330,15 +433,30 @@ class _CoverageAreaPainter extends CustomPainter {
 /// A grid of headline stat tiles for a [CollectionSummary]. Only figures that
 /// are present get a tile.
 class InsightsSummaryGrid extends StatelessWidget {
-  const InsightsSummaryGrid({super.key, required this.summary});
+  const InsightsSummaryGrid({
+    super.key,
+    required this.summary,
+    this.backlogPlayed,
+    this.backlogUnplayed,
+    this.backlogTotal,
+  });
 
   final CollectionSummary summary;
+
+  /// Optional backlog split shown as a second donut alongside the summary
+  /// figures. All three must be provided together for the donut to render.
+  final int? backlogPlayed;
+  final int? backlogUnplayed;
+  final int? backlogTotal;
 
   @override
   Widget build(BuildContext context) {
     // A base-vs-expansions split is a part-of-whole relationship, so it reads
     // better as a donut than as two separate tiles.
     final hasSplit = summary.baseGames != null && summary.expansions != null;
+    final hasBacklog = backlogPlayed != null &&
+        backlogUnplayed != null &&
+        backlogTotal != null;
 
     final children = <Widget>[
       if (hasSplit)
@@ -352,6 +470,14 @@ class InsightsSummaryGrid extends StatelessWidget {
         )
       else if (summary.totalGames != null)
         StatTile(label: 'Games', value: '${summary.totalGames}'),
+      if (hasBacklog)
+        SplitDonut(
+          primaryValue: backlogPlayed!,
+          primaryLabel: 'Played',
+          secondaryValue: backlogUnplayed!,
+          secondaryLabel: 'Unplayed',
+          total: backlogTotal,
+        ),
       if (summary.averageRating != null)
         StatTile(
             label: 'Avg Rating',
@@ -461,8 +587,7 @@ class SplitDonut extends StatelessWidget {
 }
 
 class _LegendRow extends StatelessWidget {
-  const _LegendRow(
-      {required this.color, required this.label, required this.value});
+  const _LegendRow({required this.color, required this.label, this.value = ''});
 
   final Color color;
   final String label;
@@ -484,12 +609,14 @@ class _LegendRow extends StatelessWidget {
         ),
         const SizedBox(width: 6),
         Text(label, style: theme.textTheme.bodySmall),
-        const SizedBox(width: 6),
-        Text(
-          value,
-          style:
-              theme.textTheme.bodySmall?.copyWith(fontWeight: FontWeight.bold),
-        ),
+        if (value.isNotEmpty) ...[
+          const SizedBox(width: 6),
+          Text(
+            value,
+            style: theme.textTheme.bodySmall
+                ?.copyWith(fontWeight: FontWeight.bold),
+          ),
+        ],
       ],
     );
   }

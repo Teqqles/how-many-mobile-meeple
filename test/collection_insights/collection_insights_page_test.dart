@@ -139,16 +139,19 @@ void main() {
 
     await tester.pumpWidget(_buildTestWidget(model));
 
-    final listView = find.byType(Scrollable).first;
-    await tester.scrollUntilVisible(find.text('Backlog'), 200,
-        scrollable: listView);
-    expect(find.text('1 of 3 unplayed'), findsOneWidget);
+    // Backlog donut lives in the Overview card near the top.
     expect(find.text('Played'), findsOneWidget);
     expect(find.text('Unplayed'), findsOneWidget);
 
+    final listView = find.byType(Scrollable).first;
     await tester.scrollUntilVisible(find.text('Most Played'), 200,
         scrollable: listView);
     expect(find.text('Gloomhaven'), findsOneWidget);
+
+    await tester.scrollUntilVisible(find.text('Plays Per Year'), 200,
+        scrollable: listView);
+    expect(find.byType(PlaysPerYearChart), findsOneWidget);
+    expect(find.text('From collection'), findsOneWidget);
   });
 
   testWidgets('re-renders when analytics arrive after the first build',

@@ -10,6 +10,7 @@ import 'package:how_many_mobile_meeple/components/disclaimer_text.dart';
 import 'package:how_many_mobile_meeple/components/insights_charts.dart';
 import 'package:how_many_mobile_meeple/model/collection_analytics.dart';
 import 'package:how_many_mobile_meeple/model/model.dart';
+import 'package:how_many_mobile_meeple/model/play_data.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../helpers/sync_mock_client.dart';
@@ -118,6 +119,36 @@ void main() {
     await tester.scrollUntilVisible(find.byType(BGGAttribution), 200,
         scrollable: find.byType(Scrollable).first);
     expect(find.byType(BGGAttribution), findsOneWidget);
+  });
+
+  testWidgets('renders play sections once plays have loaded', (tester) async {
+    final model = AppModel();
+    model.setCollectionAnalyticsForTest(
+        CollectionAnalytics.fromJson(_fullBody()));
+    model.setPlaysForTest(
+      collectionGameIds: {1, 2, 3},
+      playsData: {
+        1: PlayData(gameId: 1, gameName: 'Gloomhaven', totalPlays: 5, plays: [
+          BggPlay(playId: 1, date: DateTime(2026, 1, 1), length: 120),
+        ]),
+        2: PlayData(gameId: 2, gameName: 'Azul', totalPlays: 1, plays: [
+          BggPlay(playId: 2, date: DateTime(2025, 1, 1), length: 30),
+        ]),
+      },
+    );
+
+    await tester.pumpWidget(_buildTestWidget(model));
+
+    final listView = find.byType(Scrollable).first;
+    await tester.scrollUntilVisible(find.text('Backlog'), 200,
+        scrollable: listView);
+    expect(find.text('1 of 3 unplayed'), findsOneWidget);
+    expect(find.text('Played'), findsOneWidget);
+    expect(find.text('Unplayed'), findsOneWidget);
+
+    await tester.scrollUntilVisible(find.text('Most Played'), 200,
+        scrollable: listView);
+    expect(find.text('Gloomhaven'), findsOneWidget);
   });
 
   testWidgets('re-renders when analytics arrive after the first build',

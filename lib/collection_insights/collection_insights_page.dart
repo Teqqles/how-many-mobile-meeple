@@ -9,6 +9,7 @@ import 'package:how_many_mobile_meeple/components/plays_loading_indicator.dart';
 import 'package:how_many_mobile_meeple/how_many_meeple_app_bar.dart';
 import 'package:how_many_mobile_meeple/model/collection_analytics.dart';
 import 'package:how_many_mobile_meeple/model/model.dart';
+import 'package:how_many_mobile_meeple/model/play_insights.dart';
 
 /// A dashboard summarising the primary player's collection from the analytics
 /// endpoint. Reads [AppModel.collectionAnalytics] reactively and degrades to a
@@ -50,7 +51,7 @@ class _CollectionInsightsPageState extends State<CollectionInsightsPage>
           if (analytics == null || !analytics.hasData) {
             return _buildEmptyState(context);
           }
-          return _buildDashboard(context, analytics);
+          return _buildDashboard(context, model, analytics);
         },
       ),
     );
@@ -66,7 +67,8 @@ class _CollectionInsightsPageState extends State<CollectionInsightsPage>
     );
   }
 
-  Widget _buildDashboard(BuildContext context, CollectionAnalytics analytics) {
+  Widget _buildDashboard(
+      BuildContext context, AppModel model, CollectionAnalytics analytics) {
     final sections = <Widget>[];
 
     final summary = analytics.summary;
@@ -116,10 +118,85 @@ class _CollectionInsightsPageState extends State<CollectionInsightsPage>
       ));
     }
 
+    _addPlaySections(context, model, sections);
+
     return ListView(
       padding: const EdgeInsets.all(16),
       children: sections,
     );
+  }
+
+  /// Appends play-derived sections when the primary player's plays and
+  /// collection have loaded. Each subsection is guarded by its own emptiness so
+  /// a collection with no recorded plays degrades quietly.
+  void _addPlaySections(
+      BuildContext context, AppModel model, List<Widget> sections) {
+    if (!model.playsLoaded || model.collectionGameIds.isEmpty) return;
+
+    final stats = PlayInsights.from(
+      collectionGameIds: model.collectionGameIds,
+      playsData: model.playsData,
+      playCount: model.getPlayCount,
+      now: DateTime.now(),
+    );
+
+    sections.add(_Section(
+      title: 'Backlog',
+      subtitle: '${stats.unplayedGames} of ${stats.totalGames} unplayed',
+      child: SplitDonut(
+        primaryValue: stats.playedGames,
+        primaryLabel: 'Played',
+        secondaryValue: stats.unplayedGames,
+        secondaryLabel: 'Unplayed',
+        total: stats.totalGames,
+      ),
+    ));
+
+    if (stats.hasPlays) {
+      sections.add(_Section(
+        title: 'Play Activity',
+        child: Wrap(
+          spacing: 12,
+          runSpacing: 12,
+          children: [
+            StatTile(label: 'Total Plays', value: '${stats.totalPlays}'),
+            if (stats.totalMinutes > 0)
+              StatTile(
+                  label: 'Hours Played',
+                  value: '${(stats.totalMinutes / 60).round()}'),
+            StatTile(
+                label: 'Played in ${DateTime.now().year}',
+                value: '${stats.playsThisYear}'),
+            StatTile(label: 'Played Once', value: '${stats.playedOnce}'),
+            StatTile(label: 'Repeated', value: '${stats.playedRepeatedly}'),
+          ],
+        ),
+      ));
+    }
+
+    if (stats.mostPlayed.isNotEmpty) {
+      sections.add(_Section(
+        title: 'Most Played',
+        child: MechanicChips(
+          data: [
+            for (final m in stats.mostPlayed)
+              BarDatum(label: m.name, value: m.plays),
+          ],
+        ),
+      ));
+    }
+
+    if (stats.playsPerYear.isNotEmpty) {
+      sections.add(_Section(
+        title: 'Plays Per Year',
+        child: HorizontalBarChart(
+          data: [
+            for (final y in stats.playsPerYear)
+              BarDatum(label: '${y.year}', value: y.plays),
+          ],
+        ),
+      ));
+    }
   }
 
   List<BarDatum> _bucketData(List<DistributionBucket> buckets) => [

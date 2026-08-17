@@ -86,6 +86,22 @@ class AppModel extends ChangeNotifier {
 
   bool get playsLoaded => _playsLoaded;
 
+  /// The set of game ids in the primary player's collection, as loaded
+  /// alongside their plays. Empty until [loadPlays] has run.
+  Set<int> get collectionGameIds => _collectionGameIds;
+
+  @visibleForTesting
+  void setPlaysForTest({
+    required Map<int, PlayData> playsData,
+    required Set<int> collectionGameIds,
+    bool loaded = true,
+  }) {
+    _playsData = playsData;
+    _collectionGameIds = collectionGameIds;
+    _playsLoaded = loaded;
+    notifyListeners();
+  }
+
   /// The primary player's real name as recorded on their BGG plays, if any
   /// play lists them by [_primaryPlayer] as its username. Falls back to the
   /// username so callers always have something to show.

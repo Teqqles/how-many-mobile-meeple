@@ -342,24 +342,26 @@ class InsightsSummaryGrid extends StatelessWidget {
 
     final children = <Widget>[
       if (hasSplit)
-        _SplitDonut(
-          base: summary.baseGames!,
-          expansions: summary.expansions!,
+        SplitDonut(
+          primaryValue: summary.baseGames!,
+          primaryLabel: 'Base',
+          secondaryValue: summary.expansions!,
+          secondaryLabel: 'Expansions',
           total:
               summary.totalGames ?? (summary.baseGames! + summary.expansions!),
         )
       else if (summary.totalGames != null)
-        _StatTile(label: 'Games', value: '${summary.totalGames}'),
+        StatTile(label: 'Games', value: '${summary.totalGames}'),
       if (summary.averageRating != null)
-        _StatTile(
+        StatTile(
             label: 'Avg Rating',
             value: summary.averageRating!.toStringAsFixed(1)),
       if (summary.medianRating != null)
-        _StatTile(
+        StatTile(
             label: 'Median Rating',
             value: summary.medianRating!.toStringAsFixed(1)),
       if (summary.averageWeight != null)
-        _StatTile(
+        StatTile(
             label: 'Avg Weight',
             value: summary.averageWeight!.toStringAsFixed(1)),
     ];
@@ -373,25 +375,35 @@ class InsightsSummaryGrid extends StatelessWidget {
   }
 }
 
-/// A donut splitting the collection into base games and expansions, with the
-/// total in the centre and a colour-keyed legend alongside.
-class _SplitDonut extends StatelessWidget {
-  const _SplitDonut({
-    required this.base,
-    required this.expansions,
-    required this.total,
+/// A donut splitting a whole into two colour-keyed segments, with the total in
+/// the centre and a legend alongside. Used for base/expansions and
+/// played/unplayed splits.
+class SplitDonut extends StatelessWidget {
+  const SplitDonut({
+    super.key,
+    required this.primaryValue,
+    required this.primaryLabel,
+    required this.secondaryValue,
+    required this.secondaryLabel,
+    this.total,
+    this.centerLabel = 'Games',
   });
 
-  final int base;
-  final int expansions;
-  final int total;
+  final int primaryValue;
+  final String primaryLabel;
+  final int secondaryValue;
+  final String secondaryLabel;
+
+  /// Number shown in the centre; defaults to the sum of the two segments.
+  final int? total;
+  final String centerLabel;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final baseColor = theme.colorScheme.primary;
-    final expansionColor = theme.colorScheme.tertiary;
-    final denom = base + expansions;
+    final primaryColor = theme.colorScheme.primary;
+    final secondaryColor = theme.colorScheme.tertiary;
+    final denom = primaryValue + secondaryValue;
 
     return Row(
       mainAxisSize: MainAxisSize.min,
@@ -401,23 +413,23 @@ class _SplitDonut extends StatelessWidget {
           height: 96,
           child: CustomPaint(
             painter: _DonutPainter(
-              baseFraction: denom == 0 ? 0.0 : base / denom,
-              baseColor: baseColor,
-              expansionColor: expansionColor,
+              baseFraction: denom == 0 ? 0.0 : primaryValue / denom,
+              baseColor: primaryColor,
+              expansionColor: secondaryColor,
             ),
             child: Center(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    '$total',
+                    '${total ?? denom}',
                     style: theme.textTheme.titleLarge?.copyWith(
                       fontWeight: FontWeight.bold,
                       color: theme.colorScheme.onSurface,
                     ),
                   ),
                   Text(
-                    'Games',
+                    centerLabel,
                     style: theme.textTheme.labelSmall?.copyWith(
                       color: theme.colorScheme.onSurfaceVariant,
                     ),
@@ -432,12 +444,15 @@ class _SplitDonut extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _LegendRow(color: baseColor, label: 'Base', value: '$base'),
+            _LegendRow(
+                color: primaryColor,
+                label: primaryLabel,
+                value: '$primaryValue'),
             const SizedBox(height: 6),
             _LegendRow(
-                color: expansionColor,
-                label: 'Expansions',
-                value: '$expansions'),
+                color: secondaryColor,
+                label: secondaryLabel,
+                value: '$secondaryValue'),
           ],
         ),
       ],
@@ -528,8 +543,10 @@ class _DonutPainter extends CustomPainter {
       old.expansionColor != expansionColor;
 }
 
-class _StatTile extends StatelessWidget {
-  const _StatTile({required this.label, required this.value});
+/// A headline figure tile: a bold value over a label, boxed in a
+/// primary-tinted container.
+class StatTile extends StatelessWidget {
+  const StatTile({super.key, required this.label, required this.value});
 
   final String label;
   final String value;

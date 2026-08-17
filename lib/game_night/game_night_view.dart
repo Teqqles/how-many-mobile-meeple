@@ -45,6 +45,13 @@ class _GameNightViewState extends State<GameNightView> {
     _regenerate();
   }
 
+  @override
+  void didUpdateWidget(GameNightView oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // A fresh fetch (e.g. after a source change) hands us a new pool list.
+    if (!identical(oldWidget.pool, widget.pool)) _regenerate();
+  }
+
   void _regenerate() {
     setState(() {
       _lineup = widget.planner.plan(

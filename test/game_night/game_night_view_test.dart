@@ -82,6 +82,23 @@ void main() {
     expect(find.text('2-4 players'), findsWidgets);
   });
 
+  testWidgets('re-plans when a new pool arrives', (tester) async {
+    final model = AppModel();
+    await tester.pumpWidget(_wrap(model));
+    expect(find.text('Epic'), findsOneWidget);
+
+    await tester.pumpWidget(
+      _wrap(
+        model,
+        pool: [_game(8, 'Warmup', 20, 2.0), _game(9, 'Titan', 150, 3.0)],
+      ),
+    );
+    await tester.pump();
+
+    expect(find.text('Titan'), findsOneWidget);
+    expect(find.text('Epic'), findsNothing);
+  });
+
   testWidgets('pinning a slot marks it pinned', (tester) async {
     await tester.pumpWidget(_wrap(AppModel()));
 

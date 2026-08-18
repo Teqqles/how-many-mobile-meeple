@@ -159,14 +159,19 @@ class GameNightPlanner {
   bool _matchesMechanic(Game game, String? mechanic) =>
       mechanic == null || game.mechanics.contains(mechanic);
 
+  /// A game still eligible for a slot: not already placed, has a real playtime,
+  /// and carries any required mechanic. Each picker adds its own constraints.
+  bool _isAvailable(Game game, Set<int> used, String? mechanic) =>
+      !used.contains(game.id) &&
+      game.maxPlaytime > 0 &&
+      _matchesMechanic(game, mechanic);
+
   Game? _pickFiller(List<Game> pool, Set<int> used, String? mechanic) {
     final candidates = pool
         .where(
           (g) =>
-              !used.contains(g.id) &&
-              g.maxPlaytime > 0 &&
-              g.maxPlaytime <= fillerMaxMinutes &&
-              _matchesMechanic(g, mechanic),
+              _isAvailable(g, used, mechanic) &&
+              g.maxPlaytime <= fillerMaxMinutes,
         )
         .toList();
     return _choose(candidates);
@@ -179,13 +184,7 @@ class GameNightPlanner {
     String? mechanic,
   ) {
     final fitting = pool
-        .where(
-          (g) =>
-              !used.contains(g.id) &&
-              g.maxPlaytime > 0 &&
-              _cost(g) <= remaining &&
-              _matchesMechanic(g, mechanic),
-        )
+        .where((g) => _isAvailable(g, used, mechanic) && _cost(g) <= remaining)
         .toList();
     if (fitting.isEmpty) return null;
 
@@ -214,11 +213,9 @@ class GameNightPlanner {
     final similar = pool
         .where(
           (g) =>
-              !used.contains(g.id) &&
-              g.maxPlaytime > 0 &&
+              _isAvailable(g, used, mechanic) &&
               _cost(g) <= remaining &&
-              (g.maxPlaytime - main.maxPlaytime).abs() <= tolerance &&
-              _matchesMechanic(g, mechanic),
+              (g.maxPlaytime - main.maxPlaytime).abs() <= tolerance,
         )
         .toList();
     if (similar.isEmpty) return null;
@@ -247,11 +244,9 @@ class GameNightPlanner {
     final candidates = pool
         .where(
           (g) =>
-              !used.contains(g.id) &&
-              g.maxPlaytime > 0 &&
+              _isAvailable(g, used, mechanic) &&
               g.maxPlaytime <= fillerMaxMinutes &&
-              _cost(g) <= remaining &&
-              _matchesMechanic(g, mechanic),
+              _cost(g) <= remaining,
         )
         .toList();
     final closer = _choose(candidates);
@@ -260,13 +255,7 @@ class GameNightPlanner {
     // No short closer fits: offer a well-played game that still fits - fast to
     // set up for a few quick rounds.
     final fallback = pool
-        .where(
-          (g) =>
-              !used.contains(g.id) &&
-              g.maxPlaytime > 0 &&
-              _cost(g) <= remaining &&
-              _matchesMechanic(g, mechanic),
-        )
+        .where((g) => _isAvailable(g, used, mechanic) && _cost(g) <= remaining)
         .toList();
     return _pickReplayable(fallback);
   }

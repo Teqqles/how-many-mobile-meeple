@@ -64,9 +64,10 @@ class GameNightPermalink {
 /// Pure and dependency-free: selection among equally valid candidates goes
 /// through [_pick], which tests override for deterministic results.
 class GameNightPlanner {
-  /// A filler is a short game played while waiting or warming up. The ceiling
-  /// is inclusive so common 30-minute fillers qualify.
-  static const int fillerMaxMinutes = 30;
+  /// A filler is a short game played while waiting or warming up, and the same
+  /// ceiling bounds the wind-down outro. Inclusive, so a 45-minute game still
+  /// qualifies as a light opener or closer.
+  static const int fillerMaxMinutes = 45;
 
   /// The main can be any fitting game whose playtime is at least this fraction
   /// of the longest fitting game, so regenerate varies the centrepiece instead

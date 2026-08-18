@@ -37,6 +37,15 @@ void main() {
       expect(lineup.filler!.id, 1);
     });
 
+    test('a 45-minute game still qualifies as a filler', () {
+      final lineup = _planner().plan(
+        pool: [_game(1, 45), _game(2, 90)],
+        durationMinutes: 180,
+      );
+
+      expect(lineup.filler!.id, 1);
+    });
+
     test('picks the longest fitting game as the main', () {
       final lineup = _planner().plan(
         pool: [_game(1, 15), _game(2, 60), _game(3, 120), _game(4, 400)],

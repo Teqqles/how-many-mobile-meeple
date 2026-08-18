@@ -19,6 +19,18 @@ class GameRequest {
     return GameRequest(items: snapshot, headers: headers);
   }
 
+  /// Returns a copy that also asks the API to return [field] in each game,
+  /// appending it to the field whitelist. Used by the game night to fetch
+  /// `mechanics`, which the default collection request omits.
+  GameRequest withWhitelistField(String field) {
+    final header = Settings.fieldsToReturnFromApi.header!;
+    final current = headers[header];
+    if (current == null || current.split(',').contains(field)) return this;
+    final extended = Map<String, String>.from(headers)
+      ..[header] = '$current,$field';
+    return GameRequest(items: items, headers: extended);
+  }
+
   String get _headersKey {
     final sorted = headers.entries.map((e) => '${e.key}=${e.value}').toList()
       ..sort();

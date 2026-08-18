@@ -82,6 +82,44 @@ class Settings {
     enabled: true,
   );
 
+  static Setting gameNightMode = Setting(
+    "gameNightMode",
+    value: false,
+    enabled: true,
+  );
+
+  static Setting gameNightDurationMinutes = Setting(
+    "gameNightDurationMinutes",
+    value: 180,
+    enabled: true,
+  );
+
+  /// Carries a shared lineup's game ids in a permalink (see GameNightPermalink).
+  /// Disabled by default so it rides along only in a deliberately shared link,
+  /// never in a normal request or the everyday URL.
+  static Setting gameNightLineup = Setting(
+    "gameNightLineup",
+    value: "",
+    enabled: false,
+  );
+
+  /// The only pool filter a game night applies. Disabled means "any player
+  /// count", so the evening starts from the whole collection - the guided-flow
+  /// filters the user set for one-game picks never leak in.
+  static Setting gameNightPlayerCount = Setting(
+    "gameNightPlayerCount",
+    value: 4,
+    enabled: false,
+  );
+
+  /// Whether a long evening ends with a wind-down "outro" game. On by default;
+  /// the outro only appears above the planner's long-night threshold anyway.
+  static Setting gameNightOutro = Setting(
+    "gameNightOutro",
+    value: true,
+    enabled: true,
+  );
+
   static Settings defaultSettings() => Settings(
     Map.from({
       Settings.fieldsToReturnFromApi.name: Settings.fieldsToReturnFromApi
@@ -106,6 +144,12 @@ class Settings {
           .clone(),
       Settings.preferAdvancedMode.name: Settings.preferAdvancedMode.clone(),
       Settings.themeMode.name: Settings.themeMode.clone(),
+      Settings.gameNightMode.name: Settings.gameNightMode.clone(),
+      Settings.gameNightDurationMinutes.name: Settings.gameNightDurationMinutes
+          .clone(),
+      Settings.gameNightLineup.name: Settings.gameNightLineup.clone(),
+      Settings.gameNightPlayerCount.name: Settings.gameNightPlayerCount.clone(),
+      Settings.gameNightOutro.name: Settings.gameNightOutro.clone(),
     }),
   );
 

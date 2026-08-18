@@ -7,6 +7,7 @@ import 'package:how_many_mobile_meeple/model/collection_analytics.dart';
 import 'package:how_many_mobile_meeple/api/http_retry_client.dart';
 import 'package:how_many_mobile_meeple/api/plays_service.dart';
 import 'package:how_many_mobile_meeple/model/filter_seeder.dart';
+import 'package:how_many_mobile_meeple/model/game_night.dart';
 import 'package:how_many_mobile_meeple/model/play_data.dart';
 import 'package:how_many_mobile_meeple/play_log/play_log_service.dart';
 import 'package:how_many_mobile_meeple/platform/web/url_fragment_extractor.dart';
@@ -22,6 +23,7 @@ import 'package:how_many_mobile_meeple/model/app_preferences.dart';
 import 'package:how_many_mobile_meeple/model/bgg_cache.dart';
 import 'package:how_many_mobile_meeple/model/game_request.dart';
 import 'package:how_many_mobile_meeple/model/item.dart';
+import 'package:how_many_mobile_meeple/model/setting.dart';
 
 import '../api/prefetch_service.dart';
 import '../app_common.dart';
@@ -200,6 +202,12 @@ class AppModel extends ChangeNotifier {
   @visibleForTesting
   void setCollectionAnalyticsForTest(CollectionAnalytics? analytics) {
     _collectionAnalytics = analytics;
+    notifyListeners();
+  }
+
+  @visibleForTesting
+  void setGamesForTest(Games games) {
+    _bggCache = BggCache(games, _defaultCacheDurationInMinutes);
     notifyListeners();
   }
 
@@ -446,6 +454,45 @@ class AppModel extends ChangeNotifier {
   }
 
   GameRequest buildRequest() => GameRequest.from(_settings, _items);
+
+  /// The pool for a game night starts from the whole collection: the guided
+  /// flow's filters (duration, complexity, mechanics, rating) belong to one-game
+  /// picks the user configured there, never to a game night, so none of them
+  /// carry over. The evening budget governs playtime, and the only pool filter
+  /// is an explicit game-night player count when the user sets one. Mechanics
+  /// ride along in the payload so a slot can filter on mechanic locally.
+  GameRequest buildGameNightRequest() {
+    final settings = Settings.defaultSettings();
+    final players = _settings.setting(Settings.gameNightPlayerCount.name);
+    if (players.enabled) {
+      final applied = Setting(
+        Settings.filterNumberOfPlayers.name,
+        header: Settings.filterNumberOfPlayers.header,
+        value: players.getInt(),
+        enabled: true,
+      );
+      settings.updateSetting(applied);
+    }
+    return GameRequest.from(settings, _items).withWhitelistField('mechanics');
+  }
+
+  /// A clone of the current settings tuned for a shareable Game Night link:
+  /// Game Night mode on and the chosen [lineup] encoded, so a recipient lands
+  /// on the same collection, evening length, and exact games. The live settings
+  /// are untouched - the clone only shapes the permalink.
+  Settings gameNightPermalinkSettings(GameNightLineup lineup) {
+    final settings = _settings.clone();
+    final mode = settings.setting(Settings.gameNightMode.name).clone()
+      ..value = true
+      ..enabled = true;
+    settings.updateSetting(mode);
+    final encodedLineup =
+        settings.setting(Settings.gameNightLineup.name).clone()
+          ..value = GameNightPermalink.encode(lineup)
+          ..enabled = true;
+    settings.updateSetting(encodedLineup);
+    return settings;
+  }
 
   void invalidateCache() {
     _bggCache.makeStale();

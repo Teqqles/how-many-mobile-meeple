@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:how_many_mobile_meeple/model/model.dart';
+import 'package:how_many_mobile_meeple/model/settings.dart';
+import 'package:how_many_mobile_meeple/game_night/game_night_content.dart';
 import 'package:how_many_mobile_meeple/how_many_meeple_app_bar.dart';
 import 'package:how_many_mobile_meeple/app_common.dart';
 import 'package:how_many_mobile_meeple/app_page.dart';
@@ -36,6 +38,7 @@ class GuidedFlowHomePage extends StatefulWidget with AppPage {
 class _GuidedFlowHomePageState extends State<GuidedFlowHomePage> {
   int _currentStep = 0;
   bool _showAdvancedMode = false;
+  bool _showGameNight = false;
 
   final int _totalSteps = 5;
 
@@ -66,6 +69,47 @@ class _GuidedFlowHomePageState extends State<GuidedFlowHomePage> {
     }
   }
 
+  void _syncGameNightMode(AppModel model) {
+    final value = model.settings.setting(Settings.gameNightMode.name).getBool();
+    if (value != _showGameNight) {
+      WidgetsBinding.instance.addPostFrameCallback(
+        (_) => setState(() => _showGameNight = value),
+      );
+    }
+  }
+
+  void _setGameNightMode(AppModel model, bool value) {
+    final setting = model.settings.setting(Settings.gameNightMode.name);
+    setting.value = value;
+    setting.enabled = true;
+    model.settings.updateSetting(setting);
+    model.updateStore();
+    setState(() => _showGameNight = value);
+  }
+
+  Widget _buildModeToggle(BuildContext context, AppModel model) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+      child: SegmentedButton<bool>(
+        segments: const [
+          ButtonSegment(
+            value: false,
+            label: Text('One Game'),
+            icon: Icon(Icons.casino),
+          ),
+          ButtonSegment(
+            value: true,
+            label: Text('Game Night'),
+            icon: Icon(Icons.event),
+          ),
+        ],
+        selected: {_showGameNight},
+        onSelectionChanged: (selection) =>
+            _setGameNightMode(model, selection.first),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Consumer<AppModel>(
@@ -76,11 +120,12 @@ class _GuidedFlowHomePageState extends State<GuidedFlowHomePage> {
         }
 
         _syncAdvancedMode(model);
+        _syncGameNightMode(model);
 
         return Scaffold(
           appBar: HowManyMeepleAppBar(
             AppCommon.optionsPageTitle,
-            hasSaveDialog: _showAdvancedMode,
+            hasSaveDialog: _showAdvancedMode && !_showGameNight,
             isHomePage: true,
             helpSection: 'home',
             model: model,
@@ -93,21 +138,26 @@ class _GuidedFlowHomePageState extends State<GuidedFlowHomePage> {
             children: [
               const PwaUpdateBanner(),
               const PwaInstallBanner(),
-              Expanded(
-                child: _showAdvancedMode
-                    ? _buildAdvancedMode(context)
-                    : _buildGuidedFlow(context),
-              ),
+              _buildModeToggle(context, model),
+              Expanded(child: _buildModeBody(context, model)),
             ],
           ),
           bottomNavigationBar: _buildFooter(context),
           persistentFooterButtons:
-              !_showAdvancedMode && _currentStep == _totalSteps - 1
+              !_showGameNight &&
+                  !_showAdvancedMode &&
+                  _currentStep == _totalSteps - 1
               ? [widget.iconButtonGroup(context)]
               : null,
         );
       },
     );
+  }
+
+  Widget _buildModeBody(BuildContext context, AppModel model) {
+    if (_showGameNight) return GameNightContent(model: model);
+    if (_showAdvancedMode) return _buildAdvancedMode(context);
+    return _buildGuidedFlow(context);
   }
 
   Widget _buildFeatureDrawer() {

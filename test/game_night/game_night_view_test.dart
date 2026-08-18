@@ -1,9 +1,12 @@
 @Tags(['widget'])
 library;
 
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:how_many_mobile_meeple/favourites/favourite_game.dart';
+import 'package:how_many_mobile_meeple/favourites/favourites_service.dart';
 import 'package:how_many_mobile_meeple/favourites/ignored_games_service.dart';
 import 'package:how_many_mobile_meeple/game_night/game_night_view.dart';
 import 'package:how_many_mobile_meeple/model/game.dart';
@@ -59,7 +62,10 @@ Widget _wrap(AppModel model, {List<Game>? pool}) => MaterialApp(
 
 void main() {
   setUp(() => SharedPreferences.setMockInitialValues({}));
-  tearDown(IgnoredGamesService.resetForTesting);
+  tearDown(() {
+    IgnoredGamesService.resetForTesting();
+    FavouritesService.resetForTesting();
+  });
 
   testWidgets('fills filler, main and backup from the pool', (tester) async {
     await tester.pumpWidget(_wrap(AppModel()));
@@ -266,6 +272,26 @@ void main() {
 
     // Epic is the longest fitting game, but it is ignored, so the shorter Alt
     // takes the main slot instead and Epic never appears.
+    expect(find.text('Epic'), findsNothing);
+    expect(find.text('Alt'), findsOneWidget);
+  });
+
+  testWidgets('loads the ignored list when Game Night opens first', (
+    tester,
+  ) async {
+    // The ignored list is cold - nothing has loaded it yet - but the store
+    // already holds Epic as ignored.
+    SharedPreferences.setMockInitialValues({
+      'ignored_games': jsonEncode([
+        {'id': 2, 'name': 'Epic', 'thumbnail': null},
+      ]),
+    });
+
+    await tester.pumpWidget(_wrap(AppModel()));
+    await tester.pumpAndSettle();
+
+    // Once the list loads the view re-plans, so Epic drops out and the shorter
+    // Alt takes the main slot.
     expect(find.text('Epic'), findsNothing);
     expect(find.text('Alt'), findsOneWidget);
   });

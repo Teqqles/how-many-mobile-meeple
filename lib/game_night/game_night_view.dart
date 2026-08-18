@@ -110,7 +110,22 @@ class _GameNightViewState extends State<GameNightView> {
   void initState() {
     super.initState();
     _restoreSharedLineup();
+    _ensureListsLoaded();
     _regenerate();
+  }
+
+  /// The ignored and favourites lists are lazily cached on first use elsewhere,
+  /// so they may be unloaded when Game Night opens first. Load them and re-plan
+  /// once ready, otherwise ignored games leak in and favourites carry no weight.
+  void _ensureListsLoaded() {
+    if (IgnoredGamesService.cached != null &&
+        FavouritesService.cached != null) {
+      return;
+    }
+    Future.wait([IgnoredGamesService.instance(), FavouritesService.instance()])
+        .then((_) {
+          if (mounted) _regenerate();
+        });
   }
 
   /// Pins the games carried by a shared permalink so the recipient sees the

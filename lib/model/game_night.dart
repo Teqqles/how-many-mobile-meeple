@@ -64,53 +64,42 @@ class GameNightPermalink {
 /// Pure and dependency-free: selection among equally valid candidates goes
 /// through [_pick], which tests override for deterministic results.
 class GameNightPlanner {
-  /// A filler is a short game played while waiting or warming up, and the same
-  /// ceiling bounds the wind-down outro. Inclusive, so a 45-minute game still
-  /// qualifies as a light opener or closer.
+  /// Playtime ceiling for a filler or the wind-down outro. Inclusive.
   static const int fillerMaxMinutes = 45;
 
-  /// The main can be any fitting game whose playtime is at least this fraction
-  /// of the longest fitting game, so regenerate varies the centrepiece instead
-  /// of always returning the single longest title.
+  /// The main must be at least this fraction of the longest fitting game, so
+  /// regenerate varies the centrepiece instead of always the longest title.
   static const double mainLengthTolerance = 0.7;
 
-  /// The outro is a wind-down closer, only worth suggesting once the evening is
-  /// long enough that the filler and main will not fill it. Offered only above
-  /// this budget, and only when a short game still fits the leftover time.
+  /// Suggest an outro only past this budget, and only when a short game still
+  /// fits the leftover time.
   static const int outroMinDurationMinutes = 120;
 
-  /// How many times a favourite game enters the weighted draw. A favourite is
-  /// this many times more likely to be picked than an equally valid non-
-  /// favourite - a nudge, not a guarantee.
+  /// Draw entries per favourite: this many times likelier than an equal
+  /// non-favourite - a nudge, not a guarantee.
   static const int favouriteWeight = 3;
 
-  /// Minutes reserved around each game for setup, teardown and a breather
-  /// before the next one, scaled by weight. Light games teach and reset fast;
-  /// heavy ones need longer. Added to a game's playtime so the whole evening -
-  /// play plus these gaps - fits inside the budget.
+  /// Setup/teardown minutes reserved around a game, by weight, charged against
+  /// the budget alongside its playtime.
   static const int lightOverheadMinutes = 5;
   static const int mediumOverheadMinutes = 10;
   static const int heavyOverheadMinutes = 15;
 
   final int Function(int count) _pick;
 
-  /// Ids of the user's favourite games, weighted up in every draw for the
-  /// lifetime of a single [plan] call.
+  /// Favourite ids, weighted up in every draw for one [plan] call.
   Set<int> _favourites = const {};
 
-  /// Play counts by game id, used only to break the empty-slot fallback toward
-  /// games the group plays often. Empty when play history has not loaded, in
-  /// which case the fallback prefers the shortest game as the easiest replay.
+  /// Play counts by game id; break the empty-slot fallback toward well-played
+  /// games. Empty until plays load, when the fallback falls back on length.
   Map<int, int> _playCounts = const {};
 
   GameNightPlanner({int Function(int count)? pick})
     : _pick = pick ?? ((count) => Random().nextInt(count));
 
-  /// Fills the unpinned slots from [pool] within [durationMinutes].
-  ///
-  /// Pinned games are kept in their slot and never reused elsewhere. The
-  /// filler plus the main game must fit the budget; the backup is an
-  /// alternative to the main, so it does not add to the total playtime.
+  /// Fills the unpinned slots from [pool] within [durationMinutes]. Pinned
+  /// games stay put and are never reused. Filler plus main must fit the
+  /// budget; the backup is an alternative to the main, so it adds no time.
   GameNightLineup plan({
     required List<Game> pool,
     required int durationMinutes,
@@ -145,8 +134,7 @@ class GameNightPlanner {
           slotMechanics[GameNightSlot.backup],
         );
 
-    // The backup is an alternative to the main, so it is not "used" against the
-    // outro - either the main or the backup is played, never both.
+    // Backup is an alternative to the main, so it is not used against the outro.
     final outro = !includeOutro
         ? null
         : pinned[GameNightSlot.outro] ??
@@ -167,8 +155,7 @@ class GameNightPlanner {
     );
   }
 
-  /// A slot's mechanic quick-pick narrows its candidates to games carrying that
-  /// mechanic; null means the slot draws from the whole pool.
+  /// Narrows candidates to games carrying [mechanic]; null draws from the pool.
   bool _matchesMechanic(Game game, String? mechanic) =>
       mechanic == null || game.mechanics.contains(mechanic);
 
@@ -202,9 +189,8 @@ class GameNightPlanner {
         .toList();
     if (fitting.isEmpty) return null;
 
-    // The centrepiece is a long game, but not rigidly the single longest -
-    // any game within a band below the longest is a fair candidate so
-    // regenerate can offer variety instead of always the same top game.
+    // A long game, but not rigidly the longest - anything within a band of the
+    // longest counts, so regenerate can vary the centrepiece.
     final longest = fitting
         .map((g) => g.maxPlaytime)
         .reduce((a, b) => a > b ? a : b);
@@ -237,8 +223,8 @@ class GameNightPlanner {
         .toList();
     if (similar.isEmpty) return null;
 
-    // Prefer a backup in a different complexity band so it feels like a real
-    // alternative; fall back to any similarly timed game.
+    // Prefer a different complexity band so the backup feels like a real
+    // alternative; else any similar-length game.
     final mainBand = _weightBand(main.averageWeight);
     final contrasting = similar
         .where((g) => _weightBand(g.averageWeight) != mainBand)
@@ -254,8 +240,7 @@ class GameNightPlanner {
     Game? main,
     String? mechanic,
   ) {
-    // A closer only makes sense on a long night, once the main is set and time
-    // is left over to play it in.
+    // A closer needs a long night, a set main, and leftover time to play it.
     if (durationMinutes <= outroMinDurationMinutes || main == null) return null;
     final remaining = remainingAfterFiller - _cost(main);
 
@@ -272,9 +257,8 @@ class GameNightPlanner {
     final closer = _choose(candidates);
     if (closer != null) return closer;
 
-    // No short closer fits the leftover time. Rather than leave the slot
-    // empty, offer a game the group plays often that still fits - it sets up
-    // fast and suits a few quick rounds to round off the night.
+    // No short closer fits: offer a well-played game that still fits - fast to
+    // set up for a few quick rounds.
     final fallback = pool
         .where(
           (g) =>
@@ -287,9 +271,8 @@ class GameNightPlanner {
     return _pickReplayable(fallback);
   }
 
-  /// Picks the game the group plays most from [candidates]; with no play
-  /// history the shortest game wins, as a shorter game is the easiest to set
-  /// up again for another round. Returns null when there is nothing to pick.
+  /// Most-played game in [candidates]; with no play history the shortest wins,
+  /// as it is the easiest to replay. Null when empty.
   Game? _pickReplayable(List<Game> candidates) {
     if (candidates.isEmpty) return null;
 
@@ -309,9 +292,8 @@ class GameNightPlanner {
     return weighted[_pick(weighted.length)];
   }
 
-  /// Repeats each favourite candidate so it fills more of the draw, giving it a
-  /// better chance without ever excluding the rest of the pool. Order is kept,
-  /// so a deterministic [_pick] of 0 still lands on the first candidate.
+  /// Repeats each favourite in the draw list to boost it without excluding
+  /// others. Order is kept, so [_pick] 0 still lands on the first candidate.
   List<Game> _weightFavourites(List<Game> candidates) {
     if (_favourites.isEmpty) return candidates;
     final weighted = <Game>[];
@@ -324,14 +306,12 @@ class GameNightPlanner {
     return weighted;
   }
 
-  /// A game's total demand on the evening: its playtime plus the setup,
-  /// teardown and breather reserved around it. Null (an unfilled slot) costs
-  /// nothing.
+  /// Playtime plus reserved overhead. An unfilled slot costs nothing.
   int _cost(Game? game) =>
       game == null ? 0 : game.maxPlaytime + overheadFor(game);
 
-  /// Minutes reserved around [game] for setup, teardown and a breather, scaled
-  /// by its weight. The view shows this as the changeover between sections.
+  /// Setup/teardown minutes for [game] by weight; the view shows this as the
+  /// changeover between sections.
   static int overheadFor(Game game) =>
       switch (_weightBand(game.averageWeight)) {
         0 => lightOverheadMinutes,
@@ -339,9 +319,8 @@ class GameNightPlanner {
         _ => heavyOverheadMinutes,
       };
 
-  /// Minutes left unscheduled once every played game and its overhead is
-  /// subtracted from [durationMinutes]. Negative is clamped to zero. The backup
-  /// is an alternative to the main, so it never counts against the evening.
+  /// Budget minus every played game and its overhead, clamped at zero. The
+  /// backup is an alternative to the main, so it never counts.
   static int spareMinutes({
     required int durationMinutes,
     Game? filler,

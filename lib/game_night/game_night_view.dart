@@ -10,10 +10,9 @@ import 'package:how_many_mobile_meeple/model/settings.dart';
 import 'package:how_many_mobile_meeple/platform/router.dart' as r;
 import 'package:share_plus/share_plus.dart';
 
-/// Recommends a full evening's lineup - a filler, a main game and a backup -
-/// from a pool of games within a chosen time budget. The user can pin any slot
-/// and regenerate the rest. The optional expansion slot is deferred until the
-/// backend exposes expansion relationships (issue #119).
+/// Recommends an evening's lineup - filler, main and backup - from a pool
+/// within a time budget. Any slot can be pinned and the rest regenerated.
+/// Expansion slot deferred until the backend exposes expansions (issue #119).
 class GameNightView extends StatefulWidget {
   final AppModel model;
   final List<Game> pool;
@@ -52,9 +51,8 @@ class _GameNightViewState extends State<GameNightView> {
       .setting(Settings.gameNightDurationMinutes.name)
       .getInt();
 
-  /// The chosen game-night player count, or null for "any". Null starts the
-  /// pool from the whole collection; a value narrows it to games that seat
-  /// that many players.
+  /// Chosen player count, or null for "any". A value narrows the pool to games
+  /// that seat that many players; null keeps the whole collection.
   int? get _playerCount {
     final setting = widget.model.settings.setting(
       Settings.gameNightPlayerCount.name,
@@ -62,18 +60,17 @@ class _GameNightViewState extends State<GameNightView> {
     return setting.enabled ? setting.getInt() : null;
   }
 
-  /// The outro is only relevant on a long night; the toggle and slot stay
-  /// hidden below the planner's threshold.
+  /// Outro only matters on a long night; toggle and slot stay hidden below the
+  /// planner's threshold.
   bool get _outroApplies =>
       _durationMinutes > GameNightPlanner.outroMinDurationMinutes;
 
   bool get _includeOutro =>
       widget.model.settings.setting(Settings.gameNightOutro.name).getBool();
 
-  /// The pool the planner draws from: ignored games are never suggested, and
-  /// the play-history filter narrows it further. Filtering by plays needs the
-  /// play counts, so it only applies once plays have loaded; otherwise every
-  /// game would look unplayed.
+  /// The pool the planner draws from: ignored games dropped, then the
+  /// play-history filter applied. That filter waits for plays to load, else
+  /// every game looks unplayed.
   List<Game> get _effectivePool {
     final pool = _withoutIgnored(widget.pool);
     if (_playFilter == _PlayFilter.all || !widget.model.playsLoaded) {
@@ -91,9 +88,8 @@ class _GameNightViewState extends State<GameNightView> {
     return games.where((g) => !ignored.contains(g.id)).toList();
   }
 
-  /// Mechanics available in the pool, most common first. Sourced from the pool
-  /// itself (the game-night fetch whitelists `mechanics`) so every option is
-  /// guaranteed to match at least one game.
+  /// Mechanics present in the pool, most common first, so every option matches
+  /// at least one game. The game-night fetch whitelists `mechanics`.
   List<String> get _poolMechanics {
     final counts = <String, int>{};
     for (final game in widget.pool) {
@@ -114,9 +110,9 @@ class _GameNightViewState extends State<GameNightView> {
     _regenerate();
   }
 
-  /// The ignored and favourites lists are lazily cached on first use elsewhere,
-  /// so they may be unloaded when Game Night opens first. Load them and re-plan
-  /// once ready, otherwise ignored games leak in and favourites carry no weight.
+  /// Ignored and favourites lists cache lazily elsewhere, so may be unloaded
+  /// when Game Night opens first. Load them and re-plan, else ignored games
+  /// leak in and favourites carry no weight.
   void _ensureListsLoaded() {
     if (IgnoredGamesService.cached != null &&
         FavouritesService.cached != null) {
@@ -128,10 +124,10 @@ class _GameNightViewState extends State<GameNightView> {
         });
   }
 
-  /// Pins the games carried by a shared permalink so the recipient sees the
-  /// exact lineup, then consumes the token so it neither persists nor re-pins
-  /// on later visits. Any game the shared collection no longer contains is
-  /// skipped, leaving that slot to regenerate normally.
+  /// Pins the games a shared permalink carries so the recipient sees the exact
+  /// lineup, then consumes the token so it neither persists nor re-pins later.
+  /// A game the collection no longer holds is skipped, leaving its slot to
+  /// regenerate.
   void _restoreSharedLineup() {
     final setting = widget.model.settings.setting(
       Settings.gameNightLineup.name,
@@ -210,8 +206,8 @@ class _GameNightViewState extends State<GameNightView> {
     return favourites.games.map((g) => g.id).toSet();
   }
 
-  /// Play counts for the pool, used to fill an empty slot with a well-played
-  /// game. Empty until plays have loaded, so the planner falls back on length.
+  /// Pool play counts, used to fill an empty slot with a well-played game.
+  /// Empty until plays load, so the planner then falls back on length.
   Map<int, int> get _playCounts {
     if (!widget.model.playsLoaded) return const {};
     return {
@@ -220,8 +216,8 @@ class _GameNightViewState extends State<GameNightView> {
     };
   }
 
-  /// The outro plays from the pool already in hand, so toggling it re-plans
-  /// locally; the choice is persisted so it sticks across visits.
+  /// Outro draws from the pool in hand, so toggling re-plans locally; the
+  /// choice is persisted so it sticks across visits.
   void _setIncludeOutro(bool enabled) {
     final setting = widget.model.settings.setting(Settings.gameNightOutro.name)
       ..value = enabled
@@ -231,8 +227,8 @@ class _GameNightViewState extends State<GameNightView> {
     _regenerate();
   }
 
-  /// Filtering a slot by mechanic works on the pool already in hand, so it
-  /// re-plans locally without a refetch.
+  /// Slot mechanic filters the pool in hand, so it re-plans locally without a
+  /// refetch.
   void _setSlotMechanic(GameNightSlot slot, String? mechanic) {
     if (mechanic == null) {
       _slotMechanics.remove(slot);
@@ -248,9 +244,8 @@ class _GameNightViewState extends State<GameNightView> {
     _regenerate();
   }
 
-  /// Changing the player count reshapes the fetched pool, so it writes the
-  /// setting and lets the store update trigger a refetch; the new pool then
-  /// re-plans the lineup through didUpdateWidget.
+  /// Player count reshapes the fetched pool: write the setting, let the store
+  /// update trigger a refetch, and the new pool re-plans via didUpdateWidget.
   void _setPlayerCount(int? count) {
     final setting = widget.model.settings.setting(
       Settings.gameNightPlayerCount.name,
@@ -537,9 +532,8 @@ class _GameNightViewState extends State<GameNightView> {
     );
   }
 
-  /// The changeover between two played sections: the setup, teardown and
-  /// breather reserved before [next] is played, so the gaps in the evening are
-  /// visible rather than hidden inside the budget.
+  /// Setup, teardown and breather reserved before [next], so the evening's gaps
+  /// are visible rather than hidden inside the budget.
   Widget _buildChangeover(BuildContext context, GameNightSlot slot, Game next) {
     final minutes = GameNightPlanner.overheadFor(next);
     final color = Theme.of(context).colorScheme.onSurfaceVariant;
@@ -561,8 +555,8 @@ class _GameNightViewState extends State<GameNightView> {
     );
   }
 
-  /// The unscheduled time left after every played game and its changeover, so
-  /// it is clear how much breathing room the evening has.
+  /// Time left after every played game and its changeover - the evening's
+  /// breathing room.
   Widget _buildSpareSummary(BuildContext context) {
     if (_lineup.filler == null && _lineup.main == null) {
       return const SizedBox.shrink();
@@ -595,8 +589,8 @@ class _GameNightViewState extends State<GameNightView> {
     );
   }
 
-  /// A compact per-slot mechanic quick-pick. Hidden until the pool carries
-  /// mechanics, so it degrades gracefully when the field is unavailable.
+  /// Compact per-slot mechanic quick-pick, hidden until the pool carries
+  /// mechanics so it degrades gracefully when the field is absent.
   Widget _buildSlotMechanic(BuildContext context, GameNightSlot slot) {
     final options = _poolMechanics;
     if (options.isEmpty) return const SizedBox.shrink();
@@ -730,6 +724,6 @@ class _DurationPreset {
   const _DurationPreset(this.label, this.minutes);
 }
 
-/// Filters the pool by whether the primary player has logged plays of a game,
-/// so an evening can favour familiar games for teaching or fresh ones to try.
+/// Filters the pool by whether the primary player has logged plays, so an
+/// evening can favour familiar games or fresh ones to try.
 enum _PlayFilter { all, unplayed, played }

@@ -40,9 +40,21 @@ class _GameNightViewState extends State<GameNightView> {
   GameNightLineup _lineup = const GameNightLineup();
   _PlayFilter _playFilter = _PlayFilter.all;
 
+  static const List<int> _playerCounts = [1, 2, 3, 4, 5, 6, 7, 8];
+
   int get _durationMinutes => widget.model.settings
       .setting(Settings.gameNightDurationMinutes.name)
       .getInt();
+
+  /// The chosen game-night player count, or null for "any". Null starts the
+  /// pool from the whole collection; a value narrows it to games that seat
+  /// that many players.
+  int? get _playerCount {
+    final setting = widget.model.settings.setting(
+      Settings.gameNightPlayerCount.name,
+    );
+    return setting.enabled ? setting.getInt() : null;
+  }
 
   /// The pool narrowed to the chosen play-history filter. Filtering needs the
   /// play counts, so it only applies once plays have loaded; otherwise every
@@ -142,6 +154,19 @@ class _GameNightViewState extends State<GameNightView> {
     _regenerate();
   }
 
+  /// Changing the player count reshapes the fetched pool, so it writes the
+  /// setting and lets the store update trigger a refetch; the new pool then
+  /// re-plans the lineup through didUpdateWidget.
+  void _setPlayerCount(int? count) {
+    final setting = widget.model.settings.setting(
+      Settings.gameNightPlayerCount.name,
+    );
+    setting.enabled = count != null;
+    if (count != null) setting.value = count;
+    widget.model.settings.updateSetting(setting);
+    widget.model.updateStore();
+  }
+
   void _setDuration(int minutes) {
     final setting = widget.model.settings.setting(
       Settings.gameNightDurationMinutes.name,
@@ -184,6 +209,8 @@ class _GameNightViewState extends State<GameNightView> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           _buildDurationPicker(context),
+          const SizedBox(height: 16),
+          _buildPlayerCountPicker(context),
           if (widget.model.playsLoaded) ...[
             const SizedBox(height: 16),
             _buildPlayFilter(context),
@@ -257,6 +284,33 @@ class _GameNightViewState extends State<GameNightView> {
               width: 56,
               child: Text(_formatDuration(duration), textAlign: TextAlign.end),
             ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildPlayerCountPicker(BuildContext context) {
+    final selected = _playerCount;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Text('Players', style: Theme.of(context).textTheme.titleMedium),
+        const SizedBox(height: 8),
+        Wrap(
+          spacing: 8,
+          children: [
+            ChoiceChip(
+              label: const Text('Any'),
+              selected: selected == null,
+              onSelected: (_) => _setPlayerCount(null),
+            ),
+            for (final count in _playerCounts)
+              ChoiceChip(
+                label: Text('$count'),
+                selected: selected == count,
+                onSelected: (_) => _setPlayerCount(count),
+              ),
           ],
         ),
       ],

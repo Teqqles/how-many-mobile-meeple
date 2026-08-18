@@ -27,38 +27,64 @@ void _enable(AppModel model, String name) {
 void main() {
   setUp(() => SharedPreferences.setMockInitialValues({}));
 
-  test('game night request drops the per-game duration filters', () {
+  test('game night request ignores the guided-flow filters', () {
     final model = AppModel();
     _enable(model, Settings.filterMinimumTimeToPlay.name);
     _enable(model, Settings.filterMaximumTimeToPlay.name);
     _enable(model, Settings.filterNumberOfPlayers.name);
+    _enable(model, Settings.filterComplexity.name);
+    _enable(model, Settings.filterMinRating.name);
 
     final headers = model.buildGameNightRequest().headers;
 
-    expect(
-      headers.containsKey(Settings.filterMinimumTimeToPlay.header),
-      isFalse,
-    );
-    expect(
-      headers.containsKey(Settings.filterMaximumTimeToPlay.header),
-      isFalse,
-    );
-    // Non-duration filters still shape the pool.
-    expect(headers.containsKey(Settings.filterNumberOfPlayers.header), isTrue);
+    // The evening budget governs playtime and no guided-flow filter leaks in,
+    // so the pool starts from the whole collection.
+    for (final header in [
+      Settings.filterMinimumTimeToPlay.header,
+      Settings.filterMaximumTimeToPlay.header,
+      Settings.filterNumberOfPlayers.header,
+      Settings.filterComplexity.header,
+      Settings.filterMinRating.header,
+    ]) {
+      expect(headers.containsKey(header), isFalse);
+    }
   });
 
-  test('stripping duration filters does not mutate the model settings', () {
+  test('an enabled game-night player count filters the pool', () {
     final model = AppModel();
-    _enable(model, Settings.filterMaximumTimeToPlay.name);
+    final players = model.settings.setting(Settings.gameNightPlayerCount.name)
+      ..value = 6
+      ..enabled = true;
+    model.settings.updateSetting(players);
 
-    model.buildGameNightRequest();
+    final headers = model.buildGameNightRequest().headers;
 
-    final normalHeaders = model.buildRequest().headers;
-    expect(
-      normalHeaders.containsKey(Settings.filterMaximumTimeToPlay.header),
-      isTrue,
-    );
+    expect(headers[Settings.filterNumberOfPlayers.header], '6');
   });
+
+  test('a disabled game-night player count leaves the pool unfiltered', () {
+    final model = AppModel();
+
+    final headers = model.buildGameNightRequest().headers;
+
+    expect(headers.containsKey(Settings.filterNumberOfPlayers.header), isFalse);
+  });
+
+  test(
+    'building the game night request does not mutate the model settings',
+    () {
+      final model = AppModel();
+      _enable(model, Settings.filterMaximumTimeToPlay.name);
+
+      model.buildGameNightRequest();
+
+      final normalHeaders = model.buildRequest().headers;
+      expect(
+        normalHeaders.containsKey(Settings.filterMaximumTimeToPlay.header),
+        isTrue,
+      );
+    },
+  );
 
   test('permalink settings turn on game night mode and encode the lineup', () {
     final model = AppModel();

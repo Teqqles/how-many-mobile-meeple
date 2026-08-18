@@ -103,6 +103,15 @@ class Settings {
     enabled: false,
   );
 
+  /// The only pool filter a game night applies. Disabled means "any player
+  /// count", so the evening starts from the whole collection - the guided-flow
+  /// filters the user set for one-game picks never leak in.
+  static Setting gameNightPlayerCount = Setting(
+    "gameNightPlayerCount",
+    value: 4,
+    enabled: false,
+  );
+
   static Settings defaultSettings() => Settings(
     Map.from({
       Settings.fieldsToReturnFromApi.name: Settings.fieldsToReturnFromApi
@@ -131,6 +140,7 @@ class Settings {
       Settings.gameNightDurationMinutes.name: Settings.gameNightDurationMinutes
           .clone(),
       Settings.gameNightLineup.name: Settings.gameNightLineup.clone(),
+      Settings.gameNightPlayerCount.name: Settings.gameNightPlayerCount.clone(),
     }),
   );
 

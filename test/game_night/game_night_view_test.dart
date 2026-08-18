@@ -170,6 +170,30 @@ void main() {
     expect(find.byIcon(Icons.push_pin_outlined), findsNothing);
   });
 
+  testWidgets('shows a player count picker defaulting to any', (tester) async {
+    await tester.pumpWidget(_wrap(AppModel()));
+
+    expect(find.text('Players'), findsOneWidget);
+    expect(find.text('Any'), findsOneWidget);
+    for (final count in [1, 2, 3, 4, 5, 6, 7, 8]) {
+      expect(find.widgetWithText(ChoiceChip, '$count'), findsOneWidget);
+    }
+  });
+
+  testWidgets('choosing a player count enables the game-night filter', (
+    tester,
+  ) async {
+    final model = AppModel();
+    await tester.pumpWidget(_wrap(model));
+
+    await tester.tap(find.widgetWithText(ChoiceChip, '4'));
+    await tester.pump();
+
+    final setting = model.settings.setting(Settings.gameNightPlayerCount.name);
+    expect(setting.enabled, isTrue);
+    expect(setting.getInt(), 4);
+  });
+
   testWidgets('offers a share action for a filled lineup', (tester) async {
     await tester.pumpWidget(_wrap(AppModel()));
 

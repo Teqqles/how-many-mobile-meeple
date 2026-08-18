@@ -23,6 +23,7 @@ import 'package:how_many_mobile_meeple/model/app_preferences.dart';
 import 'package:how_many_mobile_meeple/model/bgg_cache.dart';
 import 'package:how_many_mobile_meeple/model/game_request.dart';
 import 'package:how_many_mobile_meeple/model/item.dart';
+import 'package:how_many_mobile_meeple/model/setting.dart';
 
 import '../api/prefetch_service.dart';
 import '../app_common.dart';
@@ -454,18 +455,22 @@ class AppModel extends ChangeNotifier {
 
   GameRequest buildRequest() => GameRequest.from(_settings, _items);
 
-  /// The pool for a game night ignores the per-game duration filters: the
-  /// evening budget governs playtime, so the planner needs the short fillers
-  /// and long centrepieces those filters would otherwise exclude. All other
-  /// filters (players, mechanics, rating, complexity) still apply.
+  /// The pool for a game night starts from the whole collection: the guided
+  /// flow's filters (duration, complexity, mechanics, rating) belong to one-game
+  /// picks the user configured there, never to a game night, so none of them
+  /// carry over. The evening budget governs playtime, and the only pool filter
+  /// is an explicit game-night player count when the user sets one.
   GameRequest buildGameNightRequest() {
-    final settings = _settings.clone();
-    for (final name in [
-      Settings.filterMinimumTimeToPlay.name,
-      Settings.filterMaximumTimeToPlay.name,
-    ]) {
-      final disabled = settings.setting(name).clone()..enabled = false;
-      settings.updateSetting(disabled);
+    final settings = Settings.defaultSettings();
+    final players = _settings.setting(Settings.gameNightPlayerCount.name);
+    if (players.enabled) {
+      final applied = Setting(
+        Settings.filterNumberOfPlayers.name,
+        header: Settings.filterNumberOfPlayers.header,
+        value: players.getInt(),
+        enabled: true,
+      );
+      settings.updateSetting(applied);
     }
     return GameRequest.from(settings, _items);
   }

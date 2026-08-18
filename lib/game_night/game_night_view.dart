@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:how_many_mobile_meeple/components/platform_independent_image.dart';
+import 'package:how_many_mobile_meeple/favourites/ignored_games_service.dart';
 import 'package:how_many_mobile_meeple/model/game.dart';
 import 'package:how_many_mobile_meeple/model/game_night.dart';
 import 'package:how_many_mobile_meeple/model/model.dart';
@@ -68,17 +69,25 @@ class _GameNightViewState extends State<GameNightView> {
   bool get _includeOutro =>
       widget.model.settings.setting(Settings.gameNightOutro.name).getBool();
 
-  /// The pool narrowed to the chosen play-history filter. Filtering needs the
+  /// The pool the planner draws from: ignored games are never suggested, and
+  /// the play-history filter narrows it further. Filtering by plays needs the
   /// play counts, so it only applies once plays have loaded; otherwise every
   /// game would look unplayed.
   List<Game> get _effectivePool {
+    final pool = _withoutIgnored(widget.pool);
     if (_playFilter == _PlayFilter.all || !widget.model.playsLoaded) {
-      return widget.pool;
+      return pool;
     }
     final wantPlayed = _playFilter == _PlayFilter.played;
-    return widget.pool
+    return pool
         .where((g) => (widget.model.getPlayCount(g.id) > 0) == wantPlayed)
         .toList();
+  }
+
+  List<Game> _withoutIgnored(List<Game> games) {
+    final ignored = IgnoredGamesService.cached;
+    if (ignored == null) return games;
+    return games.where((g) => !ignored.contains(g.id)).toList();
   }
 
   /// Mechanics available in the pool, most common first. Sourced from the pool

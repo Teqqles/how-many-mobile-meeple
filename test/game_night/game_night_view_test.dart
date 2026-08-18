@@ -3,6 +3,8 @@ library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:how_many_mobile_meeple/favourites/favourite_game.dart';
+import 'package:how_many_mobile_meeple/favourites/ignored_games_service.dart';
 import 'package:how_many_mobile_meeple/game_night/game_night_view.dart';
 import 'package:how_many_mobile_meeple/model/game.dart';
 import 'package:how_many_mobile_meeple/model/game_night.dart';
@@ -57,6 +59,7 @@ Widget _wrap(AppModel model, {List<Game>? pool}) => MaterialApp(
 
 void main() {
   setUp(() => SharedPreferences.setMockInitialValues({}));
+  tearDown(IgnoredGamesService.resetForTesting);
 
   testWidgets('fills filler, main and backup from the pool', (tester) async {
     await tester.pumpWidget(_wrap(AppModel()));
@@ -248,6 +251,18 @@ void main() {
 
     expect(find.text('Roller'), findsOneWidget);
     expect(find.text('Placer'), findsNothing);
+  });
+
+  testWidgets('never suggests an ignored game', (tester) async {
+    final ignored = await IgnoredGamesService.instance();
+    ignored.toggle(FavouriteGame(id: 2, name: 'Epic', thumbnail: null));
+
+    await tester.pumpWidget(_wrap(AppModel()));
+
+    // Epic is the longest fitting game, but it is ignored, so the shorter Alt
+    // takes the main slot instead and Epic never appears.
+    expect(find.text('Epic'), findsNothing);
+    expect(find.text('Alt'), findsOneWidget);
   });
 
   testWidgets('offers the evening-ender toggle only past two hours', (

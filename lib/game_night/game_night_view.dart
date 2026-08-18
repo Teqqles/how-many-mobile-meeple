@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:how_many_mobile_meeple/components/platform_independent_image.dart';
+import 'package:how_many_mobile_meeple/favourites/favourites_service.dart';
 import 'package:how_many_mobile_meeple/favourites/ignored_games_service.dart';
 import 'package:how_many_mobile_meeple/model/game.dart';
 import 'package:how_many_mobile_meeple/model/game_night.dart';
@@ -182,8 +183,15 @@ class _GameNightViewState extends State<GameNightView> {
         pinned: Map.of(_pinned),
         slotMechanics: Map.of(_slotMechanics),
         includeOutro: _includeOutro,
+        favouriteIds: _favouriteIds,
       );
     });
+  }
+
+  Set<int> get _favouriteIds {
+    final favourites = FavouritesService.cached;
+    if (favourites == null) return const {};
+    return favourites.games.map((g) => g.id).toSet();
   }
 
   /// The outro plays from the pool already in hand, so toggling it re-plans

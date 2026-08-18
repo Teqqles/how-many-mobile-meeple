@@ -178,6 +178,30 @@ void main() {
       expect(lineup.main!.id, 2); // unconstrained slot still fills
     });
 
+    test('weights a favourite into extra draw slots', () {
+      // Two equally valid mains; index 1 of the raw list is game 2, but game 1
+      // is a favourite, so its repeats push game 2 down the weighted list.
+      final lineup = GameNightPlanner(pick: (count) => count > 1 ? 1 : 0).plan(
+        pool: [_game(1, 120), _game(2, 118)],
+        durationMinutes: 240,
+        favouriteIds: {1},
+      );
+
+      expect(lineup.main!.id, 1);
+    });
+
+    test('a favourite never crowds out the rest of the pool', () {
+      // The last weighted slot still belongs to the non-favourite, so it can
+      // win when the draw lands there.
+      final lineup = GameNightPlanner(pick: (count) => count - 1).plan(
+        pool: [_game(1, 120), _game(2, 118)],
+        durationMinutes: 240,
+        favouriteIds: {1},
+      );
+
+      expect(lineup.main!.id, 2);
+    });
+
     test('adds a wind-down outro on a long night with time to spare', () {
       final lineup = _planner().plan(
         pool: [_game(1, 15), _game(2, 120), _game(3, 20)],

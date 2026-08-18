@@ -79,7 +79,16 @@ class GameNightPlanner {
   /// this budget, and only when a short game still fits the leftover time.
   static const int outroMinDurationMinutes = 120;
 
+  /// How many times a favourite game enters the weighted draw. A favourite is
+  /// this many times more likely to be picked than an equally valid non-
+  /// favourite - a nudge, not a guarantee.
+  static const int favouriteWeight = 3;
+
   final int Function(int count) _pick;
+
+  /// Ids of the user's favourite games, weighted up in every draw for the
+  /// lifetime of a single [plan] call.
+  Set<int> _favourites = const {};
 
   GameNightPlanner({int Function(int count)? pick})
     : _pick = pick ?? ((count) => Random().nextInt(count));
@@ -95,7 +104,9 @@ class GameNightPlanner {
     Map<GameNightSlot, Game> pinned = const {},
     Map<GameNightSlot, String> slotMechanics = const {},
     bool includeOutro = true,
+    Set<int> favouriteIds = const {},
   }) {
+    _favourites = favouriteIds;
     final used = pinned.values.map((g) => g.id).toSet();
 
     final filler =
@@ -241,7 +252,23 @@ class GameNightPlanner {
 
   Game? _choose(List<Game> candidates) {
     if (candidates.isEmpty) return null;
-    return candidates[_pick(candidates.length)];
+    final weighted = _weightFavourites(candidates);
+    return weighted[_pick(weighted.length)];
+  }
+
+  /// Repeats each favourite candidate so it fills more of the draw, giving it a
+  /// better chance without ever excluding the rest of the pool. Order is kept,
+  /// so a deterministic [_pick] of 0 still lands on the first candidate.
+  List<Game> _weightFavourites(List<Game> candidates) {
+    if (_favourites.isEmpty) return candidates;
+    final weighted = <Game>[];
+    for (final game in candidates) {
+      final copies = _favourites.contains(game.id) ? favouriteWeight : 1;
+      for (var i = 0; i < copies; i++) {
+        weighted.add(game);
+      }
+    }
+    return weighted;
   }
 
   static int _weightBand(double weight) {

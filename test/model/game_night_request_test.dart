@@ -106,7 +106,7 @@ void main() {
     expect(settings.setting(Settings.gameNightMode.name).getBool(), isTrue);
     expect(
       settings.setting(Settings.gameNightLineup.name).getString(),
-      '12-45-0',
+      '12-45-0-0',
     );
     expect(settings.setting(Settings.gameNightLineup.name).enabled, isTrue);
   });

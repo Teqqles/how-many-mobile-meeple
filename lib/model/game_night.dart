@@ -2,10 +2,11 @@ import 'dart:math';
 
 import 'package:how_many_mobile_meeple/model/game.dart';
 
-/// The three slots that make up an evening's lineup. The optional expansion
-/// slot from the design is deferred until the backend exposes expansion
-/// relationships (see issue #119).
-enum GameNightSlot { filler, main, backup }
+/// The slots that make up an evening's lineup. The outro is a wind-down game
+/// played after the main on a long night; the optional expansion slot from the
+/// design is deferred until the backend exposes expansion relationships (see
+/// issue #119).
+enum GameNightSlot { filler, main, backup, outro }
 
 /// A recommended evening lineup. Any slot may be null when the collection
 /// cannot fill it within the time budget.
@@ -13,21 +14,24 @@ class GameNightLineup {
   final Game? filler;
   final Game? main;
   final Game? backup;
+  final Game? outro;
 
-  const GameNightLineup({this.filler, this.main, this.backup});
+  const GameNightLineup({this.filler, this.main, this.backup, this.outro});
 
   Game? slot(GameNightSlot slot) => switch (slot) {
     GameNightSlot.filler => filler,
     GameNightSlot.main => main,
     GameNightSlot.backup => backup,
+    GameNightSlot.outro => outro,
   };
 
-  bool get isEmpty => filler == null && main == null && backup == null;
+  bool get isEmpty =>
+      filler == null && main == null && backup == null && outro == null;
 }
 
 /// Serialises a lineup's game ids for a shareable permalink and reads them
-/// back. The token is three `-`-separated ids in slot order, with `0` marking
-/// an empty slot, e.g. `12-45-0` (filler 12, main 45, no backup).
+/// back. The token is four `-`-separated ids in slot order, with `0` marking
+/// an empty slot, e.g. `12-45-0-8` (filler 12, main 45, no backup, outro 8).
 class GameNightPermalink {
   static const String _separator = '-';
 
@@ -35,18 +39,20 @@ class GameNightPermalink {
     lineup.filler?.id ?? 0,
     lineup.main?.id ?? 0,
     lineup.backup?.id ?? 0,
+    lineup.outro?.id ?? 0,
   ].join(_separator);
 
   /// Maps each slot to the game id carried in [token], skipping empty slots.
   /// A malformed token yields an empty map so the lineup regenerates normally.
   static Map<GameNightSlot, int> decode(String token) {
     final ids = token.split(_separator).map(int.tryParse).toList();
-    if (ids.length != 3) return const {};
+    if (ids.length != 4) return const {};
 
     final bySlot = {
       GameNightSlot.filler: ids[0],
       GameNightSlot.main: ids[1],
       GameNightSlot.backup: ids[2],
+      GameNightSlot.outro: ids[3],
     };
     bySlot.removeWhere((_, id) => id == null || id <= 0);
     return bySlot.map((slot, id) => MapEntry(slot, id!));
@@ -67,6 +73,11 @@ class GameNightPlanner {
   /// of always returning the single longest title.
   static const double mainLengthTolerance = 0.7;
 
+  /// The outro is a wind-down closer, only worth suggesting once the evening is
+  /// long enough that the filler and main will not fill it. Offered only above
+  /// this budget, and only when a short game still fits the leftover time.
+  static const int outroMinDurationMinutes = 120;
+
   final int Function(int count) _pick;
 
   GameNightPlanner({int Function(int count)? pick})
@@ -82,6 +93,7 @@ class GameNightPlanner {
     required int durationMinutes,
     Map<GameNightSlot, Game> pinned = const {},
     Map<GameNightSlot, String> slotMechanics = const {},
+    bool includeOutro = true,
   }) {
     final used = pinned.values.map((g) => g.id).toSet();
 
@@ -100,7 +112,26 @@ class GameNightPlanner {
         pinned[GameNightSlot.backup] ??
         _pickBackup(pool, used, main, slotMechanics[GameNightSlot.backup]);
 
-    return GameNightLineup(filler: filler, main: main, backup: backup);
+    // The backup is an alternative to the main, so it is not "used" against the
+    // outro - either the main or the backup is played, never both.
+    final outro = !includeOutro
+        ? null
+        : pinned[GameNightSlot.outro] ??
+              _pickOutro(
+                pool,
+                used,
+                durationMinutes,
+                filler,
+                main,
+                slotMechanics[GameNightSlot.outro],
+              );
+
+    return GameNightLineup(
+      filler: filler,
+      main: main,
+      backup: backup,
+      outro: outro,
+    );
   }
 
   /// A slot's mechanic quick-pick narrows its candidates to games carrying that
@@ -178,6 +209,33 @@ class GameNightPlanner {
         .where((g) => _weightBand(g.averageWeight) != mainBand)
         .toList();
     return _choose(contrasting.isNotEmpty ? contrasting : similar);
+  }
+
+  Game? _pickOutro(
+    List<Game> pool,
+    Set<int> used,
+    int durationMinutes,
+    Game? filler,
+    Game? main,
+    String? mechanic,
+  ) {
+    // A closer only makes sense on a long night, once the main is set and time
+    // is left over to play it in.
+    if (durationMinutes <= outroMinDurationMinutes || main == null) return null;
+    final remaining =
+        durationMinutes - (filler?.maxPlaytime ?? 0) - main.maxPlaytime;
+
+    final candidates = pool
+        .where(
+          (g) =>
+              !used.contains(g.id) &&
+              g.maxPlaytime > 0 &&
+              g.maxPlaytime <= fillerMaxMinutes &&
+              g.maxPlaytime <= remaining &&
+              _matchesMechanic(g, mechanic),
+        )
+        .toList();
+    return _choose(candidates);
   }
 
   Game? _choose(List<Game> candidates) {

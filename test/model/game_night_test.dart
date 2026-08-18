@@ -168,6 +168,59 @@ void main() {
       expect(lineup.filler!.id, 1);
       expect(lineup.main!.id, 2); // unconstrained slot still fills
     });
+
+    test('adds a wind-down outro on a long night with time to spare', () {
+      final lineup = _planner().plan(
+        pool: [_game(1, 15), _game(2, 120), _game(3, 20)],
+        durationMinutes: 240,
+      );
+
+      // Filler 15 + main 120 leaves 105 minutes, so the short game closes out.
+      expect(lineup.main!.id, 2);
+      expect(lineup.outro!.id, 3);
+    });
+
+    test('no outro on a short night', () {
+      final lineup = _planner().plan(
+        pool: [_game(1, 15), _game(2, 90), _game(3, 20)],
+        durationMinutes: 120,
+      );
+
+      expect(lineup.outro, isNull);
+    });
+
+    test('no outro when the main leaves no room for a closer', () {
+      final lineup = _planner().plan(
+        pool: [_game(1, 15), _game(2, 120), _game(3, 20)],
+        durationMinutes: 145,
+      );
+
+      // 145 - 15 filler - 120 main = 10 minutes, too little for the 20-min game.
+      expect(lineup.main!.id, 2);
+      expect(lineup.outro, isNull);
+    });
+
+    test('includeOutro false suppresses the closer', () {
+      final lineup = _planner().plan(
+        pool: [_game(1, 15), _game(2, 120), _game(3, 20)],
+        durationMinutes: 240,
+        includeOutro: false,
+      );
+
+      expect(lineup.outro, isNull);
+    });
+
+    test('a pinned outro is kept and never reused elsewhere', () {
+      final pinnedOutro = _game(3, 20);
+      final lineup = _planner().plan(
+        pool: [_game(1, 15), _game(2, 120), pinnedOutro],
+        durationMinutes: 240,
+        pinned: {GameNightSlot.outro: pinnedOutro},
+      );
+
+      expect(lineup.outro!.id, 3);
+      expect(lineup.filler?.id, isNot(3));
+    });
   });
 
   group('GameNightPermalink', () {
@@ -176,6 +229,7 @@ void main() {
         filler: _game(12, 20),
         main: _game(45, 90),
         backup: _game(7, 80),
+        outro: _game(8, 25),
       );
 
       final decoded = GameNightPermalink.decode(
@@ -186,6 +240,7 @@ void main() {
         GameNightSlot.filler: 12,
         GameNightSlot.main: 45,
         GameNightSlot.backup: 7,
+        GameNightSlot.outro: 8,
       });
     });
 
@@ -193,13 +248,13 @@ void main() {
       final lineup = GameNightLineup(main: _game(45, 90));
 
       final token = GameNightPermalink.encode(lineup);
-      expect(token, '0-45-0');
+      expect(token, '0-45-0-0');
       expect(GameNightPermalink.decode(token), {GameNightSlot.main: 45});
     });
 
     test('a malformed token yields no pins', () {
       expect(GameNightPermalink.decode('nonsense'), isEmpty);
-      expect(GameNightPermalink.decode('1-2'), isEmpty);
+      expect(GameNightPermalink.decode('1-2-3'), isEmpty);
     });
   });
 }

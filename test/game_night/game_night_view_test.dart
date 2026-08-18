@@ -36,6 +36,15 @@ List<Game> _pool() => [
   _game(4, 'Alt', 100, 1.5),
 ];
 
+AppModel _modelWithDuration(int minutes) {
+  final model = AppModel();
+  final duration = model.settings.setting(
+    Settings.gameNightDurationMinutes.name,
+  )..value = minutes;
+  model.settings.updateSetting(duration);
+  return model;
+}
+
 Widget _wrap(AppModel model, {List<Game>? pool}) => MaterialApp(
   home: Scaffold(
     body: GameNightView(
@@ -165,7 +174,7 @@ void main() {
   testWidgets('pins the games carried by a shared lineup', (tester) async {
     final model = AppModel();
     final setting = model.settings.setting(Settings.gameNightLineup.name)
-      ..value = '1-2-4'
+      ..value = '1-2-4-0'
       ..enabled = true;
     model.settings.updateSetting(setting);
 
@@ -240,4 +249,38 @@ void main() {
     expect(find.text('Roller'), findsOneWidget);
     expect(find.text('Placer'), findsNothing);
   });
+
+  testWidgets('offers the evening-ender toggle only past two hours', (
+    tester,
+  ) async {
+    await tester.pumpWidget(_wrap(_modelWithDuration(180)));
+    expect(
+      find.byKey(const ValueKey('game-night-outro-toggle')),
+      findsOneWidget,
+    );
+
+    await tester.pumpWidget(_wrap(_modelWithDuration(120)));
+    expect(find.byKey(const ValueKey('game-night-outro-toggle')), findsNothing);
+  });
+
+  testWidgets(
+    'adds a wind-down outro on a long night and lets you disable it',
+    (tester) async {
+      final pool = [
+        _game(1, 'Quick', 15, 2.0),
+        _game(2, 'Epic', 120, 3.5),
+        _game(3, 'Closer', 20, 2.0),
+      ];
+      await tester.pumpWidget(_wrap(_modelWithDuration(240), pool: pool));
+
+      expect(find.text('Outro · Wind-down closer'), findsOneWidget);
+      expect(find.text('Closer'), findsOneWidget);
+
+      await tester.tap(find.byKey(const ValueKey('game-night-outro-toggle')));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Outro · Wind-down closer'), findsNothing);
+      expect(find.text('Closer'), findsNothing);
+    },
+  );
 }

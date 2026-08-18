@@ -112,6 +112,14 @@ class Settings {
     enabled: false,
   );
 
+  /// Whether a long evening ends with a wind-down "outro" game. On by default;
+  /// the outro only appears above the planner's long-night threshold anyway.
+  static Setting gameNightOutro = Setting(
+    "gameNightOutro",
+    value: true,
+    enabled: true,
+  );
+
   static Settings defaultSettings() => Settings(
     Map.from({
       Settings.fieldsToReturnFromApi.name: Settings.fieldsToReturnFromApi
@@ -141,6 +149,7 @@ class Settings {
           .clone(),
       Settings.gameNightLineup.name: Settings.gameNightLineup.clone(),
       Settings.gameNightPlayerCount.name: Settings.gameNightPlayerCount.clone(),
+      Settings.gameNightOutro.name: Settings.gameNightOutro.clone(),
     }),
   );
 

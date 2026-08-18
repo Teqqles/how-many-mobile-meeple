@@ -60,6 +60,14 @@ class _GameNightViewState extends State<GameNightView> {
     return setting.enabled ? setting.getInt() : null;
   }
 
+  /// The outro is only relevant on a long night; the toggle and slot stay
+  /// hidden below the planner's threshold.
+  bool get _outroApplies =>
+      _durationMinutes > GameNightPlanner.outroMinDurationMinutes;
+
+  bool get _includeOutro =>
+      widget.model.settings.setting(Settings.gameNightOutro.name).getBool();
+
   /// The pool narrowed to the chosen play-history filter. Filtering needs the
   /// play counts, so it only applies once plays have loaded; otherwise every
   /// game would look unplayed.
@@ -164,8 +172,20 @@ class _GameNightViewState extends State<GameNightView> {
         durationMinutes: _durationMinutes,
         pinned: Map.of(_pinned),
         slotMechanics: Map.of(_slotMechanics),
+        includeOutro: _includeOutro,
       );
     });
+  }
+
+  /// The outro plays from the pool already in hand, so toggling it re-plans
+  /// locally; the choice is persisted so it sticks across visits.
+  void _setIncludeOutro(bool enabled) {
+    final setting = widget.model.settings.setting(Settings.gameNightOutro.name)
+      ..value = enabled
+      ..enabled = true;
+    widget.model.settings.updateSetting(setting);
+    widget.model.updateStore();
+    _regenerate();
   }
 
   /// Filtering a slot by mechanic works on the pool already in hand, so it
@@ -246,6 +266,10 @@ class _GameNightViewState extends State<GameNightView> {
             const SizedBox(height: 16),
             _buildPlayFilter(context),
           ],
+          if (_outroApplies) ...[
+            const SizedBox(height: 8),
+            _buildOutroToggle(context),
+          ],
           const SizedBox(height: 20),
           _buildSlot(context, GameNightSlot.filler, 'Filler', 'Warm-up', 0),
           _buildSlot(context, GameNightSlot.main, 'Main', 'The centrepiece', 1),
@@ -256,6 +280,14 @@ class _GameNightViewState extends State<GameNightView> {
             'If the mood shifts',
             2,
           ),
+          if (_outroApplies && _includeOutro)
+            _buildSlot(
+              context,
+              GameNightSlot.outro,
+              'Outro',
+              'Wind-down closer',
+              3,
+            ),
           const SizedBox(height: 8),
           Row(
             children: [
@@ -318,6 +350,17 @@ class _GameNightViewState extends State<GameNightView> {
           ],
         ),
       ],
+    );
+  }
+
+  Widget _buildOutroToggle(BuildContext context) {
+    return SwitchListTile(
+      key: const ValueKey('game-night-outro-toggle'),
+      contentPadding: EdgeInsets.zero,
+      title: const Text('End with a wind-down game'),
+      subtitle: const Text('A short closer after the main, on a long night'),
+      value: _includeOutro,
+      onChanged: _setIncludeOutro,
     );
   }
 

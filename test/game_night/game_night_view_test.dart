@@ -244,7 +244,12 @@ void main() {
     // Placer is the longest fitting game, so it is the default centrepiece.
     expect(find.text('Placer'), findsOneWidget);
 
-    await tester.tap(find.byKey(const ValueKey('game-night-mechanic-main')));
+    final mechanicPicker = find.byKey(
+      const ValueKey('game-night-mechanic-main'),
+    );
+    await tester.ensureVisible(mechanicPicker);
+    await tester.pumpAndSettle();
+    await tester.tap(mechanicPicker);
     await tester.pumpAndSettle();
     await tester.tap(find.text('Dice Rolling').last);
     await tester.pumpAndSettle();
@@ -263,6 +268,20 @@ void main() {
     // takes the main slot instead and Epic never appears.
     expect(find.text('Epic'), findsNothing);
     expect(find.text('Alt'), findsOneWidget);
+  });
+
+  testWidgets('shows the changeover buffer and spare time', (tester) async {
+    await tester.pumpWidget(_wrap(AppModel()));
+
+    // Quick filler (15) + Epic main (120, heavy) cost 25 + 135 = 160 of 180,
+    // so 20 minutes are spare and the main's 15-min changeover is shown.
+    expect(
+      find.byKey(const ValueKey('game-night-changeover-main')),
+      findsOneWidget,
+    );
+    expect(find.text('15 min to reset and set up'), findsOneWidget);
+    expect(find.byKey(const ValueKey('game-night-spare')), findsOneWidget);
+    expect(find.text('20 min spare'), findsOneWidget);
   });
 
   testWidgets('offers the evening-ender toggle only past two hours', (

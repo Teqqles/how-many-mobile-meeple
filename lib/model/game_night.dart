@@ -290,13 +290,33 @@ class GameNightPlanner {
   /// teardown and breather reserved around it. Null (an unfilled slot) costs
   /// nothing.
   int _cost(Game? game) =>
-      game == null ? 0 : game.maxPlaytime + _overhead(game);
+      game == null ? 0 : game.maxPlaytime + overheadFor(game);
 
-  int _overhead(Game game) => switch (_weightBand(game.averageWeight)) {
-    0 => lightOverheadMinutes,
-    1 => mediumOverheadMinutes,
-    _ => heavyOverheadMinutes,
-  };
+  /// Minutes reserved around [game] for setup, teardown and a breather, scaled
+  /// by its weight. The view shows this as the changeover between sections.
+  static int overheadFor(Game game) =>
+      switch (_weightBand(game.averageWeight)) {
+        0 => lightOverheadMinutes,
+        1 => mediumOverheadMinutes,
+        _ => heavyOverheadMinutes,
+      };
+
+  /// Minutes left unscheduled once every played game and its overhead is
+  /// subtracted from [durationMinutes]. Negative is clamped to zero. The backup
+  /// is an alternative to the main, so it never counts against the evening.
+  static int spareMinutes({
+    required int durationMinutes,
+    Game? filler,
+    Game? main,
+    Game? outro,
+  }) {
+    var used = 0;
+    for (final game in [filler, main, outro]) {
+      if (game != null) used += game.maxPlaytime + overheadFor(game);
+    }
+    final spare = durationMinutes - used;
+    return spare < 0 ? 0 : spare;
+  }
 
   static int _weightBand(double weight) {
     if (weight < 2.0) return 0;

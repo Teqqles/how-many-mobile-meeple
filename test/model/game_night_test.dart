@@ -273,6 +273,43 @@ void main() {
     });
   });
 
+  group('GameNightPlanner overhead and spare', () {
+    test('overhead scales with the weight band', () {
+      expect(GameNightPlanner.overheadFor(_game(1, 30, weight: 1.5)), 5);
+      expect(GameNightPlanner.overheadFor(_game(2, 30, weight: 2.5)), 10);
+      expect(GameNightPlanner.overheadFor(_game(3, 30, weight: 3.5)), 15);
+    });
+
+    test('spare time is the budget less playtime and overhead', () {
+      // filler 15 light (cost 20) + main 90 heavy (cost 105) = 125 of 180.
+      final spare = GameNightPlanner.spareMinutes(
+        durationMinutes: 180,
+        filler: _game(1, 15, weight: 1.5),
+        main: _game(2, 90, weight: 3.5),
+      );
+
+      expect(spare, 55);
+    });
+
+    test('spare time never goes negative', () {
+      final spare = GameNightPlanner.spareMinutes(
+        durationMinutes: 60,
+        main: _game(1, 90, weight: 3.5),
+      );
+
+      expect(spare, 0);
+    });
+
+    test('the backup does not count against spare time', () {
+      final withoutBackup = GameNightPlanner.spareMinutes(
+        durationMinutes: 180,
+        main: _game(1, 90, weight: 2.5),
+      );
+
+      expect(withoutBackup, 80); // 180 - (90 + 10), backup ignored entirely
+    });
+  });
+
   group('GameNightPermalink', () {
     test('round-trips a full lineup by slot', () {
       final lineup = GameNightLineup(

@@ -289,6 +289,8 @@ class _GameNightViewState extends State<GameNightView> {
           ],
           const SizedBox(height: 20),
           _buildSlot(context, GameNightSlot.filler, 'Filler', 'Warm-up', 0),
+          if (_lineup.filler != null && _lineup.main != null)
+            _buildChangeover(context, GameNightSlot.main, _lineup.main!),
           _buildSlot(context, GameNightSlot.main, 'Main', 'The centrepiece', 1),
           _buildSlot(
             context,
@@ -297,7 +299,9 @@ class _GameNightViewState extends State<GameNightView> {
             'If the mood shifts',
             2,
           ),
-          if (_outroApplies && _includeOutro)
+          if (_outroApplies && _includeOutro) ...[
+            if (_lineup.main != null && _lineup.outro != null)
+              _buildChangeover(context, GameNightSlot.outro, _lineup.outro!),
             _buildSlot(
               context,
               GameNightSlot.outro,
@@ -305,6 +309,8 @@ class _GameNightViewState extends State<GameNightView> {
               'Wind-down closer',
               3,
             ),
+          ],
+          _buildSpareSummary(context),
           const SizedBox(height: 8),
           Row(
             children: [
@@ -497,6 +503,64 @@ class _GameNightViewState extends State<GameNightView> {
     );
   }
 
+  /// The changeover between two played sections: the setup, teardown and
+  /// breather reserved before [next] is played, so the gaps in the evening are
+  /// visible rather than hidden inside the budget.
+  Widget _buildChangeover(BuildContext context, GameNightSlot slot, Game next) {
+    final minutes = GameNightPlanner.overheadFor(next);
+    final color = Theme.of(context).colorScheme.onSurfaceVariant;
+    return Padding(
+      key: ValueKey('game-night-changeover-${slot.name}'),
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.hourglass_bottom, size: 14, color: color),
+          const SizedBox(width: 6),
+          Text(
+            '$minutes min to reset and set up',
+            style: Theme.of(context).textTheme.bodySmall
+                ?.copyWith(color: color),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// The unscheduled time left after every played game and its changeover, so
+  /// it is clear how much breathing room the evening has.
+  Widget _buildSpareSummary(BuildContext context) {
+    if (_lineup.filler == null && _lineup.main == null) {
+      return const SizedBox.shrink();
+    }
+    final spare = GameNightPlanner.spareMinutes(
+      durationMinutes: _durationMinutes,
+      filler: _lineup.filler,
+      main: _lineup.main,
+      outro: _lineup.outro,
+    );
+    final scheme = Theme.of(context).colorScheme;
+    final label = spare == 0
+        ? 'No spare time - the evening is full'
+        : '${_formatGap(spare)} spare';
+    return Padding(
+      key: const ValueKey('game-night-spare'),
+      padding: const EdgeInsets.only(top: 4, bottom: 12),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.free_breakfast_outlined, size: 16, color: scheme.primary),
+          const SizedBox(width: 6),
+          Text(
+            label,
+            style: Theme.of(context).textTheme.labelLarge
+                ?.copyWith(color: scheme.primary),
+          ),
+        ],
+      ),
+    );
+  }
+
   /// A compact per-slot mechanic quick-pick. Hidden until the pool carries
   /// mechanics, so it degrades gracefully when the field is unavailable.
   Widget _buildSlotMechanic(BuildContext context, GameNightSlot slot) {
@@ -610,6 +674,12 @@ class _GameNightViewState extends State<GameNightView> {
     final hours = minutes / 60;
     if (minutes % 60 == 0) return '${minutes ~/ 60}h';
     return '${hours.toStringAsFixed(1)}h';
+  }
+
+  /// Short spans read better in minutes; longer ones in hours.
+  static String _formatGap(int minutes) {
+    if (minutes < 60) return '$minutes min';
+    return _formatDuration(minutes);
   }
 
   static String _weightLabel(double weight) {

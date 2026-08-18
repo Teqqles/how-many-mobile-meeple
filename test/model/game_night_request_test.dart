@@ -70,6 +70,17 @@ void main() {
     expect(headers.containsKey(Settings.filterNumberOfPlayers.header), isFalse);
   });
 
+  test('the game night request whitelists mechanics for local filtering', () {
+    final model = AppModel();
+
+    final headers = model.buildGameNightRequest().headers;
+    final whitelist = headers[Settings.fieldsToReturnFromApi.header]!.split(
+      ',',
+    );
+
+    expect(whitelist, contains('mechanics'));
+  });
+
   test(
     'building the game night request does not mutate the model settings',
     () {

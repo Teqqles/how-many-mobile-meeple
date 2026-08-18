@@ -11,7 +11,13 @@ import 'package:how_many_mobile_meeple/model/play_data.dart';
 import 'package:how_many_mobile_meeple/model/settings.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-Game _game(int id, String name, int maxPlaytime, double weight) => Game(
+Game _game(
+  int id,
+  String name,
+  int maxPlaytime,
+  double weight, {
+  List<String> mechanics = const [],
+}) => Game(
   id: id,
   name: name,
   maxPlayers: 4,
@@ -20,6 +26,7 @@ Game _game(int id, String name, int maxPlaytime, double weight) => Game(
   imageUrl: '',
   averageRating: 7,
   averageWeight: weight,
+  mechanics: mechanics,
 );
 
 List<Game> _pool() => [
@@ -200,5 +207,37 @@ void main() {
     final share = find.byKey(const ValueKey('game-night-share'));
     expect(share, findsOneWidget);
     expect(tester.widget<OutlinedButton>(share).onPressed, isNotNull);
+  });
+
+  testWidgets('hides the mechanic picker when the pool carries no mechanics', (
+    tester,
+  ) async {
+    await tester.pumpWidget(_wrap(AppModel()));
+
+    expect(
+      find.byKey(const ValueKey('game-night-mechanic-main')),
+      findsNothing,
+    );
+  });
+
+  testWidgets('a slot mechanic narrows that slot to matching games', (
+    tester,
+  ) async {
+    final pool = [
+      _game(1, 'Quick', 15, 2.0),
+      _game(2, 'Placer', 120, 3.5, mechanics: ['Worker Placement']),
+      _game(3, 'Roller', 60, 2.5, mechanics: ['Dice Rolling']),
+    ];
+    await tester.pumpWidget(_wrap(AppModel(), pool: pool));
+    // Placer is the longest fitting game, so it is the default centrepiece.
+    expect(find.text('Placer'), findsOneWidget);
+
+    await tester.tap(find.byKey(const ValueKey('game-night-mechanic-main')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Dice Rolling').last);
+    await tester.pumpAndSettle();
+
+    expect(find.text('Roller'), findsOneWidget);
+    expect(find.text('Placer'), findsNothing);
   });
 }

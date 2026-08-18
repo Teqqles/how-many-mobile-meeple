@@ -81,41 +81,59 @@ class GameNightPlanner {
     required List<Game> pool,
     required int durationMinutes,
     Map<GameNightSlot, Game> pinned = const {},
+    Map<GameNightSlot, String> slotMechanics = const {},
   }) {
     final used = pinned.values.map((g) => g.id).toSet();
 
-    final filler = pinned[GameNightSlot.filler] ?? _pickFiller(pool, used);
+    final filler =
+        pinned[GameNightSlot.filler] ??
+        _pickFiller(pool, used, slotMechanics[GameNightSlot.filler]);
     if (filler != null) used.add(filler.id);
 
     final remaining = durationMinutes - (filler?.maxPlaytime ?? 0);
-    final main = pinned[GameNightSlot.main] ?? _pickMain(pool, used, remaining);
+    final main =
+        pinned[GameNightSlot.main] ??
+        _pickMain(pool, used, remaining, slotMechanics[GameNightSlot.main]);
     if (main != null) used.add(main.id);
 
     final backup =
-        pinned[GameNightSlot.backup] ?? _pickBackup(pool, used, main);
+        pinned[GameNightSlot.backup] ??
+        _pickBackup(pool, used, main, slotMechanics[GameNightSlot.backup]);
 
     return GameNightLineup(filler: filler, main: main, backup: backup);
   }
 
-  Game? _pickFiller(List<Game> pool, Set<int> used) {
+  /// A slot's mechanic quick-pick narrows its candidates to games carrying that
+  /// mechanic; null means the slot draws from the whole pool.
+  bool _matchesMechanic(Game game, String? mechanic) =>
+      mechanic == null || game.mechanics.contains(mechanic);
+
+  Game? _pickFiller(List<Game> pool, Set<int> used, String? mechanic) {
     final candidates = pool
         .where(
           (g) =>
               !used.contains(g.id) &&
               g.maxPlaytime > 0 &&
-              g.maxPlaytime <= fillerMaxMinutes,
+              g.maxPlaytime <= fillerMaxMinutes &&
+              _matchesMechanic(g, mechanic),
         )
         .toList();
     return _choose(candidates);
   }
 
-  Game? _pickMain(List<Game> pool, Set<int> used, int remaining) {
+  Game? _pickMain(
+    List<Game> pool,
+    Set<int> used,
+    int remaining,
+    String? mechanic,
+  ) {
     final fitting = pool
         .where(
           (g) =>
               !used.contains(g.id) &&
               g.maxPlaytime > 0 &&
-              g.maxPlaytime <= remaining,
+              g.maxPlaytime <= remaining &&
+              _matchesMechanic(g, mechanic),
         )
         .toList();
     if (fitting.isEmpty) return null;
@@ -133,7 +151,12 @@ class GameNightPlanner {
     return _choose(centrepieces);
   }
 
-  Game? _pickBackup(List<Game> pool, Set<int> used, Game? main) {
+  Game? _pickBackup(
+    List<Game> pool,
+    Set<int> used,
+    Game? main,
+    String? mechanic,
+  ) {
     if (main == null) return null;
 
     final tolerance = max(15, (main.maxPlaytime * 0.3).round());
@@ -142,7 +165,8 @@ class GameNightPlanner {
           (g) =>
               !used.contains(g.id) &&
               g.maxPlaytime > 0 &&
-              (g.maxPlaytime - main.maxPlaytime).abs() <= tolerance,
+              (g.maxPlaytime - main.maxPlaytime).abs() <= tolerance &&
+              _matchesMechanic(g, mechanic),
         )
         .toList();
     if (similar.isEmpty) return null;

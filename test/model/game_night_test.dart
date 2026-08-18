@@ -5,17 +5,23 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:how_many_mobile_meeple/model/game.dart';
 import 'package:how_many_mobile_meeple/model/game_night.dart';
 
-Game _game(int id, int maxPlaytime, {double weight = 2.5, String? name}) =>
-    Game(
-      id: id,
-      name: name ?? 'Game $id',
-      maxPlayers: 4,
-      minPlayers: 2,
-      maxPlaytime: maxPlaytime,
-      imageUrl: '',
-      averageRating: 7,
-      averageWeight: weight,
-    );
+Game _game(
+  int id,
+  int maxPlaytime, {
+  double weight = 2.5,
+  String? name,
+  List<String> mechanics = const [],
+}) => Game(
+  id: id,
+  name: name ?? 'Game $id',
+  maxPlayers: 4,
+  minPlayers: 2,
+  maxPlaytime: maxPlaytime,
+  imageUrl: '',
+  averageRating: 7,
+  averageWeight: weight,
+  mechanics: mechanics,
+);
 
 // Always pick the first candidate so slot selection is deterministic.
 GameNightPlanner _planner() => GameNightPlanner(pick: (_) => 0);
@@ -118,6 +124,49 @@ void main() {
     test('empty pool yields an empty lineup', () {
       final lineup = _planner().plan(pool: [], durationMinutes: 180);
       expect(lineup.isEmpty, isTrue);
+    });
+
+    test('a slot mechanic narrows that slot to matching games', () {
+      final lineup = _planner().plan(
+        pool: [
+          _game(1, 120, mechanics: ['Worker Placement']),
+          _game(2, 118, mechanics: ['Dice Rolling']),
+          _game(3, 15),
+        ],
+        durationMinutes: 240,
+        slotMechanics: {GameNightSlot.main: 'Dice Rolling'},
+      );
+
+      // Both long games fit, but only game 2 carries the chosen mechanic.
+      expect(lineup.main!.id, 2);
+    });
+
+    test('a slot with no mechanic match is left empty', () {
+      final lineup = _planner().plan(
+        pool: [
+          _game(1, 15),
+          _game(2, 120, mechanics: ['Worker Placement']),
+        ],
+        durationMinutes: 240,
+        slotMechanics: {GameNightSlot.main: 'Legacy Game'},
+      );
+
+      expect(lineup.filler!.id, 1);
+      expect(lineup.main, isNull);
+    });
+
+    test('mechanic on one slot does not constrain the others', () {
+      final lineup = _planner().plan(
+        pool: [
+          _game(1, 15, mechanics: ['Dice Rolling']),
+          _game(2, 120, mechanics: ['Worker Placement']),
+        ],
+        durationMinutes: 240,
+        slotMechanics: {GameNightSlot.filler: 'Dice Rolling'},
+      );
+
+      expect(lineup.filler!.id, 1);
+      expect(lineup.main!.id, 2); // unconstrained slot still fills
     });
   });
 

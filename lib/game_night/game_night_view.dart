@@ -36,7 +36,11 @@ class _GameNightViewState extends State<GameNightView> {
     _DurationPreset('5h', 300),
   ];
 
+  /// How many mechanics to offer per slot, most common in the pool first.
+  static const int _maxMechanicOptions = 12;
+
   final Map<GameNightSlot, Game> _pinned = {};
+  final Map<GameNightSlot, String> _slotMechanics = {};
   GameNightLineup _lineup = const GameNightLineup();
   _PlayFilter _playFilter = _PlayFilter.all;
 
@@ -67,6 +71,21 @@ class _GameNightViewState extends State<GameNightView> {
     return widget.pool
         .where((g) => (widget.model.getPlayCount(g.id) > 0) == wantPlayed)
         .toList();
+  }
+
+  /// Mechanics available in the pool, most common first. Sourced from the pool
+  /// itself (the game-night fetch whitelists `mechanics`) so every option is
+  /// guaranteed to match at least one game.
+  List<String> get _poolMechanics {
+    final counts = <String, int>{};
+    for (final game in widget.pool) {
+      for (final mechanic in game.mechanics) {
+        counts[mechanic] = (counts[mechanic] ?? 0) + 1;
+      }
+    }
+    final sorted = counts.keys.toList()
+      ..sort((a, b) => counts[b]!.compareTo(counts[a]!));
+    return sorted.take(_maxMechanicOptions).toList();
   }
 
   @override
@@ -144,8 +163,20 @@ class _GameNightViewState extends State<GameNightView> {
         pool: _effectivePool,
         durationMinutes: _durationMinutes,
         pinned: Map.of(_pinned),
+        slotMechanics: Map.of(_slotMechanics),
       );
     });
+  }
+
+  /// Filtering a slot by mechanic works on the pool already in hand, so it
+  /// re-plans locally without a refetch.
+  void _setSlotMechanic(GameNightSlot slot, String? mechanic) {
+    if (mechanic == null) {
+      _slotMechanics.remove(slot);
+    } else {
+      _slotMechanics[slot] = mechanic;
+    }
+    _regenerate();
   }
 
   void _setPlayFilter(_PlayFilter filter) {
@@ -389,6 +420,7 @@ class _GameNightViewState extends State<GameNightView> {
                         color: Theme.of(context).colorScheme.onSurfaceVariant,
                       ),
                     ),
+                  _buildSlotMechanic(context, slot),
                 ],
               ),
             ),
@@ -401,6 +433,44 @@ class _GameNightViewState extends State<GameNightView> {
               ),
           ],
         ),
+      ),
+    );
+  }
+
+  /// A compact per-slot mechanic quick-pick. Hidden until the pool carries
+  /// mechanics, so it degrades gracefully when the field is unavailable.
+  Widget _buildSlotMechanic(BuildContext context, GameNightSlot slot) {
+    final options = _poolMechanics;
+    if (options.isEmpty) return const SizedBox.shrink();
+    final selected = _slotMechanics[slot];
+    final color = Theme.of(context).colorScheme.onSurfaceVariant;
+    return Padding(
+      padding: const EdgeInsets.only(top: 8),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(Icons.tune, size: 14, color: color),
+          const SizedBox(width: 4),
+          DropdownButton<String?>(
+            key: ValueKey('game-night-mechanic-${slot.name}'),
+            value: selected,
+            isDense: true,
+            underline: const SizedBox.shrink(),
+            hint: Text(
+              'Any mechanic',
+              style: Theme.of(context).textTheme.bodySmall
+                  ?.copyWith(color: color),
+            ),
+            style: Theme.of(context).textTheme.bodySmall
+                ?.copyWith(color: color),
+            items: [
+              const DropdownMenuItem(value: null, child: Text('Any mechanic')),
+              for (final mechanic in options)
+                DropdownMenuItem(value: mechanic, child: Text(mechanic)),
+            ],
+            onChanged: (value) => _setSlotMechanic(slot, value),
+          ),
+        ],
       ),
     );
   }

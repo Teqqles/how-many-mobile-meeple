@@ -459,7 +459,8 @@ class AppModel extends ChangeNotifier {
   /// flow's filters (duration, complexity, mechanics, rating) belong to one-game
   /// picks the user configured there, never to a game night, so none of them
   /// carry over. The evening budget governs playtime, and the only pool filter
-  /// is an explicit game-night player count when the user sets one.
+  /// is an explicit game-night player count when the user sets one. Mechanics
+  /// ride along in the payload so a slot can filter on mechanic locally.
   GameRequest buildGameNightRequest() {
     final settings = Settings.defaultSettings();
     final players = _settings.setting(Settings.gameNightPlayerCount.name);
@@ -472,7 +473,7 @@ class AppModel extends ChangeNotifier {
       );
       settings.updateSetting(applied);
     }
-    return GameRequest.from(settings, _items);
+    return GameRequest.from(settings, _items).withWhitelistField('mechanics');
   }
 
   /// A clone of the current settings tuned for a shareable Game Night link:

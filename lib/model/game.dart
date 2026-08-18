@@ -15,6 +15,11 @@ class Game {
   /// reported no date or a whitelist omitted the field.
   final DateTime? lastModified;
 
+  /// The game's mechanics, e.g. "Worker Placement". Empty unless the fetch
+  /// whitelisted `mechanics`; the game night asks for it so slots can filter
+  /// on mechanic locally.
+  final List<String> mechanics;
+
   Game({
     required this.id,
     required this.name,
@@ -26,6 +31,7 @@ class Game {
     required this.averageRating,
     required this.averageWeight,
     this.lastModified,
+    this.mechanics = const [],
   });
 
   factory Game.fromJson(Map<String, dynamic> json) {
@@ -40,7 +46,13 @@ class Game {
       averageRating: (json['stats']['average'] ?? 0).toDouble(),
       averageWeight: (json['stats']['averageweight'] ?? 0).toDouble(),
       lastModified: _parseLastModified(json['lastmodified']),
+      mechanics: _parseMechanics(json['mechanics']),
     );
+  }
+
+  static List<String> _parseMechanics(Object? value) {
+    if (value is! List) return const [];
+    return value.whereType<String>().toList();
   }
 
   static DateTime? _parseLastModified(Object? value) {

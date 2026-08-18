@@ -98,6 +98,11 @@ class GameNightPlanner {
   /// lifetime of a single [plan] call.
   Set<int> _favourites = const {};
 
+  /// Play counts by game id, used only to break the empty-slot fallback toward
+  /// games the group plays often. Empty when play history has not loaded, in
+  /// which case the fallback prefers the shortest game as the easiest replay.
+  Map<int, int> _playCounts = const {};
+
   GameNightPlanner({int Function(int count)? pick})
     : _pick = pick ?? ((count) => Random().nextInt(count));
 
@@ -113,8 +118,10 @@ class GameNightPlanner {
     Map<GameNightSlot, String> slotMechanics = const {},
     bool includeOutro = true,
     Set<int> favouriteIds = const {},
+    Map<int, int> playCounts = const {},
   }) {
     _favourites = favouriteIds;
+    _playCounts = playCounts;
     final used = pinned.values.map((g) => g.id).toSet();
 
     final filler =
@@ -262,7 +269,38 @@ class GameNightPlanner {
               _matchesMechanic(g, mechanic),
         )
         .toList();
-    return _choose(candidates);
+    final closer = _choose(candidates);
+    if (closer != null) return closer;
+
+    // No short closer fits the leftover time. Rather than leave the slot
+    // empty, offer a game the group plays often that still fits - it sets up
+    // fast and suits a few quick rounds to round off the night.
+    final fallback = pool
+        .where(
+          (g) =>
+              !used.contains(g.id) &&
+              g.maxPlaytime > 0 &&
+              _cost(g) <= remaining &&
+              _matchesMechanic(g, mechanic),
+        )
+        .toList();
+    return _pickReplayable(fallback);
+  }
+
+  /// Picks the game the group plays most from [candidates]; with no play
+  /// history the shortest game wins, as a shorter game is the easiest to set
+  /// up again for another round. Returns null when there is nothing to pick.
+  Game? _pickReplayable(List<Game> candidates) {
+    if (candidates.isEmpty) return null;
+
+    final played =
+        candidates.where((g) => (_playCounts[g.id] ?? 0) > 0).toList()
+          ..sort((a, b) => _playCounts[b.id]!.compareTo(_playCounts[a.id]!));
+    if (played.isNotEmpty) return played.first;
+
+    return ([
+      ...candidates,
+    ]..sort((a, b) => a.maxPlaytime.compareTo(b.maxPlaytime))).first;
   }
 
   Game? _choose(List<Game> candidates) {

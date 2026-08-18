@@ -260,6 +260,56 @@ void main() {
       expect(lineup.outro, isNull);
     });
 
+    test('falls back to a well-played game when no short closer fits', () {
+      // Filler 15 + main 120 leaves 80 minutes, but the only unused games run
+      // past the 45-min closer ceiling. The one played most fills the slot.
+      final lineup = _planner().plan(
+        pool: [
+          _game(1, 15, weight: 2.0),
+          _game(2, 120, weight: 3.5),
+          _game(3, 60, weight: 2.5),
+          _game(4, 50, weight: 2.5),
+        ],
+        durationMinutes: 240,
+        playCounts: {3: 5, 4: 1},
+      );
+
+      expect(lineup.main!.id, 2);
+      expect(lineup.outro!.id, 3);
+    });
+
+    test('the empty-slot fallback prefers the shortest game with no plays', () {
+      final lineup = _planner().plan(
+        pool: [
+          _game(1, 15, weight: 2.0),
+          _game(2, 120, weight: 3.5),
+          _game(3, 60, weight: 2.5),
+          _game(4, 50, weight: 2.5),
+        ],
+        durationMinutes: 240,
+      );
+
+      // No play history, so the shorter of the two oversized games wins.
+      expect(lineup.outro!.id, 4);
+    });
+
+    test('a fitting short closer still wins over the fallback', () {
+      final lineup = _planner().plan(
+        pool: [
+          _game(1, 15, weight: 2.0),
+          _game(2, 120, weight: 3.5),
+          _game(3, 20, weight: 2.0),
+          _game(4, 60, weight: 2.5),
+        ],
+        durationMinutes: 240,
+        playCounts: {4: 9},
+      );
+
+      // Game 3 fits the closer ceiling, so it is used even though game 4 is
+      // played far more - the fallback only fires for an empty slot.
+      expect(lineup.outro!.id, 3);
+    });
+
     test('a pinned outro is kept and never reused elsewhere', () {
       final pinnedOutro = _game(3, 20);
       final lineup = _planner().plan(

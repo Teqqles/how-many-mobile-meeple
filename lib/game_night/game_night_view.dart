@@ -184,6 +184,7 @@ class _GameNightViewState extends State<GameNightView> {
         slotMechanics: Map.of(_slotMechanics),
         includeOutro: _includeOutro,
         favouriteIds: _favouriteIds,
+        playCounts: _playCounts,
       );
     });
   }
@@ -192,6 +193,16 @@ class _GameNightViewState extends State<GameNightView> {
     final favourites = FavouritesService.cached;
     if (favourites == null) return const {};
     return favourites.games.map((g) => g.id).toSet();
+  }
+
+  /// Play counts for the pool, used to fill an empty slot with a well-played
+  /// game. Empty until plays have loaded, so the planner falls back on length.
+  Map<int, int> get _playCounts {
+    if (!widget.model.playsLoaded) return const {};
+    return {
+      for (final game in widget.pool)
+        game.id: widget.model.getPlayCount(game.id),
+    };
   }
 
   /// The outro plays from the pool already in hand, so toggling it re-plans

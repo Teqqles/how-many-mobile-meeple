@@ -297,6 +297,27 @@ void main() {
     expect(find.byKey(const ValueKey('game-night-outro-toggle')), findsNothing);
   });
 
+  testWidgets('fills an empty closer with a well-played game', (tester) async {
+    final pool = [
+      _game(1, 'Quick', 15, 2.0),
+      _game(2, 'Epic', 120, 3.5),
+      _game(3, 'Regular', 60, 2.5),
+      _game(4, 'Rare', 50, 2.5),
+    ];
+    final model = _modelWithDuration(240)
+      ..setPlaysForTest(
+        playsData: {3: PlayData(gameId: 3, gameName: 'Regular', totalPlays: 5)},
+        collectionGameIds: {1, 2, 3, 4},
+      );
+
+    await tester.pumpWidget(_wrap(model, pool: pool));
+
+    // No unused game fits the closer's 45-min ceiling, so the most-played
+    // game that still fits the leftover time closes the night.
+    expect(find.text('Outro · Wind-down closer'), findsOneWidget);
+    expect(find.text('Regular'), findsOneWidget);
+  });
+
   testWidgets(
     'adds a wind-down outro on a long night and lets you disable it',
     (tester) async {

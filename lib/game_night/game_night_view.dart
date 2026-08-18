@@ -492,8 +492,9 @@ class _GameNightViewState extends State<GameNightView> {
                 children: [
                   Text(
                     '$title · $subtitle',
-                    style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                      color: Theme.of(context).colorScheme.primary,
+                    style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                      color: scheme.onSurface,
+                      fontWeight: FontWeight.w700,
                     ),
                   ),
                   const SizedBox(height: 4),
@@ -517,12 +518,19 @@ class _GameNightViewState extends State<GameNightView> {
               ),
             ),
             if (game != null)
-              IconButton(
-                tooltip: pinned ? 'Unpin' : 'Pin',
-                icon: Icon(pinned ? Icons.push_pin : Icons.push_pin_outlined),
-                color: pinned ? Theme.of(context).colorScheme.primary : null,
-                onPressed: () => _togglePin(slot),
-              ),
+              // A pinned slot gets a filled button so the locked state reads at
+              // a glance; an unpinned one stays a plain outline.
+              pinned
+                  ? IconButton.filled(
+                      tooltip: 'Unpin',
+                      icon: const Icon(Icons.push_pin),
+                      onPressed: () => _togglePin(slot),
+                    )
+                  : IconButton(
+                      tooltip: 'Pin',
+                      icon: const Icon(Icons.push_pin_outlined),
+                      onPressed: () => _togglePin(slot),
+                    ),
           ],
         ),
       ),

@@ -1,6 +1,11 @@
 {
-  "version": "2.34.2",
+  "version": "2.35.1",
   "recent_changes": [
+    {
+      "type": "feat",
+      "scope": "",
+      "description": "Game Night lineup planner (#39)"
+    },
     {
       "type": "feat",
       "scope": "",
@@ -100,14 +105,16 @@
       "type": "feat",
       "scope": "",
       "description": "debounce slider persistence to reduce redundant writes"
-    },
-    {
-      "type": "feat",
-      "scope": "",
-      "description": "replace tour tips with context-sensitive help page"
     }
   ],
   "upcoming": [
+    {
+      "number": 119,
+      "title": "Expose expansion relationships for Game Night expansion slot",
+      "labels": [
+        "enhancement"
+      ]
+    },
     {
       "number": 117,
       "title": "Let players pick a specific theme instead of random",
@@ -193,11 +200,6 @@
     {
       "number": 41,
       "title": "Mood-Based Discovery",
-      "labels": []
-    },
-    {
-      "number": 39,
-      "title": "Game Night",
       "labels": []
     },
     {

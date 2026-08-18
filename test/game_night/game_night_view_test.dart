@@ -124,7 +124,7 @@ void main() {
     await tester.pumpWidget(
       _wrap(
         model,
-        pool: [_game(8, 'Warmup', 20, 2.0), _game(9, 'Titan', 150, 3.0)],
+        pool: [_game(8, 'Warmup', 20, 2.0), _game(9, 'Titan', 140, 3.0)],
       ),
     );
     await tester.pump();

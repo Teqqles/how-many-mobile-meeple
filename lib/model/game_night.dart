@@ -84,6 +84,14 @@ class GameNightPlanner {
   /// favourite - a nudge, not a guarantee.
   static const int favouriteWeight = 3;
 
+  /// Minutes reserved around each game for setup, teardown and a breather
+  /// before the next one, scaled by weight. Light games teach and reset fast;
+  /// heavy ones need longer. Added to a game's playtime so the whole evening -
+  /// play plus these gaps - fits inside the budget.
+  static const int lightOverheadMinutes = 5;
+  static const int mediumOverheadMinutes = 10;
+  static const int heavyOverheadMinutes = 15;
+
   final int Function(int count) _pick;
 
   /// Ids of the user's favourite games, weighted up in every draw for the
@@ -114,7 +122,7 @@ class GameNightPlanner {
         _pickFiller(pool, used, slotMechanics[GameNightSlot.filler]);
     if (filler != null) used.add(filler.id);
 
-    final remaining = durationMinutes - (filler?.maxPlaytime ?? 0);
+    final remaining = durationMinutes - _cost(filler);
     final main =
         pinned[GameNightSlot.main] ??
         _pickMain(pool, used, remaining, slotMechanics[GameNightSlot.main]);
@@ -122,7 +130,13 @@ class GameNightPlanner {
 
     final backup =
         pinned[GameNightSlot.backup] ??
-        _pickBackup(pool, used, main, slotMechanics[GameNightSlot.backup]);
+        _pickBackup(
+          pool,
+          used,
+          main,
+          remaining,
+          slotMechanics[GameNightSlot.backup],
+        );
 
     // The backup is an alternative to the main, so it is not "used" against the
     // outro - either the main or the backup is played, never both.
@@ -133,7 +147,7 @@ class GameNightPlanner {
                 pool,
                 used,
                 durationMinutes,
-                filler,
+                remaining,
                 main,
                 slotMechanics[GameNightSlot.outro],
               );
@@ -175,7 +189,7 @@ class GameNightPlanner {
           (g) =>
               !used.contains(g.id) &&
               g.maxPlaytime > 0 &&
-              g.maxPlaytime <= remaining &&
+              _cost(g) <= remaining &&
               _matchesMechanic(g, mechanic),
         )
         .toList();
@@ -198,6 +212,7 @@ class GameNightPlanner {
     List<Game> pool,
     Set<int> used,
     Game? main,
+    int remaining,
     String? mechanic,
   ) {
     if (main == null) return null;
@@ -208,6 +223,7 @@ class GameNightPlanner {
           (g) =>
               !used.contains(g.id) &&
               g.maxPlaytime > 0 &&
+              _cost(g) <= remaining &&
               (g.maxPlaytime - main.maxPlaytime).abs() <= tolerance &&
               _matchesMechanic(g, mechanic),
         )
@@ -227,15 +243,14 @@ class GameNightPlanner {
     List<Game> pool,
     Set<int> used,
     int durationMinutes,
-    Game? filler,
+    int remainingAfterFiller,
     Game? main,
     String? mechanic,
   ) {
     // A closer only makes sense on a long night, once the main is set and time
     // is left over to play it in.
     if (durationMinutes <= outroMinDurationMinutes || main == null) return null;
-    final remaining =
-        durationMinutes - (filler?.maxPlaytime ?? 0) - main.maxPlaytime;
+    final remaining = remainingAfterFiller - _cost(main);
 
     final candidates = pool
         .where(
@@ -243,7 +258,7 @@ class GameNightPlanner {
               !used.contains(g.id) &&
               g.maxPlaytime > 0 &&
               g.maxPlaytime <= fillerMaxMinutes &&
-              g.maxPlaytime <= remaining &&
+              _cost(g) <= remaining &&
               _matchesMechanic(g, mechanic),
         )
         .toList();
@@ -270,6 +285,18 @@ class GameNightPlanner {
     }
     return weighted;
   }
+
+  /// A game's total demand on the evening: its playtime plus the setup,
+  /// teardown and breather reserved around it. Null (an unfilled slot) costs
+  /// nothing.
+  int _cost(Game? game) =>
+      game == null ? 0 : game.maxPlaytime + _overhead(game);
+
+  int _overhead(Game game) => switch (_weightBand(game.averageWeight)) {
+    0 => lightOverheadMinutes,
+    1 => mediumOverheadMinutes,
+    _ => heavyOverheadMinutes,
+  };
 
   static int _weightBand(double weight) {
     if (weight < 2.0) return 0;

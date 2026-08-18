@@ -178,6 +178,22 @@ void main() {
       expect(lineup.main!.id, 2); // unconstrained slot still fills
     });
 
+    test('reserves setup and teardown overhead against the budget', () {
+      // A 90-min heavy game costs 90 + 15 overhead = 105. With a 15-min light
+      // filler costing 15 + 5 = 20, the pair needs 125 minutes.
+      final justFits = _planner().plan(
+        pool: [_game(1, 15, weight: 1.5), _game(2, 90, weight: 3.5)],
+        durationMinutes: 125,
+      );
+      expect(justFits.main!.id, 2);
+
+      final justShort = _planner().plan(
+        pool: [_game(1, 15, weight: 1.5), _game(2, 90, weight: 3.5)],
+        durationMinutes: 124,
+      );
+      expect(justShort.main, isNull); // one minute short once overhead counts
+    });
+
     test('weights a favourite into extra draw slots', () {
       // Two equally valid mains; index 1 of the raw list is game 2, but game 1
       // is a favourite, so its repeats push game 2 down the weighted list.
@@ -225,10 +241,11 @@ void main() {
     test('no outro when the main leaves no room for a closer', () {
       final lineup = _planner().plan(
         pool: [_game(1, 15), _game(2, 120), _game(3, 20)],
-        durationMinutes: 145,
+        durationMinutes: 160,
       );
 
-      // 145 - 15 filler - 120 main = 10 minutes, too little for the 20-min game.
+      // Filler cost 25 + main cost 130 = 155, leaving 5 minutes - far short of
+      // the cheapest closer (a 20-min game costs 30 with its overhead).
       expect(lineup.main!.id, 2);
       expect(lineup.outro, isNull);
     });

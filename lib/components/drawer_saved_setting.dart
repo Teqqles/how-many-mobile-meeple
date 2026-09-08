@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:how_many_mobile_meeple/model/app_preferences.dart';
 import 'package:how_many_mobile_meeple/model/model.dart';
 import 'package:how_many_mobile_meeple/storage/preferences_history_interface.dart';
@@ -47,8 +48,9 @@ class DrawerSavedSetting extends Container {
                onTap: () async {
                  var model = AppModel.of(context, listen: false);
 
-                 // Capture navigator before async operations
+                 // Capture navigator/router before async operations
                  final navigator = Navigator.of(context);
+                 final router = GoRouter.of(context);
 
                  await model.replaceItems(preferences.items);
                  await model.replaceSettings(preferences.settings);
@@ -57,7 +59,7 @@ class DrawerSavedSetting extends Container {
 
                  // Always show settings summary after loading saved settings
                  Future.delayed(Duration(milliseconds: 300), () {
-                   navigator.pushNamed(r.Router.settingsRoute);
+                   router.push(r.Router.settingsRoute);
                  });
                },
              ),

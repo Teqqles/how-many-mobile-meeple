@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:how_many_mobile_meeple/components/app_choice_chip.dart';
 import 'package:how_many_mobile_meeple/components/app_switch.dart';
@@ -387,16 +388,16 @@ class _QuickPickSheetState extends State<QuickPickSheet> {
     model.invalidateCache();
     model.updateStore();
 
+    // Capture the router before popping the sheet - once popped, this context
+    // is unmounted and can no longer resolve the GoRouter.
+    final router = GoRouter.maybeOf(context);
     Navigator.of(context).pop();
 
-    final randomPageSettings = r.Router.generateRouteSettings(
+    final randomPageLocation = r.Router.encodeLocation(
       r.Router.randomRoute,
       model,
     );
     model.pageRefreshed = true;
-    Navigator.of(context).pushReplacementNamed(
-      randomPageSettings.name!,
-      arguments: randomPageSettings.arguments,
-    );
+    router?.pushReplacement(randomPageLocation);
   }
 }

@@ -28,11 +28,15 @@ Game _game(int id, int maxPlaytime) => Game(
   averageWeight: 2.5,
 );
 
-/// The fragment part of a permalink is what the browser keeps after `#`. On a
-/// refresh, Flutter web parses that fragment as a [Uri] to drive routing, so a
-/// permalink only survives a refresh if the collection sources live in the Uri
-/// *path* - not swallowed into the authority by a stray leading `//`.
-Uri _parseFragment(String url) => Uri.parse(Uri.parse(url).fragment);
+/// A permalink is now a clean-path URL (`https://host/gameNight/teqqles?...`).
+/// On a refresh, Flutter web routes on the Uri path plus query, so a permalink
+/// only survives if the collection sources live in the path - not swallowed
+/// into the authority by a stray leading `//`. This yields the path+query
+/// location string the app reads back on that refresh.
+String _locationOf(String url) {
+  final uri = Uri.parse(url);
+  return uri.hasQuery ? '${uri.path}?${uri.query}' : uri.path;
+}
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -62,22 +66,22 @@ void main() {
     );
 
     final url = Router.gameNightPermalink(sender, lineup);
-    final fragment = _parseFragment(url);
+    final uri = Uri.parse(url);
 
-    // A leading `//` makes `Uri.parse` read the collection as a host; a refresh
-    // then strips it, losing the sources.
+    // A leading `//` in the path makes `Uri.parse` read the collection as a
+    // host; a refresh then strips it, losing the sources.
     expect(
-      fragment.hasAuthority,
+      uri.path.startsWith('//'),
       isFalse,
       reason: 'the collection must not be parsed as a URL authority',
     );
     expect(
-      fragment.path,
+      uri.path,
       startsWith('/gameNight/'),
       reason: 'a Game Night link carries mode in its path prefix',
     );
     expect(
-      fragment.path,
+      uri.path,
       contains('teqqles'),
       reason: 'the collection must survive in the path across a refresh',
     );
@@ -96,14 +100,8 @@ void main() {
     final url = Router.gameNightPermalink(sender, lineup);
 
     // Simulate a hard refresh: Flutter web routes on the Uri path (plus query),
-    // so anything that landed in the authority is gone by the time the app
-    // reads the fragment back.
-    final parsed = _parseFragment(url);
-    final refreshedFragment = Uri(
-      path: parsed.path,
-      query: parsed.query.isEmpty ? null : parsed.query,
-    ).toString();
-    final extractor = UrlFragmentExtractor(Uri(fragment: refreshedFragment));
+    // which is exactly the location string the extractor reads back.
+    final extractor = UrlFragmentExtractor.fromLocation(_locationOf(url));
 
     expect(
       extractor.extractItems().itemList.map((i) => i.name),

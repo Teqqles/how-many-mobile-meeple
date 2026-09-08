@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:how_many_mobile_meeple/components/quick_pick_sheet.dart';
 import 'package:how_many_mobile_meeple/model/model.dart';
@@ -81,11 +82,11 @@ class Step5FinalActions extends StatelessWidget {
                 // Secondary action - Random Game
                 OutlinedButton.icon(
                   onPressed: () {
-                    final randomPageSettings = r.Router.generateRouteSettings(
+                    final randomPageLocation = r.Router.encodeLocation(
                       r.Router.randomRoute,
                       model,
                     );
-                    _navigateToPage(context, randomPageSettings);
+                    _navigateToPage(context, randomPageLocation);
                   },
                   icon: const Icon(Icons.casino, size: 24),
                   label: const Text(
@@ -105,11 +106,11 @@ class Step5FinalActions extends StatelessWidget {
                 // Secondary action - View List
                 OutlinedButton.icon(
                   onPressed: () {
-                    final listPageSettings = r.Router.generateRouteSettings(
+                    final listPageLocation = r.Router.encodeLocation(
                       r.Router.listRoute,
                       model,
                     );
-                    _navigateToPage(context, listPageSettings);
+                    _navigateToPage(context, listPageLocation);
                   },
                   icon: const Icon(Icons.list, size: 24),
                   label: const Text(
@@ -130,7 +131,7 @@ class Step5FinalActions extends StatelessWidget {
                 OutlinedButton.icon(
                   onPressed: () {
                     final username = model.primaryPlayer ?? '';
-                    Navigator.of(context).pushNamed(
+                    context.push(
                       '${r.Router.shelfOfShameRoute}/${Uri.encodeComponent(username)}',
                     );
                   },
@@ -152,7 +153,7 @@ class Step5FinalActions extends StatelessWidget {
                 // Tertiary action - Review Settings
                 OutlinedButton.icon(
                   onPressed: () {
-                    Navigator.of(context).pushNamed(r.Router.settingsRoute);
+                    context.push(r.Router.settingsRoute);
                   },
                   icon: const Icon(Icons.settings_outlined, size: 24),
                   label: const Text(
@@ -246,12 +247,9 @@ class Step5FinalActions extends StatelessWidget {
     );
   }
 
-  void _navigateToPage(BuildContext context, RouteSettings pageSettings) {
+  void _navigateToPage(BuildContext context, String location) {
     final model = AppModel.of(context, listen: false);
     model.pageRefreshed = true;
-    Navigator.of(context).pushReplacementNamed(
-      pageSettings.name!,
-      arguments: pageSettings.arguments,
-    );
+    context.pushReplacement(location);
   }
 }

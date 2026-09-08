@@ -8,6 +8,7 @@ import 'favourites_service.dart';
 import 'ignored_games_service.dart';
 import '../model/game.dart';
 import '../model/model.dart';
+import '../platform/router.dart' as r;
 import '../play_log/log_play_dialog.dart';
 import '../play_log/play_log_service.dart';
 import '../services/service_locator.dart';
@@ -187,11 +188,11 @@ class _GameActionButtonsState extends State<GameActionButtons> {
   }
 
   void _share(BuildContext context, Game game) async {
-    final baseUri = Uri.base.removeFragment();
-    final uri = baseUri.replace(
-      fragment: '/game/${game.name.replaceAll(' ', '+')}/${game.id}',
-    );
-    final url = uri.toString();
+    // Clean-path share link (`https://host/game/Name/174430`) matching the
+    // router's game-detail route - no hash fragment.
+    final url =
+        '${r.Router.originOf(Uri.base)}/game/${game.name.replaceAll(' ', '+')}/${game.id}';
+    final uri = Uri.parse(url);
     try {
       await SharePlus.instance.share(
         ShareParams(title: '${game.name} on How Many Meeple', uri: uri),

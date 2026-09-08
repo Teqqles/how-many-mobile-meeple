@@ -3,24 +3,35 @@ library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
 import 'package:how_many_mobile_meeple/guided_flow/step5_final_actions.dart';
 import 'package:how_many_mobile_meeple/model/model.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 Widget _buildTestWidget(AppModel model, {VoidCallback? onSwitchToAdvanced}) {
-  return ChangeNotifierProvider.value(
-    value: model,
-    child: MaterialApp(
-      routes: {'/settings': (_) => const Scaffold(body: Text('Settings Page'))},
-      home: Scaffold(
-        body: SingleChildScrollView(
-          child: Step5FinalActions(
-            onSwitchToAdvanced: onSwitchToAdvanced ?? () {},
+  final router = GoRouter(
+    routes: [
+      GoRoute(
+        path: '/',
+        builder: (context, state) => Scaffold(
+          body: SingleChildScrollView(
+            child: Step5FinalActions(
+              onSwitchToAdvanced: onSwitchToAdvanced ?? () {},
+            ),
           ),
         ),
       ),
-    ),
+      GoRoute(
+        path: '/settings',
+        builder: (context, state) =>
+            const Scaffold(body: Text('Settings Page')),
+      ),
+    ],
+  );
+  return ChangeNotifierProvider.value(
+    value: model,
+    child: MaterialApp.router(routerConfig: router),
   );
 }
 

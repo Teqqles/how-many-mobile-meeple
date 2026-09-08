@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:how_many_mobile_meeple/components/quick_pick_sheet.dart';
@@ -45,15 +46,12 @@ class FeatureDrawer extends StatelessWidget {
                   enabled: hasSources,
                   onTap: () {
                     Navigator.of(context).pop();
-                    final settings = r.Router.generateRouteSettings(
+                    final location = r.Router.encodeLocation(
                       r.Router.randomRoute,
                       model,
                     );
                     model.pageRefreshed = true;
-                    Navigator.of(context).pushReplacementNamed(
-                      settings.name!,
-                      arguments: settings.arguments,
-                    );
+                    context.pushReplacement(location);
                   },
                 ),
                 _buildItem(
@@ -63,15 +61,12 @@ class FeatureDrawer extends StatelessWidget {
                   enabled: hasSources,
                   onTap: () {
                     Navigator.of(context).pop();
-                    final settings = r.Router.generateRouteSettings(
+                    final location = r.Router.encodeLocation(
                       r.Router.listRoute,
                       model,
                     );
                     model.pageRefreshed = true;
-                    Navigator.of(context).pushReplacementNamed(
-                      settings.name!,
-                      arguments: settings.arguments,
-                    );
+                    context.pushReplacement(location);
                   },
                 ),
                 const Divider(),
@@ -85,7 +80,7 @@ class FeatureDrawer extends StatelessWidget {
                   onTap: () {
                     Navigator.of(context).pop();
                     final username = model.primaryPlayer ?? '';
-                    Navigator.of(context).pushNamed(
+                    context.push(
                       '${r.Router.shelfOfShameRoute}/${Uri.encodeComponent(username)}',
                     );
                   },
@@ -98,7 +93,7 @@ class FeatureDrawer extends StatelessWidget {
                   disabledMessage: 'Add a BGG collection first',
                   onTap: () {
                     Navigator.of(context).pop();
-                    Navigator.of(context).pushNamed(r.Router.insightsRoute);
+                    context.push(r.Router.insightsRoute);
                   },
                 ),
                 const Divider(),
@@ -109,7 +104,7 @@ class FeatureDrawer extends StatelessWidget {
                   label: 'Favourites',
                   onTap: () {
                     Navigator.of(context).pop();
-                    Navigator.of(context).pushNamed(r.Router.favouritesRoute);
+                    context.push(r.Router.favouritesRoute);
                   },
                 ),
                 _buildItem(
@@ -118,7 +113,7 @@ class FeatureDrawer extends StatelessWidget {
                   label: 'Play History',
                   onTap: () {
                     Navigator.of(context).pop();
-                    Navigator.of(context).pushNamed(r.Router.playLogRoute);
+                    context.push(r.Router.playLogRoute);
                   },
                 ),
                 _buildItem(
@@ -127,7 +122,7 @@ class FeatureDrawer extends StatelessWidget {
                   label: 'Ignored Games',
                   onTap: () {
                     Navigator.of(context).pop();
-                    Navigator.of(context).pushNamed(r.Router.ignoredRoute);
+                    context.push(r.Router.ignoredRoute);
                   },
                 ),
                 _buildItem(
@@ -206,8 +201,7 @@ class FeatureDrawer extends StatelessWidget {
       ),
       onTap: () {
         Navigator.of(context).pop();
-        Navigator.of(context)
-            .pushNamed('${r.Router.gameDetailRoute}/${game.id}');
+        context.push('${r.Router.gameDetailRoute}/${game.id}');
       },
     );
   }

@@ -1,6 +1,7 @@
 // coverage:ignore-file
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:how_many_mobile_meeple/platform/router.dart' as r;
@@ -54,8 +55,7 @@ class AppFooter extends StatelessWidget {
                 Tooltip(
                   message: 'About',
                   child: GestureDetector(
-                    onTap: () =>
-                        Navigator.of(context).pushNamed(r.Router.aboutRoute),
+                    onTap: () => context.push(r.Router.aboutRoute),
                     child: Icon(
                       Icons.info_outline,
                       size: 20,

@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:how_many_mobile_meeple/app_common.dart';
 import 'package:how_many_mobile_meeple/model/game.dart';
 import 'package:how_many_mobile_meeple/model/model.dart';
@@ -136,7 +137,7 @@ class _RecommendationTile extends StatelessWidget {
     return MouseRegion(
       cursor: SystemMouseCursors.click,
       child: GestureDetector(
-        onTap: () => Navigator.of(context).pushNamed(
+        onTap: () => context.push(
           '${r.Router.gameDetailRoute}/${recommendation.name.replaceAll(' ', '+')}/${recommendation.gameId}',
         ),
         child: SizedBox(

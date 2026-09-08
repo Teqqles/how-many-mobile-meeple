@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:how_many_mobile_meeple/model/model.dart';
 import 'package:how_many_mobile_meeple/model/settings.dart';
@@ -70,8 +71,12 @@ class _GuidedFlowHomePageState extends State<GuidedFlowHomePage> {
     // means it never clobbers edits the user makes while a link is open.
     if (!_routeApplied) {
       _routeApplied = true;
-      final name = ModalRoute.of(context)?.settings.name;
-      AppModel.of(context, listen: false).applyRouteUrl(name);
+      // Only present when built under the app's GoRouter; widget tests may pump
+      // this page on a bare MaterialApp, where there is no route URL to apply.
+      if (GoRouter.maybeOf(context) != null) {
+        final location = GoRouterState.of(context).uri.toString();
+        AppModel.of(context, listen: false).applyRouteUrl(location);
+      }
     }
   }
 
@@ -471,8 +476,7 @@ class _GuidedFlowHomePageState extends State<GuidedFlowHomePage> {
               Tooltip(
                 message: 'About',
                 child: GestureDetector(
-                  onTap: () =>
-                      Navigator.of(context).pushNamed(r.Router.aboutRoute),
+                  onTap: () => context.push(r.Router.aboutRoute),
                   child: Icon(
                     Icons.info_outline,
                     size: 20,

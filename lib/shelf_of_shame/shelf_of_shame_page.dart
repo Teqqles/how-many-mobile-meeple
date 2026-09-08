@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:how_many_mobile_meeple/api/http_retry_client.dart';
@@ -423,7 +424,7 @@ class _ShelfOfShamePageState extends State<ShelfOfShamePage>
         ),
         title: Text(game.name),
         subtitle: _buildTileSubtitle(context, game),
-        onTap: () => Navigator.of(context).pushNamed(
+        onTap: () => context.push(
           '${r.Router.gameDetailRoute}/${game.name.replaceAll(' ', '+')}/${game.id}',
         ),
       ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:how_many_mobile_meeple/favourites/favourites_service.dart';
 import 'package:how_many_mobile_meeple/favourites/ignored_games_service.dart';
 import 'package:how_many_mobile_meeple/model/game_night.dart';
@@ -39,6 +40,9 @@ class Router {
   /// prefix - not a query flag - is what puts the recipient in Game Night mode.
   static const String gameNightRoute = '/gameNight';
 
+  /// Bare routes that carry no encoded model. [UrlFragmentExtractor] uses this
+  /// to tell a plain navigation target (`/list`) from a model-bearing deep link
+  /// (`/list/<collection>?<settings>`).
   static List<String> routeList = [
     randomRoute,
     listRoute,
@@ -48,64 +52,80 @@ class Router {
     homeRoute,
   ];
 
-  static Route<dynamic> generateRoute(RouteSettings settings) {
-    var secondSlash = settings.name!.substring(1).indexOf("/");
-    var path = secondSlash == -1
-        ? settings.name!
-        : settings.name!.substring(0, secondSlash + 1);
+  /// The app's single [GoRouter]. Built once so its state (and the browser
+  /// history it drives) survives widget rebuilds. Using the Router API gives us
+  /// Flutter's [MultiEntryBrowserHistory], which maps browser back/forward to
+  /// real Navigator pops - unlike the Navigator 1.0 API's single-entry history,
+  /// which cancelled every popstate with `history.go(-1)` and bounced a
+  /// re-visited tab off the app entirely.
+  static final GoRouter router = GoRouter(
+    routes: _routes(),
+    // Any unmatched path falls back to the home page; the model still reads the
+    // URL, so a malformed model link degrades to the home screen rather than an
+    // error page.
+    errorBuilder: (context, state) => Pages.platformPages().homePage(),
+  );
 
-    if (path == Router.gameDetailRoute) {
-      final segments = settings.name!
-          .split('/')
-          .where((s) => s.isNotEmpty)
-          .toList();
-      final idStr = segments.last;
-      final gameId = int.tryParse(idStr);
-      if (gameId != null) {
-        return MaterialPageRoute(
-          builder: (_) => _deferred(
-            game_detail.loadLibrary,
-            () => game_detail.GameDetailPage(gameId: gameId),
-          ),
-          settings: settings,
-        );
-      }
-    }
-
-    switch (path) {
-      case Router.homeRoute:
-      // A shared Game Night link (`/gameNight/<collection>`) lands on the same
-      // home page; the model reads the fragment and opens Game Night mode.
-      case Router.gameNightRoute:
-        return MaterialPageRoute(
-          builder: (_) => Pages.platformPages().homePage(),
-          settings: settings,
-        );
-      case Router.listRoute:
-        final pages = Pages.platformPages();
-        return MaterialPageRoute(
-          builder: (_) =>
-              _deferred(pages.listGamesLoader, () => pages.listGamesPage()),
-          settings: settings,
-        );
-      case Router.randomRoute:
-        final rPages = Pages.platformPages();
-        return MaterialPageRoute(
-          builder: (_) =>
-              _deferred(rPages.randomGameLoader, () => rPages.randomGamePage()),
-          settings: settings,
-        );
-      case Router.settingsRoute:
-        return MaterialPageRoute(
-          builder: (_) => _deferred(
+  // Each model-bearing route (`/`, `/gameNight`, `/list`, `/random`) is
+  // registered twice: bare, and with a `:payload` segment for the encoded
+  // collection. Page widgets never read the payload - [AppModel] loads it from
+  // the URL - so both variants build the same page. Keying pages by the full
+  // location means re-visiting a different shared link remounts the page, which
+  // re-runs its once-per-mount URL restore.
+  static List<RouteBase> _routes() {
+    final pages = Pages.platformPages();
+    return [
+      GoRoute(
+        path: homeRoute,
+        pageBuilder: (_, state) => _page(state, pages.homePage()),
+      ),
+      GoRoute(
+        path: gameNightRoute,
+        pageBuilder: (_, state) => _page(state, pages.homePage()),
+      ),
+      GoRoute(
+        path: '$gameNightRoute/:payload',
+        pageBuilder: (_, state) => _page(state, pages.homePage()),
+      ),
+      GoRoute(
+        path: listRoute,
+        pageBuilder: (_, state) =>
+            _page(state, _deferred(pages.listGamesLoader, pages.listGamesPage)),
+      ),
+      GoRoute(
+        path: '$listRoute/:payload',
+        pageBuilder: (_, state) =>
+            _page(state, _deferred(pages.listGamesLoader, pages.listGamesPage)),
+      ),
+      GoRoute(
+        path: randomRoute,
+        pageBuilder: (_, state) => _page(
+          state,
+          _deferred(pages.randomGameLoader, pages.randomGamePage),
+        ),
+      ),
+      GoRoute(
+        path: '$randomRoute/:payload',
+        pageBuilder: (_, state) => _page(
+          state,
+          _deferred(pages.randomGameLoader, pages.randomGamePage),
+        ),
+      ),
+      GoRoute(
+        path: settingsRoute,
+        pageBuilder: (_, state) => _page(
+          state,
+          _deferred(
             settings_page.loadLibrary,
             () => settings_page.SettingsSummaryPage(),
           ),
-          settings: settings,
-        );
-      case Router.favouritesRoute:
-        return MaterialPageRoute(
-          builder: (_) => _deferred(
+        ),
+      ),
+      GoRoute(
+        path: favouritesRoute,
+        pageBuilder: (_, state) => _page(
+          state,
+          _deferred(
             game_list.loadLibrary,
             () => game_list.GameListPage(
               title: 'Favourites',
@@ -115,11 +135,13 @@ class Router {
               serviceFactory: FavouritesService.instance,
             ),
           ),
-          settings: settings,
-        );
-      case Router.ignoredRoute:
-        return MaterialPageRoute(
-          builder: (_) => _deferred(
+        ),
+      ),
+      GoRoute(
+        path: ignoredRoute,
+        pageBuilder: (_, state) => _page(
+          state,
+          _deferred(
             game_list.loadLibrary,
             () => game_list.GameListPage(
               title: 'Ignored Games',
@@ -129,98 +151,131 @@ class Router {
               serviceFactory: IgnoredGamesService.instance,
             ),
           ),
-          settings: settings,
-        );
-      case Router.playLogRoute:
-        return MaterialPageRoute(
-          builder: (_) =>
-              _deferred(play_log.loadLibrary, () => play_log.PlayLogPage()),
-          settings: settings,
-        );
-      case Router.shelfOfShameRoute:
-        final sosSegments = settings.name!
-            .split('/')
-            .where((s) => s.isNotEmpty)
-            .toList();
-        final sosUsername = sosSegments.length > 1
-            ? Uri.decodeComponent(sosSegments.last)
-            : null;
-        return MaterialPageRoute(
-          builder: (_) => _deferred(
-            shelf_of_shame.loadLibrary,
-            () => shelf_of_shame.ShelfOfShamePage(username: sosUsername),
-          ),
-          settings: settings,
-        );
-      case Router.insightsRoute:
-        return MaterialPageRoute(
-          builder: (_) => _deferred(
+        ),
+      ),
+      GoRoute(
+        path: playLogRoute,
+        pageBuilder: (_, state) => _page(
+          state,
+          _deferred(play_log.loadLibrary, () => play_log.PlayLogPage()),
+        ),
+      ),
+      GoRoute(
+        path: insightsRoute,
+        pageBuilder: (_, state) => _page(
+          state,
+          _deferred(
             collection_insights.loadLibrary,
             () => collection_insights.CollectionInsightsPage(),
           ),
-          settings: settings,
-        );
-      case Router.aboutRoute:
-        return MaterialPageRoute(
-          builder: (_) => _deferred(about.loadLibrary, () => about.AboutPage()),
-          settings: settings,
-        );
-      case Router.helpRoute:
-        final helpSegments = settings.name!
-            .split('/')
-            .where((s) => s.isNotEmpty)
-            .toList();
-        final sectionId = helpSegments.length > 1 ? helpSegments.last : null;
-        return MaterialPageRoute(
-          builder: (_) => _deferred(
-            help.loadLibrary,
-            () => help.HelpPage(initialSectionId: sectionId),
-          ),
-          settings: settings,
-        );
-      default:
-        return MaterialPageRoute(
-          builder: (_) => Pages.platformPages().homePage(),
-          settings: settings,
-        );
+        ),
+      ),
+      GoRoute(
+        path: aboutRoute,
+        pageBuilder: (_, state) =>
+            _page(state, _deferred(about.loadLibrary, () => about.AboutPage())),
+      ),
+      GoRoute(
+        path: helpRoute,
+        pageBuilder: (_, state) => _helpPage(state, null),
+      ),
+      GoRoute(
+        path: '$helpRoute/:section',
+        pageBuilder: (_, state) =>
+            _helpPage(state, state.pathParameters['section']),
+      ),
+      GoRoute(
+        path: shelfOfShameRoute,
+        pageBuilder: (_, state) => _shelfPage(state, null),
+      ),
+      GoRoute(
+        path: '$shelfOfShameRoute/:user',
+        pageBuilder: (_, state) => _shelfPage(
+          state,
+          Uri.decodeComponent(state.pathParameters['user']!),
+        ),
+      ),
+      // A game detail link carries the game id in its last segment. It comes in
+      // two shapes: `/game/<id>` and `/game/<name>/<id>`; the name segment is
+      // decorative (readable/shareable), so both resolve on the id.
+      GoRoute(
+        path: '$gameDetailRoute/:id',
+        pageBuilder: (_, state) =>
+            _gameDetailPage(state, state.pathParameters['id']),
+      ),
+      GoRoute(
+        path: '$gameDetailRoute/:name/:id',
+        pageBuilder: (_, state) =>
+            _gameDetailPage(state, state.pathParameters['id']),
+      ),
+    ];
+  }
+
+  static Page<dynamic> _page(GoRouterState state, Widget child) =>
+      MaterialPage(key: ValueKey(state.uri.toString()), child: child);
+
+  static Page<dynamic> _helpPage(GoRouterState state, String? section) => _page(
+    state,
+    _deferred(help.loadLibrary, () => help.HelpPage(initialSectionId: section)),
+  );
+
+  static Page<dynamic> _shelfPage(GoRouterState state, String? username) =>
+      _page(
+        state,
+        _deferred(
+          shelf_of_shame.loadLibrary,
+          () => shelf_of_shame.ShelfOfShamePage(username: username),
+        ),
+      );
+
+  static Page<dynamic> _gameDetailPage(GoRouterState state, String? idStr) {
+    final gameId = int.tryParse(idStr ?? '');
+    if (gameId == null) {
+      return _page(state, Pages.platformPages().homePage());
     }
-  }
-
-  /// The initial route stack for the app's first frame. A deep link like
-  /// `/gameNight/teqqles` has several path segments, and Flutter's default
-  /// initial-route logic would build a route for each ancestor (`/`,
-  /// `/gameNight`, `/gameNight/teqqles`), mounting the home page - and its
-  /// single-use Game Night lineup restore - several times over. The early
-  /// mounts consume the shared lineup, leaving the top-most mount with nothing
-  /// to restore, so it regenerates a random lineup on every load. Collapsing
-  /// the stack to the one route the URL actually names keeps the restore a
-  /// single, stable mount.
-  static List<Route<dynamic>> generateInitialRoutes(String initialRoute) {
-    return [generateRoute(RouteSettings(name: initialRoute))];
-  }
-
-  static RouteSettings generateRouteSettings(String name, AppModel model) {
-    var items = model.items;
-    var settings = model.settings;
-    var encodedName = UrlFragmentEncoder.encode(
-      name,
-      items: items,
-      settings: settings,
+    return _page(
+      state,
+      _deferred(
+        game_detail.loadLibrary,
+        () => game_detail.GameDetailPage(gameId: gameId),
+      ),
     );
-    return RouteSettings(name: encodedName);
+  }
+
+  /// Encodes the current model (collection + settings) onto [name] as a
+  /// clean-path location string, e.g. `/list/teqqles?maxPlayers=4`, for
+  /// imperative navigation (`context.pushReplacement(location)`).
+  static String encodeLocation(String name, AppModel model) {
+    return UrlFragmentEncoder.encode(
+      name,
+      items: model.items,
+      settings: model.settings,
+    );
   }
 
   /// A full shareable URL for the current Game Night lineup, e.g.
-  /// `/#/gameNight/teqqles?gameNightLineup=...`. The `/gameNight` path prefix
-  /// puts the recipient in Game Night mode, with the shared collection loaded
-  /// and the games pinned (see GameNightView) - no `gameNightMode` flag needed.
+  /// `https://host/gameNight/teqqles?gameNightLineup=...`. The `/gameNight` path
+  /// prefix puts the recipient in Game Night mode, with the shared collection
+  /// loaded and the games pinned (see GameNightView) - no `gameNightMode` flag
+  /// needed.
   static String gameNightPermalink(AppModel model, GameNightLineup lineup) {
-    final fragment = UrlFragmentEncoder.encode(
+    final location = UrlFragmentEncoder.encode(
       gameNightRoute,
       items: model.items,
       settings: model.gameNightPermalinkSettings(lineup),
     );
-    return Uri.base.removeFragment().replace(fragment: fragment).toString();
+    // location is a leading-slash path (+ query); join it to the current
+    // origin. Building the string directly avoids Uri re-encoding the already
+    // encoded settings query.
+    return '${originOf(Uri.base)}$location';
+  }
+
+  /// The scheme+authority to prefix a permalink with. On the web [Uri.base] is
+  /// http(s) and [Uri.origin] applies; off the web (e.g. VM tests) [Uri.base]
+  /// is a `file:` URI and `.origin` throws, so fall back to scheme+authority.
+  static String originOf(Uri base) {
+    if (base.isScheme('http') || base.isScheme('https')) return base.origin;
+    return '${base.scheme}://${base.authority}';
   }
 }
 

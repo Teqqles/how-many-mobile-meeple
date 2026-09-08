@@ -50,7 +50,7 @@ void main() {
     }
   });
 
-  test('an enabled game-night player count filters the pool', () {
+  test('an enabled game-night player count is not sent to the server', () {
     final model = AppModel();
     final players = model.settings.setting(Settings.gameNightPlayerCount.name)
       ..value = 6
@@ -59,10 +59,12 @@ void main() {
 
     final headers = model.buildGameNightRequest().headers;
 
-    expect(headers[Settings.filterNumberOfPlayers.header], '6');
+    // Player count is applied locally in the view so the fetched pool stays
+    // whole; a shared lineup can then pin a game the count would exclude.
+    expect(headers.containsKey(Settings.filterNumberOfPlayers.header), isFalse);
   });
 
-  test('a disabled game-night player count leaves the pool unfiltered', () {
+  test('the game-night pool is fetched unfiltered by player count', () {
     final model = AppModel();
 
     final headers = model.buildGameNightRequest().headers;
@@ -97,13 +99,12 @@ void main() {
     },
   );
 
-  test('permalink settings turn on game night mode and encode the lineup', () {
+  test('permalink settings encode the lineup', () {
     final model = AppModel();
     final lineup = GameNightLineup(filler: _game(12, 20), main: _game(45, 90));
 
     final settings = model.gameNightPermalinkSettings(lineup);
 
-    expect(settings.setting(Settings.gameNightMode.name).getBool(), isTrue);
     expect(
       settings.setting(Settings.gameNightLineup.name).getString(),
       '12-45-0-0',
@@ -111,15 +112,23 @@ void main() {
     expect(settings.setting(Settings.gameNightLineup.name).enabled, isTrue);
   });
 
+  test('permalink settings leave game night mode to the link path', () {
+    final model = AppModel();
+
+    final settings = model.gameNightPermalinkSettings(
+      GameNightLineup(main: _game(45, 90)),
+    );
+
+    // Mode rides in the `/gameNight` path prefix, so it is not a URL setting;
+    // it stays at its (disabled) default here.
+    expect(settings.setting(Settings.gameNightMode.name).getBool(), isFalse);
+  });
+
   test('building permalink settings does not mutate the live settings', () {
     final model = AppModel();
 
     model.gameNightPermalinkSettings(GameNightLineup(main: _game(45, 90)));
 
-    expect(
-      model.settings.setting(Settings.gameNightMode.name).getBool(),
-      false,
-    );
     expect(
       model.settings.setting(Settings.gameNightLineup.name).enabled,
       isFalse,

@@ -45,6 +45,11 @@ class _GameNightViewState extends State<GameNightView> {
   GameNightLineup _lineup = const GameNightLineup();
   _PlayFilter _playFilter = _PlayFilter.all;
 
+  /// True until the recipient of a shared lineup first edits it. While set, the
+  /// planner leaves the slots the sender left empty empty, so the evening is
+  /// reproduced exactly rather than filled with a different game each reload.
+  bool _fromSharedLineup = false;
+
   static const List<int> _playerCounts = [1, 2, 3, 4, 5, 6, 7, 8];
 
   int get _durationMinutes => widget.model.settings
@@ -68,11 +73,20 @@ class _GameNightViewState extends State<GameNightView> {
   bool get _includeOutro =>
       widget.model.settings.setting(Settings.gameNightOutro.name).getBool();
 
-  /// The pool the planner draws from: ignored games dropped, then the
-  /// play-history filter applied. That filter waits for plays to load, else
-  /// every game looks unplayed.
+  /// The pool the planner draws from: ignored games dropped, the chosen player
+  /// count applied, then the play-history filter. Player count is filtered here
+  /// rather than at fetch so [widget.pool] stays whole and a shared lineup can
+  /// still pin a game the count excludes (pinned games bypass this pool). The
+  /// play-history filter waits for plays to load, else every game looks
+  /// unplayed.
   List<Game> get _effectivePool {
-    final pool = _withoutIgnored(widget.pool);
+    var pool = _withoutIgnored(widget.pool);
+    final count = _playerCount;
+    if (count != null) {
+      pool = pool
+          .where((g) => g.minPlayers <= count && count <= g.maxPlayers)
+          .toList();
+    }
     if (_playFilter == _PlayFilter.all || !widget.model.playsLoaded) {
       return pool;
     }
@@ -125,7 +139,11 @@ class _GameNightViewState extends State<GameNightView> {
   }
 
   /// Pins the games a shared permalink carries so the recipient sees the exact
-  /// lineup, then consumes the token so it neither persists nor re-pins later.
+  /// lineup. The lineup is a URL-only token that the model never persists (see
+  /// AppModel._storeSettings) and re-reads from the URL on every home-page mount
+  /// (AppModel.applyRouteUrl), so restoring here is safe to repeat and needs no
+  /// one-shot "consume" - two stacked pages, or a re-visit of the same link,
+  /// each pin the identical lineup rather than racing to blank a shared setting.
   /// A game the collection no longer holds is skipped, leaving its slot to
   /// regenerate.
   void _restoreSharedLineup() {
@@ -140,7 +158,9 @@ class _GameNightViewState extends State<GameNightView> {
       final game = _findInPool(id);
       if (game != null) _pinned[slot] = game;
     });
-    _consumeSharedLineup();
+    // Hold the shared lineup exactly as sent: empty slots stay empty until the
+    // recipient edits it, rather than auto-filling with a fresh game each load.
+    _fromSharedLineup = true;
   }
 
   Game? _findInPool(int id) {
@@ -148,16 +168,6 @@ class _GameNightViewState extends State<GameNightView> {
       if (game.id == id) return game;
     }
     return null;
-  }
-
-  void _consumeSharedLineup() {
-    final setting = widget.model.settings.setting(Settings.gameNightLineup.name)
-      ..value = ''
-      ..enabled = false;
-    widget.model.settings.updateSetting(setting);
-    WidgetsBinding.instance.addPostFrameCallback(
-      (_) => widget.model.updateStore(),
-    );
   }
 
   Future<void> _share() async {
@@ -187,6 +197,13 @@ class _GameNightViewState extends State<GameNightView> {
   }
 
   void _regenerate() {
+    // A freshly restored share keeps the sender's empty slots empty; once the
+    // recipient edits it, those slots fill like any other.
+    final lockedEmpty = _fromSharedLineup
+        ? GameNightSlot.values
+              .where((slot) => !_pinned.containsKey(slot))
+              .toSet()
+        : const <GameNightSlot>{};
     setState(() {
       _lineup = widget.planner.plan(
         pool: _effectivePool,
@@ -196,8 +213,20 @@ class _GameNightViewState extends State<GameNightView> {
         includeOutro: _includeOutro,
         favouriteIds: _favouriteIds,
         playCounts: _playCounts,
+        lockedEmpty: lockedEmpty,
       );
     });
+  }
+
+  /// The recipient of a shared lineup has started editing it, so drop the hold
+  /// that kept the sender's empty slots empty and let them fill normally.
+  void _releaseSharedLineup() => _fromSharedLineup = false;
+
+  /// Regenerate at the user's request: releases a restored share so empty slots
+  /// fill, then re-plans.
+  void _userRegenerate() {
+    _releaseSharedLineup();
+    _regenerate();
   }
 
   Set<int> get _favouriteIds {
@@ -224,6 +253,7 @@ class _GameNightViewState extends State<GameNightView> {
       ..enabled = true;
     widget.model.settings.updateSetting(setting);
     widget.model.updateStore();
+    _releaseSharedLineup();
     _regenerate();
   }
 
@@ -235,17 +265,19 @@ class _GameNightViewState extends State<GameNightView> {
     } else {
       _slotMechanics[slot] = mechanic;
     }
+    _releaseSharedLineup();
     _regenerate();
   }
 
   void _setPlayFilter(_PlayFilter filter) {
     if (filter == _playFilter) return;
     _playFilter = filter;
+    _releaseSharedLineup();
     _regenerate();
   }
 
-  /// Player count reshapes the fetched pool: write the setting, let the store
-  /// update trigger a refetch, and the new pool re-plans via didUpdateWidget.
+  /// Player count filters the pool in hand, so it re-plans locally without a
+  /// refetch; the choice is persisted so it sticks across visits.
   void _setPlayerCount(int? count) {
     final setting = widget.model.settings.setting(
       Settings.gameNightPlayerCount.name,
@@ -254,6 +286,8 @@ class _GameNightViewState extends State<GameNightView> {
     if (count != null) setting.value = count;
     widget.model.settings.updateSetting(setting);
     widget.model.updateStore();
+    _releaseSharedLineup();
+    _regenerate();
   }
 
   void _setDuration(int minutes) {
@@ -264,11 +298,13 @@ class _GameNightViewState extends State<GameNightView> {
     setting.enabled = true;
     widget.model.settings.updateSetting(setting);
     widget.model.updateStore();
+    _releaseSharedLineup();
     _regenerate();
   }
 
   void _togglePin(GameNightSlot slot) {
     final game = _lineup.slot(slot);
+    _releaseSharedLineup();
     setState(() {
       if (_pinned.containsKey(slot)) {
         _pinned.remove(slot);
@@ -338,7 +374,7 @@ class _GameNightViewState extends State<GameNightView> {
               Expanded(
                 child: FilledButton.icon(
                   key: const ValueKey('game-night-regenerate'),
-                  onPressed: _regenerate,
+                  onPressed: _userRegenerate,
                   icon: const Icon(Icons.casino),
                   label: const Text('Regenerate'),
                 ),

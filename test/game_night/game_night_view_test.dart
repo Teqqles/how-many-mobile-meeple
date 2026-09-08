@@ -195,6 +195,42 @@ void main() {
     expect(find.byIcon(Icons.push_pin_outlined), findsNothing);
   });
 
+  testWidgets(
+    'a shared empty slot stays empty until the recipient regenerates',
+    (tester) async {
+      // A long night shows the outro slot; the pool holds a short game that
+      // would fit it.
+      final model = _modelWithDuration(300);
+      final setting = model.settings.setting(Settings.gameNightLineup.name)
+        ..value = '1-2-3-0'
+        ..enabled = true;
+      model.settings.updateSetting(setting);
+      final pool = [
+        _game(1, 'Quick', 15, 2.0),
+        _game(2, 'Epic', 120, 3.5),
+        _game(3, 'Mid', 60, 2.5),
+        _game(5, 'Closer', 20, 1.5),
+      ];
+
+      await tester.pumpWidget(_wrap(model, pool: pool));
+      await tester.pump();
+
+      // The sender left the outro empty, so it stays empty - not filled with
+      // the short game that would otherwise slot in and change each reload.
+      expect(find.text('No fit for this slot'), findsOneWidget);
+      expect(find.text('Closer'), findsNothing);
+
+      // Once the recipient asks for a fresh plan, the empty slot fills.
+      final regenerate = find.byKey(const ValueKey('game-night-regenerate'));
+      await tester.ensureVisible(regenerate);
+      await tester.pumpAndSettle();
+      await tester.tap(regenerate);
+      await tester.pumpAndSettle();
+
+      expect(find.text('Closer'), findsWidgets);
+    },
+  );
+
   testWidgets('shows a player count picker defaulting to any', (tester) async {
     await tester.pumpWidget(_wrap(AppModel()));
 
@@ -217,6 +253,44 @@ void main() {
     final setting = model.settings.setting(Settings.gameNightPlayerCount.name);
     expect(setting.enabled, isTrue);
     expect(setting.getInt(), 4);
+  });
+
+  testWidgets('a player count narrows the pool locally without a refetch', (
+    tester,
+  ) async {
+    // Two games fit the evening; only the party game seats six.
+    final pool = [
+      Game(
+        id: 1,
+        name: 'Duet',
+        maxPlayers: 4,
+        minPlayers: 2,
+        maxPlaytime: 60,
+        imageUrl: '',
+        averageRating: 7,
+        averageWeight: 2,
+      ),
+      Game(
+        id: 2,
+        name: 'Party',
+        maxPlayers: 8,
+        minPlayers: 2,
+        maxPlaytime: 60,
+        imageUrl: '',
+        averageRating: 7,
+        averageWeight: 2,
+      ),
+    ];
+    await tester.pumpWidget(_wrap(AppModel(), pool: pool));
+    expect(find.text('Duet'), findsWidgets);
+
+    // Six players excludes the four-player game from the planner's pool, in
+    // hand, with no fresh fetch.
+    await tester.tap(find.widgetWithText(ChoiceChip, '6'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Duet'), findsNothing);
+    expect(find.text('Party'), findsWidgets);
   });
 
   testWidgets('offers a share action for a filled lineup', (tester) async {

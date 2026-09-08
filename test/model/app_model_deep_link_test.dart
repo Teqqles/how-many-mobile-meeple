@@ -138,4 +138,88 @@ void main() {
       );
     });
   });
+
+  group('deep link opened in a running app (no reload)', () {
+    test('applyRouteUrl loads a collection the construction-time URL never carried', () async {
+      // An existing visitor: no model in the URL at start-up, stored data loads.
+      final model = _modelForFragment('/');
+      await model.loadStoredData();
+      expect(
+        model.items.itemList.map((i) => i.name),
+        isNot(contains('teqqles')),
+      );
+
+      // They open a shared Game Night link. Flutter pushes it as a new route
+      // (Uri.base is unchanged), so the model only learns of it via the route
+      // name handed to applyRouteUrl.
+      await model.applyRouteUrl(
+        '/gameNight/teqqles?gameNightLineup=822-243759-251661-223770',
+      );
+
+      expect(
+        model.items.itemList.map((i) => i.name),
+        contains('teqqles'),
+        reason: 'the opened collection must load',
+      );
+      expect(
+        model.settings.setting(Settings.gameNightMode.name).enabled,
+        true,
+        reason: 'the /gameNight prefix must switch on Game Night mode',
+      );
+      expect(
+        model.settings.setting(Settings.gameNightLineup.name).getString(),
+        '822-243759-251661-223770',
+        reason: 'the shared lineup must be carried into settings',
+      );
+    });
+
+    test('applyRouteUrl re-restores the shared lineup when the same link is '
+        'visited again after its single-use lineup was consumed', () async {
+      final model = _modelForFragment('/');
+      await model.loadStoredData();
+
+      const link =
+          '/gameNight/teqqles?gameNightLineup=822-243759-251661-223770';
+      await model.applyRouteUrl(link);
+
+      // The first visit's GameNightView consumes the single-use lineup: it
+      // blanks and disables the setting once the games are pinned.
+      final consumed = model.settings.setting(Settings.gameNightLineup.name)
+        ..value = ''
+        ..enabled = false;
+      model.settings.updateSetting(consumed);
+
+      // Re-visiting the same link (a fresh page mount) must re-read the lineup
+      // from the URL, not show the consumed, empty one.
+      await model.applyRouteUrl(link);
+
+      expect(
+        model.settings.setting(Settings.gameNightLineup.name).getString(),
+        '822-243759-251661-223770',
+      );
+      expect(
+        model.settings.setting(Settings.gameNightLineup.name).enabled,
+        true,
+      );
+    });
+
+    test('the shared lineup is a URL-only token that is never persisted, so a '
+        'later plain visit does not resurface it', () async {
+      // Open a shared link, then persist - as the app does after restoring.
+      final shared = _modelForFragment('/');
+      await shared.loadStoredData();
+      await shared.applyRouteUrl(
+        '/gameNight/teqqles?gameNightLineup=822-243759-251661-223770',
+      );
+      await shared.updateStore();
+
+      // A later visit with no model in the URL loads only stored data.
+      final later = _modelForFragment('/');
+      await later.loadStoredData();
+
+      final lineup = later.settings.setting(Settings.gameNightLineup.name);
+      expect(lineup.enabled, false, reason: 'the lineup must not persist');
+      expect(lineup.getString(), '');
+    });
+  });
 }

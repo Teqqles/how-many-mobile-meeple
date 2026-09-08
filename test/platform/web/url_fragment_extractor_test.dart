@@ -78,6 +78,53 @@ main() {
       var extractor = UrlFragmentExtractor(mockUri);
       expect(extractor.containsModel(), false);
     });
+
+    test('returns true for a Game Night deep link', () {
+      // The collection travels in the path like any other model link.
+      final mockUri = MockUri();
+      when(mockUri.hasFragment).thenReturn(true);
+      when(mockUri.fragment).thenReturn('/gameNight/teqqles');
+      var extractor = UrlFragmentExtractor(mockUri);
+      expect(extractor.containsModel(), true);
+    });
+  });
+
+  group('game night path form', () {
+    test('extracts the collection from a /gameNight link', () {
+      final mockUri = MockUri();
+      when(mockUri.hasFragment).thenReturn(true);
+      when(mockUri.fragment)
+          .thenReturn('/gameNight/teqqles?gameNightLineup=1-2-3-0');
+
+      var extractor = UrlFragmentExtractor(mockUri);
+      expect(extractor.extractItems(), Items([Item('teqqles')]));
+    });
+
+    test('turns on game night mode from the /gameNight path prefix', () {
+      final mockUri = MockUri();
+      when(mockUri.hasFragment).thenReturn(true);
+      when(mockUri.fragment)
+          .thenReturn('/gameNight/teqqles?gameNightLineup=1-2-3-0');
+
+      var settings = UrlFragmentExtractor(mockUri).extractSettings();
+      final mode = settings.setting(Settings.gameNightMode.name);
+      expect(mode.getBool(), isTrue);
+      expect(mode.enabled, isTrue);
+      // The query still rides along.
+      expect(
+        settings.setting(Settings.gameNightLineup.name).getString(),
+        '1-2-3-0',
+      );
+    });
+
+    test('leaves game night mode off for an ordinary collection link', () {
+      final mockUri = MockUri();
+      when(mockUri.hasFragment).thenReturn(true);
+      when(mockUri.fragment).thenReturn('/list/teqqles');
+
+      var settings = UrlFragmentExtractor(mockUri).extractSettings();
+      expect(settings.setting(Settings.gameNightMode.name).getBool(), isFalse);
+    });
   });
 
   var expectedItems = Items([

@@ -152,6 +152,22 @@ main() {
       expect(encodedName, expectedEncodedName);
     });
 
+    test('does not double the slash when the name is the home route', () {
+      final mockItems = MockItems();
+      final mockSettings = MockSettings();
+
+      // The home route is "/", so appending "/test" naively yields "//test",
+      // which parses as a URL authority and is dropped on refresh.
+      when(mockItems.itemList).thenReturn([Item('test')]);
+      when(mockSettings.changedSettings).thenReturn({});
+      var encodedName = UrlFragmentEncoder.encode(
+        '/',
+        items: mockItems,
+        settings: mockSettings,
+      );
+      expect(encodedName, '/test');
+    });
+
     test('encodes a hotList item wrapped in square brackets', () {
       final mockItems = MockItems();
       final mockSettings = MockSettings();

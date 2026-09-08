@@ -100,6 +100,10 @@ class GameNightPlanner {
   /// Fills the unpinned slots from [pool] within [durationMinutes]. Pinned
   /// games stay put and are never reused. Filler plus main must fit the
   /// budget; the backup is an alternative to the main, so it adds no time.
+  ///
+  /// A slot in [lockedEmpty] (and not pinned) is left deliberately empty rather
+  /// than auto-filled - used to reproduce a shared lineup exactly, so a slot the
+  /// sender left blank does not fill with a different game on every reload.
   GameNightLineup plan({
     required List<Game> pool,
     required int durationMinutes,
@@ -108,44 +112,56 @@ class GameNightPlanner {
     bool includeOutro = true,
     Set<int> favouriteIds = const {},
     Map<int, int> playCounts = const {},
+    Set<GameNightSlot> lockedEmpty = const {},
   }) {
     _favourites = favouriteIds;
     _playCounts = playCounts;
     final used = pinned.values.map((g) => g.id).toSet();
 
-    final filler =
-        pinned[GameNightSlot.filler] ??
-        _pickFiller(pool, used, slotMechanics[GameNightSlot.filler]);
+    Game? fill(GameNightSlot slot, Game? Function() picker) {
+      if (pinned.containsKey(slot)) return pinned[slot];
+      if (lockedEmpty.contains(slot)) return null;
+      return picker();
+    }
+
+    final filler = fill(
+      GameNightSlot.filler,
+      () => _pickFiller(pool, used, slotMechanics[GameNightSlot.filler]),
+    );
     if (filler != null) used.add(filler.id);
 
     final remaining = durationMinutes - _cost(filler);
-    final main =
-        pinned[GameNightSlot.main] ??
-        _pickMain(pool, used, remaining, slotMechanics[GameNightSlot.main]);
+    final main = fill(
+      GameNightSlot.main,
+      () => _pickMain(pool, used, remaining, slotMechanics[GameNightSlot.main]),
+    );
     if (main != null) used.add(main.id);
 
-    final backup =
-        pinned[GameNightSlot.backup] ??
-        _pickBackup(
-          pool,
-          used,
-          main,
-          remaining,
-          slotMechanics[GameNightSlot.backup],
-        );
+    final backup = fill(
+      GameNightSlot.backup,
+      () => _pickBackup(
+        pool,
+        used,
+        main,
+        remaining,
+        slotMechanics[GameNightSlot.backup],
+      ),
+    );
 
     // Backup is an alternative to the main, so it is not used against the outro.
     final outro = !includeOutro
         ? null
-        : pinned[GameNightSlot.outro] ??
-              _pickOutro(
-                pool,
-                used,
-                durationMinutes,
-                remaining,
-                main,
-                slotMechanics[GameNightSlot.outro],
-              );
+        : fill(
+            GameNightSlot.outro,
+            () => _pickOutro(
+              pool,
+              used,
+              durationMinutes,
+              remaining,
+              main,
+              slotMechanics[GameNightSlot.outro],
+            ),
+          );
 
     return GameNightLineup(
       filler: filler,

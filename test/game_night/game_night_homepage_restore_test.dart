@@ -64,9 +64,9 @@ void main() {
     FavouritesService.resetForTesting();
   });
 
-  Future<void> pumpHome(WidgetTester tester, String fragment) async {
+  Future<void> pumpHome(WidgetTester tester, String location) async {
     final model = AppModel(
-      urlExtractor: UrlFragmentExtractor(Uri(fragment: fragment)),
+      urlExtractor: UrlFragmentExtractor.fromLocation(location),
     );
     await tester.pumpWidget(
       ChangeNotifierProvider<AppModel>.value(

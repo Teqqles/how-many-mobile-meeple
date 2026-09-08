@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 import 'app_common.dart';
 import 'model/model.dart';
@@ -35,13 +36,10 @@ class HowManyMeepleAppBar extends AppBar {
                        icon: const Icon(Icons.arrow_back),
                        tooltip: 'Back',
                        onPressed: () {
-                         if (Navigator.of(ctx).canPop()) {
-                           Navigator.of(ctx).pop();
+                         if (ctx.canPop()) {
+                           ctx.pop();
                          } else {
-                           Navigator.of(ctx).pushNamedAndRemoveUntil(
-                             r.Router.homeRoute,
-                             (route) => false,
-                           );
+                           ctx.go(r.Router.homeRoute);
                          }
                        },
                      ),
@@ -67,7 +65,7 @@ class HowManyMeepleAppBar extends AppBar {
                    icon: const Icon(Icons.help_outline, size: 20),
                    tooltip: 'Help',
                    visualDensity: VisualDensity.compact,
-                   onPressed: () => Navigator.of(ctx).pushNamed(
+                   onPressed: () => ctx.push(
                      helpSection == null
                          ? r.Router.helpRoute
                          : '${r.Router.helpRoute}/$helpSection',
@@ -79,8 +77,7 @@ class HowManyMeepleAppBar extends AppBar {
                    icon: const Icon(Icons.favorite, size: 20),
                    tooltip: 'Favourites',
                    visualDensity: VisualDensity.compact,
-                   onPressed: () =>
-                       Navigator.of(ctx).pushNamed(r.Router.favouritesRoute),
+                   onPressed: () => ctx.push(r.Router.favouritesRoute),
                  ),
                ),
                if (hasSaveDialog && model != null)

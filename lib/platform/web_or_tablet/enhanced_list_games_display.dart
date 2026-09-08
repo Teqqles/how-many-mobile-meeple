@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:how_many_mobile_meeple/components/app_default_padding.dart';
 import 'package:how_many_mobile_meeple/components/feature_drawer.dart';
 import 'package:how_many_mobile_meeple/components/plays_loading_indicator.dart';
@@ -417,7 +418,7 @@ class _GameListBodyState extends State<_GameListBody> with ScreenTools {
           Expanded(
             child: AppDefaultPadding(
               child: InkWell(
-                onTap: () => Navigator.of(context).pushNamed(
+                onTap: () => context.push(
                   '${r.Router.gameDetailRoute}/${game.name.replaceAll(' ', '+')}/${game.id}',
                 ),
                 child: Column(

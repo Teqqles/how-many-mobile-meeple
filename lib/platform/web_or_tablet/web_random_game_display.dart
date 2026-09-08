@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:how_many_mobile_meeple/components/feature_drawer.dart';
 import 'package:how_many_mobile_meeple/components/plays_loading_indicator.dart';
 import 'package:how_many_mobile_meeple/components/game_image_with_stats.dart';
@@ -150,7 +151,7 @@ class WebRandomGameDisplayPage extends GameDisplayPage {
                 onPressed: () {
                   final game = model.bggCache.randomIncludingIgnored();
                   if (game != null) {
-                    Navigator.of(context).pushReplacementNamed(
+                    context.pushReplacement(
                       '${r.Router.gameDetailRoute}/${game.name.replaceAll(' ', '+')}/${game.id}',
                     );
                   }

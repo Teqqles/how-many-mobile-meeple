@@ -109,13 +109,10 @@ void main() {
 
       // A shared permalink: four pinned games and a four-player table.
       final model = AppModel(
-        urlExtractor: UrlFragmentExtractor(
-          Uri(
-            fragment:
-                '/gameNight/teqqles?gameNightDurationMinutes=300'
-                '&gameNightLineup=101-102-103-104'
-                '&gameNightPlayerCount=4',
-          ),
+        urlExtractor: UrlFragmentExtractor.fromLocation(
+          '/gameNight/teqqles?gameNightDurationMinutes=300'
+          '&gameNightLineup=101-102-103-104'
+          '&gameNightPlayerCount=4',
         ),
       );
       await model.loadStoredData();

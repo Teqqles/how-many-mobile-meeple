@@ -2,6 +2,12 @@
 <html>
 <head>
   <meta charset="UTF-8">
+  <!-- Absolute base so relative assets (main.dart.js, manifest.json, the
+       service worker) resolve from the site root, not the current deep path.
+       Without it, a hard load of /gameNight/x fetches /gameNight/main.dart.js,
+       which the SPA fallback answers with index.html (text/html) - a MIME
+       error that stops the app booting. Also anchors path-URL-strategy routing. -->
+  <base href="/">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -9,6 +15,34 @@
   <meta name="apple-mobile-web-app-title" content="How Many Meeple?">
   <link rel="manifest" href="manifest.json">
   <title>How Many Meeple?</title>
+
+  <!-- Static link preview (Open Graph + Twitter). Crawlers don't run the SPA,
+       so these site-wide tags must live in the served HTML. Per-page previews
+       would need edge-rendered tags and are a separate workstream. -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="How Many Meeple?">
+  <meta property="og:title" content="How Many Meeple?">
+  <meta property="og:description" content="Pick your next board game from your BoardGameGeek collection - by players, time, and style.">
+  <meta property="og:image" content="https://www.howmanymeeple.com/icons/icon-512.png">
+  <meta property="og:url" content="https://www.howmanymeeple.com/">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="How Many Meeple?">
+  <meta name="twitter:description" content="Pick your next board game from your BoardGameGeek collection - by players, time, and style.">
+  <meta name="twitter:image" content="https://www.howmanymeeple.com/icons/icon-512.png">
+
+  <script>
+    // Redirect legacy hash links (`/#/gameNight/x`) to clean paths
+    // (`/gameNight/x`) before Flutter boots, so old shared URLs keep working
+    // now that routing uses the path URL strategy.
+    (function () {
+      var hash = window.location.hash;
+      if (hash.startsWith('#/')) {
+        // The legacy encoder put the whole route - path and query - inside the
+        // fragment, so hash.substring(1) is the full clean-path location.
+        window.history.replaceState(null, '', hash.substring(1));
+      }
+    })();
+  </script>
   <script>
     // Capture the beforeinstallprompt event so Flutter can trigger it later
     window._pwaInstallPrompt = null;

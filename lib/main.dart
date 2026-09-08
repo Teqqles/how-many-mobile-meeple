@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_web_plugins/url_strategy.dart';
 import 'package:how_many_mobile_meeple/platform/router.dart' as r;
 
 import 'package:provider/provider.dart';
@@ -15,6 +16,11 @@ import 'meeple_theme.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Clean paths (`/gameNight/teqqles`) instead of hash URLs (`/#/gameNight/...`)
+  // so shared links are readable and crawlable. Requires the SPA host to serve
+  // index.html for unknown paths (see DEPLOYMENT.md).
+  usePathUrlStrategy();
 
   await AppConfig.initialize();
 
@@ -45,15 +51,12 @@ class MyApp extends StatelessWidget {
           final mode = themeModeFromString(
             model.settings.setting(Settings.themeMode.name).getString(),
           );
-          return MaterialApp(
+          return MaterialApp.router(
             title: 'How Many Meeple?',
             theme: MeepleTheme.light(MeepleTheme.lightSwatches[_themeIndex]),
             darkTheme: MeepleTheme.dark(MeepleTheme.darkPalettes[_themeIndex]),
             themeMode: mode,
-            onGenerateRoute: r.Router.generateRoute,
-            // Collapse a multi-segment deep link (e.g. `/gameNight/teqqles`) to
-            // a single initial route; see Router.generateInitialRoutes.
-            onGenerateInitialRoutes: r.Router.generateInitialRoutes,
+            routerConfig: r.Router.router,
           );
         },
       ),

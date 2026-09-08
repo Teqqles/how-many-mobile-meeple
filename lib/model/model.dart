@@ -385,7 +385,7 @@ class AppModel extends ChangeNotifier {
   /// edits the user makes while a link is open.
   Future<void> applyRouteUrl(String? routeName) async {
     if (routeName == null) return;
-    final extractor = UrlFragmentExtractor(Uri(fragment: routeName));
+    final extractor = UrlFragmentExtractor.fromLocation(routeName);
     if (!extractor.containsModel()) return;
     _urlConsumed = true;
     await _applyUrlModel(extractor);

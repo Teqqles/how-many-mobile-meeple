@@ -74,24 +74,24 @@ void main() {
       final model = AppModel();
       await model.addItem(Item('teqqles'));
 
-      final navKey = GlobalKey<NavigatorState>();
       await tester.pumpWidget(
         ChangeNotifierProvider<AppModel>.value(
           value: model,
           // Mirror main.dart: the whole app rebuilds on every model change.
           child: Consumer<AppModel>(
-            builder: (context, m, _) => MaterialApp(
-              navigatorKey: navKey,
-              home: const Scaffold(body: Center(child: Text('HOME'))),
-              onGenerateRoute: r.Router.generateRoute,
-            ),
+            builder: (context, m, _) =>
+                MaterialApp.router(routerConfig: r.Router.router),
           ),
         ),
       );
       await tester.pump(const Duration(milliseconds: 100));
 
-      navKey.currentState!.pushNamed(r.Router.shelfOfShameRoute);
+      r.Router.router.push(r.Router.shelfOfShameRoute);
       await tester.pump(const Duration(milliseconds: 100));
+      await tester.pump(const Duration(milliseconds: 100));
+
+      // Baseline after the deferred page has mounted and done its initial fetch.
+      final afterMount = collectionCount;
 
       // Churn the model the way loadPlays/collection completion would.
       for (var i = 0; i < 8; i++) {
@@ -99,11 +99,11 @@ void main() {
         await tester.pump(const Duration(milliseconds: 100));
       }
 
-      // The page's own fetch plus the model's collection fetch = 2. A reload loop
-      // pushes this up by 2 on every rebuild.
+      // A remount-on-notify loop refetches the collection on every rebuild; a
+      // page that mounts once holds its state and never fetches again.
       expect(
         collectionCount,
-        lessThanOrEqualTo(2),
+        afterMount,
         reason: 'deferred page must not remount and refetch on model notifies',
       );
     },

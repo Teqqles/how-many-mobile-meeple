@@ -3,6 +3,7 @@ library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
 import 'package:how_many_mobile_meeple/how_many_meeple_app_bar.dart';
 import 'package:how_many_mobile_meeple/model/model.dart';
 import 'package:provider/provider.dart';
@@ -36,6 +37,49 @@ Widget _buildTestApp({
         ),
       ),
     ),
+  );
+}
+
+// The app bar navigates with go_router (context.push), so a routed harness is
+// needed to observe where Help lands. Help routes record the location reached.
+Widget _buildRoutedApp({
+  String? helpSection,
+  required ValueChanged<String> onHelp,
+}) {
+  final appModel = AppModel();
+  final router = GoRouter(
+    routes: [
+      GoRoute(
+        path: '/',
+        builder: (context, state) => Scaffold(
+          appBar: HowManyMeepleAppBar(
+            'Test Subtitle',
+            context: context,
+            helpSection: helpSection,
+            model: appModel,
+          ),
+          body: const Text('Body'),
+        ),
+      ),
+      GoRoute(
+        path: '/help',
+        builder: (context, state) {
+          onHelp('/help');
+          return const Scaffold(body: Text('Help Page'));
+        },
+      ),
+      GoRoute(
+        path: '/help/:section',
+        builder: (context, state) {
+          onHelp('/help/${state.pathParameters['section']}');
+          return const Scaffold(body: Text('Help Page'));
+        },
+      ),
+    ],
+  );
+  return ChangeNotifierProvider<AppModel>.value(
+    value: appModel,
+    child: MaterialApp.router(routerConfig: router),
   );
 }
 
@@ -82,14 +126,7 @@ void main() {
     ) async {
       var pushedRoute = '';
       await tester.pumpWidget(
-        _buildTestApp(
-          routes: {
-            '/help': (_) {
-              pushedRoute = '/help';
-              return const Scaffold(body: Text('Help Page'));
-            },
-          },
-        ),
+        _buildRoutedApp(onHelp: (location) => pushedRoute = location),
       );
 
       await tester.tap(find.byTooltip('Help'));
@@ -103,14 +140,9 @@ void main() {
     ) async {
       var pushedRoute = '';
       await tester.pumpWidget(
-        _buildTestApp(
+        _buildRoutedApp(
           helpSection: 'list',
-          routes: {
-            '/help/list': (_) {
-              pushedRoute = '/help/list';
-              return const Scaffold(body: Text('Help Page'));
-            },
-          },
+          onHelp: (location) => pushedRoute = location,
         ),
       );
 

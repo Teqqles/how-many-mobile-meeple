@@ -12,9 +12,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../helpers/mock_api_client.dart';
 
-AppModel _modelForFragment(String fragment) {
-  final uri = Uri(fragment: fragment);
-  return AppModel(urlExtractor: UrlFragmentExtractor(uri));
+AppModel _modelForFragment(String location) {
+  return AppModel(urlExtractor: UrlFragmentExtractor.fromLocation(location));
 }
 
 void main() {

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:how_many_mobile_meeple/screen_tools.dart';
 
@@ -161,9 +162,7 @@ abstract class NetworkWidget extends StatelessWidget with ScreenTools {
             ),
             const SizedBox(height: 24),
             FilledButton.icon(
-              onPressed: () =>
-                  Navigator.of(context)
-                      .pushNamedAndRemoveUntil('/', (_) => false),
+              onPressed: () => context.go('/'),
               icon: const Icon(Icons.home),
               label: const Text('Go to Home'),
             ),

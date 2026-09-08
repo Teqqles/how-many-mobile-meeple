@@ -51,8 +51,17 @@ aws s3 cp s3://your-bucket-name/ s3://your-bucket-name/ \
 ### 4. CloudFront Distribution (Optional)
 - Create distribution pointing to S3 bucket
 - Set Default Root Object: `index.html`
-- Add Custom Error Response: 404 → /index.html (200)
+- Add Custom Error Responses (see note below): 404 → /index.html (200) **and** 403 → /index.html (200)
 - Enable HTTPS
+
+> **Required for clean-path deep links.** The app now uses clean URLs
+> (`/gameNight/teqqles`, `/list/user`, …) instead of hash fragments. A hard
+> refresh or shared link requests that path from the origin, where no object
+> exists. An S3 REST origin answers a missing key with **403** (not 404), so
+> **both** custom error responses must rewrite to `/index.html` (200) or deep
+> links break with an access-denied page. This distribution is
+> `E9QY0RG8DLIV5`. Old hash links (`/#/gameNight/teqqles`) are handled by a
+> pre-boot redirect shim in `web/index.html` and need no server config.
 
 ---
 

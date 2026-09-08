@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:how_many_mobile_meeple/platform/router.dart' as r;
 import 'package:provider/provider.dart';
 import 'package:how_many_mobile_meeple/components/drawer_bgg_filter.dart';
@@ -126,7 +127,7 @@ mixin AppPage {
         title: const Text('Help', style: TextStyle(fontSize: 13)),
         onTap: () {
           Navigator.of(context).pop();
-          Navigator.of(context).pushNamed(r.Router.helpRoute);
+          context.push(r.Router.helpRoute);
         },
       ),
     );
@@ -154,7 +155,7 @@ mixin AppPage {
             ),
             onTap: () {
               Navigator.of(context).pop();
-              Navigator.of(context).pushNamed(r.Router.ignoredRoute);
+              context.push(r.Router.ignoredRoute);
             },
           ),
         );
@@ -224,12 +225,9 @@ mixin AppPage {
     );
   }
 
-  void loadPage(BuildContext context, RouteSettings pageSettings) {
+  void loadPage(BuildContext context, String location) {
     AppModel.of(context, listen: false).pageRefreshed = true;
-    Navigator.of(context).pushReplacementNamed(
-      pageSettings.name!,
-      arguments: pageSettings.arguments,
-    );
+    context.pushReplacement(location);
   }
 
   void startPage(BuildContext context) {
@@ -269,11 +267,11 @@ mixin AppPage {
         icon: Icons.format_list_numbered,
         tooltip: 'View List',
         onPressed: () {
-          var listPageSettings = r.Router.generateRouteSettings(
+          var listPageLocation = r.Router.encodeLocation(
             r.Router.listRoute,
             AppModel.of(context, listen: false),
           );
-          loadPage(context, listPageSettings);
+          loadPage(context, listPageLocation);
         },
       ),
       Padding(
@@ -289,11 +287,11 @@ mixin AppPage {
         padding: const EdgeInsets.only(left: 8, right: 8),
         child: MaterialButton(
           onPressed: () {
-            var randomPageSettings = r.Router.generateRouteSettings(
+            var randomPageLocation = r.Router.encodeLocation(
               r.Router.randomRoute,
               AppModel.of(context, listen: false),
             );
-            loadPage(context, randomPageSettings);
+            loadPage(context, randomPageLocation);
           },
           child: Container(
             decoration: BoxDecoration(

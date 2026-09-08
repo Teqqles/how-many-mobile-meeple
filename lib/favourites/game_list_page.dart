@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:how_many_mobile_meeple/app_page.dart';
 import 'package:how_many_mobile_meeple/components/feature_drawer.dart';
 import 'package:how_many_mobile_meeple/components/game_thumbnail.dart';
@@ -117,7 +118,7 @@ class _GameListPageState extends State<GameListPage> with AppPage {
           tooltip: 'Remove',
           onPressed: () => _service!.remove(game.id),
         ),
-        onTap: () => Navigator.of(context).pushNamed(
+        onTap: () => context.push(
           '${r.Router.gameDetailRoute}/${game.name.replaceAll(' ', '+')}/${game.id}',
         ),
       ),

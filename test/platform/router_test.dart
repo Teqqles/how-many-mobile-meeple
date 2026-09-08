@@ -84,4 +84,28 @@ void main() {
       expect(route, isA<MaterialPageRoute>());
     });
   });
+
+  group('Router.generateInitialRoutes', () {
+    test('collapses a multi-segment deep link to a single route', () {
+      // Flutter's default initial-route logic would build one route per
+      // ancestor segment (`/`, `/gameNight`, `/gameNight/teqqles`), mounting
+      // the home page - and its single-use Game Night restore - several times.
+      // We must hand back exactly one route so the shared lineup restores once.
+      final routes = r.Router.generateInitialRoutes(
+        '/gameNight/teqqles?gameNightLineup=822-243759-251661-223770',
+      );
+
+      expect(routes, hasLength(1));
+      expect(routes.single, isA<MaterialPageRoute>());
+      expect(
+        routes.single.settings.name,
+        '/gameNight/teqqles?gameNightLineup=822-243759-251661-223770',
+      );
+    });
+
+    test('collapses even the plain home route to a single route', () {
+      final routes = r.Router.generateInitialRoutes('/');
+      expect(routes, hasLength(1));
+    });
+  });
 }

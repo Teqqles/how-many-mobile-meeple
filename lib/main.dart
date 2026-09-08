@@ -1,7 +1,6 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:how_many_mobile_meeple/platform/pages.dart';
 import 'package:how_many_mobile_meeple/platform/router.dart' as r;
 
 import 'package:provider/provider.dart';
@@ -51,8 +50,10 @@ class MyApp extends StatelessWidget {
             theme: MeepleTheme.light(MeepleTheme.lightSwatches[_themeIndex]),
             darkTheme: MeepleTheme.dark(MeepleTheme.darkPalettes[_themeIndex]),
             themeMode: mode,
-            home: Pages.platformPages().homePage(),
             onGenerateRoute: r.Router.generateRoute,
+            // Collapse a multi-segment deep link (e.g. `/gameNight/teqqles`) to
+            // a single initial route; see Router.generateInitialRoutes.
+            onGenerateInitialRoutes: r.Router.generateInitialRoutes,
           );
         },
       ),

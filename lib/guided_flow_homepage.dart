@@ -45,6 +45,7 @@ class _GuidedFlowHomePageState extends State<GuidedFlowHomePage> {
   bool _advancedModeLoaded = false;
   bool _featureDrawerLoaded = false;
   bool _quickPickLoaded = false;
+  bool _routeApplied = false;
 
   @override
   void initState() {
@@ -60,21 +61,37 @@ class _GuidedFlowHomePageState extends State<GuidedFlowHomePage> {
     });
   }
 
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Apply this route's URL model once per mount. A browser URL change pushes a
+    // fresh home page, so re-visiting a shared Game Night link re-reads its
+    // lineup from the URL. Doing it here (once per mount) rather than in build()
+    // means it never clobbers edits the user makes while a link is open.
+    if (!_routeApplied) {
+      _routeApplied = true;
+      final name = ModalRoute.of(context)?.settings.name;
+      AppModel.of(context, listen: false).applyRouteUrl(name);
+    }
+  }
+
   void _syncAdvancedMode(AppModel model) {
     final value = model.settings.setting('preferAdvancedMode').getBool();
     if (value != _showAdvancedMode) {
-      WidgetsBinding.instance.addPostFrameCallback(
-        (_) => setState(() => _showAdvancedMode = value),
-      );
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        // A stacked duplicate home page may be disposed before this fires (see
+        // HomeRouteDedupObserver), so guard against setState after dispose.
+        if (mounted) setState(() => _showAdvancedMode = value);
+      });
     }
   }
 
   void _syncGameNightMode(AppModel model) {
     final value = model.settings.setting(Settings.gameNightMode.name).getBool();
     if (value != _showGameNight) {
-      WidgetsBinding.instance.addPostFrameCallback(
-        (_) => setState(() => _showGameNight = value),
-      );
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) setState(() => _showGameNight = value);
+      });
     }
   }
 

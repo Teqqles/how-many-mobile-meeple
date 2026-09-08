@@ -14,7 +14,14 @@ class UrlFragmentEncoder {
         .map((setting) => "${setting.name}=${setting.value}")
         .join("&");
     var encodedFragment = name;
-    if (encodedItems.isNotEmpty) encodedFragment += "/$encodedItems";
+    if (encodedItems.isNotEmpty) {
+      // The home route is "/", so blindly appending "/items" yields "//items".
+      // Parsed as a Uri that leading "//" reads the collection as an authority,
+      // and a refresh - which routes on the Uri path - then drops it, losing
+      // the sources a shared link carries (e.g. a Game Night permalink).
+      final separator = name.endsWith("/") ? "" : "/";
+      encodedFragment += "$separator$encodedItems";
+    }
     if (encodedSettings.isNotEmpty) encodedFragment += "?$encodedSettings";
     return encodedFragment;
   }

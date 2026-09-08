@@ -35,6 +35,10 @@ class Router {
   static const String shelfOfShameRoute = '/shelf-of-shame';
   static const String insightsRoute = '/insights';
 
+  /// Path prefix for a shared Game Night link, e.g. `/gameNight/teqqles`. The
+  /// prefix - not a query flag - is what puts the recipient in Game Night mode.
+  static const String gameNightRoute = '/gameNight';
+
   static List<String> routeList = [
     randomRoute,
     listRoute,
@@ -70,6 +74,9 @@ class Router {
 
     switch (path) {
       case Router.homeRoute:
+      // A shared Game Night link (`/gameNight/<collection>`) lands on the same
+      // home page; the model reads the fragment and opens Game Night mode.
+      case Router.gameNightRoute:
         return MaterialPageRoute(
           builder: (_) => Pages.platformPages().homePage(),
           settings: settings,
@@ -179,6 +186,19 @@ class Router {
     }
   }
 
+  /// The initial route stack for the app's first frame. A deep link like
+  /// `/gameNight/teqqles` has several path segments, and Flutter's default
+  /// initial-route logic would build a route for each ancestor (`/`,
+  /// `/gameNight`, `/gameNight/teqqles`), mounting the home page - and its
+  /// single-use Game Night lineup restore - several times over. The early
+  /// mounts consume the shared lineup, leaving the top-most mount with nothing
+  /// to restore, so it regenerates a random lineup on every load. Collapsing
+  /// the stack to the one route the URL actually names keeps the restore a
+  /// single, stable mount.
+  static List<Route<dynamic>> generateInitialRoutes(String initialRoute) {
+    return [generateRoute(RouteSettings(name: initialRoute))];
+  }
+
   static RouteSettings generateRouteSettings(String name, AppModel model) {
     var items = model.items;
     var settings = model.settings;
@@ -190,12 +210,13 @@ class Router {
     return RouteSettings(name: encodedName);
   }
 
-  /// A full shareable URL for the current Game Night lineup. Opening it lands
-  /// the recipient on the home page in Game Night mode, with the shared
-  /// collection loaded and the three games pinned (see GameNightView).
+  /// A full shareable URL for the current Game Night lineup, e.g.
+  /// `/#/gameNight/teqqles?gameNightLineup=...`. The `/gameNight` path prefix
+  /// puts the recipient in Game Night mode, with the shared collection loaded
+  /// and the games pinned (see GameNightView) - no `gameNightMode` flag needed.
   static String gameNightPermalink(AppModel model, GameNightLineup lineup) {
     final fragment = UrlFragmentEncoder.encode(
-      homeRoute,
+      gameNightRoute,
       items: model.items,
       settings: model.gameNightPermalinkSettings(lineup),
     );

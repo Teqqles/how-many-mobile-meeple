@@ -16,6 +16,7 @@ import 'package:how_many_mobile_meeple/storage/storage_factory.dart';
 import 'package:how_many_mobile_meeple/storage/stored_preferences.dart';
 import 'package:how_many_mobile_meeple/util/retry_scheduler.dart';
 import 'package:provider/provider.dart';
+import 'package:how_many_mobile_meeple/model/setting.dart';
 import 'package:how_many_mobile_meeple/model/settings.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -23,7 +24,6 @@ import 'package:how_many_mobile_meeple/model/app_preferences.dart';
 import 'package:how_many_mobile_meeple/model/bgg_cache.dart';
 import 'package:how_many_mobile_meeple/model/game_request.dart';
 import 'package:how_many_mobile_meeple/model/item.dart';
-import 'package:how_many_mobile_meeple/model/setting.dart';
 
 import '../api/prefetch_service.dart';
 import '../app_common.dart';
@@ -369,9 +369,33 @@ class AppModel extends ChangeNotifier {
     if (_urlConsumed) return;
     if (!_extractor.containsModel()) return;
     _urlConsumed = true;
+    await _applyUrlModel(_extractor);
+  }
+
+  /// Applies the model (collection + settings) encoded in a freshly navigated
+  /// route's URL.
+  ///
+  /// A deep link opened in an already-running app is a browser URL change, not
+  /// a reload: Flutter pushes it as a new route rather than rebuilding from
+  /// [Uri.base], so the construction-time [_extractor] and the one-shot
+  /// [_urlConsumed] guard never see it. The home page hands us the route name
+  /// once per mount (a browser URL change pushes a fresh home page) so the
+  /// shared collection and lineup always load - even when re-visiting a link.
+  /// Because it runs once per navigation, not per rebuild, it does not clobber
+  /// edits the user makes while a link is open.
+  Future<void> applyRouteUrl(String? routeName) async {
+    if (routeName == null) return;
+    final extractor = UrlFragmentExtractor(Uri(fragment: routeName));
+    if (!extractor.containsModel()) return;
+    _urlConsumed = true;
+    await _applyUrlModel(extractor);
+    notifyListeners();
+  }
+
+  Future<void> _applyUrlModel(UrlFragmentExtractor extractor) async {
     await _deferPastCurrentBuild();
-    await replaceItems(_extractor.extractItems());
-    var extractedSettings = _extractor.extractSettings();
+    await replaceItems(extractor.extractItems());
+    var extractedSettings = extractor.extractSettings();
     extractedSettings = _rebuildUrlMechanics(extractedSettings);
     if (_settings != extractedSettings) {
       _settings.updateAllSettings(extractedSettings);
@@ -455,37 +479,43 @@ class AppModel extends ChangeNotifier {
 
   GameRequest buildRequest() => GameRequest.from(_settings, _items);
 
-  /// The pool for a game night starts from the whole collection: the guided
-  /// flow's filters (duration, complexity, mechanics, rating) belong to one-game
-  /// picks the user configured there, never to a game night, so none of them
-  /// carry over. The evening budget governs playtime, and the only pool filter
-  /// is an explicit game-night player count when the user sets one. Mechanics
-  /// ride along in the payload so a slot can filter on mechanic locally.
+  /// The pool for a game night is the whole collection: the guided flow's
+  /// filters (duration, complexity, mechanics, rating) belong to one-game picks
+  /// the user configured there, never to a game night, so none of them carry
+  /// over. The evening budget governs playtime. Player count is applied locally
+  /// in the view rather than sent to the server, so the fetched pool stays
+  /// complete - a shared lineup can then pin any game it names, even one the
+  /// count would otherwise drop. Mechanics ride along in the payload so a slot
+  /// can filter on mechanic locally.
   GameRequest buildGameNightRequest() {
-    final settings = Settings.defaultSettings();
-    final players = _settings.setting(Settings.gameNightPlayerCount.name);
-    if (players.enabled) {
-      final applied = Setting(
-        Settings.filterNumberOfPlayers.name,
-        header: Settings.filterNumberOfPlayers.header,
-        value: players.getInt(),
-        enabled: true,
-      );
-      settings.updateSetting(applied);
-    }
-    return GameRequest.from(settings, _items).withWhitelistField('mechanics');
+    return GameRequest.from(
+      Settings.defaultSettings(),
+      _items,
+    ).withWhitelistField('mechanics');
   }
 
-  /// A clone of the current settings tuned for a shareable Game Night link:
-  /// Game Night mode on and the chosen [lineup] encoded, so a recipient lands
-  /// on the same collection, evening length, and exact games. The live settings
-  /// are untouched - the clone only shapes the permalink.
+  /// Settings tuned for a shareable Game Night link: the chosen [lineup] encoded
+  /// so a recipient lands on the same collection, evening length, and exact
+  /// games. Game Night mode itself rides in the URL's `/gameNight` path prefix
+  /// (see Router.gameNightPermalink), not here. Built from defaults and carrying
+  /// only the handful of settings a Game Night actually reads, so the URL stays
+  /// short and none of the one-game guided-flow filters (or the field whitelist,
+  /// which buildGameNightRequest rebuilds from defaults anyway) leak in. The
+  /// live settings are untouched.
   Settings gameNightPermalinkSettings(GameNightLineup lineup) {
-    final settings = _settings.clone();
-    final mode = settings.setting(Settings.gameNightMode.name).clone()
-      ..value = true
-      ..enabled = true;
-    settings.updateSetting(mode);
+    final settings = Settings.defaultSettings();
+
+    // Evening length, player count and the outro toggle shape the recipient's
+    // night; each rides along only when it differs from the default (see
+    // Settings.changedSettings), keeping the link lean.
+    for (final name in [
+      Settings.gameNightDurationMinutes.name,
+      Settings.gameNightPlayerCount.name,
+      Settings.gameNightOutro.name,
+    ]) {
+      settings.updateSetting(_settings.setting(name).clone());
+    }
+
     final encodedLineup =
         settings.setting(Settings.gameNightLineup.name).clone()
           ..value = GameNightPermalink.encode(lineup)
@@ -616,7 +646,20 @@ class AppModel extends ChangeNotifier {
 
   Future<void> _storeSettings(Settings settings) async {
     final store = await _getStore();
-    await store.saveSettings(settings);
+    await store.saveSettings(_withoutTransientSettings(settings));
+  }
+
+  /// The shared Game Night lineup is a URL-only share token: it must ride along
+  /// only in a deliberately shared link, never resurface on a plain later visit
+  /// or re-pin games the user never chose. So strip it back to its disabled
+  /// default before anything is written to storage; the live in-memory settings
+  /// keep it (each home-page mount re-reads it from the URL via applyRouteUrl).
+  Settings _withoutTransientSettings(Settings settings) {
+    final copy = settings.clone();
+    copy.updateSetting(
+      Setting(Settings.gameNightLineup.name, value: '', enabled: false),
+    );
+    return copy;
   }
 
   Future<void> _storeItems(Items items) async {

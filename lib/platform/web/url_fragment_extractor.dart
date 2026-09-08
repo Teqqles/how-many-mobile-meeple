@@ -34,6 +34,13 @@ class UrlFragmentExtractor {
       fragment == Router.shelfOfShameRoute ||
       fragment.startsWith('${Router.shelfOfShameRoute}/');
 
+  /// A Game Night deep link (e.g. `/gameNight/teqqles`). The `/gameNight` prefix
+  /// carries the collection like any other model link, but also signals Game
+  /// Night mode - which [extractSettings] turns on - in place of a query flag.
+  bool _isGameNightFragment(String fragment) =>
+      fragment == Router.gameNightRoute ||
+      fragment.startsWith('${Router.gameNightRoute}/');
+
   bool containsModel() {
     return hasModelData;
   }
@@ -69,10 +76,22 @@ class UrlFragmentExtractor {
       return settings;
     }
     var firstQueryIndex = _calculateQueryPosition(uri.fragment);
-    var potentialEncodedSettings = uri.fragment.substring(firstQueryIndex + 1);
-    var settingsFromString = potentialEncodedSettings.split("&");
-    var newSettings = _mapSettingsFromFragments(settingsFromString);
-    settings.updateAllSettings(newSettings);
+    if (firstQueryIndex > -1) {
+      var potentialEncodedSettings = uri.fragment.substring(
+        firstQueryIndex + 1,
+      );
+      var settingsFromString = potentialEncodedSettings.split("&");
+      var newSettings = _mapSettingsFromFragments(settingsFromString);
+      settings.updateAllSettings(newSettings);
+    }
+    // The `/gameNight` path prefix stands in for a `gameNightMode=true` query
+    // flag, so turn the mode on from the route rather than the query string.
+    if (_isGameNightFragment(uri.fragment)) {
+      final mode = settings.setting(Settings.gameNightMode.name)
+        ..value = true
+        ..enabled = true;
+      settings.updateSetting(mode);
+    }
     return settings;
   }
 

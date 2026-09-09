@@ -4,6 +4,7 @@ import 'package:how_many_mobile_meeple/favourites/favourites_service.dart';
 import 'package:how_many_mobile_meeple/favourites/ignored_games_service.dart';
 import 'package:how_many_mobile_meeple/model/game_night.dart';
 import 'package:how_many_mobile_meeple/model/model.dart';
+import 'package:how_many_mobile_meeple/platform/common/not_found_page.dart';
 import 'package:how_many_mobile_meeple/platform/pages.dart';
 import 'package:how_many_mobile_meeple/platform/web/url_fragment_encoder.dart';
 
@@ -70,10 +71,7 @@ class Router {
     GoRouter.optionURLReflectsImperativeAPIs = true;
     return GoRouter(
       routes: _routes(),
-      // Any unmatched path falls back to the home page; the model still reads
-      // the URL, so a malformed model link degrades to the home screen rather
-      // than an error page.
-      errorBuilder: (context, state) => Pages.platformPages().homePage(),
+      errorBuilder: (context, state) => NotFoundPage(location: state.uri),
     );
   }
 

@@ -92,12 +92,25 @@ class _GuidedFlowHomePageState extends State<GuidedFlowHomePage> {
   }
 
   void _syncGameNightMode(AppModel model) {
-    final value = model.settings.setting(Settings.gameNightMode.name).getBool();
+    final value =
+        _modeFromBareRoute() ??
+        model.settings.setting(Settings.gameNightMode.name).getBool();
     if (value != _showGameNight) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) setState(() => _showGameNight = value);
       });
     }
+  }
+
+  /// The mode a bare home route names by its path, or null when the location
+  /// carries the mode in its settings instead. Reading [GoRouterState] here
+  /// makes back/forward rebuild and re-sync this page.
+  bool? _modeFromBareRoute() {
+    if (GoRouter.maybeOf(context) == null) return null;
+    final path = GoRouterState.of(context).uri.path;
+    if (path == r.Router.homeRoute) return false;
+    if (path == r.Router.gameNightRoute) return true;
+    return null;
   }
 
   void _setGameNightMode(AppModel model, bool value) {
@@ -107,6 +120,10 @@ class _GuidedFlowHomePageState extends State<GuidedFlowHomePage> {
     model.settings.updateSetting(setting);
     model.updateStore();
     setState(() => _showGameNight = value);
+    // Mirror the mode into the URL so a copied link reopens it. The shared key
+    // (Router._homePage) means this rewrites the address bar without remounting.
+    final router = GoRouter.maybeOf(context);
+    router?.go(value ? r.Router.gameNightRoute : r.Router.homeRoute);
   }
 
   Widget _buildModeToggle(BuildContext context, AppModel model) {

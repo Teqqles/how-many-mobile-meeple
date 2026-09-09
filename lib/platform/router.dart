@@ -41,8 +41,10 @@ class Router {
   static const String gameNightRoute = '/gameNight';
 
   /// Bare routes that carry no encoded model. [UrlFragmentExtractor] uses this
-  /// to tell a plain navigation target (`/list`) from a model-bearing deep link
-  /// (`/list/<collection>?<settings>`).
+  /// to tell a plain navigation target (`/list`, `/gameNight`) from a
+  /// model-bearing deep link (`/list/<collection>?<settings>`). Only
+  /// `/gameNight/<collection>` carries a shared lineup; bare `/gameNight` is
+  /// just the mode-toggle mirror.
   static List<String> routeList = [
     randomRoute,
     listRoute,
@@ -50,6 +52,7 @@ class Router {
     insightsRoute,
     settingsRoute,
     homeRoute,
+    gameNightRoute,
   ];
 
   /// The app's single [GoRouter]. Built once so its state (and the browser
@@ -58,13 +61,21 @@ class Router {
   /// real Navigator pops - unlike the Navigator 1.0 API's single-entry history,
   /// which cancelled every popstate with `history.go(-1)` and bounced a
   /// re-visited tab off the app entirely.
-  static final GoRouter router = GoRouter(
-    routes: _routes(),
-    // Any unmatched path falls back to the home page; the model still reads the
-    // URL, so a malformed model link degrades to the home screen rather than an
-    // error page.
-    errorBuilder: (context, state) => Pages.platformPages().homePage(),
-  );
+  static final GoRouter router = _buildRouter();
+
+  static GoRouter _buildRouter() {
+    // Without this, go_router leaves the address bar on the previous location
+    // for context.push, so drawer pages (favourites, play log, insights, etc.)
+    // never appear in the URL. Keeps push's back-stack semantics.
+    GoRouter.optionURLReflectsImperativeAPIs = true;
+    return GoRouter(
+      routes: _routes(),
+      // Any unmatched path falls back to the home page; the model still reads
+      // the URL, so a malformed model link degrades to the home screen rather
+      // than an error page.
+      errorBuilder: (context, state) => Pages.platformPages().homePage(),
+    );
+  }
 
   // Each model-bearing route (`/`, `/gameNight`, `/list`, `/random`) is
   // registered twice: bare, and with a `:payload` segment for the encoded
@@ -77,11 +88,11 @@ class Router {
     return [
       GoRoute(
         path: homeRoute,
-        pageBuilder: (_, state) => _page(state, pages.homePage()),
+        pageBuilder: (_, state) => _homePage(pages.homePage()),
       ),
       GoRoute(
         path: gameNightRoute,
-        pageBuilder: (_, state) => _page(state, pages.homePage()),
+        pageBuilder: (_, state) => _homePage(pages.homePage()),
       ),
       GoRoute(
         path: '$gameNightRoute/:payload',
@@ -213,6 +224,13 @@ class Router {
 
   static Page<dynamic> _page(GoRouterState state, Widget child) =>
       MaterialPage(key: ValueKey(state.uri.toString()), child: child);
+
+  /// A fixed key shared by the bare `/` and `/gameNight` routes so toggling the
+  /// mode rewrites the URL without remounting, keeping guided-flow step state.
+  /// (The `/gameNight/<collection>` deep link still keys by location via [_page]
+  /// so re-visiting a shared link remounts and re-reads its lineup.)
+  static Page<dynamic> _homePage(Widget child) =>
+      MaterialPage(key: const ValueKey('home'), child: child);
 
   static Page<dynamic> _helpPage(GoRouterState state, String? section) => _page(
     state,

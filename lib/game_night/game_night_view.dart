@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:go_router/go_router.dart';
 import 'package:how_many_mobile_meeple/components/platform_independent_image.dart';
 import 'package:how_many_mobile_meeple/favourites/favourites_service.dart';
 import 'package:how_many_mobile_meeple/favourites/ignored_games_service.dart';
@@ -302,6 +303,11 @@ class _GameNightViewState extends State<GameNightView> {
     _regenerate();
   }
 
+  void _openGameDetail(BuildContext context, Game game) {
+    final name = game.name.replaceAll(' ', '+');
+    context.push('${r.Router.gameDetailRoute}/$name/${game.id}');
+  }
+
   void _togglePin(GameNightSlot slot) {
     final game = _lineup.slot(slot);
     _releaseSharedLineup();
@@ -513,39 +519,59 @@ class _GameNightViewState extends State<GameNightView> {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            if (game != null) ...[
-              _buildThumbnail(context, game),
-              const SizedBox(width: 12),
-            ],
             Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    '$title · $subtitle',
-                    style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                      color: scheme.onSurface,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  if (game != null) ...[
-                    Text(
-                      game.name,
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
-                    const SizedBox(height: 6),
-                    _buildGameDetails(context, game),
-                  ] else
-                    Text(
-                      'No fit for this slot',
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        fontStyle: FontStyle.italic,
-                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+              child: InkWell(
+                key: ValueKey('game-night-open-${slot.name}'),
+                borderRadius: BorderRadius.circular(8),
+                // A filled slot opens its game detail; the mechanic dropdown
+                // nested below keeps its own tap handling.
+                onTap: game == null
+                    ? null
+                    : () => _openGameDetail(context, game),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (game != null) ...[
+                      _buildThumbnail(context, game),
+                      const SizedBox(width: 12),
+                    ],
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            '$title · $subtitle',
+                            style: Theme.of(context).textTheme.titleSmall
+                                ?.copyWith(
+                                  color: scheme.onSurface,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                          ),
+                          const SizedBox(height: 4),
+                          if (game != null) ...[
+                            Text(
+                              game.name,
+                              style: Theme.of(context).textTheme.titleMedium,
+                            ),
+                            const SizedBox(height: 6),
+                            _buildGameDetails(context, game),
+                          ] else
+                            Text(
+                              'No fit for this slot',
+                              style: Theme.of(context).textTheme.bodyMedium
+                                  ?.copyWith(
+                                    fontStyle: FontStyle.italic,
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurfaceVariant,
+                                  ),
+                            ),
+                          _buildSlotMechanic(context, slot),
+                        ],
                       ),
                     ),
-                  _buildSlotMechanic(context, slot),
-                ],
+                  ],
+                ),
               ),
             ),
             if (game != null)

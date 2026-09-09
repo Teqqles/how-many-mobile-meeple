@@ -224,6 +224,27 @@ void main() {
     expect(find.byIcon(Icons.push_pin), findsOneWidget);
   });
 
+  testWidgets('notes when every slot is pinned and clears on unpin', (
+    tester,
+  ) async {
+    final model = AppModel();
+    final setting = model.settings.setting(Settings.gameNightLineup.name)
+      ..value = '1-2-4-0'
+      ..enabled = true;
+    model.settings.updateSetting(setting);
+
+    await tester.pumpWidget(_wrap(model));
+    await tester.pump();
+
+    final notice = find.byKey(const ValueKey('game-night-pinned-notice'));
+    expect(notice, findsOneWidget);
+
+    await tester.tap(find.byIcon(Icons.push_pin).first);
+    await tester.pump();
+
+    expect(notice, findsNothing);
+  });
+
   testWidgets('play-history filter appears only once plays are loaded', (
     tester,
   ) async {

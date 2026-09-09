@@ -391,6 +391,7 @@ class _GameNightViewState extends State<GameNightView> {
             ),
           ],
           _buildSpareSummary(context),
+          _buildPinnedNotice(context),
           const SizedBox(height: 8),
           Row(
             children: [
@@ -662,6 +663,40 @@ class _GameNightViewState extends State<GameNightView> {
             label,
             style: Theme.of(context).textTheme.labelLarge
                 ?.copyWith(color: scheme.primary),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Every filled slot is pinned, so Regenerate can change nothing. True after
+  /// returning from a game's detail (the lineup is frozen) or once the user has
+  /// pinned each slot themselves.
+  bool get _allFilledSlotsPinned {
+    final filled = GameNightSlot.values.where(
+      (slot) => _lineup.slot(slot) != null,
+    );
+    return filled.isNotEmpty && filled.every(_pinned.containsKey);
+  }
+
+  /// Tells the user why Regenerate looks inert and how to free it up.
+  Widget _buildPinnedNotice(BuildContext context) {
+    if (!_allFilledSlotsPinned) return const SizedBox.shrink();
+    final color = Theme.of(context).colorScheme.primary;
+    return Padding(
+      key: const ValueKey('game-night-pinned-notice'),
+      padding: const EdgeInsets.only(bottom: 4),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.info_outline, size: 14, color: color),
+          const SizedBox(width: 6),
+          Flexible(
+            child: Text(
+              'All games pinned - unpin one to regenerate',
+              style: Theme.of(context).textTheme.bodySmall
+                  ?.copyWith(color: color),
+            ),
           ),
         ],
       ),

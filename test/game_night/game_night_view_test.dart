@@ -5,6 +5,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
 import 'package:how_many_mobile_meeple/favourites/favourite_game.dart';
 import 'package:how_many_mobile_meeple/favourites/favourites_service.dart';
 import 'package:how_many_mobile_meeple/favourites/ignored_games_service.dart';
@@ -58,6 +59,31 @@ Widget _wrap(AppModel model, {List<Game>? pool}) => MaterialApp(
       planner: GameNightPlanner(pick: (_) => 0),
     ),
   ),
+);
+
+/// Routed harness so a tap on a slot can navigate to the game-detail route,
+/// which the bare [_wrap] (Navigator 1.0) cannot resolve.
+GoRouter _routedGameNight(AppModel model, {List<Game>? pool}) => GoRouter(
+  routes: [
+    GoRoute(
+      path: '/',
+      builder: (_, _) => Scaffold(
+        body: GameNightView(
+          model: model,
+          pool: pool ?? _pool(),
+          planner: GameNightPlanner(pick: (_) => 0),
+        ),
+      ),
+    ),
+    GoRoute(
+      path: '/game/:name/:id',
+      builder: (_, state) => Scaffold(
+        body: Text(
+          'detail ${state.pathParameters['name']}/${state.pathParameters['id']}',
+        ),
+      ),
+    ),
+  ],
 );
 
 void main() {
@@ -137,6 +163,38 @@ void main() {
 
     expect(find.text('Titan'), findsOneWidget);
     expect(find.text('Epic'), findsNothing);
+  });
+
+  testWidgets('tapping a slot opens its game detail', (tester) async {
+    final router = _routedGameNight(AppModel());
+    await tester.pumpWidget(MaterialApp.router(routerConfig: router));
+
+    await tester.tap(find.text('Epic'));
+    await tester.pumpAndSettle();
+
+    // Epic is game id 2; spaces in a name become '+' in the path.
+    expect(find.text('detail Epic/2'), findsOneWidget);
+  });
+
+  testWidgets('an empty slot is not tappable', (tester) async {
+    final model = _modelWithDuration(300);
+    final setting = model.settings.setting(Settings.gameNightLineup.name)
+      ..value = '1-2-3-0'
+      ..enabled = true;
+    model.settings.updateSetting(setting);
+    final pool = [
+      _game(1, 'Quick', 15, 2.0),
+      _game(2, 'Epic', 120, 3.5),
+      _game(3, 'Mid', 60, 2.5),
+      _game(5, 'Closer', 20, 1.5),
+    ];
+    final router = _routedGameNight(model, pool: pool);
+    await tester.pumpWidget(MaterialApp.router(routerConfig: router));
+    await tester.pump();
+
+    final emptySlot = find.byKey(const ValueKey('game-night-open-outro'));
+    expect(emptySlot, findsOneWidget);
+    expect(tester.widget<InkWell>(emptySlot).onTap, isNull);
   });
 
   testWidgets('pinning a slot marks it pinned', (tester) async {

@@ -3,6 +3,11 @@
 All notable changes to this project are documented here.
 This file is auto-generated from conventional commits on each release.
 
+## [v2.35.1] - 2026-08-18
+
+### Added
+- Game Night lineup planner (#39)
+
 ## [v2.34.1] - 2026-08-17
 
 ### Added

@@ -1,6 +1,36 @@
 {
-  "version": "2.35.1",
+  "version": "3.0.0",
   "recent_changes": [
+    {
+      "type": "feat",
+      "scope": "",
+      "description": "note when every Game Night slot is pinned"
+    },
+    {
+      "type": "fix",
+      "scope": "",
+      "description": "keep the Game Night lineup when opening a game's detail"
+    },
+    {
+      "type": "feat",
+      "scope": "",
+      "description": "show a not-found page for unmatched routes"
+    },
+    {
+      "type": "feat",
+      "scope": "",
+      "description": "open game detail from a Game Night slot"
+    },
+    {
+      "type": "fix",
+      "scope": "",
+      "description": "reflect the current page in the browser URL"
+    },
+    {
+      "type": "fix",
+      "scope": "",
+      "description": "reliably restore shared Game Night lineup from permalink"
+    },
     {
       "type": "feat",
       "scope": "",

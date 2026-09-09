@@ -176,6 +176,23 @@ void main() {
     expect(find.text('detail Epic/2'), findsOneWidget);
   });
 
+  testWidgets('opening a game freezes the lineup so back shows it again', (
+    tester,
+  ) async {
+    final model = AppModel();
+    final router = _routedGameNight(model);
+    await tester.pumpWidget(MaterialApp.router(routerConfig: router));
+
+    await tester.tap(find.text('Epic'));
+    await tester.pumpAndSettle();
+
+    // Filler Quick(1), main Epic(2), backup Alt(4), no outro - stored as the
+    // URL-only lineup token that re-pins the same games on a remount.
+    final lineup = model.settings.setting(Settings.gameNightLineup.name);
+    expect(lineup.enabled, isTrue);
+    expect(lineup.getString(), '1-2-4-0');
+  });
+
   testWidgets('an empty slot is not tappable', (tester) async {
     final model = _modelWithDuration(300);
     final setting = model.settings.setting(Settings.gameNightLineup.name)

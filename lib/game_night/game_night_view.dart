@@ -304,8 +304,25 @@ class _GameNightViewState extends State<GameNightView> {
   }
 
   void _openGameDetail(BuildContext context, Game game) {
+    _holdLineupForReturn();
     final name = game.name.replaceAll(' ', '+');
     context.push('${r.Router.gameDetailRoute}/$name/${game.id}');
+  }
+
+  /// Freeze the current lineup before leaving for a game's detail, so returning
+  /// shows the same games rather than a fresh plan. Pins every filled slot for
+  /// the common case (this view stays mounted underneath the detail page), and
+  /// stores the lineup as the URL-only token so it is re-pinned even if the pool
+  /// refetches and remounts the view (see [_restoreSharedLineup]).
+  void _holdLineupForReturn() {
+    for (final slot in GameNightSlot.values) {
+      final game = _lineup.slot(slot);
+      if (game != null) _pinned[slot] = game;
+    }
+    final setting = widget.model.settings.setting(Settings.gameNightLineup.name)
+      ..value = GameNightPermalink.encode(_lineup)
+      ..enabled = true;
+    widget.model.settings.updateSetting(setting);
   }
 
   void _togglePin(GameNightSlot slot) {

@@ -44,7 +44,7 @@ class Router {
   /// to tell a plain navigation target (`/list`, `/gameNight`) from a
   /// model-bearing deep link (`/list/<collection>?<settings>`). Only
   /// `/gameNight/<collection>` carries a shared lineup; bare `/gameNight` is
-  /// just the mode-toggle mirror.
+  /// only the mode-toggle mirror.
   static List<String> routeList = [
     randomRoute,
     listRoute,

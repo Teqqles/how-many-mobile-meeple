@@ -498,7 +498,7 @@ class AppModel extends ChangeNotifier {
   /// so a recipient lands on the same collection, evening length, and exact
   /// games. Game Night mode itself rides in the URL's `/gameNight` path prefix
   /// (see Router.gameNightPermalink), not here. Built from defaults and carrying
-  /// only the handful of settings a Game Night actually reads, so the URL stays
+  /// only the handful of settings a Game Night reads, so the URL stays
   /// short and none of the one-game guided-flow filters (or the field whitelist,
   /// which buildGameNightRequest rebuilds from defaults anyway) leak in. The
   /// live settings are untouched.

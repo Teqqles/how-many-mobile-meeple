@@ -44,6 +44,13 @@ jobs:
           MINOR_COUNT=$(echo "$RELEVANT" | grep -ciE '^feat(\(.*\))?:' || true)
           PATCH_COUNT=$(echo "$RELEVANT" | grep -cviE '^feat(\(.*\))?:' || true)
 
+          # A breaking change is a `!` before the colon (e.g. feat!:, fix!:) or a
+          # `BREAKING CHANGE:` footer in any commit body, per Conventional Commits.
+          SUBJECT_BREAKING=$(echo "$RELEVANT" | grep -ciE '^[a-z]+(\(.*\))?!:' || true)
+          BODY_BREAKING=$(git log "${LATEST}..HEAD" --pretty=%b | grep -c 'BREAKING CHANGE' || true)
+          MAJOR_COUNT=$((SUBJECT_BREAKING + BODY_BREAKING))
+
+          echo "major_count=$MAJOR_COUNT" >> "$GITHUB_OUTPUT"
           echo "minor_count=$MINOR_COUNT" >> "$GITHUB_OUTPUT"
           echo "patch_count=$PATCH_COUNT" >> "$GITHUB_OUTPUT"
           echo "type=bump" >> "$GITHUB_OUTPUT"
@@ -52,6 +59,7 @@ jobs:
         if: steps.bump.outputs.type != 'skip'
         id: version
         run: |
+          MAJOR_COUNT="${{ steps.bump.outputs.major_count }}"
           MINOR_COUNT="${{ steps.bump.outputs.minor_count }}"
           PATCH_COUNT="${{ steps.bump.outputs.patch_count }}"
 
@@ -65,9 +73,13 @@ jobs:
           MINOR=$(echo "$LATEST" | sed 's/v//' | cut -d. -f2)
           PATCH=$(echo "$LATEST" | sed 's/v//' | cut -d. -f3)
 
-          if [ "$MINOR_COUNT" -gt 0 ]; then
+          if [ "$MAJOR_COUNT" -gt 0 ]; then
+            MAJOR=$((MAJOR + 1))
+            MINOR=0
+            PATCH=0
+          elif [ "$MINOR_COUNT" -gt 0 ]; then
             MINOR=$((MINOR + MINOR_COUNT))
-            PATCH=$PATCH_COUNT
+            PATCH=0
           else
             PATCH=$((PATCH + PATCH_COUNT))
           fi

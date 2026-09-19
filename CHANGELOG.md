@@ -3,6 +3,18 @@
 All notable changes to this project are documented here.
 This file is auto-generated from conventional commits on each release.
 
+## [v3.0.0] - 2026-09-09
+
+### Added
+- note when every Game Night slot is pinned
+- show a not-found page for unmatched routes
+- open game detail from a Game Night slot
+
+### Fixed
+- keep the Game Night lineup when opening a game's detail
+- reflect the current page in the browser URL
+- reliably restore shared Game Night lineup from permalink
+
 ## [v2.35.1] - 2026-08-18
 
 ### Added

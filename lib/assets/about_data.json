@@ -1,6 +1,11 @@
 {
-  "version": "3.0.0",
+  "version": "3.1.0",
   "recent_changes": [
+    {
+      "type": "feat",
+      "scope": "",
+      "description": "show which source each Game Night slot came from"
+    },
     {
       "type": "feat",
       "scope": "",
@@ -30,114 +35,133 @@
       "type": "fix",
       "scope": "",
       "description": "reliably restore shared Game Night lineup from permalink"
-    },
-    {
-      "type": "feat",
-      "scope": "",
-      "description": "Game Night lineup planner (#39)"
-    },
-    {
-      "type": "feat",
-      "scope": "",
-      "description": "Collection Insights dashboard (#107)"
-    },
-    {
-      "type": "feat",
-      "scope": "",
-      "description": "show live collection match counts on guided-flow steps"
-    },
-    {
-      "type": "feat",
-      "scope": "",
-      "description": "surface top-mechanic chips in guided flow, quick picks, and mechanics section"
-    },
-    {
-      "type": "feat",
-      "scope": "",
-      "description": "show top-mechanics chips above the mechanics filter"
-    },
-    {
-      "type": "feat",
-      "scope": "",
-      "description": "add top-mechanics quick-filter chips"
-    },
-    {
-      "type": "fix",
-      "scope": "",
-      "description": "clone Setting collection values instead of sharing them"
-    },
-    {
-      "type": "feat",
-      "scope": "",
-      "description": "retain collection analytics on AppModel"
-    },
-    {
-      "type": "feat",
-      "scope": "",
-      "description": "parse top_mechanics from collection analytics"
-    },
-    {
-      "type": "fix",
-      "scope": "",
-      "description": "seed filter defaults without a manual refresh"
-    },
-    {
-      "type": "fix",
-      "scope": "",
-      "description": "prevent inverted time range and align complexity floor in seeder"
-    },
-    {
-      "type": "feat",
-      "scope": "",
-      "description": "seed filter defaults from collection analytics on load"
-    },
-    {
-      "type": "feat",
-      "scope": "",
-      "description": "add FilterSeeder for position-only default seeding"
-    },
-    {
-      "type": "feat",
-      "scope": "",
-      "description": "add CollectionAnalyticsService"
-    },
-    {
-      "type": "fix",
-      "scope": "",
-      "description": "harden CollectionAnalytics parsing against malformed labels"
-    },
-    {
-      "type": "feat",
-      "scope": "",
-      "description": "add CollectionAnalytics parse model"
-    },
-    {
-      "type": "fix",
-      "scope": "",
-      "description": "stop shelf-of-shame infinite reload loop"
-    },
-    {
-      "type": "fix",
-      "scope": "",
-      "description": "stop shelf of shame deep link reload loop and show linked user's shelf"
-    },
-    {
-      "type": "feat",
-      "scope": "",
-      "description": "add dark mode with curated theme palettes"
-    },
-    {
-      "type": "feat",
-      "scope": "",
-      "description": "recently viewed games history in drawer"
-    },
-    {
-      "type": "feat",
-      "scope": "",
-      "description": "debounce slider persistence to reduce redundant writes"
     }
   ],
   "upcoming": [
+    {
+      "number": 139,
+      "title": "Game Night: prefer source where the player owns the most expansions",
+      "labels": []
+    },
+    {
+      "number": 138,
+      "title": "Client: host controls (close voting)",
+      "labels": [
+        "enhancement"
+      ]
+    },
+    {
+      "number": 137,
+      "title": "Client: results view (counts, ratio, promotion, closed state)",
+      "labels": [
+        "enhancement"
+      ]
+    },
+    {
+      "number": 136,
+      "title": "Client: voting view (per-game up/down, login-gated)",
+      "labels": [
+        "enhancement"
+      ]
+    },
+    {
+      "number": 135,
+      "title": "Client: create vote from a lineup + shareable poll link",
+      "labels": [
+        "enhancement"
+      ]
+    },
+    {
+      "number": 134,
+      "title": "Backend: close poll (owner-only) + reject votes when closed",
+      "labels": [
+        "enhancement"
+      ]
+    },
+    {
+      "number": 133,
+      "title": "Backend: tally + approval-ratio ordering + promotion (counts-only)",
+      "labels": [
+        "enhancement"
+      ]
+    },
+    {
+      "number": 132,
+      "title": "Backend: vote schema + upsert endpoint (dedupe + erasure)",
+      "labels": [
+        "enhancement"
+      ]
+    },
+    {
+      "number": 131,
+      "title": "Backend: poll + poll_game schema + create-poll endpoint",
+      "labels": [
+        "enhancement"
+      ]
+    },
+    {
+      "number": 130,
+      "title": "Privacy policy page + account/data deletion (GDPR erasure)",
+      "labels": [
+        "enhancement"
+      ]
+    },
+    {
+      "number": 129,
+      "title": "Client: login UI + gate protected actions",
+      "labels": [
+        "enhancement"
+      ]
+    },
+    {
+      "number": 128,
+      "title": "Client: Facebook SDK integration",
+      "labels": [
+        "enhancement"
+      ]
+    },
+    {
+      "number": 127,
+      "title": "Client: auth service + session storage + Google SDK",
+      "labels": [
+        "enhancement"
+      ]
+    },
+    {
+      "number": 126,
+      "title": "Backend: Facebook token verification + login endpoint",
+      "labels": [
+        "enhancement"
+      ]
+    },
+    {
+      "number": 125,
+      "title": "Backend: Google id-token verification + login endpoint",
+      "labels": [
+        "enhancement"
+      ]
+    },
+    {
+      "number": 124,
+      "title": "Backend: user table + session infra + /auth/me + logout",
+      "labels": [
+        "enhancement"
+      ]
+    },
+    {
+      "number": 123,
+      "title": "Game Night polls & voting",
+      "labels": [
+        "enhancement"
+      ]
+    },
+    {
+      "number": 122,
+      "title": "Accounts & OAuth sign-in (Google + Facebook)",
+      "labels": [
+        "enhancement"
+      ]
+    },
     {
       "number": 119,
       "title": "Expose expansion relationships for Game Night expansion slot",
@@ -200,41 +224,6 @@
     {
       "number": 71,
       "title": "Share a filtered search link",
-      "labels": []
-    },
-    {
-      "number": 68,
-      "title": "Game detail page shows a synopsis",
-      "labels": []
-    },
-    {
-      "number": 61,
-      "title": "List screen should show current filtering",
-      "labels": []
-    },
-    {
-      "number": 45,
-      "title": "Recommended because...",
-      "labels": []
-    },
-    {
-      "number": 44,
-      "title": "Adventure Mode - Explore Outside Your Comfort Zone",
-      "labels": []
-    },
-    {
-      "number": 43,
-      "title": "Compare Two Choices",
-      "labels": []
-    },
-    {
-      "number": 41,
-      "title": "Mood-Based Discovery",
-      "labels": []
-    },
-    {
-      "number": 26,
-      "title": "Repeated widget patterns not extracted",
       "labels": []
     }
   ]

@@ -9,23 +9,34 @@ import 'package:how_many_mobile_meeple/model/game_request.dart';
 import 'package:how_many_mobile_meeple/model/item.dart';
 
 import 'model/game.dart';
+import 'model/game_sources.dart';
 import 'model/games.dart';
 
 class LoadGames {
-  static Future<Games> fetchGames(GameRequest request) async {
+  static Future<Games> fetchGames(GameRequest request) async =>
+      (await fetchGamesWithSources(request)).games;
+
+  /// Fetches the pool plus a [GameSources] map of each game's origin, built
+  /// here because the merged pool keys games by name and loses it. Sources keep
+  /// request order so [GameSources] can apply its ranking.
+  static Future<({Games games, GameSources sources})> fetchGamesWithSources(
+    GameRequest request,
+  ) async {
     Games games = Games(gamesByName: Map<String, Game>());
 
-    final futures = request.items.itemList.map(
-      (item) => _fetchItem(item, request.headers),
+    final items = request.items.itemList;
+    final responses = await Future.wait(
+      items.map((item) => _fetchItem(item, request.headers)),
     );
-    final responses = await Future.wait(futures);
 
-    for (var response in responses) {
-      Games loadedGames = Games.fromJson(jsonDecode(response.body));
+    final loaded = <({Item item, List<Game> games})>[];
+    for (var i = 0; i < items.length; i++) {
+      final loadedGames = Games.fromJson(jsonDecode(responses[i].body));
       games.addGames(loadedGames);
+      loaded.add((item: items[i], games: loadedGames.games));
     }
 
-    return games;
+    return (games: games, sources: GameSources.fromSources(loaded));
   }
 
   static Future<http.Response> _fetchItem(

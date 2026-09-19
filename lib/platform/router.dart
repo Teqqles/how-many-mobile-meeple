@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:how_many_mobile_meeple/favourites/favourites_service.dart';
 import 'package:how_many_mobile_meeple/favourites/ignored_games_service.dart';
 import 'package:how_many_mobile_meeple/model/game_night.dart';
+import 'package:how_many_mobile_meeple/model/item.dart';
 import 'package:how_many_mobile_meeple/model/model.dart';
 import 'package:how_many_mobile_meeple/platform/common/not_found_page.dart';
 import 'package:how_many_mobile_meeple/platform/pages.dart';
@@ -274,11 +275,18 @@ class Router {
   /// prefix puts the recipient in Game Night mode, with the shared collection
   /// loaded and the games pinned (see GameNightView) - no `gameNightMode` flag
   /// needed.
-  static String gameNightPermalink(AppModel model, GameNightLineup lineup) {
+  static String gameNightPermalink(
+    AppModel model,
+    GameNightLineup lineup, {
+    Map<GameNightSlot, Item?> slotSources = const {},
+  }) {
     final location = UrlFragmentEncoder.encode(
       gameNightRoute,
       items: model.items,
-      settings: model.gameNightPermalinkSettings(lineup),
+      settings: model.gameNightPermalinkSettings(
+        lineup,
+        slotSources: slotSources,
+      ),
     );
     // location is a leading-slash path (+ query); join it to the current
     // origin. Building the string directly avoids Uri re-encoding the already

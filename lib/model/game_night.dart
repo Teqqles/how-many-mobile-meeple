@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:how_many_mobile_meeple/model/game.dart';
+import 'package:how_many_mobile_meeple/model/item.dart';
 
 /// The slots that make up an evening's lineup. The outro is a wind-down game
 /// played after the main on a long night; the optional expansion slot from the
@@ -30,33 +31,92 @@ class GameNightLineup {
 }
 
 /// Serialises a lineup's game ids for a shareable permalink and reads them
-/// back. The token is four `-`-separated ids in slot order, with `0` marking
-/// an empty slot, e.g. `12-45-0-8` (filler 12, main 45, no backup, outro 8).
+/// back. Four `-`-separated segments in slot order, `0` for an empty slot,
+/// e.g. `12-45-0-8`.
+///
+/// A segment may bake in its source as `id~<sourceToken>`, so a shared lineup
+/// shows the sender's provenance rather than each recipient's own. The source
+/// token is percent-encoded (with `-` and `~` also escaped) so neither
+/// separator appears inside it. A segment with no `~` is a plain id, so old
+/// sourceless links still decode.
 class GameNightPermalink {
   static const String _separator = '-';
+  static const String _sourceSeparator = '~';
 
-  static String encode(GameNightLineup lineup) => [
-    lineup.filler?.id ?? 0,
-    lineup.main?.id ?? 0,
-    lineup.backup?.id ?? 0,
-    lineup.outro?.id ?? 0,
-  ].join(_separator);
+  static const _slotOrder = [
+    GameNightSlot.filler,
+    GameNightSlot.main,
+    GameNightSlot.backup,
+    GameNightSlot.outro,
+  ];
 
-  /// Maps each slot to the game id carried in [token], skipping empty slots.
-  /// A malformed token yields an empty map so the lineup regenerates normally.
+  /// Encodes [lineup] as the permalink token, baking in each [slotSources]
+  /// entry that names a source for a filled slot.
+  static String encode(
+    GameNightLineup lineup, {
+    Map<GameNightSlot, Item?> slotSources = const {},
+  }) => _slotOrder
+      .map((slot) {
+        final game = lineup.slot(slot);
+        if (game == null) return '0';
+        final source = slotSources[slot];
+        if (source == null) return '${game.id}';
+        return '${game.id}$_sourceSeparator${_encodeSource(source)}';
+      })
+      .join(_separator);
+
+  /// Maps each slot to its game id, skipping empty slots. A malformed token
+  /// yields an empty map so the lineup regenerates normally.
   static Map<GameNightSlot, int> decode(String token) {
-    final ids = token.split(_separator).map(int.tryParse).toList();
-    if (ids.length != 4) return const {};
+    final segments = _segments(token);
+    if (segments == null) return const {};
 
-    final bySlot = {
-      GameNightSlot.filler: ids[0],
-      GameNightSlot.main: ids[1],
-      GameNightSlot.backup: ids[2],
-      GameNightSlot.outro: ids[3],
-    };
+    final bySlot = <GameNightSlot, int?>{};
+    for (var i = 0; i < _slotOrder.length; i++) {
+      bySlot[_slotOrder[i]] = int.tryParse(_idPart(segments[i]));
+    }
     bySlot.removeWhere((_, id) => id == null || id <= 0);
     return bySlot.map((slot, id) => MapEntry(slot, id!));
   }
+
+  /// Maps each slot that baked in a source to the [Item] it names. Plain-id
+  /// segments (old links, or an unknown source) and empty slots are absent.
+  static Map<GameNightSlot, Item> decodeSources(String token) {
+    final segments = _segments(token);
+    if (segments == null) return const {};
+
+    final bySlot = <GameNightSlot, Item>{};
+    for (var i = 0; i < _slotOrder.length; i++) {
+      final segment = segments[i];
+      final separator = segment.indexOf(_sourceSeparator);
+      if (separator < 0) continue;
+
+      final id = int.tryParse(segment.substring(0, separator));
+      if (id == null || id <= 0) continue;
+      bySlot[_slotOrder[i]] = Item.fromUrlToken(
+        segment.substring(separator + 1),
+      );
+    }
+    return bySlot;
+  }
+
+  /// The four raw slot segments, or null when [token] is not four segments.
+  static List<String>? _segments(String token) {
+    final segments = token.split(_separator);
+    return segments.length == _slotOrder.length ? segments : null;
+  }
+
+  static String _idPart(String segment) {
+    final separator = segment.indexOf(_sourceSeparator);
+    return separator < 0 ? segment : segment.substring(0, separator);
+  }
+
+  /// Percent-encodes a source token, also escaping `-` and `~` (untouched by
+  /// [Uri.encodeComponent]) so neither separator appears inside it.
+  static String _encodeSource(Item source) =>
+      Uri.encodeComponent(source.toUrlToken())
+          .replaceAll(_separator, '%2D')
+          .replaceAll(_sourceSeparator, '%7E');
 }
 
 /// Builds a Game Night lineup from a pool of games and a time budget.

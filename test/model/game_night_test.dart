@@ -4,6 +4,7 @@ library;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:how_many_mobile_meeple/model/game.dart';
 import 'package:how_many_mobile_meeple/model/game_night.dart';
+import 'package:how_many_mobile_meeple/model/item.dart';
 
 Game _game(
   int id,
@@ -392,6 +393,80 @@ void main() {
     test('a malformed token yields no pins', () {
       expect(GameNightPermalink.decode('nonsense'), isEmpty);
       expect(GameNightPermalink.decode('1-2-3'), isEmpty);
+    });
+
+    test('bakes a per-slot source token into the link', () {
+      final lineup = GameNightLineup(
+        filler: _game(12, 20),
+        main: _game(45, 90),
+        outro: _game(8, 25),
+      );
+      final token = GameNightPermalink.encode(
+        lineup,
+        slotSources: {
+          GameNightSlot.filler: Item('alice', itemType: ItemType.collection),
+          GameNightSlot.outro: Item('99', itemType: ItemType.geekList),
+        },
+      );
+
+      // filler carries a source, main has none, backup is empty, outro carries
+      // a geeklist source.
+      expect(token, '12~alice-45-0-8~99');
+    });
+
+    test('round-trips slot sources, including a username with a hyphen', () {
+      final lineup = GameNightLineup(
+        filler: _game(12, 20),
+        main: _game(45, 90),
+      );
+      final aliceBob = Item('alice-bob', itemType: ItemType.collection);
+      final geeklist = Item('12345', itemType: ItemType.geekList);
+
+      final token = GameNightPermalink.encode(
+        lineup,
+        slotSources: {
+          GameNightSlot.filler: aliceBob,
+          GameNightSlot.main: geeklist,
+        },
+      );
+
+      // The hyphen in the username must not be read as a slot separator.
+      expect(GameNightPermalink.decode(token), {
+        GameNightSlot.filler: 12,
+        GameNightSlot.main: 45,
+      });
+      expect(GameNightPermalink.decodeSources(token), {
+        GameNightSlot.filler: aliceBob,
+        GameNightSlot.main: geeklist,
+      });
+    });
+
+    test('encodes no source token when a slot has none', () {
+      final lineup = GameNightLineup(main: _game(45, 90));
+
+      final token = GameNightPermalink.encode(lineup);
+
+      expect(token, '0-45-0-0');
+      expect(GameNightPermalink.decodeSources(token), isEmpty);
+    });
+
+    test('accepts an old sourceless link and reads no sources from it', () {
+      const token = '12-45-0-8';
+
+      expect(GameNightPermalink.decode(token), {
+        GameNightSlot.filler: 12,
+        GameNightSlot.main: 45,
+        GameNightSlot.outro: 8,
+      });
+      expect(GameNightPermalink.decodeSources(token), isEmpty);
+    });
+
+    test('reads sources only from the segments that carry one', () {
+      const token = '12~alice-45-0-8';
+
+      expect(GameNightPermalink.decodeSources(token), {
+        GameNightSlot.filler: Item('alice', itemType: ItemType.collection),
+      });
     });
   });
 }

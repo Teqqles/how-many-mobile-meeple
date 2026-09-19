@@ -502,7 +502,10 @@ class AppModel extends ChangeNotifier {
   /// short and none of the one-game guided-flow filters (or the field whitelist,
   /// which buildGameNightRequest rebuilds from defaults anyway) leak in. The
   /// live settings are untouched.
-  Settings gameNightPermalinkSettings(GameNightLineup lineup) {
+  Settings gameNightPermalinkSettings(
+    GameNightLineup lineup, {
+    Map<GameNightSlot, Item?> slotSources = const {},
+  }) {
     final settings = Settings.defaultSettings();
 
     // Evening length, player count and the outro toggle shape the recipient's
@@ -518,7 +521,7 @@ class AppModel extends ChangeNotifier {
 
     final encodedLineup =
         settings.setting(Settings.gameNightLineup.name).clone()
-          ..value = GameNightPermalink.encode(lineup)
+          ..value = GameNightPermalink.encode(lineup, slotSources: slotSources)
           ..enabled = true;
     settings.updateSetting(encodedLineup);
     return settings;

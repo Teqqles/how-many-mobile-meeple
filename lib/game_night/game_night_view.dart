@@ -6,6 +6,8 @@ import 'package:how_many_mobile_meeple/favourites/favourites_service.dart';
 import 'package:how_many_mobile_meeple/favourites/ignored_games_service.dart';
 import 'package:how_many_mobile_meeple/model/game.dart';
 import 'package:how_many_mobile_meeple/model/game_night.dart';
+import 'package:how_many_mobile_meeple/model/game_sources.dart';
+import 'package:how_many_mobile_meeple/model/item.dart';
 import 'package:how_many_mobile_meeple/model/model.dart';
 import 'package:how_many_mobile_meeple/model/settings.dart';
 import 'package:how_many_mobile_meeple/platform/router.dart' as r;
@@ -17,12 +19,16 @@ import 'package:share_plus/share_plus.dart';
 class GameNightView extends StatefulWidget {
   final AppModel model;
   final List<Game> pool;
+
+  /// Which source each pool game came from, so a slot can show its provenance.
+  final GameSources sources;
   final GameNightPlanner planner;
 
   GameNightView({
     super.key,
     required this.model,
     required this.pool,
+    this.sources = const GameSources.empty(),
     GameNightPlanner? planner,
   }) : planner = planner ?? GameNightPlanner();
 
@@ -45,6 +51,16 @@ class _GameNightViewState extends State<GameNightView> {
   final Map<GameNightSlot, String> _slotMechanics = {};
   GameNightLineup _lineup = const GameNightLineup();
   _PlayFilter _playFilter = _PlayFilter.all;
+
+  /// The source shown on each filled slot's chip. Derived from [widget.sources]
+  /// as slots fill, except a slot restored from a shared link keeps the source
+  /// the link baked in (see [_sharedSources]).
+  final Map<GameNightSlot, Item> _slotSources = {};
+
+  /// Sources baked into a restored shared link, by slot. These win over the
+  /// recipient's own [widget.sources] for as long as the slot holds the shared
+  /// game, so every viewer of a link sees the sender's provenance.
+  final Map<GameNightSlot, Item> _sharedSources = {};
 
   /// True until the recipient of a shared lineup first edits it. While set, the
   /// planner leaves the slots the sender left empty empty, so the evening is
@@ -155,9 +171,15 @@ class _GameNightViewState extends State<GameNightView> {
     final token = setting.getString();
     if (token.isEmpty) return;
 
+    final sources = GameNightPermalink.decodeSources(token);
     GameNightPermalink.decode(token).forEach((slot, id) {
       final game = _findInPool(id);
-      if (game != null) _pinned[slot] = game;
+      if (game == null) return;
+      _pinned[slot] = game;
+      // The link's own source is authoritative, so every viewer sees the
+      // sender's provenance rather than one re-derived from their collection.
+      final source = sources[slot];
+      if (source != null) _sharedSources[slot] = source;
     });
     // Hold the shared lineup exactly as sent: empty slots stay empty until the
     // recipient edits it, rather than auto-filling with a fresh game each load.
@@ -172,7 +194,11 @@ class _GameNightViewState extends State<GameNightView> {
   }
 
   Future<void> _share() async {
-    final url = r.Router.gameNightPermalink(widget.model, _lineup);
+    final url = r.Router.gameNightPermalink(
+      widget.model,
+      _lineup,
+      slotSources: _slotSources,
+    );
     try {
       await SharePlus.instance.share(
         ShareParams(
@@ -216,7 +242,33 @@ class _GameNightViewState extends State<GameNightView> {
         playCounts: _playCounts,
         lockedEmpty: lockedEmpty,
       );
+      _syncSlotSources();
     });
+  }
+
+  /// Refreshes each slot's source chip to match the game now in it. A slot that
+  /// still holds the game a shared link pinned keeps the link's baked source;
+  /// every other filled slot takes the source from the fetched pool. Empty
+  /// slots carry none.
+  void _syncSlotSources() {
+    for (final slot in GameNightSlot.values) {
+      final game = _lineup.slot(slot);
+      if (game == null) {
+        _slotSources.remove(slot);
+        continue;
+      }
+      final shared = _sharedSources[slot];
+      if (shared != null && _pinned[slot]?.id == game.id) {
+        _slotSources[slot] = shared;
+        continue;
+      }
+      final source = widget.sources.sourceFor(game.id);
+      if (source != null) {
+        _slotSources[slot] = source;
+      } else {
+        _slotSources.remove(slot);
+      }
+    }
   }
 
   /// The recipient of a shared lineup has started editing it, so drop the hold
@@ -320,7 +372,7 @@ class _GameNightViewState extends State<GameNightView> {
       if (game != null) _pinned[slot] = game;
     }
     final setting = widget.model.settings.setting(Settings.gameNightLineup.name)
-      ..value = GameNightPermalink.encode(_lineup)
+      ..value = GameNightPermalink.encode(_lineup, slotSources: _slotSources)
       ..enabled = true;
     widget.model.settings.updateSetting(setting);
   }
@@ -571,6 +623,7 @@ class _GameNightViewState extends State<GameNightView> {
                               game.name,
                               style: Theme.of(context).textTheme.titleMedium,
                             ),
+                            _buildSourceChip(context, slot),
                             const SizedBox(height: 6),
                             _buildGameDetails(context, game),
                           ] else
@@ -606,6 +659,45 @@ class _GameNightViewState extends State<GameNightView> {
                       icon: const Icon(Icons.push_pin_outlined),
                       onPressed: () => _togglePin(slot),
                     ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// A chip naming the source a slot's game came from - a collection or a
+  /// geeklist - each with its own icon. Absent when the source is unknown (e.g.
+  /// a trending-games pool, or a game the fetched sources did not place).
+  Widget _buildSourceChip(BuildContext context, GameNightSlot slot) {
+    final source = _slotSources[slot];
+    if (source == null) return const SizedBox.shrink();
+
+    final scheme = Theme.of(context).colorScheme;
+    final isGeeklist = source.itemType == ItemType.geekList;
+    return Padding(
+      key: ValueKey('game-night-source-${slot.name}'),
+      padding: const EdgeInsets.only(top: 4),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+        decoration: BoxDecoration(
+          color: scheme.secondaryContainer,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: scheme.outlineVariant),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              isGeeklist ? Icons.format_list_bulleted : Icons.person_outline,
+              size: 13,
+              color: scheme.onSecondaryContainer,
+            ),
+            const SizedBox(width: 4),
+            Text(
+              source.name,
+              style: Theme.of(context).textTheme.bodySmall
+                  ?.copyWith(color: scheme.onSecondaryContainer),
+            ),
           ],
         ),
       ),

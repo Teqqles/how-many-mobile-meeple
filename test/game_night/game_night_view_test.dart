@@ -12,6 +12,8 @@ import 'package:how_many_mobile_meeple/favourites/ignored_games_service.dart';
 import 'package:how_many_mobile_meeple/game_night/game_night_view.dart';
 import 'package:how_many_mobile_meeple/model/game.dart';
 import 'package:how_many_mobile_meeple/model/game_night.dart';
+import 'package:how_many_mobile_meeple/model/game_sources.dart';
+import 'package:how_many_mobile_meeple/model/item.dart';
 import 'package:how_many_mobile_meeple/model/model.dart';
 import 'package:how_many_mobile_meeple/model/play_data.dart';
 import 'package:how_many_mobile_meeple/model/settings.dart';
@@ -51,15 +53,17 @@ AppModel _modelWithDuration(int minutes) {
   return model;
 }
 
-Widget _wrap(AppModel model, {List<Game>? pool}) => MaterialApp(
-  home: Scaffold(
-    body: GameNightView(
-      model: model,
-      pool: pool ?? _pool(),
-      planner: GameNightPlanner(pick: (_) => 0),
-    ),
-  ),
-);
+Widget _wrap(AppModel model, {List<Game>? pool, GameSources? sources}) =>
+    MaterialApp(
+      home: Scaffold(
+        body: GameNightView(
+          model: model,
+          pool: pool ?? _pool(),
+          sources: sources ?? const GameSources.empty(),
+          planner: GameNightPlanner(pick: (_) => 0),
+        ),
+      ),
+    );
 
 /// Routed harness so a tap on a slot can navigate to the game-detail route,
 /// which the bare [_wrap] (Navigator 1.0) cannot resolve.
@@ -387,6 +391,65 @@ void main() {
 
     expect(find.text('Duet'), findsNothing);
     expect(find.text('Party'), findsWidgets);
+  });
+
+  testWidgets('shows the source each slot came from', (tester) async {
+    final sources = GameSources.fromSources([
+      (
+        item: Item('alice', itemType: ItemType.collection),
+        games: [_game(1, 'Quick', 15, 2.0)],
+      ),
+      (
+        item: Item('999', itemType: ItemType.geekList),
+        games: [_game(2, 'Epic', 120, 3.5)],
+      ),
+    ]);
+
+    await tester.pumpWidget(_wrap(AppModel(), sources: sources));
+
+    // Filler is Quick (from alice's collection); main is Epic (from geeklist).
+    expect(
+      find.byKey(const ValueKey('game-night-source-filler')),
+      findsOneWidget,
+    );
+    expect(find.text('alice'), findsOneWidget);
+    expect(find.text('999'), findsOneWidget);
+  });
+
+  testWidgets('shows no source chip when the source is unknown', (
+    tester,
+  ) async {
+    await tester.pumpWidget(_wrap(AppModel()));
+
+    expect(
+      find.byKey(const ValueKey('game-night-source-filler')),
+      findsNothing,
+    );
+  });
+
+  testWidgets('a restored shared lineup shows the baked source', (
+    tester,
+  ) async {
+    // The link bakes the filler's source as bob's collection; the recipient's
+    // own pool says alice owns the same game. The baked source must win.
+    final model = AppModel();
+    final setting = model.settings.setting(Settings.gameNightLineup.name)
+      ..value = '1~bob-2-4-0'
+      ..enabled = true;
+    model.settings.updateSetting(setting);
+
+    final recipientSources = GameSources.fromSources([
+      (
+        item: Item('alice', itemType: ItemType.collection),
+        games: [_game(1, 'Quick', 15, 2.0)],
+      ),
+    ]);
+
+    await tester.pumpWidget(_wrap(model, sources: recipientSources));
+    await tester.pump();
+
+    expect(find.text('bob'), findsOneWidget);
+    expect(find.text('alice'), findsNothing);
   });
 
   testWidgets('offers a share action for a filled lineup', (tester) async {

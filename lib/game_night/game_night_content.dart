@@ -5,6 +5,7 @@ import 'package:how_many_mobile_meeple/guided_flow/step1_select_source.dart';
 import 'package:how_many_mobile_meeple/load_games.dart';
 import 'package:how_many_mobile_meeple/model/game_night.dart';
 import 'package:how_many_mobile_meeple/model/game_request.dart';
+import 'package:how_many_mobile_meeple/model/game_sources.dart';
 import 'package:how_many_mobile_meeple/model/games.dart';
 import 'package:how_many_mobile_meeple/model/model.dart';
 
@@ -27,7 +28,7 @@ class GameNightContent extends StatefulWidget {
 }
 
 class _GameNightContentState extends State<GameNightContent> {
-  Future<Games>? _pool;
+  Future<({Games games, GameSources sources})>? _pool;
   GameRequest? _poolRequest;
 
   @override
@@ -44,7 +45,7 @@ class _GameNightContentState extends State<GameNightContent> {
 
     final request = widget.model.buildGameNightRequest();
     if (_pool == null || request != _poolRequest) {
-      _pool = LoadGames.fetchGames(request);
+      _pool = LoadGames.fetchGamesWithSources(request);
       _poolRequest = request;
     }
 
@@ -52,7 +53,7 @@ class _GameNightContentState extends State<GameNightContent> {
       children: [
         _buildSourcesPanel(context),
         Expanded(
-          child: FutureBuilder<Games>(
+          child: FutureBuilder<({Games games, GameSources sources})>(
             future: _pool,
             builder: (context, snapshot) {
               if (snapshot.hasError) {
@@ -72,7 +73,8 @@ class _GameNightContentState extends State<GameNightContent> {
               }
               return GameNightView(
                 model: widget.model,
-                pool: snapshot.data!.games,
+                pool: snapshot.data!.games.games,
+                sources: snapshot.data!.sources,
                 planner: widget.planner,
               );
             },

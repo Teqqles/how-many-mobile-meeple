@@ -31,16 +31,14 @@ class GameNightLineup {
 }
 
 /// Serialises a lineup's game ids for a shareable permalink and reads them
-/// back. The token is four `-`-separated segments in slot order, with `0`
-/// marking an empty slot, e.g. `12-45-0-8` (filler 12, main 45, no backup,
-/// outro 8).
+/// back. Four `-`-separated segments in slot order, `0` for an empty slot,
+/// e.g. `12-45-0-8`.
 ///
-/// A segment may bake in the source a slot's game came from, so a shared lineup
-/// shows the sender's provenance to every viewer rather than each recipient's
-/// own. Such a segment is `id~<sourceToken>`; the source token is
-/// percent-encoded (with `-` and `~` also escaped) so neither separator can
-/// appear inside it. A segment with no `~` is a plain id, so old sourceless
-/// links keep working.
+/// A segment may bake in its source as `id~<sourceToken>`, so a shared lineup
+/// shows the sender's provenance rather than each recipient's own. The source
+/// token is percent-encoded (with `-` and `~` also escaped) so neither
+/// separator appears inside it. A segment with no `~` is a plain id, so old
+/// sourceless links still decode.
 class GameNightPermalink {
   static const String _separator = '-';
   static const String _sourceSeparator = '~';
@@ -52,9 +50,8 @@ class GameNightPermalink {
     GameNightSlot.outro,
   ];
 
-  /// Encodes [lineup] as the permalink token. When [slotSources] names a source
-  /// for a filled slot, that slot bakes in the source token; otherwise the slot
-  /// is a plain id.
+  /// Encodes [lineup] as the permalink token, baking in each [slotSources]
+  /// entry that names a source for a filled slot.
   static String encode(
     GameNightLineup lineup, {
     Map<GameNightSlot, Item?> slotSources = const {},
@@ -68,8 +65,8 @@ class GameNightPermalink {
       })
       .join(_separator);
 
-  /// Maps each slot to the game id carried in [token], skipping empty slots.
-  /// A malformed token yields an empty map so the lineup regenerates normally.
+  /// Maps each slot to its game id, skipping empty slots. A malformed token
+  /// yields an empty map so the lineup regenerates normally.
   static Map<GameNightSlot, int> decode(String token) {
     final segments = _segments(token);
     if (segments == null) return const {};
@@ -82,9 +79,8 @@ class GameNightPermalink {
     return bySlot.map((slot, id) => MapEntry(slot, id!));
   }
 
-  /// Maps each slot that baked in a source to the [Item] it names. Slots with a
-  /// plain id (old links, or a slot whose source was unknown) are absent, as are
-  /// empty slots. A malformed token yields an empty map.
+  /// Maps each slot that baked in a source to the [Item] it names. Plain-id
+  /// segments (old links, or an unknown source) and empty slots are absent.
   static Map<GameNightSlot, Item> decodeSources(String token) {
     final segments = _segments(token);
     if (segments == null) return const {};
@@ -105,8 +101,6 @@ class GameNightPermalink {
   }
 
   /// The four raw slot segments, or null when [token] is not four segments.
-  /// Source tokens are percent-encoded so they never contain [_separator],
-  /// leaving exactly four segments for a well-formed token.
   static List<String>? _segments(String token) {
     final segments = token.split(_separator);
     return segments.length == _slotOrder.length ? segments : null;
@@ -117,9 +111,8 @@ class GameNightPermalink {
     return separator < 0 ? segment : segment.substring(0, separator);
   }
 
-  /// Percent-encodes a source's URL token, additionally escaping `-` and `~`
-  /// (which [Uri.encodeComponent] leaves untouched) so neither the slot nor the
-  /// source separator can appear inside it.
+  /// Percent-encodes a source token, also escaping `-` and `~` (untouched by
+  /// [Uri.encodeComponent]) so neither separator appears inside it.
   static String _encodeSource(Item source) =>
       Uri.encodeComponent(source.toUrlToken())
           .replaceAll(_separator, '%2D')

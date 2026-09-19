@@ -16,11 +16,9 @@ class LoadGames {
   static Future<Games> fetchGames(GameRequest request) async =>
       (await fetchGamesWithSources(request)).games;
 
-  /// Fetches the pool and, alongside it, a [GameSources] map recording which
-  /// source each game came from - built here because the merged pool keys games
-  /// by name and loses that origin. Sources are recorded in the order they were
-  /// requested so [GameSources] can apply its collection-before-geeklist,
-  /// add-order-then rule.
+  /// Fetches the pool plus a [GameSources] map of each game's origin, built
+  /// here because the merged pool keys games by name and loses it. Sources keep
+  /// request order so [GameSources] can apply its ranking.
   static Future<({Games games, GameSources sources})> fetchGamesWithSources(
     GameRequest request,
   ) async {

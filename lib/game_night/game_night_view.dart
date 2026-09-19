@@ -52,14 +52,11 @@ class _GameNightViewState extends State<GameNightView> {
   GameNightLineup _lineup = const GameNightLineup();
   _PlayFilter _playFilter = _PlayFilter.all;
 
-  /// The source shown on each filled slot's chip. Derived from [widget.sources]
-  /// as slots fill, except a slot restored from a shared link keeps the source
-  /// the link baked in (see [_sharedSources]).
+  /// The source shown on each filled slot's chip.
   final Map<GameNightSlot, Item> _slotSources = {};
 
-  /// Sources baked into a restored shared link, by slot. These win over the
-  /// recipient's own [widget.sources] for as long as the slot holds the shared
-  /// game, so every viewer of a link sees the sender's provenance.
+  /// Sources baked into a restored shared link. These beat [widget.sources]
+  /// while the slot holds the shared game, so every viewer sees the sender's.
   final Map<GameNightSlot, Item> _sharedSources = {};
 
   /// True until the recipient of a shared lineup first edits it. While set, the
@@ -176,8 +173,7 @@ class _GameNightViewState extends State<GameNightView> {
       final game = _findInPool(id);
       if (game == null) return;
       _pinned[slot] = game;
-      // The link's own source is authoritative, so every viewer sees the
-      // sender's provenance rather than one re-derived from their collection.
+      // The link's source is authoritative, not one re-derived per recipient.
       final source = sources[slot];
       if (source != null) _sharedSources[slot] = source;
     });
@@ -246,10 +242,8 @@ class _GameNightViewState extends State<GameNightView> {
     });
   }
 
-  /// Refreshes each slot's source chip to match the game now in it. A slot that
-  /// still holds the game a shared link pinned keeps the link's baked source;
-  /// every other filled slot takes the source from the fetched pool. Empty
-  /// slots carry none.
+  /// Refreshes each slot's source chip. A slot still holding a shared-link game
+  /// keeps the baked source; others take it from the fetched pool.
   void _syncSlotSources() {
     for (final slot in GameNightSlot.values) {
       final game = _lineup.slot(slot);
@@ -665,9 +659,7 @@ class _GameNightViewState extends State<GameNightView> {
     );
   }
 
-  /// A chip naming the source a slot's game came from - a collection or a
-  /// geeklist - each with its own icon. Absent when the source is unknown (e.g.
-  /// a trending-games pool, or a game the fetched sources did not place).
+  /// A chip naming a slot's source, with a per-type icon. Absent when unknown.
   Widget _buildSourceChip(BuildContext context, GameNightSlot slot) {
     final source = _slotSources[slot];
     if (source == null) return const SizedBox.shrink();
